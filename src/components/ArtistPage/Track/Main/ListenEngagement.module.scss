@@ -1,0 +1,56 @@
+.main {
+  height: 37px;
+  width: 820px;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1px solid lightgray;
+  button {
+    background-color: white;
+    font-size: 14px;
+    padding: 2px 10px 2px 11px;
+    height: 26px;
+    box-sizing: border-box;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    margin-right: 5px;
+    cursor: pointer;
+    svg,
+    span {
+      vertical-align: middle;
+      display: inline-block;
+    }
+    span {
+      margin-left: 3px;
+    }
+    &.repost svg {
+      font-size: 17px;
+    }
+  }
+  .stats {
+    color: #999999;
+    float: right;
+    font-size: 12px;
+    text-align: right;
+    .playStats,
+    .likeStats,
+    .repostStats {
+      display: inline-block;
+      margin-left: 15px;
+      svg,
+      span {
+        vertical-align: middle;
+        display: inline-block;
+      }
+      span {
+        margin-left: 3px;
+      }
+    }
+    .repostStats svg {
+      font-size: 17px;
+    }
+  }
+}

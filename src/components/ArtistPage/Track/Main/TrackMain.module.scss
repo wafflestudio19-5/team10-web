@@ -1,0 +1,22 @@
+.trackMain {
+  display: grid;
+  grid-template-columns: 880px 360px;
+  background-color: white;
+  padding: 0 30px;
+}
+.header {
+  display: grid;
+  grid-row: 2;
+  position: relative;
+}
+.infoComments {
+  position: relative;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 150px 670px;
+}
+.leftSide {
+  margin-top: 30px;
+  border-right: 1px solid rgb(231, 231, 231);
+  width: 850px;
+}
