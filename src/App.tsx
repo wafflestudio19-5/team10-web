@@ -1,7 +1,8 @@
 import React from "react";
+import TrackPage from "./components/ArtistPage/Track/TrackPage";
 
 function App() {
-  return <div></div>;
+  return <TrackPage />;
 }
 
 export default App;
