@@ -6,6 +6,7 @@ import { BiRepost } from "react-icons/bi";
 import { FaPlay } from "react-icons/fa";
 import { FcComments } from "react-icons/fc";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
+import { useHistory } from "react-router";
 
 interface ITrack {
   artistName: string;
@@ -18,6 +19,10 @@ interface ITrack {
 const Track = ({ track }: { track: ITrack }) => {
   const [play, setPlay] = useState(false);
   const clickPlayButton = () => setPlay(!play);
+  const history = useHistory();
+  const clickUsername = () => history.push(`/${track.artistName}`);
+  const clickTrack = () =>
+    history.push(`/${track.artistName}/${track.trackName}`);
   return (
     <li className={styles.tracks}>
       <div className={styles.trackImage}>
@@ -26,8 +31,12 @@ const Track = ({ track }: { track: ITrack }) => {
         </div>
       </div>
       <div className={styles.trackInfo}>
-        <span className={styles.artistName}>{track.artistName}</span>
-        <span className={styles.trackName}>{track.trackName}</span>
+        <span className={styles.artistName} onClick={clickUsername}>
+          {track.artistName}
+        </span>
+        <span className={styles.trackName} onClick={clickTrack}>
+          {track.trackName}
+        </span>
         <div className={styles.miniStats}>
           <div className={styles.statContainer}>
             <div>
