@@ -22,7 +22,7 @@ const TrackMain = () => {
           </div>
         </div>
       </div>
-      <div className={styles.sideBar}></div>
+      <div className={styles.side}></div>
     </div>
   );
 };
