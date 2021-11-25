@@ -9,6 +9,7 @@ $gradient-angle: random(4) * 90;
     lighten($gradient-color-1, 10%)
   );
   position: relative;
+  top: 46px;
 }
 .trackInfo {
   float: left;
