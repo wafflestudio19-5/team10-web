@@ -3,7 +3,7 @@ import styles from "./TrackHeader.module.scss";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useHistory } from "react-router";
 
-const TrackHeader = () => {
+const TrackHeader = ({ openModal }: { openModal: () => void }) => {
   const [play, setPlay] = useState(false);
   const clickPlayButton = () => setPlay(!play);
   const history = useHistory();
@@ -32,7 +32,7 @@ const TrackHeader = () => {
           #{tags[0]}
         </div>
       </div>
-      <div className={styles.albumImage} />
+      <div className={styles.albumImage} onClick={openModal} />
     </div>
   );
 };
