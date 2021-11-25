@@ -11,14 +11,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    span {
-      margin-left: 5px;
-    }
-    .viewAll {
-      cursor: pointer;
-      &:hover {
+    cursor: pointer;
+    &:hover {
+      .viewAll {
         color: black;
       }
+    }
+    span {
+      margin-left: 5px;
     }
   }
   .trackList {

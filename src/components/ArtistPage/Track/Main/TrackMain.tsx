@@ -28,9 +28,9 @@ const TrackMain = () => {
       </div>
       <div className={styles.side}>
         <RelatedTracks />
-        <RepostUsers />
-        <LikeUsers />
         <InPlaylists />
+        <LikeUsers />
+        <RepostUsers />
       </div>
     </div>
   );

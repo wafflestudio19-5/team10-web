@@ -1,0 +1,40 @@
+.container {
+  width: 300px;
+  height: 90px;
+  box-sizing: border-box;
+  margin-top: 30px;
+}
+.title {
+  height: 30px;
+  border-bottom: 1px solid #f2f2f2;
+  font-size: 14px;
+  color: #999999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  &:hover {
+    .viewAll {
+      color: black;
+    }
+  }
+  span {
+    margin-left: 5px;
+  }
+}
+.userImages {
+  width: 300px;
+  height: 65px;
+  padding: 10px 0px 8px 0px;
+  .image {
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: gray;
+    border: 1px solid white;
+    display: inline-block;
+    margin-left: -7px;
+  }
+}
