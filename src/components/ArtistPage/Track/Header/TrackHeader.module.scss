@@ -58,6 +58,7 @@ $gradient-angle: random(4) * 90;
       color: lightgray;
       padding: 2px 7px;
       font-size: 16px;
+      cursor: pointer;
     }
   }
 }
@@ -73,7 +74,7 @@ $gradient-angle: random(4) * 90;
 .titleInfo {
   position: absolute;
   top: 30px;
-  right: 380px;
+  right: 390px;
   width: 75px;
   height: 67px;
   display: grid;

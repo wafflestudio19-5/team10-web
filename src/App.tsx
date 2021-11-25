@@ -15,7 +15,6 @@ function App() {
           <Route exact path="/discover" component={Discover} />
           <Route exact path="/you/library" component={ArtistPage} />
           <Route exact path="/username/trackname" component={TrackPage} />
-          <Redirect to="/discover" />
         </Switch>
       </BrowserRouter>
     </div>

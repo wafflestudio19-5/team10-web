@@ -22,6 +22,7 @@
     grid-template-columns: 50px 520px 90px;
     padding: 15px 0;
     .userImage {
+      cursor: pointer;
       div {
         height: 40px;
         width: 40px;
@@ -32,7 +33,13 @@
     .mainComment {
       color: #999999;
       font-size: 12px;
-      span {
+      .hoverClick {
+        cursor: pointer;
+        &:hover {
+          color: black;
+        }
+      }
+      .at {
         color: #cccccc;
       }
       .comment {

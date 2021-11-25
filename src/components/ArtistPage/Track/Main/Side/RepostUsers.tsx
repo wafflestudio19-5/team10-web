@@ -4,7 +4,7 @@ import { BiRepost } from "react-icons/bi";
 
 const RepostUsers = () => {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={{ marginBottom: "30px" }}>
       <div className={styles.title}>
         <div>
           <BiRepost />
