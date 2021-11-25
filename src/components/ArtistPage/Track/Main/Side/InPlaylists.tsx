@@ -30,7 +30,7 @@ const InPlaylists = () => {
       <div className={styles.title}>
         <div>
           <MdFeaturedPlayList />
-          <span>Related Tracks</span>
+          <span>In Playlists</span>
         </div>
         <span className={styles.viewAll}>View all</span>
       </div>

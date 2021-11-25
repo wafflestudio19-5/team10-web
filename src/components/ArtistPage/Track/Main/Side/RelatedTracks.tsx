@@ -58,19 +58,19 @@ const RelatedTracks = () => {
                     </div>
                   </div>
                   <div className={styles.statContainer}>
-                    <div>
+                    <div className={styles.pointer}>
                       <BsSuitHeartFill />
                       <span>{track.likes}</span>
                     </div>
                   </div>
                   <div className={styles.statContainer}>
-                    <div>
+                    <div className={styles.pointer}>
                       <BiRepost />
                       <span>{track.reposts}</span>
                     </div>
                   </div>
                   <div className={styles.statContainer}>
-                    <div>
+                    <div className={styles.pointer}>
                       <FcComments />
                       <span>{track.comments}</span>
                     </div>
