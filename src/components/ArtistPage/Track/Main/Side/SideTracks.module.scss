@@ -1,0 +1,69 @@
+.container {
+  margin-top: 30px;
+  height: 250px;
+  width: 300px;
+  box-sizing: border-box;
+  .title {
+    height: 30px;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 14px;
+    color: #999999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    span {
+      margin-left: 5px;
+    }
+    .viewAll {
+      cursor: pointer;
+    }
+  }
+  .trackList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  .tracks {
+    width: 300px;
+    height: 72px;
+    box-sizing: border-box;
+    padding: 5px 0px;
+    display: grid;
+    grid-template-columns: 60px 235px;
+    .trackImage {
+      padding: 5px;
+      width: 50px;
+      height: 50px;
+      border: 1px solid black;
+    }
+    .trackInfo {
+      margin-left: 10px;
+      display: grid;
+      .artistName,
+      .trackName {
+        font-size: 14px;
+      }
+      .artistName {
+        color: #999999;
+      }
+      .miniStats {
+        font-size: 11px;
+        color: #999999;
+        .statContainer {
+          display: inline-block;
+          margin-right: 5px;
+          div {
+            display: flex;
+            align-items: center;
+            svg path {
+              fill: #999999;
+            }
+            span {
+              margin-left: 2px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
