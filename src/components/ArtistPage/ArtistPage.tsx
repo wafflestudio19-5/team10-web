@@ -1,7 +1,5 @@
 function ArtistPage() {
-  return (
-    <div>HELLO</div>
-  );
+  return <div>HELLO</div>;
 }
 
 export default ArtistPage;

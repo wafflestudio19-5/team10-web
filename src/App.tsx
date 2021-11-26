@@ -1,17 +1,16 @@
-import React from "react";
-import { Switch, Route, useLocation } from "react-router-dom";
+import Login from "./components/Login/Login";
 import TrackPage from "./components/ArtistPage/Track/TrackPage";
 import Header from "./components/Header/Header";
 import Discover from "./components/Discover/Discover";
 import ArtistPage from "./components/ArtistPage/ArtistPage";
-import Login from "./components/Login/Login";
 import Logout from "./components/Logout/Logout";
+import { Switch, Route, useLocation } from "react-router-dom";
 
 function App() {
   const location = useLocation();
   return (
     <div>
-      {location.pathname !== "/" && <Header />}
+      {location.pathname !== "/" ? <Header /> : null}
       <Switch>
         <Route exact path="/" component={Login} />
         <Route exact path="/discover" component={Discover} />
