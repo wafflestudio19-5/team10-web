@@ -1,4 +1,5 @@
 import "./ArtistPage.scss";
+import ReactAudioPlayer from "react-audio-player";
 
 function ArtistPage() {
   return (
@@ -51,7 +52,11 @@ function ArtistPage() {
                 <div className={"trackname"}>TrackName</div>
               </div>
             </div>
-            <div className={"musicplayer"}>노래 플레이어</div>
+            <ReactAudioPlayer
+              className="player"
+              controls
+              src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+            />
             <div className={"comment"}>
               <img
                 src="https://lovemewithoutall.github.io/assets/images/kiki.jpg"
@@ -92,8 +97,6 @@ function ArtistPage() {
           </div>
         </div>
       </div>
-
-      <hr className={"divider"} />
     </div>
   );
 }

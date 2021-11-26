@@ -128,10 +128,9 @@
   margin-top: -3px;
 }
 
-.musicplayer {
+.player {
   width: 644px;
   height: 60px;
-  background-color: #ccc;
   margin-top: 10px;
   margin-bottom: 20px;
 }
@@ -185,9 +184,4 @@
   div {
     line-height: 22px;
   }
-}
-
-.divider {
-  height: calc(100vh - 422px);
-  color: #ccc;
 }
