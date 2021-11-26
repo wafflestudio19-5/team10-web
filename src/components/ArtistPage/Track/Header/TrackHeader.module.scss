@@ -63,7 +63,7 @@ $gradient-angle: random(4) * 90;
   }
 }
 .playingTrack {
-  border: 1px solid black;
+  //   border: 1px solid black;
   position: relative;
   top: 246px;
   left: 30px;
@@ -72,8 +72,9 @@ $gradient-angle: random(4) * 90;
   box-sizing: border-box;
   .audioPlayer {
     position: absolute;
-    top: 0;
     left: 0;
+    bottom: 0;
+    border-radius: 15px;
   }
 }
 .titleInfo {

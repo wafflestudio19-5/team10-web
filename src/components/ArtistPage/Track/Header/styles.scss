@@ -49,6 +49,7 @@ $rhap_font-family: inherit !default;
 
   .rhap_controls-section {
     margin-left: 8px;
+    display: none;
   }
 }
 
@@ -137,7 +138,7 @@ $rhap_font-family: inherit !default;
   top: -8px;
   background: $rhap_theme-color;
   border-radius: 50px;
-  box-shadow: rgba($rhap_theme-color, .5) 0 0 5px;
+  box-shadow: rgba($rhap_theme-color, 0.5) 0 0 5px;
 }
 
 .rhap_controls-section {
@@ -180,7 +181,6 @@ $rhap_font-family: inherit !default;
   font-size: 40px;
   width: 40px;
   height: 40px;
-  
 }
 
 .rhap_volume-controls {
@@ -239,11 +239,11 @@ $rhap_font-family: inherit !default;
   background: $rhap_theme-color;
   opacity: 0.9;
   border-radius: 50px;
-  box-shadow: rgba($rhap_theme-color, .5) 0 0 3px;
+  box-shadow: rgba($rhap_theme-color, 0.5) 0 0 3px;
   cursor: pointer;
 
   &:hover {
-    opacity: .9;
+    opacity: 0.9;
   }
 }
 
@@ -264,12 +264,12 @@ $rhap_font-family: inherit !default;
   cursor: pointer;
 
   &:hover {
-    opacity: .9;
-    transition-duration: .2s;
+    opacity: 0.9;
+    transition-duration: 0.2s;
   }
 
   &:active {
-    opacity: .95;
+    opacity: 0.95;
   }
 
   &:focus:not(:focus-visible) {
