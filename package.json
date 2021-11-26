@@ -18,13 +18,17 @@
     "react-scripts": "4.0.3",
     "sass": "^1.43.4",
     "typescript": "^4.1.2",
+    "bootstrap": "^5.1.3",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "winBuild": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "aws s3 sync ./build s3://waffle-team-10-s3 --profile=github-actions",
+    "invalidate": "aws cloudfront create-invalidation --profile=Arsture --distribution-id ETK0P7B0HTZ1T --paths / /index.html /error.html /service-worker.js /manifest.json /favicon.ico"
   },
   "eslintConfig": {
     "extends": [
