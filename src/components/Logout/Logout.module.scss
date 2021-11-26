@@ -1,13 +1,8 @@
-@media screen and (min-width: 920px) {
-  .box {
-    width: 90vw;
-  }
-}
-
 .box {
   padding: 46px 0 46px 0;
-  width: 920px;
-  height: calc(100vh-92px);
+  margin: auto;
+  width: 1240px;
+  height: calc(100vh - 92px);
   background-color: white;
   display: flex;
   justify-content: center;

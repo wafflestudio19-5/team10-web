@@ -1,27 +1,22 @@
-@media screen and (min-width: 920px) {
-  .box {
-    width: 90vw;
-  }
-}
-
 .box {
+  margin: auto;
   padding: 0 0 46px 0;
-  width: 920px;
-  height: calc(100vh-46px);
+  width: 1240px;
+  height: calc(100vh - 46px);
   background-color: white;
   display: block;
   justify-content: center;
   .upperline {
-    width: 920px;
+    width: 1240px;
     height: 5px;
     background-color: #ff5602;
   }
   .background {
-    width: 920px;
+    width: 1240px;
     height: 420px;
     background-image: url("../../BG.png");
-    background-position: 80% 50%;
-    background-size: 1200px;
+    background-position: 50% 40%;
+    background-size: 1240px;
     background-repeat: no-repeat;
     background-clip: padding-box;
     button {
@@ -70,6 +65,7 @@
       font-weight: 400;
     }
     .signUp {
+      margin-left: 500px;
       color: white;
       width: 210px;
       height: 46px;
