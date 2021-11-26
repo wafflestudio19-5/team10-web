@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import NewItems from "./NewItems";
 import styles from "./NewList.module.scss";
 
-const NewList = () => {
+const NewList = ({ listScroll }: any) => {
   const [newTrackList, setNewTrackList] = useState([
     {
       title: "strawberry moon",
@@ -41,17 +41,9 @@ const NewList = () => {
       setNewTrackList([...newTrackList]);
     }
   }, []);
-  const listScroll = useRef<HTMLDivElement>(null);
-  const handleScroll = () => {
-    listScroll.current?.scrollTo({
-      top: 350,
-      left: 350,
-      behavior: "smooth",
-    });
-  };
 
   return (
-    <div className={styles.newList} ref={listScroll} onClick={handleScroll}>
+    <div className={styles.newList} ref={listScroll}>
       {newTrackList.map((item) => (
         <NewItems title={item.title} img={item.img} />
       ))}

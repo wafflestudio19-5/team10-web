@@ -1,8 +1,27 @@
+import { useRef } from "react";
 import styles from "./Discover.module.scss";
 import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
 
 const Discover = () => {
+  const listScroll = useRef<HTMLDivElement>(null);
+  const rightButton = useRef<HTMLButtonElement>(null);
+  const leftButton = useRef<HTMLButtonElement>(null);
+  const handleScrollRight = () => {
+    listScroll.current?.scrollTo({
+      top: 350,
+      left: 340,
+      behavior: "smooth",
+    });
+    console.log(listScroll.current?.scrollLeft);
+  };
+  const handleScrollLeft = () => {
+    listScroll.current?.scrollTo({
+      top: 350,
+      left: 0,
+      behavior: "smooth",
+    });
+  };
   return (
     <div className={styles.box}>
       <div className={styles.main}>
@@ -17,7 +36,21 @@ const Discover = () => {
         <div className={styles.new}>
           <h2>New tracks</h2>
           <div>
-            <NewList />
+            <button
+              className={styles.left}
+              ref={leftButton}
+              onClick={handleScrollLeft}
+            >
+              &lt;
+            </button>
+            <button
+              className={styles.right}
+              ref={rightButton}
+              onClick={handleScrollRight}
+            >
+              &gt;
+            </button>
+            <NewList listScroll={listScroll} />
             {/* 아티스트 프로필이 있어야 가능 */}
           </div>
         </div>
