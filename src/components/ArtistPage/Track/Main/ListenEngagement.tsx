@@ -38,11 +38,11 @@ const ListenEngagement = () => {
         </div>
         <div className={styles.likeStats}>
           <BsSuitHeartFill />
-          <span>25.2K</span>
+          <span className={styles.pointer}>25.2K</span>
         </div>
         <div className={styles.repostStats}>
           <BiRepost />
-          <span>1,614</span>
+          <span className={styles.pointer}>1,614</span>
         </div>
       </div>
     </div>

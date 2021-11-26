@@ -55,6 +55,11 @@
     .likeStats,
     .repostStats {
       cursor: pointer;
+      .pointer {
+        &:hover {
+          color: black;
+        }
+      }
     }
   }
 }
