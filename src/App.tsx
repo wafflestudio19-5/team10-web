@@ -9,7 +9,7 @@ import { Switch, Route, useLocation } from "react-router-dom";
 function App() {
   const location = useLocation();
   return (
-    <div className="app">
+    <div>
       {location.pathname !== "/" ? <Header /> : null}
       <Switch>
         <Route exact path="/" component={Login} />

@@ -52,5 +52,14 @@
     .repostStats svg {
       font-size: 17px;
     }
+    .likeStats,
+    .repostStats {
+      cursor: pointer;
+      .pointer {
+        &:hover {
+          color: black;
+        }
+      }
+    }
   }
 }
