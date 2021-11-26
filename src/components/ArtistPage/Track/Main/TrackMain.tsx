@@ -5,6 +5,10 @@ import ListenArtistInfo from "./ListenArtistInfo";
 import ListenEngagement from "./ListenEngagement";
 import Comments from "./Comments";
 import styles from "./TrackMain.module.scss";
+import RelatedTracks from "./Side/RelatedTracks";
+import RepostUsers from "./Side/RepostUsers";
+import LikeUsers from "./Side/LikeUsers";
+import InPlaylists from "./Side/InPlaylists";
 
 const TrackMain = () => {
   return (
@@ -22,7 +26,12 @@ const TrackMain = () => {
           </div>
         </div>
       </div>
-      <div className={styles.sideBar}></div>
+      <div className={styles.side}>
+        <RelatedTracks />
+        <InPlaylists />
+        <LikeUsers />
+        <RepostUsers />
+      </div>
     </div>
   );
 };
