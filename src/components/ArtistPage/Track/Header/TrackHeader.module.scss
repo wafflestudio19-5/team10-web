@@ -70,6 +70,11 @@ $gradient-angle: random(4) * 90;
   height: 100px;
   width: 820px;
   box-sizing: border-box;
+  .audioPlayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 .titleInfo {
   position: absolute;
