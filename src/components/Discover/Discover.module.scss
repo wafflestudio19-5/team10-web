@@ -2,7 +2,7 @@
   margin: auto;
   padding: 46px 0 46px 0;
   width: 1240px;
-  height: calc(100vh - 92px);
+  height: calc(100vh);
   background-color: white;
   display: flex;
   flex-direction: row;
@@ -66,6 +66,7 @@
     width: 300px;
     border-left: solid #f2f2f2 2px;
     .likes {
+      margin-top: 40px;
       height: 200px;
       .header {
         margin: 0 20px 0 20px;
