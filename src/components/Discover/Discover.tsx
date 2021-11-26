@@ -1,4 +1,6 @@
 import styles from "./Discover.module.scss";
+import MostList from "./MostList/MostList";
+import NewList from "./NewList/NewList";
 
 const Discover = () => {
   return (
@@ -9,11 +11,15 @@ const Discover = () => {
             <h2>More of what you like</h2>
             <div>Suggestions based on what you've liked or played</div>
           </div>
-          <div>Slider</div>
+          <MostList />
+          {/* 아티스트 프로필이 있어야 가능 */}
         </div>
-        <div className={styles.recent}>
-          <h2>Recently Played</h2>
-          <div>Slider</div>
+        <div className={styles.new}>
+          <h2>New tracks</h2>
+          <div>
+            <NewList />
+            {/* 아티스트 프로필이 있어야 가능 */}
+          </div>
         </div>
       </div>
       <div className={styles.fluid}>
