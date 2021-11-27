@@ -1,6 +1,14 @@
+import { useHistory } from "react-router";
 import "./Header.scss";
+import Cookies from "universal-cookie";
 
 function Header() {
+  const history = useHistory();
+  const cookies = new Cookies();
+  const onSignOut = () => {
+    cookies.remove("jwt_token");
+    history.push("/");
+  };
   return (
     <div className={"header_bar"}>
       <div className={"header"}>
@@ -84,7 +92,7 @@ function Header() {
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a className="dropdown-item" href="#" onClick={onSignOut}>
                   Sign out
                 </a>
               </li>
