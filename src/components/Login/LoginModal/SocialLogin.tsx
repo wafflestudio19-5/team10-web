@@ -15,16 +15,23 @@ const SocialLogin = ({
     <div className="modal" onClick={(e) => e.stopPropagation()}>
       <div className="social">대충 소셜로그인</div>
       <div className="or">——————————— &nbsp;or&nbsp; ———————————</div>
-      <input
-        ref={input}
-        type="email"
-        placeholder="Your email addressor profile URL"
-        onChange={handleInput}
-        name="email"
-        value={email}
-        required
-      />
-      <button onClick={() => handleSignup()}>Continue</button>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSignup();
+        }}
+      >
+        <input
+          ref={input}
+          type="email"
+          placeholder="Your email addressor profile URL"
+          onChange={handleInput}
+          name="email"
+          value={email}
+          required
+        />
+        <button>Continue</button>
+      </form>
       <p>
         When registering, you agree that we may use your provided data for the
         registration and to send you notifications on our products and services.

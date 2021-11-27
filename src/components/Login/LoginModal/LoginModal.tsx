@@ -16,7 +16,7 @@ const LoginModal = ({
   const [inputs, setInputs] = useState({
     email: "",
     password: "",
-    age: undefined,
+    age: "",
     gender: "male",
     displayName: "",
   });
