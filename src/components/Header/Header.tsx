@@ -9,9 +9,7 @@ function Header() {
         </div>
 
         <div className={"header_menu"}>
-          <a className={"menu1"} href={"/discover"}>
-            Home
-          </a>
+          <a href={"/discover"}>Home</a>
           <a href={"/stream"}>Stream</a>
           <a href={"/you/library"}>Library</a>
         </div>
