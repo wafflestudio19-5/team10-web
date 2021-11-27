@@ -44,14 +44,15 @@
     list-style-type: none;
   }
 
+
   a {
     color: white;
     text-decoration: none;
   }
 }
 
-.menu1 {
-  background-color: #111;
+
+}
 }
 
 .search {
@@ -126,6 +127,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: url(https://a-v2.sndcdn.com/assets/images/activities-66caaa5e.svg) 50% 50% no-repeat;
 }
 
 .messages {
@@ -133,6 +135,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: url(https://a-v2.sndcdn.com/assets/images/messages-f517d0eb.svg) 50% 50% no-repeat;
 }
 
 .header_more {
