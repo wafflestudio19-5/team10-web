@@ -7,7 +7,7 @@ function Header() {
   const cookies = new Cookies();
   const onSignOut = () => {
     cookies.remove("jwt_token");
-    history.push("/");
+    history.push("/logout");
   };
   return (
     <div className={"header_bar"}>
@@ -17,9 +17,9 @@ function Header() {
         </div>
 
         <div className={"header_menu"}>
-          <a href={"/discover"}>Home</a>
-          <a href={"/stream"}>Stream</a>
-          <a href={"/you/library"}>Library</a>
+          <span onClick={() => history.push("/discover")}>Home</span>
+          <span onClick={() => history.push("/you/stream")}>Stream</span>
+          <span onClick={() => history.push("/you/library")}>Library</span>
         </div>
 
         <div className={"search"}>

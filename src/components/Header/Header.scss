@@ -37,22 +37,18 @@
   display: flex;
   flex-direction: row;
 
-  a {
+  span {
     width: 104px;
     line-height: 46px;
     text-align: center;
     list-style-type: none;
+    cursor: pointer;
   }
 
-
-  a {
+  span {
     color: white;
     text-decoration: none;
   }
-}
-
-
-}
 }
 
 .search {
@@ -127,7 +123,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url(https://a-v2.sndcdn.com/assets/images/activities-66caaa5e.svg) 50% 50% no-repeat;
+  background: url(https://a-v2.sndcdn.com/assets/images/activities-66caaa5e.svg)
+    50% 50% no-repeat;
 }
 
 .messages {
@@ -135,7 +132,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url(https://a-v2.sndcdn.com/assets/images/messages-f517d0eb.svg) 50% 50% no-repeat;
+  background: url(https://a-v2.sndcdn.com/assets/images/messages-f517d0eb.svg)
+    50% 50% no-repeat;
 }
 
 .header_more {
