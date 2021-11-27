@@ -140,15 +140,15 @@ function ArtistPage() {
 
           <Grid className={"artist-info"} columns={3} divided>
             <Grid.Row>
-              <Grid.Column>
+              <Grid.Column className="artist-info-text">
                 <div>Followers</div>
                 <text>213K</text>
               </Grid.Column>
-              <Grid.Column>
+              <Grid.Column className="artist-info-text">
                 <div>Following</div>
                 <text>5</text>
               </Grid.Column>
-              <Grid.Column>
+              <Grid.Column className="artist-info-text">
                 <div>Tracks</div>
                 <text>2</text>
               </Grid.Column>
