@@ -6,6 +6,7 @@
   background-color: #333;
   display: flex;
   justify-content: center;
+  z-index: 20;
 }
 
 .header {
@@ -43,13 +44,13 @@ a {
 }
 
 a {
-   color: white;
+   color: #ccc;
    text-decoration: none;
-}
-}
 
-.menu1 {
-  background-color: #111;
+   &:hover {
+     color: white;
+   }
+}
 }
 
 .search {
@@ -72,10 +73,14 @@ a {
   justify-content: center;
 
   a {
-      color: white;
+      color: #ccc;
       text-decoration: none;
       line-height: 46px;
       text-align: center;
+
+      &:hover {
+        color: white;
+      }
   }
 }
 
@@ -114,8 +119,12 @@ a {
 
   text {
       font-size: 14px;
-      color: white;
+      color: #ccc;
       line-height: 46px;
+
+      &:hover {
+        color: white;
+      }
   }
 }
 
@@ -125,6 +134,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: url(https://a-v2.sndcdn.com/assets/images/activities-66caaa5e.svg) 50% 50% no-repeat;
 }
 
 .messages {
@@ -132,6 +142,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: url(https://a-v2.sndcdn.com/assets/images/messages-f517d0eb.svg) 50% 50% no-repeat;
 }
 
 .header_more {
