@@ -1,0 +1,37 @@
+name: Workflow for S3 Deploy
+on: 
+  push:
+    branches:
+    - sprint1
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${ap-northeast-2}
+    steps:
+        - uses: actions/checkout@v1
+
+        - name: Install dependencies
+          run: npm
+
+        - name: Build
+          run: npm run build
+
+        - name: Deploy
+          uses: lbertenasco/s3-deploy@v1
+          with:
+            folder: build
+            bucket: ${waffle-soundcloud}
+            dist-id: ${E2C59T7GNQYU6N}
+            invalidation: / *
+
+        - name: Invalidate AWS CloudFront
+          uses: chetan/invalidate-cloudfront-action@v2.2
+          env:
+            DISTRIBUTION: ${{ secrets.DISTRIBUTION }}
+            PATHS: "/index.html"
+            AWS_REGION: "ap-northeast-2"
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
