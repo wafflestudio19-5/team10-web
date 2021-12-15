@@ -1,37 +1,49 @@
 name: Workflow for S3 Deploy
-on: 
+
+on:
   push:
     branches:
-    - sprint1
+      - sprint1
+      - sprint2
+      - sprint3
+      - sprint4
+
+
 jobs:
-  run:
+
+  build:
+
     runs-on: ubuntu-latest
+
+
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${ap-northeast-2}
+      AWS_DEFAULT_REGION: ap-northeast-2
+
     steps:
-        - uses: actions/checkout@v1
 
-        - name: Install dependencies
-          run: npm
+      - uses: actions/checkout@v2
 
-        - name: Build
-          run: npm run build
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+            
+      - name: Install Dependencies   
+         run: npm install
 
-        - name: Deploy
+      - name: Build
+         run: npm run build     
+
+      - name: Deploy
           uses: lbertenasco/s3-deploy@v1
           with:
             folder: build
-            bucket: ${waffle-soundcloud}
-            dist-id: ${E2C59T7GNQYU6N}
+            bucket: ${{ secrets.BUCKET_NAME }}
+            dist-id: ${{ secrets.DISTRIBUTION_ID }}
             invalidation: / *
-
-        - name: Invalidate AWS CloudFront
-          uses: chetan/invalidate-cloudfront-action@v2.2
-          env:
-            DISTRIBUTION: ${{ secrets.DISTRIBUTION }}
-            PATHS: "/index.html"
-            AWS_REGION: "ap-northeast-2"
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
