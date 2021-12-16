@@ -41,7 +41,15 @@
   border-radius: 50%;
   box-sizing: border-box;
   border: 1px solid lightgray;
+  overflow: hidden;
+  display: grid;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+  img {
+    height: 120px;
+    width: 120px;
+  }
 }
 .username {
   margin-top: 15px;

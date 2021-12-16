@@ -12,14 +12,14 @@ import InPlaylists from "./Side/InPlaylists";
 import { ITrack } from "../TrackPage";
 
 const TrackMain = ({ track }: { track: ITrack }) => {
-  const { artist, description, likes, reposts } = track;
+  const { artist, description } = track;
 
   return (
     <div className={styles.trackMain}>
       <div className={styles.leftSide}>
         <div className={styles.header}>
           <CommentsInput />
-          <ListenEngagement likes={likes} reposts={reposts} />
+          <ListenEngagement track={track} />
         </div>
         <div className={styles.infoComments}>
           <ListenArtistInfo artist={artist} />

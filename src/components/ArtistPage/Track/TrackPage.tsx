@@ -47,7 +47,7 @@ const TrackPage = () => {
       "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3",
     description: "트랙 정보",
     created_at: "1 year ago",
-    count: 0,
+    count: 134565,
     tags: ["Piano"],
     is_private: false,
     likes: 2649,
