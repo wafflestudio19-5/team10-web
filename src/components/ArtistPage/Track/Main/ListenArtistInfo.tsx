@@ -6,7 +6,7 @@ import { RiUserFollowFill } from "react-icons/ri";
 import { MdReport } from "react-icons/md";
 import { useHistory } from "react-router";
 
-const ListenArtistInfo = () => {
+const ListenArtistInfo = ({ artist }: { artist: string }) => {
   const followers = 6048;
   const tracks = 49;
   const history = useHistory();
@@ -14,11 +14,12 @@ const ListenArtistInfo = () => {
   const clickUsername = () => history.push(`/${username}`);
   const clickFollowers = () => history.push(`/${username}/followers`);
   const clickTracks = () => history.push(`/${username}/tracks`);
+
   return (
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}></div>
       <div className={styles.username} onClick={clickUsername}>
-        Username
+        {artist}
       </div>
       <ul className={styles.userInfo}>
         <li onClick={clickFollowers}>

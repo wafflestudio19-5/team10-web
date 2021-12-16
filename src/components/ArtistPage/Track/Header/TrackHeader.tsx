@@ -4,19 +4,22 @@ import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useHistory } from "react-router";
 import AudioPlayer from "react-h5-audio-player";
 import "./styles.scss";
+import { ITrack } from "../TrackPage";
 
-const TrackHeader = ({ openModal }: { openModal: () => void }) => {
+const TrackHeader = ({
+  openModal,
+  track,
+}: {
+  openModal: () => void;
+  track: ITrack;
+}) => {
   const [play, setPlay] = useState(false);
   const history = useHistory();
-  const username = "username";
-  const tags = ["Piano", "sad piano"];
+  const username = track.artist;
+  const tags = track.tags;
   const clickUsername = () => history.push(`/${username}`);
   const clickTag = () => history.push(`/tags/${tags[0]}`);
-  const playingAudio: any = useRef(
-    new Audio(
-      "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
-    )
-  );
+  const playingAudio: any = useRef(new Audio(track.audio));
   const clickPlayButton = () => {
     setPlay(true);
     console.log(playingAudio.current);
@@ -27,6 +30,7 @@ const TrackHeader = ({ openModal }: { openModal: () => void }) => {
     console.log(playingAudio.current);
     playingAudio.current && playingAudio.current.pause();
   };
+
   return (
     <div className={styles.trackHeader}>
       <div className={styles.trackInfo}>
@@ -40,9 +44,9 @@ const TrackHeader = ({ openModal }: { openModal: () => void }) => {
           </button>
         )}
         <div className={styles.soundTitle}>
-          <div className={styles.titleContainer}>Title</div>
+          <div className={styles.titleContainer}>{track.title}</div>
           <div className={styles.usernameContainer} onClick={clickUsername}>
-            username
+            {track.artist}
           </div>
         </div>
       </div>
@@ -55,12 +59,16 @@ const TrackHeader = ({ openModal }: { openModal: () => void }) => {
         />
       </div>
       <div className={styles.titleInfo}>
-        <div className={styles.releasedDate}>1 year ago</div>
+        <div className={styles.releasedDate}>{track.created_at}</div>
         <div className={styles.tag} onClick={clickTag}>
           #{tags[0]}
         </div>
       </div>
-      <div className={styles.albumImage} onClick={openModal} />
+      <div className={styles.albumImage} onClick={openModal}>
+        {track.image ? (
+          <img src={track.image} alt={`${track.title}의 트랙 이미지`} />
+        ) : null}
+      </div>
     </div>
   );
 };

@@ -109,8 +109,11 @@ $gradient-angle: random(4) * 90;
   top: 20px;
   width: 340px;
   height: 340px;
-  border: 1px solid black;
   right: 20px;
   background-color: white;
   cursor: pointer;
+  img {
+    width: 340px;
+    height: 340px;
+  }
 }

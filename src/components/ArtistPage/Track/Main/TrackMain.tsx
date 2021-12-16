@@ -9,19 +9,22 @@ import RelatedTracks from "./Side/RelatedTracks";
 import RepostUsers from "./Side/RepostUsers";
 import LikeUsers from "./Side/LikeUsers";
 import InPlaylists from "./Side/InPlaylists";
+import { ITrack } from "../TrackPage";
 
-const TrackMain = () => {
+const TrackMain = ({ track }: { track: ITrack }) => {
+  const { artist, description, likes, reposts } = track;
+
   return (
     <div className={styles.trackMain}>
       <div className={styles.leftSide}>
         <div className={styles.header}>
           <CommentsInput />
-          <ListenEngagement />
+          <ListenEngagement likes={likes} reposts={reposts} />
         </div>
         <div className={styles.infoComments}>
-          <ListenArtistInfo />
+          <ListenArtistInfo artist={artist} />
           <div>
-            <AudioInfo />
+            <AudioInfo description={description} />
             <Comments />
           </div>
         </div>

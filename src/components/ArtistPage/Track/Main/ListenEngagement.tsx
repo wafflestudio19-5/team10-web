@@ -6,7 +6,13 @@ import { ImShare } from "react-icons/im";
 import { FiLink2, FiMoreHorizontal } from "react-icons/fi";
 import { FaPlay } from "react-icons/fa";
 
-const ListenEngagement = () => {
+const ListenEngagement = ({
+  likes,
+  reposts,
+}: {
+  likes: number;
+  reposts: number;
+}) => {
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>
@@ -38,11 +44,11 @@ const ListenEngagement = () => {
         </div>
         <div className={styles.likeStats}>
           <BsSuitHeartFill />
-          <span className={styles.pointer}>25.2K</span>
+          <span className={styles.pointer}>{likes}</span>
         </div>
         <div className={styles.repostStats}>
           <BiRepost />
-          <span className={styles.pointer}>1,614</span>
+          <span className={styles.pointer}>{reposts}</span>
         </div>
       </div>
     </div>

@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "./AudioInfo.module.scss";
 
-const AudioInfo = () => {
+const AudioInfo = ({ description }: { description: string }) => {
   return (
     <div className={styles.main}>
-      트랙 정보
+      {description}
       <button>Show more</button>
     </div>
   );

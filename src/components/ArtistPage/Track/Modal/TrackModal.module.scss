@@ -46,7 +46,10 @@
 .trackImage {
   height: 500px;
   width: 500px;
-  border: 1px solid lightgray;
   position: relative;
   top: 18px;
+  img {
+    height: 500px;
+    width: 500px;
+  }
 }
