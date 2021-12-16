@@ -65,16 +65,112 @@ $gradient-angle: random(4) * 90;
 .playingTrack {
   // border: 1px solid black;
   position: relative;
-  top: 246px;
+  top: 220px;
   left: 30px;
   height: 100px;
   width: 820px;
   box-sizing: border-box;
-  .audioPlayer {
+  .barContainer {
+    width: 100%;
+  }
+
+  .progressBar {
+    --bar-bg: #ffffff;
+    --seek-before-width: 0;
+    --seek-before-color: #ff3f02;
+    --knobby: #ff3f02;
+    --selectedKnobby: #26c9c3;
+
+    appearance: none;
+    background: var(--bar-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 11px;
+    outline: none;
+  }
+  //   Safari
+  .progressBar::-webkit-slider-runnable-track {
+    background: var(--bar-bg);
+    border-radius: 10px;
+    position: relative;
+    width: 100%;
+    height: 11px;
+    outline: none;
+  }
+  //   Firefox
+  .progressBar::-moz-range-track {
+    background: var(--bar-bg);
+    border-radius: 10px;
+    position: relative;
+    width: 100%;
+    height: 11px;
+    outline: none;
+  }
+  .progressBar::-moz-focus-outer {
+    border: 0;
+  }
+  // Chrome & Safari
+  .progressBar::before {
+    content: "";
+    height: 11px;
+    width: var(--seek-before-width);
+    background-color: var(--seek-before-color);
+    border-radius: 10px;
     position: absolute;
+    top: 0;
     left: 0;
-    bottom: 0;
-    border-radius: 15px;
+    z-index: 3;
+    cursor: pointer;
+  }
+  /* progress bar - firefox */
+  .progressBar::-moz-range-progress {
+    background-color: var(--seek-before-color);
+    border-radius: 10px;
+    height: 11px;
+  }
+  /* knobby - chrome and safari */
+  .progressBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 0px;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 4;
+  }
+  /* knobby - firefox */
+  .progressBar::-moz-range-thumb {
+    width: 0px;
+    border-radius: 10px;
+    border: transparent;
+    cursor: pointer;
+    z-index: 4;
+  }
+}
+.trackPlayer {
+  display: grid;
+  grid-row: 2;
+  width: 100%;
+  .time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    height: 15px;
+    box-sizing: border-box;
+  }
+  .currentTime,
+  .duration {
+    font-size: 10px;
+    background: black;
+    letter-spacing: 1px;
+    padding: 2px;
+  }
+  .currentTime {
+    color: #ff3f02;
+  }
+  .duration {
+    color: #999999;
   }
 }
 .titleInfo {
