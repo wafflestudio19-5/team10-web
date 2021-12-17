@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Cookies from "universal-cookie";
 
@@ -21,7 +21,10 @@ const SignupAge = ({
   const cookies = new Cookies();
   const history = useHistory();
   const input = useRef<HTMLInputElement>(null);
-  input.current?.focus();
+  const input2 = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    input.current?.focus();
+  }, []);
   const [lastPage, setLastSign] = useState(false);
   const onClick = async () => {
     await axios
@@ -69,6 +72,7 @@ const SignupAge = ({
             onClick={() => {
               setNextSign(null);
               setLastSign(!lastPage);
+              input2.current?.focus();
             }}
           >
             Continue
@@ -81,7 +85,7 @@ const SignupAge = ({
           <input
             type="text"
             name="displayName"
-            ref={input}
+            ref={input2}
             value={displayName}
             onChange={handleInput}
           />

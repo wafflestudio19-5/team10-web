@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 
 const SignupPassword = ({
   email,
@@ -16,18 +17,28 @@ const SignupPassword = ({
   setGoSignup: any;
 }) => {
   const input = useRef<HTMLInputElement>(null);
-  input.current?.focus();
+  useEffect(() => {
+    input.current?.focus();
+  }, []);
+  const alertPwError = () => toast.error("비밀번호는 8글자 이상이어야 합니다");
+  const goNext = () => {
+    handlenextSign();
+    setGoSignup(null);
+  };
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <div className="title">Create your SoundCloud account</div>
+      <div className="title">Create your SoundWaffle account</div>
       <div className="prevEmail" onClick={handleSignup}>
         ◀️&nbsp;{email}
       </div>
       <form
         onClick={(e) => {
           e.preventDefault();
-          handlenextSign();
-          setGoSignup(null);
+          input.current?.value.length === undefined
+            ? alertPwError()
+            : input.current?.value.length < 8
+            ? alertPwError()
+            : goNext();
         }}
       >
         <label htmlFor="password" onClick={(e) => e.stopPropagation()}>

@@ -16,9 +16,11 @@ const Login = () => {
           <button className={styles.signIn} onClick={handleModal}>
             Sign in
           </button>
-          <button className={styles.createAccount}>Create account</button>
+          <button className={styles.createAccount} onClick={handleModal}>
+            Create account
+          </button>
         </div>
-        <p className={styles.texthighlight}>Connect on SoundCloud</p>
+        <p className={styles.texthighlight}>Connect on SoundWaffle</p>
         <p className={styles.textdetail}>
           Discover, stream, and share a constantly expanding mix of music
           <br />
