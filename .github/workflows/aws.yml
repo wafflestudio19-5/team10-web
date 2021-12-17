@@ -3,6 +3,7 @@ name: Workflow for S3 Deploy
 on:
   push:
     branches:
+      - master
       - sprint1
       - sprint2
       - sprint3
