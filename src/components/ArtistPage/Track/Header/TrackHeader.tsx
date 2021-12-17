@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./TrackHeader.module.scss";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useHistory } from "react-router";
-// import AudioPlayer from "react-h5-audio-player";
 import "./styles.scss";
 import { ITrack } from "../TrackPage";
+import { useColor } from "color-thief-react";
 
 const TrackHeader = ({
   openModal,
@@ -26,15 +26,7 @@ const TrackHeader = ({
   const audioPlayer = useRef<HTMLAudioElement>(new Audio());
   const progressBar = useRef<any>(null);
   const animationRef = useRef(0);
-
-  useEffect(() => {
-    const seconds = Math.floor(audioPlayer.current.duration);
-    setDuration(seconds);
-    progressBar.current.max = seconds;
-  }, [
-    audioPlayer?.current?.onloadedmetadata,
-    audioPlayer?.current?.readyState,
-  ]);
+  const trackHeader = useRef<HTMLDivElement>(null);
 
   const onLoadedMetadata = () => {
     const seconds = Math.floor(audioPlayer.current.duration);
@@ -75,13 +67,39 @@ const TrackHeader = ({
   const changePlayerCurrentTime = () => {
     progressBar.current.style.setProperty(
       "--seek-before-width",
-      `${(progressBar.current.value / duration) * 100}%`
+      `${(progressBar.current.value / duration) * 100 + 0.5}%`
     );
     setCurrentTime(progressBar.current.value);
   };
 
+  const onPlayerClick = () => {
+    setIsPlaying(true);
+    audioPlayer.current.play();
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
+
+  const onEnded = () => {
+    setIsPlaying(false);
+    audioPlayer.current.pause();
+  };
+
+  const { data } = useColor(track.image, "rgbArray", {
+    crossOrigin: "anonymous",
+    quality: 10,
+  });
+  useEffect(() => {
+    const { current } = trackHeader;
+    if (current !== null && data !== undefined) {
+      const [red, green, blue] = data;
+      current.style.setProperty("--red", `${red}`);
+      current.style.setProperty("--green", `${green}`);
+      current.style.setProperty("--blue", `${blue}`);
+      console.log(data);
+    }
+  }, [trackHeader, data]);
+
   return (
-    <div className={styles.trackHeader}>
+    <div ref={trackHeader} className={styles.trackHeader}>
       <div className={styles.trackInfo}>
         {isPlaying ? (
           <button className={styles.playButton} onClick={togglePlayPause}>
@@ -100,18 +118,13 @@ const TrackHeader = ({
         </div>
       </div>
       <div className={styles.playingTrack}>
-        {/* <AudioPlayer
-          className={styles.audioPlayer}
-          src="https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
-          ref={playingAudio.current}
-          layout="horizontal"
-        /> */}
         <audio
           ref={audioPlayer}
           className={styles.audioPlayer}
-          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+          src={track.audio}
           preload="metadata"
           onLoadedMetadata={onLoadedMetadata}
+          onEnded={onEnded}
         ></audio>
         <div className={styles.trackPlayer}>
           <div className={styles.time}>
@@ -119,7 +132,7 @@ const TrackHeader = ({
               {calculateTime(currentTime)}
             </div>
             <div className={styles.duration}>
-              {duration && !isNaN(duration) && calculateTime(duration)}
+              {!isNaN(duration) ? calculateTime(duration) : "0:00"}
             </div>
           </div>
           <div className={styles.barContainer}>
@@ -129,7 +142,8 @@ const TrackHeader = ({
               className={styles.progressBar}
               defaultValue="0"
               onChange={changeRange}
-              step="0.05"
+              step="0.1"
+              onClick={onPlayerClick}
             />
           </div>
         </div>

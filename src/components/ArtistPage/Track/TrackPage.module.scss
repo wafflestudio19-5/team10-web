@@ -1,7 +1,8 @@
 @import url("https://use.typekit.net/wii1ijh.css");
 .track {
-  margin: auto;
+  margin: 0 auto;
   width: 1240px;
+  height: calc(100vh - 92px);
   background-color: white;
   box-sizing: border-box;
   font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans,

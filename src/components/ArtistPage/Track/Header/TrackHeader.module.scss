@@ -1,13 +1,12 @@
-$gradient-color-1: rgb(random(110) + 70, random(110) + 70, random(110) + 70);
-$gradient-angle: random(4) * 90;
-
 .trackHeader {
   height: 380px;
-  background: linear-gradient(
-    $gradient-angle + deg,
-    $gradient-color-1,
-    lighten($gradient-color-1, 10%)
-  );
+  --opacity: 0.6;
+  --red: 0;
+  --green: 0;
+  --blue: 0;
+  --bg-color: rgba(var(--red), var(--green), var(--blue), 1);
+  --bg-color-light: rgba(var(--red), var(--green), var(--blue), var(--opacity));
+  background: linear-gradient(120deg, var(--bg-color), var(--bg-color-light));
   position: relative;
   top: 46px;
 }
@@ -164,7 +163,9 @@ $gradient-angle: random(4) * 90;
     font-size: 10px;
     background: black;
     letter-spacing: 1px;
-    padding: 2px;
+    width: 28px;
+    display: flex;
+    justify-content: center;
   }
   .currentTime {
     color: #ff3f02;
@@ -206,10 +207,12 @@ $gradient-angle: random(4) * 90;
   width: 340px;
   height: 340px;
   right: 20px;
-  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   img {
-    width: 340px;
-    height: 340px;
+    max-width: 340px;
+    max-height: 340px;
   }
 }

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import styles from "./CommentsInput.module.scss";
 
-const CommentsInput = () => {
+const CommentsInput = ({ fetchComments }: { fetchComments: () => void }) => {
   const [commentInput, setInput] = useState("");
   const onCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -19,6 +19,7 @@ const CommentsInput = () => {
     //   console.log(console.error());
     // }
     setInput("");
+    fetchComments;
   };
 
   return (

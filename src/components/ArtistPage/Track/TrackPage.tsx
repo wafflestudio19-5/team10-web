@@ -9,7 +9,7 @@ export interface ITrack {
   title: string;
   artist: string;
   permalink: string;
-  image: string | null;
+  image: string;
   audio: string;
   description: string;
   created_at: string;
@@ -42,9 +42,8 @@ const TrackPage = () => {
     artist: "aritst",
     permalink: "example",
     image:
-      "https://images.unsplash.com/photo-1524650359799-842906ca1c06?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8bXVzaWN8ZW58MHwyfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    audio:
-      "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3",
+      "https://images.unsplash.com/photo-1507808973436-a4ed7b5e87c9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHwyfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+    audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
     description: "트랙 정보",
     created_at: "1 year ago",
     count: 134565,

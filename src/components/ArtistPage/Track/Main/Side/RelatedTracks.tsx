@@ -71,6 +71,7 @@ const Track = ({ track }: { track: ITrack }) => {
 const RelatedTracks = () => {
   const relatedTracks = [
     {
+      id: 1,
       artistName: "Artist Name",
       trackName: "Track Name",
       plays: "2.69M",
@@ -79,6 +80,7 @@ const RelatedTracks = () => {
       comments: 163,
     },
     {
+      id: 2,
       artistName: "Artist Name",
       trackName: "Track Name",
       plays: "2.69M",
@@ -87,6 +89,7 @@ const RelatedTracks = () => {
       comments: 163,
     },
     {
+      id: 3,
       artistName: "Artist Name",
       trackName: "Track Name",
       plays: "2.69M",
@@ -107,7 +110,7 @@ const RelatedTracks = () => {
       </div>
       <ul className={styles.trackList}>
         {relatedTracks.map((track) => {
-          return <Track track={track} />;
+          return <Track track={track} key={track.id} />;
         })}
       </ul>
     </div>

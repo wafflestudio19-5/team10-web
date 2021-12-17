@@ -6,9 +6,12 @@ import { ImShare } from "react-icons/im";
 import { FiLink2, FiMoreHorizontal } from "react-icons/fi";
 import { FaPlay } from "react-icons/fa";
 import { ITrack } from "../TrackPage";
+import { useHistory } from "react-router-dom";
 // import axios from "axios";
 
 const ListenEngagement = ({ track }: { track: ITrack }) => {
+  const history = useHistory();
+
   const likeTrack = async () => {
     // try {
     //   const response = await axios.post(
@@ -46,6 +49,9 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
     console.log("success");
   };
 
+  const trackLikes = () => history.push(`/username/trackname/likes`);
+  const trackReposts = () => history.push(`/username/trackname/reposts`);
+
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>
@@ -77,11 +83,15 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
         </div>
         <div className={styles.likeStats}>
           <BsSuitHeartFill />
-          <span className={styles.pointer}>{track.likes}</span>
+          <span className={styles.pointer} onClick={trackLikes}>
+            {track.likes}
+          </span>
         </div>
         <div className={styles.repostStats}>
           <BiRepost />
-          <span className={styles.pointer}>{track.reposts}</span>
+          <span className={styles.pointer} onClick={trackReposts}>
+            {track.reposts}
+          </span>
         </div>
       </div>
     </div>
