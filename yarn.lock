@@ -1784,6 +1784,11 @@
   "resolved" "https://registry.npmjs.org/@types/cookie/-/cookie-0.3.3.tgz"
   "version" "0.3.3"
 
+"@types/debounce@*":
+  "integrity" "sha512-epMsEE85fi4lfmJUH/89/iV/LI+F5CvNIvmgs5g5jYFPfhO2S/ae8WSsLOKWdwtoaZw9Q2IhJ4tQ5tFCcS/4HA=="
+  "resolved" "https://registry.npmjs.org/@types/debounce/-/debounce-1.2.1.tgz"
+  "version" "1.2.1"
+
 "@types/eslint@^7.28.2":
   "integrity" "sha512-VNcvioYDH8/FxaeTKkM4/TiTwt6pBV9E3OfGmvaw8tPl0rrHCJ4Ll15HRT+pMiFAf/MLQvAzC+6RzUMEL9Ceng=="
   "resolved" "https://registry.npmjs.org/@types/eslint/-/eslint-7.29.0.tgz"
@@ -1980,6 +1985,13 @@
   "version" "3.12.0"
   dependencies:
     "source-map" "^0.6.1"
+
+"@types/wavesurfer.js@^5.2.2":
+  "integrity" "sha512-/vjpf81co0SK3z4F5V79fZrFPQ8pw9/fEpgkzcgNVkBa9sY0gAaYzKuaQyCX/yjVf6kc73uPtWABQuVgvpguDQ=="
+  "resolved" "https://registry.npmjs.org/@types/wavesurfer.js/-/wavesurfer.js-5.2.2.tgz"
+  "version" "5.2.2"
+  dependencies:
+    "@types/debounce" "*"
 
 "@types/webpack-sources@*":
   "integrity" "sha512-LXn/oYIpBeucgP1EIJbKQ2/4ZmpvRl+dlrFdX7+94SKRUV3Evy3FsfMZY318vGhkWUS5MPhtOM3w1/hCOAOXcg=="
@@ -12020,6 +12032,11 @@
   optionalDependencies:
     "chokidar" "^3.4.1"
     "watchpack-chokidar2" "^2.0.1"
+
+"wavesurfer.js@^5.2.0":
+  "integrity" "sha512-SkPlTXfvKy+ZnEA7f7g7jn6iQg5/8mAvWpVV5vRbIS/FF9TB2ak9J7VayQfzfshOLW/CqccTiN6DDR/fZA902g=="
+  "resolved" "https://registry.npmjs.org/wavesurfer.js/-/wavesurfer.js-5.2.0.tgz"
+  "version" "5.2.0"
 
 "wbuf@^1.1.0", "wbuf@^1.7.3":
   "integrity" "sha512-O84QOnr0icsbFGLS0O3bI5FswxzRr8/gHwWkDlQFskhSPryQXvrTMxjxGP4+iWYoauLoBvfDpkrOauZ+0iZpDA=="

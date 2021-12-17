@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./ListenEngagement.module.scss";
 import { BsSuitHeartFill } from "react-icons/bs";
 import { BiRepost } from "react-icons/bi";
@@ -10,6 +10,8 @@ import { useHistory } from "react-router-dom";
 // import axios from "axios";
 
 const ListenEngagement = ({ track }: { track: ITrack }) => {
+  const [like, setLike] = useState(false);
+
   const history = useHistory();
 
   const likeTrack = async () => {
@@ -18,21 +20,24 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
     //     `https://api.soundwaffle.com/likes/tracks/track_id`
     //   );
     //   console.log(response);
+    //   setLike(true)
     // } catch (error) {
     //   console.log(error);
     // }
-    return;
+    setLike(true);
   };
-  //   const unlikeTrack = async () => {
-  // try {
-  //   const response = await axios.delete(
-  //     `https://api.soundwaffle.com/likes/tracks/track_id`
-  //   );
-  //   console.log(response);
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  //   };
+  const unlikeTrack = async () => {
+    // try {
+    //   const response = await axios.delete(
+    //     `https://api.soundwaffle.com/likes/tracks/track_id`
+    //   );
+    //   console.log(response);
+    //   setLike(false);
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    setLike(false);
+  };
   const repostTrack = async () => {
     // try {
     //   const response = await axios.post(
@@ -52,13 +57,22 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
   const trackLikes = () => history.push(`/username/trackname/likes`);
   const trackReposts = () => history.push(`/username/trackname/reposts`);
 
+  console.log(like);
+
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>
-        <button className={styles.like} onClick={likeTrack}>
-          <BsSuitHeartFill />
-          <span>Like</span>
-        </button>
+        {like ? (
+          <button className={styles.like} onClick={unlikeTrack}>
+            <BsSuitHeartFill />
+            <span>Liked</span>
+          </button>
+        ) : (
+          <button className={styles.notLike} onClick={likeTrack}>
+            <BsSuitHeartFill />
+            <span>Like</span>
+          </button>
+        )}
         <button className={styles.repost} onClick={repostTrack}>
           <BiRepost />
           <span>Repost</span>

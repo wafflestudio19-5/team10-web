@@ -5,6 +5,7 @@ import { useHistory } from "react-router";
 import "./styles.scss";
 import { ITrack } from "../TrackPage";
 import { useColor } from "color-thief-react";
+// import WaveSurfer from "wavesurfer.js";
 
 const TrackHeader = ({
   openModal,
@@ -94,7 +95,6 @@ const TrackHeader = ({
       current.style.setProperty("--red", `${red}`);
       current.style.setProperty("--green", `${green}`);
       current.style.setProperty("--blue", `${blue}`);
-      console.log(data);
     }
   }, [trackHeader, data]);
 
@@ -161,6 +161,36 @@ const TrackHeader = ({
       </div>
     </div>
   );
+
+  //   let [isPlaying, setIsPlaying] = useState(false);
+  //   let [waveSurfer, setWaveSurfer] = useState<any>(null);
+
+  //   const wavesurfer = useRef<any>(null);
+
+  //   useEffect(() => {
+  //     wavesurfer.current = WaveSurfer.create({
+  //       container: "#waveform",
+  //     });
+  //     return () => wavesurfer.current.destroy();
+  //   }, []);
+
+  //   useEffect(() => {
+  //     if (wavesurfer) {
+  //       wavesurfer.current.load(track.audio);
+  //     }
+  //   }, [wavesurfer]);
+
+  //   wavesurfer.current.on("ready", function () {
+  //     wavesurfer.current.setVolume(0.5);
+  //     wavesurfer.current.play();
+  //   });
+
+  //   openModal;
+  //   return (
+  //     <>
+  //       <div ref={wavesurfer}></div>
+  //     </>
+  //   );
 };
 
 export default TrackHeader;

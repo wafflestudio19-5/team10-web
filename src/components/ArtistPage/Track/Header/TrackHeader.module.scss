@@ -160,9 +160,9 @@
   }
   .currentTime,
   .duration {
-    font-size: 10px;
+    font: 10px/1.4 Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda,
+      Verdana, Tahoma, sans-serif;
     background: black;
-    letter-spacing: 1px;
     width: 28px;
     display: flex;
     justify-content: center;

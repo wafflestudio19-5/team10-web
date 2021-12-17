@@ -39,7 +39,7 @@ const TrackPage = () => {
   // });
   const track = {
     title: "Title",
-    artist: "aritst",
+    artist: "username",
     permalink: "example",
     image:
       "https://images.unsplash.com/photo-1507808973436-a4ed7b5e87c9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHwyfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
