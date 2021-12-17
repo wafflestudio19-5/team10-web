@@ -1,0 +1,104 @@
+.container {
+  margin-top: 30px;
+  height: 250px;
+  width: 300px;
+  box-sizing: border-box;
+  .title {
+    height: 30px;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 14px;
+    color: #999999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    &:hover {
+      .viewAll {
+        color: black;
+      }
+    }
+    span {
+      margin-left: 5px;
+    }
+  }
+  .trackList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  .tracks {
+    width: 300px;
+    height: 72px;
+    box-sizing: border-box;
+    padding: 5px 0px;
+    display: grid;
+    grid-template-columns: 60px 235px;
+    .trackImage {
+      padding: 5px;
+      width: 50px;
+      height: 50px;
+      border: 1px solid black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .playButton {
+        display: none;
+      }
+      &:hover {
+        cursor: pointer;
+        .playButton {
+          display: block;
+          height: 28px;
+          width: 28px;
+          background-color: #ff3300;
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
+    .trackInfo {
+      margin-left: 10px;
+      display: grid;
+      .artistName,
+      .trackName {
+        font-size: 14px;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+      .artistName {
+        color: #999999;
+        &:hover {
+          color: black;
+        }
+      }
+      .miniStats {
+        font-size: 11px;
+        color: #999999;
+        .statContainer {
+          display: inline-block;
+          margin-right: 7px;
+          div {
+            display: flex;
+            align-items: center;
+            svg path {
+              fill: #999999;
+            }
+            span {
+              margin-left: 3px;
+            }
+          }
+          .pointer {
+            &:hover {
+              cursor: pointer;
+              color: black;
+            }
+          }
+        }
+      }
+    }
+  }
+}

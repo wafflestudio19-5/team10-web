@@ -1,0 +1,121 @@
+.box {
+  margin: auto;
+  padding: 46px 0 46px 0;
+  width: 1240px;
+  height: calc(100vh);
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  .main {
+    width: 900px;
+    .most {
+      margin: 0 25px 0 20px;
+      text-align: left;
+      div {
+        h2 {
+          margin: 10px 0 10px 0;
+          font-size: 24px;
+          font-weight: 400;
+        }
+        div {
+          color: #5f5f5f;
+          font-size: 14px;
+        }
+      }
+    }
+    .new {
+      position: relative;
+      margin: 0 25px 0 20px;
+      text-align: left;
+      h2 {
+        margin: 10px 0 10px 0;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      div {
+        button {
+          color: #5f5f5f;
+          text-align: center;
+          font-size: 16px;
+          position: absolute;
+          top: 135px;
+          z-index: 3;
+          width: 32px;
+          height: 32px;
+          background-color: white;
+          cursor: pointer;
+          border: 1px solid #5f5f5f;
+          border-radius: 2px;
+          &:hover {
+            border: 1px solid #ff5500;
+            color: #ff5500;
+          }
+        }
+        .left {
+          left: -35px;
+        }
+        .right {
+          right: -10px;
+        }
+      }
+    }
+  }
+
+  .fluid {
+    width: 300px;
+    border-left: solid #f2f2f2 2px;
+    .likes {
+      margin-top: 40px;
+      height: 200px;
+      .header {
+        margin: 0 20px 0 20px;
+        border-bottom: solid #f2f2f2 2px;
+        color: #999999;
+        height: 30px;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 20px;
+        button {
+          background: none;
+          border: none;
+          color: #999999;
+          font-size: 14px;
+          height: 20px;
+          width: 130px;
+          &:hover {
+            color: #5f5f5f;
+          }
+        }
+      }
+    }
+    .history {
+      height: 200px;
+      .header {
+        white-space: nowrap;
+        margin: 0 20px 0 20px;
+        border-bottom: solid #f2f2f2 2px;
+        color: #999999;
+        height: 30px;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 20px;
+        button {
+          background: none;
+          border: none;
+          color: #999999;
+          font-size: 14px;
+          height: 20px;
+          width: 130px;
+          &:hover {
+            color: #5f5f5f;
+          }
+        }
+      }
+    }
+  }
+}

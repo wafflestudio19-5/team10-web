@@ -1,0 +1,16 @@
+.box {
+  padding: 46px 0 46px 0;
+  margin: auto;
+  width: 1240px;
+  height: calc(100vh);
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  p {
+    margin: 50px 0 0 0;
+    font-size: 37px;
+    font-weight: 100;
+    text-align: center;
+    text-decoration: none solid rgb(51, 51, 51);
+  }
+}
