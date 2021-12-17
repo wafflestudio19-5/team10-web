@@ -38,11 +38,11 @@ const SignupAge = ({
       .then(async (res) => {
         cookies.set("profile_id", res.data.profile_id, {
           path: "/",
-          expires: new Date(Date.now() + 3600),
+          expires: new Date(Date.now() + 3600000),
         });
         cookies.set("jwt_token", res.data.token, {
           path: "/",
-          expires: new Date(Date.now() + 3600),
+          expires: new Date(Date.now() + 3600000),
         }); // 쿠키가 저장이 안됨. 이유를 모르겠음.
         history.push("/discover");
       })

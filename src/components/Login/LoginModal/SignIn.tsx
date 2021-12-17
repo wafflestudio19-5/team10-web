@@ -39,7 +39,7 @@ const SignIn = ({
               console.log(res.data.token);
               cookies.set("jwt_token", res.data.token, {
                 path: "/",
-                expires: new Date(Date.now() + 3600),
+                expires: new Date(Date.now() + 3600000),
               }); // 쿠키가 저장이 안됨. 이유를 모르겠음.
               history.push("/discover");
             })
