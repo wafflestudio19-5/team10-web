@@ -1,9 +1,16 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useHistory } from "react-router";
+import Cookies from "universal-cookie";
 import styles from "./Discover.module.scss";
 import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
 
 const Discover = () => {
+  const cookies = new Cookies();
+  const history = useHistory();
+  useEffect(() => {
+    cookies.get("jwt_token") === undefined ? history.push("/") : null;
+  }, []);
   const listScroll = useRef<HTMLDivElement>(null);
   const rightButton = useRef<HTMLButtonElement>(null);
   const leftButton = useRef<HTMLButtonElement>(null);

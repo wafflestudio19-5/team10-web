@@ -5,11 +5,13 @@ import Discover from "./components/Discover/Discover";
 import ArtistPage from "./components/ArtistPage/ArtistPage";
 import Logout from "./components/Logout/Logout";
 import { Switch, Route, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const location = useLocation();
   return (
     <div>
+      <Toaster />
       {location.pathname !== "/" ? <Header /> : null}
       <Switch>
         <Route exact path="/" component={Login} />

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./LoginModal.scss";
+import SignIn from "./SignIn";
 import SignupAge from "./SignupAge";
 import SignupPassword from "./SignupPassword";
 import SocialLogin from "./SocialLogin";
@@ -11,7 +12,7 @@ const LoginModal = ({
   modal: boolean;
   handleModal: any;
 }) => {
-  const [goSignup, setGoSignup] = useState(false);
+  const [goSignup, setGoSignup]: any[] = useState(false);
   const [nextSign, setNextSign] = useState(false);
   const [inputs, setInputs] = useState({
     email: "",
@@ -26,6 +27,9 @@ const LoginModal = ({
   const handleSignup = () => {
     setGoSignup(!goSignup);
   };
+  const handleSignIn = () => {
+    setGoSignup("signIn");
+  };
   const handlenextSign = () => {
     setNextSign(!nextSign);
   };
@@ -38,6 +42,7 @@ const LoginModal = ({
         <SocialLogin
           handleInput={handleInput}
           handleSignup={handleSignup}
+          handleSignIn={handleSignIn}
           email={inputs.email}
         />
       ) : goSignup === true ? (
@@ -48,6 +53,13 @@ const LoginModal = ({
           handleInput={handleInput}
           handlenextSign={handlenextSign}
           setGoSignup={setGoSignup}
+        />
+      ) : goSignup === "signIn" ? (
+        <SignIn
+          handleSignup={handleSignup}
+          email={inputs.email}
+          password={inputs.password}
+          handleInput={handleInput}
         />
       ) : (
         <SignupAge
