@@ -14,28 +14,31 @@ import Albums from "./components/Library/Albums/Albums";
 import Stations from "./components/Library/Stations/Stations";
 import Following from "./components/Library/Following/Following";
 import History from "./components/Library/History/History";
+import { AuthProvider } from "./Context";
 
 function App() {
   const location = useLocation();
   return (
-    <div className={styles.wrapper}>
-      <Toaster />
-      {location.pathname !== "/" ? <Header /> : null}
-      <Switch>
-        <Route exact path="/" component={Login} />
-        <Route exact path="/discover" component={Discover} />
-        <Route exact path="/username" component={ArtistPage} />
-        <Route exact path="/username/trackname" component={TrackPage} />
-        <Route exact path="/logout" component={Logout} />
-        <Route exact path="/you/library" component={Library} />
-        <Route exact path="/you/likes" component={Likes} />
-        <Route exact path="/you/sets" component={Playlists} />
-        <Route exact path="/you/albums" component={Albums} />
-        <Route exact path="/you/stations" component={Stations} />
-        <Route exact path="/you/following" component={Following} />
-        <Route exact path="/you/history" component={History} />
-      </Switch>
-    </div>
+    <AuthProvider>
+      <div className={styles.wrapper}>
+        <Toaster />
+        {location.pathname !== "/" ? <Header /> : null}
+        <Switch>
+          <Route exact path="/" component={Login} />
+          <Route exact path="/discover" component={Discover} />
+          <Route exact path="/username" component={ArtistPage} />
+          <Route exact path="/username/trackname" component={TrackPage} />
+          <Route exact path="/logout" component={Logout} />
+          <Route exact path="/you/library" component={Library} />
+          <Route exact path="/you/likes" component={Likes} />
+          <Route exact path="/you/sets" component={Playlists} />
+          <Route exact path="/you/albums" component={Albums} />
+          <Route exact path="/you/stations" component={Stations} />
+          <Route exact path="/you/following" component={Following} />
+          <Route exact path="/you/history" component={History} />
+        </Switch>
+      </div>
+    </AuthProvider>
   );
 }
 

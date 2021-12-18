@@ -19,7 +19,7 @@ const Following = () => {
           className={styles.others}
           onClick={() => goToSomewhere("/you/likes")}
         >
-          likes
+          Likes
         </div>
         <div
           className={styles.others}

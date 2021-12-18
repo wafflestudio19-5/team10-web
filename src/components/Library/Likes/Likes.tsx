@@ -15,7 +15,7 @@ const Likes = () => {
         >
           Overview
         </div>
-        <div className={styles.focus}>likes</div>
+        <div className={styles.focus}>Likes</div>
         <div
           className={styles.others}
           onClick={() => goToSomewhere("/you/sets")}
