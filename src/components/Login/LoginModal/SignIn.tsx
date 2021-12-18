@@ -36,7 +36,10 @@ const SignIn = ({
               password: password,
             })
             .then(async (res) => {
-              console.log(res.data.token);
+              cookies.set("permalink", res.data.permalink, {
+                path: "/",
+                expires: new Date(Date.now() + 3600000),
+              });
               cookies.set("jwt_token", res.data.token, {
                 path: "/",
                 expires: new Date(Date.now() + 3600000),
