@@ -3,6 +3,7 @@ import TrackMain from "./Main/TrackMain";
 import TrackHeader from "./Header/TrackHeader";
 import styles from "./TrackPage.module.scss";
 import TrackModal from "./Modal/TrackModal";
+import TrackBar from "./TrackBar/TrackBar";
 // import axios from "axios";
 
 export interface ITrack {
@@ -89,6 +90,7 @@ const TrackPage = () => {
       <TrackModal modal={modal} closeModal={closeModal} track={track} />
       <TrackHeader openModal={openModal} track={track} />
       <TrackMain track={track} />
+      <TrackBar />
     </div>
   );
 };

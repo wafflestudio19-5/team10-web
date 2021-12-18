@@ -6,7 +6,7 @@ import ArtistPage from "./components/ArtistPage/ArtistPage";
 import Logout from "./components/Logout/Logout";
 import { Switch, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
+import YourTracks from "./components/ArtistPage/Track/YourTracks/YourTracks";
 
 function App() {
   const location = useLocation();
@@ -20,8 +20,8 @@ function App() {
         <Route exact path="/username" component={ArtistPage} />
         <Route exact path="/username/trackname" component={TrackPage} />
         <Route exact path="/logout" component={Logout} />
+        <Route exact path="/you/tracks" component={YourTracks} />
       </Switch>
-      {location.pathname !== "/" ? <TrackBar /> : null}
     </div>
   );
 }
