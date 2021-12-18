@@ -1,0 +1,86 @@
+.uploadpage-wrapper {
+    width: 100vw;
+    background-color: #f2f2f2;
+  }
+
+  .uploadpage {
+    margin: auto;
+    width: 1240px;
+    background-color: white;
+    margin-top: 46px;
+    height: calc(100vh - 46px);
+  }
+
+  .upload-header-left {
+    display: flex;
+    flex-direction: row;
+  
+    a {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-top: 18px;
+      margin-left: 30px;
+  
+      &:hover {
+        color: #ff5500;
+        border-bottom: 2px solid #ff5500;
+      }
+    }
+  }
+
+  .upload-box {
+    width: 800px;
+    height: 400px;
+    border: 1px solid #f2f2f2;
+    margin: auto;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    margin-top: 150px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px -5px;
+
+    .upload-text {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      width: 300px;
+      height: 40px;
+      background-color: #ff5500;
+      border: 1px solid #ff5500;
+      color: white;
+      font-size: 16px;
+      line-height: 40px;
+      margin-bottom: 10px;
+    }
+
+    .file-input {
+      display: flex;
+      margin-left: 45px;
+    }
+
+    .upload-playlist {
+      display: flex;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .upload-privacy {
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      margin-top: 10px;
+
+      text{
+        margin-right: 10px;
+      }
+
+      .form-check {
+        margin-right: 10px;
+      }
+    }
+  }
