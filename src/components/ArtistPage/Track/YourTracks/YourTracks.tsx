@@ -1,11 +1,16 @@
 import { BiPencil } from "react-icons/bi";
 import { MdPlaylistAdd } from "react-icons/md";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
+import { AiOutlineDown } from "react-icons/ai";
 import { BsSoundwave } from "react-icons/bs";
 import styles from "./YourTracks.module.scss";
 import { useHistory } from "react-router-dom";
+import { useState } from "react";
 
 const YourTracks = () => {
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const editToggle = () => setIsEditOpen(!isEditOpen);
+
   const history = useHistory();
   const uploadTrack = () => history.push(`/upload`);
 
@@ -19,11 +24,21 @@ const YourTracks = () => {
           <div className={styles.checkboxContainer}>
             <input type="checkbox" />
           </div>
-          <button className={styles.editTracks} disabled>
-            <BiPencil />
-            <span>Edit tracks</span>
-          </button>
-          <button className={styles.addToPlaylist} disabled>
+          <div className={styles.dropdownContainer}>
+            <button className={styles.editTracks} onClick={editToggle}>
+              <BiPencil />
+              <span>Edit tracks</span>
+              <AiOutlineDown />
+            </button>
+            {isEditOpen && (
+              <ul>
+                <li>Privacy and tags</li>
+                <li>Artwork</li>
+                <li>Permissions</li>
+              </ul>
+            )}
+          </div>
+          <button className={styles.addToPlaylist}>
             <MdPlaylistAdd />
             <span>&nbsp;&nbsp;Add to playlist</span>
           </button>

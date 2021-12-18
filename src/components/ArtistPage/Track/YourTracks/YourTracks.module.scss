@@ -49,16 +49,38 @@
   width: 123px;
   height: 26px;
   box-sizing: border-box;
+  //   color: #333333;
   color: #cccccc;
+  //   background: #ffffff;
   background: #f2f2f2;
   border: 1px solid #e5e5e5;
   border-radius: 3px;
   display: flex;
   align-items: center;
-  padding: 0 25px 0 10px;
+  justify-content: space-between;
   margin-right: 5px;
   svg {
-    font-size: 16px;
+    font-size: 13px;
+  }
+}
+.dropdownContainer {
+  ul {
+    padding: 0;
+    margin: 0;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    width: 123px;
+    box-sizing: border-box;
+    color: #333333;
+    font-size: 13px;
+    position: absolute;
+    &:first-child {
+      padding-top: 0.8em;
+    }
+  }
+  li {
+    padding: 7px;
+    list-style: none;
   }
 }
 .addToPlaylist {
