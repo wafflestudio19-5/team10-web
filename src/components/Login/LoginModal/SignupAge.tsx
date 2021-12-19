@@ -36,7 +36,7 @@ const SignupAge = ({
         gender: gender,
       })
       .then(async (res) => {
-        cookies.set("profile_id", res.data.profile_id, {
+        cookies.set("permalink", res.data.permalink, {
           path: "/",
           expires: new Date(Date.now() + 3600000),
         });

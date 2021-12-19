@@ -1,16 +1,29 @@
+import axios from "axios";
 import { useEffect, useRef } from "react";
-import { useHistory } from "react-router";
 import Cookies from "universal-cookie";
+import { AuthContext } from "../../Context";
 import styles from "./Discover.module.scss";
 import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
 
 const Discover = () => {
   const cookies = new Cookies();
-  const history = useHistory();
+  const { userSecret, setUserSecret } = AuthContext();
   useEffect(() => {
-    cookies.get("jwt_token") === undefined ? history.push("/") : null;
+    const checkValid = async () => {
+      const jwtToken = cookies.get("jwt_token");
+      const permal = cookies.get("permalink");
+      await setUserSecret({ jwt: jwtToken, permalink: permal });
+    };
+    checkValid();
   }, []);
+  useEffect(() => {
+    userSecret.permalink !== true // 나중에 === undefined 로 바꿔야함
+      ? null
+      : axios.get(`https://api.soundwaffle.com/users/${userSecret.permalink}`);
+    // 여기에 permalink가 아니라 해당 url을 통해 아래와 같이 정보를 얻을 수 있음
+    //HTTP GET: https://api.soundcloud.com/resolve.json?url=https%3A%2F%2Fsoundcloud.com%2Fmsmrsounds%2Fms-mr-hurricane-chvrches-remix&client_id=[permalink]
+  }, [userSecret]);
   const listScroll = useRef<HTMLDivElement>(null);
   const rightButton = useRef<HTMLButtonElement>(null);
   const leftButton = useRef<HTMLButtonElement>(null);
@@ -70,12 +83,12 @@ const Discover = () => {
           </div>
           {/* 이자리에 like 리스트 컴포넌트 */}
         </div>
-        <div className={styles.history}>
+        <div className={styles.following}>
           <div className={styles.header}>
-            📅 Listening history
+            📅 following artists
             <button>View all</button>
           </div>
-          {/* 이자리에 Listening history 리스트 컴포넌트 */}
+          {/* 이자리에 following artists 리스트 컴포넌트 */}
         </div>
       </div>
     </div>
