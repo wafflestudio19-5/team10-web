@@ -15,6 +15,7 @@ import Stations from "./components/Library/Stations/Stations";
 import Following from "./components/Library/Following/Following";
 import History from "./components/Library/History/History";
 import { AuthProvider } from "./Context";
+import Upload from "./components/Upload/Upload";
 
 function App() {
   const location = useLocation();
@@ -36,6 +37,7 @@ function App() {
           <Route exact path="/you/stations" component={Stations} />
           <Route exact path="/you/following" component={Following} />
           <Route exact path="/you/history" component={History} />
+          <Route exact path="/upload" component={Upload} />
         </Switch>
       </div>
     </AuthProvider>
