@@ -1,9 +1,10 @@
 @import url("https://use.typekit.net/wii1ijh.css");
 .track {
+  margin: 0 auto;
   width: 1240px;
-  margin: auto;
+  padding-bottom: 70px;
   background-color: white;
-  z-index: -10;
+  box-sizing: border-box;
   font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans,
     Garuda, Verdana, Tahoma, sans-serif;
 }

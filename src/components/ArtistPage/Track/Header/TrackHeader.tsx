@@ -1,68 +1,196 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./TrackHeader.module.scss";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useHistory } from "react-router";
-import AudioPlayer from "react-h5-audio-player";
 import "./styles.scss";
+import { ITrack } from "../TrackPage";
+import { useColor } from "color-thief-react";
+// import WaveSurfer from "wavesurfer.js";
 
-const TrackHeader = ({ openModal }: { openModal: () => void }) => {
-  const [play, setPlay] = useState(false);
+const TrackHeader = ({
+  openModal,
+  track,
+}: {
+  openModal: () => void;
+  track: ITrack;
+}) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+
   const history = useHistory();
-  const username = "username";
-  const tags = ["Piano", "sad piano"];
-  const clickUsername = () => history.push(`/${username}`);
+
+  const { artist, tags } = track;
+  const clickUsername = () => history.push(`/${artist}`);
   const clickTag = () => history.push(`/tags/${tags[0]}`);
-  const playingAudio: any = useRef(
-    new Audio(
-      "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
-    )
-  );
-  const clickPlayButton = () => {
-    setPlay(true);
-    console.log(playingAudio.current);
-    playingAudio.current && playingAudio.current.play();
+
+  const audioPlayer = useRef<HTMLAudioElement>(new Audio());
+  const progressBar = useRef<any>(null);
+  const animationRef = useRef(0);
+  const trackHeader = useRef<HTMLDivElement>(null);
+
+  const onLoadedMetadata = () => {
+    const seconds = Math.floor(audioPlayer.current.duration);
+    setDuration(audioPlayer.current.duration);
+    progressBar.current.max = seconds;
   };
-  const clickPauseButton = () => {
-    setPlay(false);
-    console.log(playingAudio.current);
-    playingAudio.current && playingAudio.current.pause();
+
+  const calculateTime = (secs: number) => {
+    const minutes = Math.floor(secs / 60);
+    const seconds = Math.floor(secs % 60);
+    const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+    return `${minutes}:${returnedSeconds}`;
   };
+
+  const changeRange = () => {
+    audioPlayer.current.currentTime = progressBar.current.value;
+    changePlayerCurrentTime();
+  };
+
+  const togglePlayPause = () => {
+    const prevValue = isPlaying;
+    setIsPlaying(!prevValue);
+    if (!prevValue) {
+      audioPlayer.current.play();
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    } else {
+      audioPlayer.current.pause();
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+
+  const whilePlaying = () => {
+    progressBar.current.value = audioPlayer.current.currentTime;
+    changePlayerCurrentTime();
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
+
+  const changePlayerCurrentTime = () => {
+    progressBar.current.style.setProperty(
+      "--seek-before-width",
+      `${(progressBar.current.value / duration) * 100 + 0.5}%`
+    );
+    setCurrentTime(progressBar.current.value);
+  };
+
+  const onPlayerClick = () => {
+    setIsPlaying(true);
+    audioPlayer.current.play();
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
+
+  const onEnded = () => {
+    setIsPlaying(false);
+    audioPlayer.current.pause();
+  };
+
+  const { data } = useColor(track.image, "rgbArray", {
+    crossOrigin: "anonymous",
+    quality: 10,
+  });
+  useEffect(() => {
+    const { current } = trackHeader;
+    if (current !== null && data !== undefined) {
+      const [red, green, blue] = data;
+      current.style.setProperty("--red", `${red}`);
+      current.style.setProperty("--green", `${green}`);
+      current.style.setProperty("--blue", `${blue}`);
+    }
+  }, [trackHeader, data]);
+
   return (
-    <div className={styles.trackHeader}>
+    <div ref={trackHeader} className={styles.trackHeader}>
       <div className={styles.trackInfo}>
-        {play ? (
-          <button className={styles.playButton} onClick={clickPauseButton}>
+        {isPlaying ? (
+          <button className={styles.playButton} onClick={togglePlayPause}>
             <IoMdPause />
           </button>
         ) : (
-          <button className={styles.playButton} onClick={clickPlayButton}>
+          <button className={styles.playButton} onClick={togglePlayPause}>
             <IoMdPlay />
           </button>
         )}
         <div className={styles.soundTitle}>
-          <div className={styles.titleContainer}>Title</div>
+          <div className={styles.titleContainer}>{track.title}</div>
           <div className={styles.usernameContainer} onClick={clickUsername}>
-            username
+            {track.artist}
           </div>
         </div>
       </div>
       <div className={styles.playingTrack}>
-        <AudioPlayer
+        <audio
+          ref={audioPlayer}
           className={styles.audioPlayer}
-          src="https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3"
-          ref={playingAudio.current}
-          layout="horizontal"
-        />
+          src={track.audio}
+          preload="metadata"
+          onLoadedMetadata={onLoadedMetadata}
+          onEnded={onEnded}
+        ></audio>
+        <div className={styles.trackPlayer}>
+          <div className={styles.time}>
+            <div className={styles.currentTime}>
+              {calculateTime(currentTime)}
+            </div>
+            <div className={styles.duration}>
+              {!isNaN(duration) ? calculateTime(duration) : "0:00"}
+            </div>
+          </div>
+          <div className={styles.barContainer}>
+            <input
+              ref={progressBar}
+              type="range"
+              className={styles.progressBar}
+              defaultValue="0"
+              onChange={changeRange}
+              step="0.1"
+              onClick={onPlayerClick}
+            />
+          </div>
+        </div>
       </div>
       <div className={styles.titleInfo}>
-        <div className={styles.releasedDate}>1 year ago</div>
+        <div className={styles.releasedDate}>{track.created_at}</div>
         <div className={styles.tag} onClick={clickTag}>
           #{tags[0]}
         </div>
       </div>
-      <div className={styles.albumImage} onClick={openModal} />
+      <div className={styles.albumImage} onClick={openModal}>
+        {track.image ? (
+          <img src={track.image} alt={`${track.title}의 트랙 이미지`} />
+        ) : null}
+      </div>
     </div>
   );
+
+  //   let [isPlaying, setIsPlaying] = useState(false);
+  //   let [waveSurfer, setWaveSurfer] = useState<any>(null);
+
+  //   const wavesurfer = useRef<any>(null);
+
+  //   useEffect(() => {
+  //     wavesurfer.current = WaveSurfer.create({
+  //       container: "#waveform",
+  //     });
+  //     return () => wavesurfer.current.destroy();
+  //   }, []);
+
+  //   useEffect(() => {
+  //     if (wavesurfer) {
+  //       wavesurfer.current.load(track.audio);
+  //     }
+  //   }, [wavesurfer]);
+
+  //   wavesurfer.current.on("ready", function () {
+  //     wavesurfer.current.setVolume(0.5);
+  //     wavesurfer.current.play();
+  //   });
+
+  //   openModal;
+  //   return (
+  //     <>
+  //       <div ref={wavesurfer}></div>
+  //     </>
+  //   );
 };
 
 export default TrackHeader;
