@@ -86,11 +86,13 @@ const TrackPage = () => {
   // });
 
   return (
-    <div className={styles.track}>
-      <TrackModal modal={modal} closeModal={closeModal} track={track} />
-      <TrackHeader openModal={openModal} track={track} />
-      <TrackMain track={track} />
-      <TrackBar />
+    <div className={styles.trackWrapper}>
+      <div className={styles.track}>
+        <TrackModal modal={modal} closeModal={closeModal} track={track} />
+        <TrackHeader openModal={openModal} track={track} />
+        <TrackMain track={track} />
+        <TrackBar />
+      </div>
     </div>
   );
 };
