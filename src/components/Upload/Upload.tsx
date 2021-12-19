@@ -5,7 +5,8 @@ import Cookies from "universal-cookie";
 function Upload() {
   const cookies = new Cookies();
   const token = cookies.get("jwt_token");
-  const changeFileInput = () => {
+  const changeFileInput = (e: any) => {
+    e.preventDefault();
     axios
       .post(
         "https://api.soundwaffle.com/tracks",
