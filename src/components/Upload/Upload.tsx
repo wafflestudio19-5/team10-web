@@ -17,7 +17,7 @@ function Upload() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `JWT ${token}`,
           },
         }
       )
