@@ -1,9 +1,10 @@
 import axios from "axios";
 import "./Upload.scss";
+import Cookies from "universal-cookie";
 
 function Upload() {
-  const token =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJleHAiOjE2Mzk4NDMzOTQsImVtYWlsIjoiZXhhbXBsZUBleGFtcGxlLmNvbSIsIm9yaWdfaWF0IjoxNjM5ODM2MTk0fQ.PUqQ_CIXoxBtbDdJd2URppo9aoQCci4rvVyVu9D_EX8";
+  const cookies = new Cookies();
+  const token = cookies.get("jwt_token");
   const changeFileInput = () => {
     axios
       .post(
