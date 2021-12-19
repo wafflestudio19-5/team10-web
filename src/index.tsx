@@ -5,12 +5,15 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import "semantic-ui-css/semantic.min.css";
+import { TrackProvider } from "../src/context/TrackContext";
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <TrackProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </TrackProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

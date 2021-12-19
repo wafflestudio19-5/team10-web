@@ -112,13 +112,20 @@ const TrackBar = () => {
   };
 
   const onFollowArtist = async () => {
-    //   try {
-    //       const response = await axios.post(`https://api.soundwaffle.com/users/{user_id}/follow`)
-    //       console.log(response)
-    //       setFollowArtist(true)
-    //   } catch(error) {
-    //       console.log(error)
-    //   }
+    // try {
+    //   const response = await axios.post(
+    //     `https://api.soundwaffle.com/resolve?url=https://soundwaffle.com/user/xdlcfiw69486/follow&client_id=eok6x7k4bef2`,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMSwidXNlcm5hbWUiOiJhbmRobDIwNEBzb3VuZHdhZmZsZS5jb20iLCJleHAiOjE2Mzk4NTIzNDYsImVtYWlsIjoiYW5kaGwyMDRAc291bmR3YWZmbGUuY29tIiwib3JpZ19pYXQiOjE2Mzk4NDUxNDZ9.t__NMUozOtcOiZfpDRmCQNTo_1A91gOi3MVlFRayRYM`,
+    //       },
+    //     }
+    //   );
+    //   console.log(response);
+    //   setFollowArtist(true);
+    // } catch (error) {
+    //   console.log(error);
+    // }
     setFollowArtist(true);
   };
   const unfollowArtist = async () => {
