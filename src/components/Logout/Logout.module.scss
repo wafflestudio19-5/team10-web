@@ -5,9 +5,10 @@
   height: calc(100vh);
   background-color: white;
   display: flex;
-  justify-content: center;
-  p {
-    margin: 50px 0 0 0;
+  flex-direction: column;
+  justify-content: baseline;
+  div {
+    padding-top: 50px;
     font-size: 37px;
     font-weight: 100;
     text-align: center;
