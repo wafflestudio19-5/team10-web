@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import AudioInfo from "./AudioInfo";
-import CommentsInput from "./CommentsInput";
+import CommentsInput from "./Comments/CommentsInput";
 import ListenArtistInfo from "./ListenArtistInfo";
 import ListenEngagement from "./ListenEngagement";
-import Comments from "./Comments";
+import Comments from "./Comments/Comments";
 import styles from "./TrackMain.module.scss";
 import RelatedTracks from "./Side/RelatedTracks";
 import RepostUsers from "./Side/RepostUsers";

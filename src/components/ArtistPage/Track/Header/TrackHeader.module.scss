@@ -16,50 +16,6 @@
   margin-left: 30px;
   height: 63px;
   width: 650px;
-  .playButton {
-    margin-top: 2px;
-    width: 60px;
-    height: 60px;
-    float: left;
-    border-radius: 50%;
-    border: none;
-    background-color: rgb(255, 81, 0);
-    cursor: pointer;
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 35px;
-    svg path {
-      fill: white;
-    }
-    &:hover {
-      background-color: #ff3300;
-    }
-  }
-  .soundTitle {
-    display: grid;
-    grid-row: 2;
-    .titleContainer {
-      margin-left: 5px;
-      height: 37px;
-      box-sizing: border-box;
-      width: fit-content;
-      background-color: rgb(34, 34, 34);
-      color: white;
-      font-size: 24px;
-      padding: 4px 7px;
-    }
-    .usernameContainer {
-      margin: 5px 0 0 5px;
-      width: fit-content;
-      background-color: rgb(34, 34, 34);
-      color: lightgray;
-      padding: 2px 7px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  }
 }
 .playingTrack {
   // border: 1px solid black;
@@ -173,47 +129,5 @@
   }
   .duration {
     color: #999999;
-  }
-}
-.titleInfo {
-  position: absolute;
-  top: 30px;
-  right: 390px;
-  width: 75px;
-  height: 67px;
-  display: grid;
-  align-content: space-between;
-  font-size: 16px;
-  text-align: center;
-  color: white;
-  .releasedDate {
-    height: 22px;
-  }
-  .tag {
-    height: 26px;
-    background-color: #999999;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    &:hover {
-      background-color: #666666;
-      cursor: pointer;
-    }
-  }
-}
-.albumImage {
-  position: absolute;
-  top: 20px;
-  width: 340px;
-  height: 340px;
-  right: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  img {
-    max-width: 340px;
-    max-height: 340px;
   }
 }
