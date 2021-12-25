@@ -11,25 +11,6 @@
     height: calc(100vh - 46px);
   }
 
-  .upload-header-left {
-    display: flex;
-    flex-direction: row;
-  
-    a {
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      color: #333;
-      margin-top: 18px;
-      margin-left: 30px;
-  
-      &:hover {
-        color: #ff5500;
-        border-bottom: 2px solid #ff5500;
-      }
-    }
-  }
-
   .upload-box {
     width: 800px;
     height: 400px;

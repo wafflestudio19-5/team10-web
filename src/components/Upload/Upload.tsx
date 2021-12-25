@@ -1,6 +1,7 @@
 import axios from "axios";
 import "./Upload.scss";
 import Cookies from "universal-cookie";
+import UploadHeader from "./UploadHeader/UploadHeader";
 
 function Upload() {
   const cookies = new Cookies();
@@ -32,14 +33,7 @@ function Upload() {
   return (
     <div className={"uploadpage-wrapper"}>
       <div className={"uploadpage"}>
-        <div className={"upload-header"}>
-          <div className={"upload-header-left"}>
-            <a href={"/upload"}>Upload</a>
-            <a href={"/you/mastering"}>Mastering</a>
-            <a href={"/you/tracks"}>Your tracks</a>
-            <a href={"/pro"}>Pro Plans</a>
-          </div>
-        </div>
+        <UploadHeader />
 
         <div className="upload-box">
           <form className={"upload-form"}>
