@@ -110,7 +110,7 @@
 .progressBar::before {
   content: "";
   height: 1px;
-  width: var(--seek-before-width);
+  width: calc(var(--seek-before-width) + 2px);
   background-color: var(--seek-before-color);
   position: absolute;
   top: 0;
@@ -130,6 +130,7 @@
   height: 8px;
   width: 8px;
   border-radius: 50%;
+  margin-left: -0.5px;
   border: none;
   cursor: pointer;
   box-sizing: border-box;

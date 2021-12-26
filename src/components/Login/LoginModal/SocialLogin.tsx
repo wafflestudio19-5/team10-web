@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 const SocialLogin = ({
   handleInput,
@@ -19,13 +19,13 @@ const SocialLogin = ({
       <div className="social">대충 소셜로그인</div>
       <div className="or">——————————— &nbsp;or&nbsp; ———————————</div>
       <form
-        onSubmit={(e: React.FormEvent) => {
+        onSubmit={(e) => {
           e.preventDefault();
           axios
             .post(`https://api.soundwaffle.com/signup`, {
               email: email,
             })
-            .catch((e: any) => {
+            .catch((e) => {
               e.response.status === 400
                 ? handleSignup()
                 : e.response.status === 409

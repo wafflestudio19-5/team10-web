@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "./TrackHeader.module.scss";
 import { ITrack } from "../TrackPage";
 import { useColor } from "color-thief-react";
@@ -6,6 +6,7 @@ import HeaderButton from "./PlayPauseButton";
 import TrackInfo from "./TrackInfo";
 import AlbumImage from "./AlbumImage";
 import TrackTag from "./TrackTag";
+import { useTrackContext } from "../../../../context/TrackContext";
 // import WaveSurfer from "wavesurfer.js";
 
 const TrackHeader = ({
@@ -15,11 +16,21 @@ const TrackHeader = ({
   openModal: () => void;
   track: ITrack;
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false); // 트랙이 재생중인지
-  const [duration, setDuration] = useState(0); // 트랙 길이
-  const [currentTime, setCurrentTime] = useState(0); // 현재 재생되고 있는 시간
+  //   const [isPlaying, setIsPlaying] = useState(false); // 트랙이 재생중인지
+  //   const [duration, setDuration] = useState(0); // 트랙 길이
 
-  const audioPlayer = useRef<HTMLAudioElement>(new Audio()); // 오디오 태그 접근
+  const {
+    trackDuration,
+    setTrackDuration,
+    trackIsPlaying,
+    setTrackIsPlaying,
+    playingTime,
+    setPlayingTime,
+    audioPlayer,
+    isMuted,
+  } = useTrackContext();
+
+  //   const audioPlayer = useRef<HTMLAudioElement>(new Audio()); // 오디오 태그 접근
   const progressBar = useRef<any>(null); // 재생 바 태그 접근(input)
   const animationRef = useRef(0); // 재생 애니메이션
 
@@ -28,7 +39,7 @@ const TrackHeader = ({
   const onLoadedMetadata = () => {
     // 트랙 metadata가 로드되었을 때 실행
     const seconds = Math.floor(audioPlayer.current.duration); // 트랙 길이 정보를 받아와서 재생 바 오른쪽에 트랙 길이 표현하기 위함
-    setDuration(audioPlayer.current.duration);
+    setTrackDuration(audioPlayer.current.duration);
     progressBar.current.max = seconds; // input의 최댓값을 트랙의 길이로(input type=range가 트랙이 재생되는 바를 표현하게 됨)
   };
 
@@ -42,24 +53,28 @@ const TrackHeader = ({
 
   const changeRange = () => {
     audioPlayer.current.currentTime = progressBar.current.value; // input slider와 트랙 연결
+    setPlayingTime(audioPlayer.current.currentTime);
     changePlayerCurrentTime();
   };
 
   const togglePlayPause = () => {
     // 재생/일시정지 버튼 누를 때
-    const prevValue = isPlaying;
-    setIsPlaying(!prevValue);
+    const prevValue = trackIsPlaying;
+    setTrackIsPlaying(!prevValue);
     if (!prevValue) {
       audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
       animationRef.current = requestAnimationFrame(whilePlaying);
     } else {
       audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
       cancelAnimationFrame(animationRef.current);
     }
   };
 
   const whilePlaying = () => {
     progressBar.current.value = audioPlayer.current.currentTime;
+    setPlayingTime(progressBar.current.value);
     changePlayerCurrentTime();
     animationRef.current = requestAnimationFrame(whilePlaying);
   };
@@ -68,25 +83,30 @@ const TrackHeader = ({
     // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
     progressBar.current.style.setProperty(
       "--seek-before-width",
-      `${(progressBar.current.value / duration) * 100 + 0.5}%`
+      `${(audioPlayer.current.currentTime / trackDuration) * 100 + 0.5}%`
     );
-    setCurrentTime(progressBar.current.value);
+    setPlayingTime(audioPlayer.current.currentTime);
   };
+
+  useEffect(() => {
+    changePlayerCurrentTime();
+  }, [playingTime]);
 
   const onPlayerClick = () => {
     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-    setIsPlaying(true);
+    setTrackIsPlaying(true);
+    setPlayingTime(progressBar.current.value);
     audioPlayer.current.play();
     animationRef.current = requestAnimationFrame(whilePlaying);
   };
 
   const onEnded = () => {
     // 트랙 재생이 끝났을 때
-    setIsPlaying(false);
+    setTrackIsPlaying(false);
     audioPlayer.current.pause();
   };
 
-  //여기서부터는 재생과는 무관합니다
+  //여기서부터는 재생과는 무관
   const { data } = useColor(track.image, "rgbArray", {
     // 트랙 이미지에 따라 헤더 색을 자동으로 생성
     crossOrigin: "anonymous",
@@ -105,7 +125,10 @@ const TrackHeader = ({
   return (
     <div ref={trackHeader} className={styles.trackHeader}>
       <div className={styles.trackInfo}>
-        <HeaderButton isPlaying={isPlaying} togglePlayPause={togglePlayPause} />
+        <HeaderButton
+          isPlaying={trackIsPlaying}
+          togglePlayPause={togglePlayPause}
+        />
         <TrackInfo track={track} />
       </div>
       <div className={styles.playingTrack}>
@@ -116,14 +139,15 @@ const TrackHeader = ({
           preload="metadata"
           onLoadedMetadata={onLoadedMetadata}
           onEnded={onEnded}
-        ></audio>
+          muted={isMuted}
+        />
         <div className={styles.trackPlayer}>
           <div className={styles.time}>
             <div className={styles.currentTime}>
-              {calculateTime(currentTime)}
+              {calculateTime(playingTime)}
             </div>
             <div className={styles.duration}>
-              {!isNaN(duration) ? calculateTime(duration) : "0:00"}
+              {!isNaN(trackDuration) ? calculateTime(trackDuration) : "0:00"}
             </div>
           </div>
           <div className={styles.barContainer}>
