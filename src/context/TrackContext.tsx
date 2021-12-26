@@ -32,7 +32,7 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     useState<ITrackContext["trackIsPlaying"]>(false);
   const [playingTime, setPlayingTime] =
     useState<ITrackContext["playingTime"]>(0);
-  const audioPlayer = useRef<ITrackContext["audioPlayer"]>(null);
+  const audioPlayer = useRef<ITrackContext["audioPlayer"]>(new Audio());
   const [isMuted, setIsMuted] = useState(false);
 
   return (
