@@ -7,6 +7,8 @@ function Upload() {
   const cookies = new Cookies();
   const token = cookies.get("jwt_token");
   const changeFileInput = (e: any) => {
+    let fileInput = document.getElementById("file-input");
+    fileInput?.click();
     e.preventDefault();
     axios
       .post(
@@ -41,7 +43,7 @@ function Upload() {
               Drag and drop your tracks & albums here
             </div>
             <button onClick={changeFileInput}>upload</button>
-            <input className="file-input" type="file" />
+            <input type="file" id="file-input" className="file-input" />
             <div className="upload-playlist">
               <div className="form-check">
                 <input
