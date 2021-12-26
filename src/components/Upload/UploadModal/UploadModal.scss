@@ -1,0 +1,31 @@
+.upload-modal {
+    width: 800px;
+    height: 860px;
+    border: 1px solid #f2f2f2;
+    margin: auto;
+    margin-top: 150px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px -5px;
+
+    .upload-modal-header {
+        width: 748px;
+        height: 40px;
+        display: flex;
+        flex-direction: row;
+        margin: 20px 26px;
+        border-bottom: 1px solid #f2f2f2;
+
+        .upload-basic-info {
+            color: #FF5500;
+            border-bottom: 2px solid #FF5500;
+        }
+
+        div {
+            font-size: 24px;
+            margin-right: 20px;
+
+            &:hover {
+                border-bottom: 2px solid #333;
+            }
+        }
+    }
+}
