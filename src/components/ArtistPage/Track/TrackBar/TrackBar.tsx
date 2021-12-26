@@ -20,9 +20,6 @@ import { useTrackContext } from "../../../../context/TrackContext";
 // import axios from "axios";
 
 const TrackBar = () => {
-  //   const [isPlaying, setIsPlaying] = useState(false);
-  //   const [duration, setDuration] = useState(0);
-  //   const [currentTime, setCurrentTime] = useState(0);
   const [likeTrack, setLikeTrack] = useState(false);
   const [followArtist, setFollowArtist] = useState(false);
 
