@@ -1,35 +1,15 @@
-import axios from "axios";
 import "./UploadBox.scss";
-import Cookies from "universal-cookie";
 
-function UploadBox({ setModal }: any) {
-  const cookies = new Cookies();
-  const token = cookies.get("jwt_token");
-  const changeFileInput = (e: any) => {
+function UploadBox({ setSelectedFile, setModal }: any) {
+  const handleFileInput = async (event: any) => {
+    setSelectedFile(event.target.files[0]);
+    setModal(true);
+  };
+
+  const clickFileInput = (event: any) => {
+    event.preventDefault();
     let fileInput = document.getElementById("file-input");
     fileInput?.click();
-    e.preventDefault();
-    axios
-      .post(
-        "https://api.soundwaffle.com/tracks",
-        {
-          title: "example_track",
-          permalink: "xdlcfiw69486",
-          audio_filename: "example.mp3",
-        },
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    setModal(true);
   };
 
   return (
@@ -38,8 +18,13 @@ function UploadBox({ setModal }: any) {
         <div className="upload-text">
           Drag and drop your tracks & albums here
         </div>
-        <button onClick={changeFileInput}>or choose files to upload</button>
-        <input type="file" id="file-input" className="file-input" />
+        <button onClick={clickFileInput}>or choose files to upload</button>
+        <input
+          type="file"
+          id="file-input"
+          className="file-input"
+          onChange={handleFileInput}
+        />
         <div className="upload-playlist">
           <div className="form-check">
             <input
