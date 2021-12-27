@@ -2,7 +2,7 @@ import React, { createContext, useContext, useRef, useState } from "react";
 
 // 토큰 타입 지정
 interface ITrackContext {
-  trackDuration: number; // 현재 재생되고 있는 트랙 src
+  trackDuration: number; // 현재 재생되고 있는 트랙 길이
   setTrackDuration: React.Dispatch<React.SetStateAction<number>>;
   trackIsPlaying: boolean; // 현재 트랙이 재생되고 있는지
   setTrackIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;

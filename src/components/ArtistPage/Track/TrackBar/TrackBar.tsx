@@ -76,12 +76,14 @@ const TrackBar = () => {
   };
 
   const changePlayerCurrentTime = () => {
-    progressBar.current.value = audioPlayer.current.currentTime;
-    // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
-    progressBar.current.style.setProperty(
-      "--seek-before-width",
-      `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
-    );
+    if (progressBar.current && audioPlayer.current) {
+      progressBar.current.value = audioPlayer.current.currentTime;
+      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+      progressBar.current.style.setProperty(
+        "--seek-before-width",
+        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+      );
+    }
     setPlayingTime(audioPlayer.current.currentTime);
   };
 
@@ -97,9 +99,6 @@ const TrackBar = () => {
     barAnimationRef.current = requestAnimationFrame(whilePlaying);
   };
 
-  //   useEffect(() => {
-  //     trackIsPlaying ? audioPlayer.current.play() : audioPlayer.current.pause();
-  //   }, [trackIsPlaying]);
   const toggleMuteUnmute = () => setIsMuted(!isMuted);
 
   const clickArtist = () => history.push(`/username`);
@@ -190,7 +189,7 @@ const TrackBar = () => {
               type="range"
               className={styles.progressBar}
               onChange={changeRange}
-              step="0.1"
+              step="0.3"
               defaultValue="0"
               onClick={onPlayerClick}
               max={trackDuration}

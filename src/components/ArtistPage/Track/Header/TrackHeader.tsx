@@ -80,11 +80,14 @@ const TrackHeader = ({
   };
 
   const changePlayerCurrentTime = () => {
-    // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
-    progressBar.current.style.setProperty(
-      "--seek-before-width",
-      `${(audioPlayer.current.currentTime / trackDuration) * 100 + 0.5}%`
-    );
+    if (progressBar.current && audioPlayer.current) {
+      progressBar.current.value = audioPlayer.current.currentTime;
+      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+      progressBar.current.style.setProperty(
+        "--seek-before-width",
+        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+      );
+    }
     setPlayingTime(audioPlayer.current.currentTime);
   };
 
@@ -157,7 +160,7 @@ const TrackHeader = ({
               className={styles.progressBar}
               defaultValue="0"
               onChange={changeRange}
-              step="0.1"
+              step="0.3"
               onClick={onPlayerClick}
             />
           </div>
