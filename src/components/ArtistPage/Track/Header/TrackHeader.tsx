@@ -64,7 +64,7 @@ const TrackHeader = ({
   };
 
   const whilePlaying = () => {
-    progressBar.current.value = audioPlayer.current.currentTime;
+    // progressBar.current.value = audioPlayer.current.currentTime;
     setPlayingTime(progressBar.current.value);
     changePlayerCurrentTime();
     animationRef.current = requestAnimationFrame(whilePlaying);
@@ -90,6 +90,7 @@ const TrackHeader = ({
     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
     setTrackIsPlaying(true);
     setPlayingTime(progressBar.current.value);
+    console.log(progressBar.current.value);
     audioPlayer.current.play();
     animationRef.current = requestAnimationFrame(whilePlaying);
   };
@@ -138,6 +139,7 @@ const TrackHeader = ({
               onChange={changeRange}
               step="0.3"
               onClick={onPlayerClick}
+              max={trackDuration}
             />
           </div>
         </div>

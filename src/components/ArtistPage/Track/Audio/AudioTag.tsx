@@ -1,8 +1,14 @@
 import { useTrackContext } from "../../../../context/TrackContext";
 
 const AudioTag = () => {
-  const { audioPlayer, setTrackDuration, setTrackIsPlaying, isMuted, loop } =
-    useTrackContext();
+  const {
+    audioPlayer,
+    audioSrc,
+    setTrackDuration,
+    setTrackIsPlaying,
+    isMuted,
+    loop,
+  } = useTrackContext();
   const onLoadedMetadata = () => {
     // 트랙 metadata가 로드되었을 때 실행
     setTrackDuration(audioPlayer.current.duration);
@@ -18,7 +24,7 @@ const AudioTag = () => {
   return (
     <audio
       ref={audioPlayer}
-      src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+      src={audioSrc}
       preload="metadata"
       onLoadedMetadata={onLoadedMetadata}
       muted={isMuted}
