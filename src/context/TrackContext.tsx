@@ -11,6 +11,8 @@ interface ITrackContext {
   audioPlayer: any; // 현재 재생되고 있는 오디오 -- 이거를 하단 바와 다른 곳에 있는 플레이어에 동시 적용하는 방식을 생각해보았습니다
   isMuted: boolean; // 음소거 여부
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
+  loop: boolean;
+  setLoop: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TrackContext = createContext<ITrackContext>({
@@ -23,6 +25,8 @@ const TrackContext = createContext<ITrackContext>({
   audioPlayer: null,
   isMuted: false,
   setIsMuted: () => Boolean,
+  loop: false,
+  setLoop: () => Boolean,
 });
 
 export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
@@ -34,6 +38,7 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     useState<ITrackContext["playingTime"]>(0);
   const audioPlayer = useRef<ITrackContext["audioPlayer"]>(new Audio());
   const [isMuted, setIsMuted] = useState(false);
+  const [loop, setLoop] = useState(false);
 
   return (
     <TrackContext.Provider
@@ -47,6 +52,8 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
         audioPlayer,
         isMuted,
         setIsMuted,
+        loop,
+        setLoop,
       }}
     >
       {children}

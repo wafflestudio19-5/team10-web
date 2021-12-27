@@ -18,6 +18,7 @@ import { AuthProvider } from "./Context";
 import Upload from "./components/Upload/Upload";
 import YourTracks from "./components/ArtistPage/Track/YourTracks/YourTracks";
 import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
+import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
 
 function App() {
   const location = useLocation();
@@ -43,6 +44,7 @@ function App() {
           <Route exact path="/you/tracks" component={YourTracks} />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
+        {location.pathname !== "/" && <AudioTag />}
       </div>
     </AuthProvider>
   );

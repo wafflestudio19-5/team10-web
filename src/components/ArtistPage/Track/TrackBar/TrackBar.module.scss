@@ -37,6 +37,9 @@
     &.playButton {
       justify-content: end;
     }
+    &.loopTrack {
+      color: #ff5500;
+    }
   }
   .trackContainer {
     width: 632px;

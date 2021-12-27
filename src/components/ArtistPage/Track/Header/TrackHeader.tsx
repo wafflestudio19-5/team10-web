@@ -21,13 +21,11 @@ const TrackHeader = ({
 
   const {
     trackDuration,
-    setTrackDuration,
     trackIsPlaying,
     setTrackIsPlaying,
     playingTime,
     setPlayingTime,
     audioPlayer,
-    isMuted,
   } = useTrackContext();
 
   //   const audioPlayer = useRef<HTMLAudioElement>(new Audio()); // 오디오 태그 접근
@@ -35,13 +33,6 @@ const TrackHeader = ({
   const animationRef = useRef(0); // 재생 애니메이션
 
   const trackHeader = useRef<HTMLDivElement>(null); // 헤더 전체 div(재생과는 무관)
-
-  const onLoadedMetadata = () => {
-    // 트랙 metadata가 로드되었을 때 실행
-    const seconds = Math.floor(audioPlayer.current.duration); // 트랙 길이 정보를 받아와서 재생 바 오른쪽에 트랙 길이 표현하기 위함
-    setTrackDuration(audioPlayer.current.duration);
-    progressBar.current.max = seconds; // input의 최댓값을 트랙의 길이로(input type=range가 트랙이 재생되는 바를 표현하게 됨)
-  };
 
   const calculateTime = (secs: number) => {
     // 트랙 길이를 분:초 단위로 환산
@@ -103,12 +94,6 @@ const TrackHeader = ({
     animationRef.current = requestAnimationFrame(whilePlaying);
   };
 
-  const onEnded = () => {
-    // 트랙 재생이 끝났을 때
-    setTrackIsPlaying(false);
-    audioPlayer.current.pause();
-  };
-
   //여기서부터는 재생과는 무관
   const { data } = useColor(track.image, "rgbArray", {
     // 트랙 이미지에 따라 헤더 색을 자동으로 생성
@@ -135,15 +120,6 @@ const TrackHeader = ({
         <TrackInfo track={track} />
       </div>
       <div className={styles.playingTrack}>
-        <audio
-          ref={audioPlayer}
-          className={styles.audioPlayer}
-          src={track.audio}
-          preload="metadata"
-          onLoadedMetadata={onLoadedMetadata}
-          onEnded={onEnded}
-          muted={isMuted}
-        />
         <div className={styles.trackPlayer}>
           <div className={styles.time}>
             <div className={styles.currentTime}>

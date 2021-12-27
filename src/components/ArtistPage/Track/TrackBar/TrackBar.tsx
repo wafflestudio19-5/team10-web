@@ -32,6 +32,8 @@ const TrackBar = () => {
     audioPlayer,
     isMuted,
     setIsMuted,
+    loop,
+    setLoop,
   } = useTrackContext();
 
   const history = useHistory();
@@ -99,6 +101,7 @@ const TrackBar = () => {
     barAnimationRef.current = requestAnimationFrame(whilePlaying);
   };
 
+  const toggleLoop = () => setLoop(!loop);
   const toggleMuteUnmute = () => setIsMuted(!isMuted);
 
   const clickArtist = () => history.push(`/username`);
@@ -178,7 +181,10 @@ const TrackBar = () => {
         <button className={styles.shuffle}>
           <IoShuffleSharp />
         </button>
-        <button className={styles.loop}>
+        <button
+          className={`${styles.loop} ${loop && styles.loopTrack}`}
+          onClick={toggleLoop}
+        >
           <BiRepeat />
         </button>
         <div className={styles.trackContainer}>
