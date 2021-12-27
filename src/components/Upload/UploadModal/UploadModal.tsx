@@ -1,6 +1,27 @@
+import { useState } from "react";
 import "./UploadModal.scss";
 
-function UploadModal() {
+function UploadModal({ selectedFile }: any) {
+  const [imageUrl, setImageUrl] = useState<any>(null);
+
+  const clickImageInput = (event: any) => {
+    event.preventDefault();
+    let fileInput = document.getElementById("file-input");
+    fileInput?.click();
+  };
+
+  const imageToUrl = (event: any) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(event.target.files[0]);
+    reader.onload = () => {
+      setImageUrl(reader.result);
+    };
+  };
+
+  const handleUpload = () => {
+    console.log(selectedFile);
+  };
+
   return (
     <div className="upload-modal">
       <div className="upload-modal-header">
@@ -12,18 +33,24 @@ function UploadModal() {
 
       <div className="upload-modal-body">
         <div className="upload-image">
-          <img
-            className="upload-track-img"
-            src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
-            alt="track-img"
-          />
-          <button>
+          {!imageUrl && (
+            <img
+              className="upload-track-img"
+              src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
+              alt="track-img"
+            />
+          )}
+          {imageUrl && (
+            <img className="upload-track-img" src={imageUrl} alt="img" />
+          )}
+          <button onClick={clickImageInput}>
             <img
               src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
               alt="img"
             />
             <div>Upload image</div>
           </button>
+          <input type="file" id="file-input" onChange={imageToUrl} />
         </div>
 
         <div className="upload-info">
@@ -73,7 +100,9 @@ function UploadModal() {
 
       <div className="upload-modal-button">
         <button className="cancel-button">Cancel</button>
-        <button className="save-button">Save</button>
+        <button className="save-button" onClick={handleUpload}>
+          Save
+        </button>
       </div>
     </div>
   );

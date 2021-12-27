@@ -13,13 +13,9 @@ function Upload() {
       <div className={"uploadpage"}>
         <UploadHeader />
         {!modal && (
-          <UploadBox
-            setModal={setModal}
-            selectedFile={selectedFile}
-            setSelectedFile={setSelectedFile}
-          />
+          <UploadBox setModal={setModal} setSelectedFile={setSelectedFile} />
         )}
-        {modal && <UploadModal />}
+        {modal && <UploadModal selectedFile={selectedFile} />}
       </div>
     </div>
   );
