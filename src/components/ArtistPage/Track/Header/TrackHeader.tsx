@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./TrackHeader.module.scss";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useHistory } from "react-router";
 import "./styles.scss";
 import { ITrack } from "../TrackPage";
-import { useColor } from "color-thief-react";
 // import WaveSurfer from "wavesurfer.js";
 
 const TrackHeader = ({
@@ -27,7 +26,6 @@ const TrackHeader = ({
   const audioPlayer = useRef<HTMLAudioElement>(new Audio());
   const progressBar = useRef<any>(null);
   const animationRef = useRef(0);
-  const trackHeader = useRef<HTMLDivElement>(null);
 
   const onLoadedMetadata = () => {
     const seconds = Math.floor(audioPlayer.current.duration);
@@ -84,22 +82,8 @@ const TrackHeader = ({
     audioPlayer.current.pause();
   };
 
-  const { data } = useColor(track.image, "rgbArray", {
-    crossOrigin: "anonymous",
-    quality: 10,
-  });
-  useEffect(() => {
-    const { current } = trackHeader;
-    if (current !== null && data !== undefined) {
-      const [red, green, blue] = data;
-      current.style.setProperty("--red", `${red}`);
-      current.style.setProperty("--green", `${green}`);
-      current.style.setProperty("--blue", `${blue}`);
-    }
-  }, [trackHeader, data]);
-
   return (
-    <div ref={trackHeader} className={styles.trackHeader}>
+    <div className={styles.trackHeader}>
       <div className={styles.trackInfo}>
         {isPlaying ? (
           <button className={styles.playButton} onClick={togglePlayPause}>
