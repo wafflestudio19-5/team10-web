@@ -103,5 +103,5 @@ dist
 # TernJS port file
 .tern-port
 
-#ACCESS KEY
-.env
+#DS_Store
+.DS_Store
