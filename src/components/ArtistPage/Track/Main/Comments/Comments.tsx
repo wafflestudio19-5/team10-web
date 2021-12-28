@@ -16,7 +16,7 @@ const Comments = ({ comments }: { comments: IComment[] }) => {
       <ul className={styles.commentsList}>
         {comments.length
           ? comments.map((comment) => {
-              return <CommentItem comment={comment} />;
+              return <CommentItem comment={comment} key={comment.id} />;
             })
           : null}
       </ul>

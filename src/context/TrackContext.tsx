@@ -8,8 +8,8 @@ interface ITrackContext {
   setTrackIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   playingTime: number; // 현재 재생되고 있는 시점(재생되고 있는 트랙 페이지일 경우 트랙페이지 플레이어와 하단 바 플레이어 싱크를 맞추기 위함)
   setPlayingTime: React.Dispatch<React.SetStateAction<number>>;
-  audioPlayer: any;
-  audioSrc: string; // 현재 재생되고 있는 오디오 -- 이거를 하단 바와 다른 곳에 있는 플레이어에 동시 적용하는 방식을 생각해보았습니다
+  audioPlayer: any; // 현재 재생되고 있는 오디오 -- 이거를 하단 바와 다른 곳에 있는 플레이어에 동시 적용하는 방식을 생각해보았습니다
+  audioSrc: string; // 오디오 src
   setAudioSrc: React.Dispatch<React.SetStateAction<string>>;
   isMuted: boolean; // 음소거 여부
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;

@@ -5,13 +5,15 @@ import { IoMdPlay, IoMdPause } from "react-icons/io";
 const HeaderButton = ({
   isPlaying,
   togglePlayPause,
+  isSameTrack,
 }: {
   isPlaying: boolean;
   togglePlayPause: () => void;
+  isSameTrack: boolean;
 }) => {
   return (
     <>
-      {isPlaying ? (
+      {isPlaying && isSameTrack ? (
         <button className={styles.playButton} onClick={togglePlayPause}>
           <IoMdPause />
         </button>

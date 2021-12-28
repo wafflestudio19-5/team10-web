@@ -139,6 +139,7 @@
   box-sizing: border-box;
   z-index: 22;
   margin-top: 7px;
+  visibility: hidden;
 }
 /* knobby - firefox */
 .progressBar::-moz-range-thumb {
@@ -149,6 +150,17 @@
   border: none;
   cursor: pointer;
   z-index: 22;
+  visibility: hidden;
+}
+.progressBar {
+  &:hover {
+    &::-webkit-slider-thumb {
+      visibility: visible;
+    }
+    &::-moz-range-thumb {
+      visibility: visible;
+    }
+  }
 }
 
 .trackInfo {

@@ -30,6 +30,7 @@ const TrackBar = () => {
     playingTime,
     setPlayingTime,
     audioPlayer,
+    setAudioSrc,
     isMuted,
     setIsMuted,
     loop,
@@ -60,7 +61,12 @@ const TrackBar = () => {
     // 재생/일시정지 버튼 누를 때
     const prevValue = trackIsPlaying;
     setTrackIsPlaying(!prevValue);
-    if (!prevValue) {
+    const isPlaying =
+      audioPlayer.current.currentTime > 0 &&
+      !audioPlayer.current.paused &&
+      !audioPlayer.current.ended &&
+      audioPlayer.current.readyState > audioPlayer.current.HAVE_CURRENT_DATA;
+    if (!prevValue && !isPlaying) {
       audioPlayer.current.play();
       setPlayingTime(audioPlayer.current.currentTime);
       barAnimationRef.current = requestAnimationFrame(whilePlaying);
@@ -72,9 +78,12 @@ const TrackBar = () => {
   };
 
   const whilePlaying = () => {
-    setPlayingTime(progressBar.current.value);
-    changePlayerCurrentTime();
-    barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    // progressBar.current.value = audioPlayer.current.currentTime;
+    if (progressBar.current) {
+      setPlayingTime(progressBar.current.value);
+      changePlayerCurrentTime();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }
   };
 
   const changePlayerCurrentTime = () => {
@@ -160,10 +169,42 @@ const TrackBar = () => {
     setFollowArtist(false);
   };
 
+  const nextTrack = () => {
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setAudioSrc(
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+    );
+    audioPlayer.current.src =
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+
+    audioPlayer.current.load();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
+  };
+
+  const prevTrack = () => {
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setAudioSrc(
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    );
+    audioPlayer.current.src =
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+    audioPlayer.current.load();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.main}>
-        <button className={styles.previousTrack}>
+        <button className={styles.previousTrack} onClick={prevTrack}>
           <IoPlaySkipBackSharp />
         </button>
         {trackIsPlaying ? (
@@ -175,7 +216,7 @@ const TrackBar = () => {
             <IoPlaySharp />
           </button>
         )}
-        <button className={styles.nextTrack}>
+        <button className={styles.nextTrack} onClick={nextTrack}>
           <IoPlaySkipForwardSharp />
         </button>
         <button className={styles.shuffle}>
