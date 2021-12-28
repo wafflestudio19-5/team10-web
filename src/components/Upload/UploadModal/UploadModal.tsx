@@ -1,14 +1,20 @@
 import axios from "axios";
 import { useState } from "react";
+import Cookies from "universal-cookie";
 import { AuthContext } from "../../../Context";
 import "./UploadModal.scss";
 
 function UploadModal({ selectedFile }: any) {
-  const { userSecret } = AuthContext();
+  // 삭제예정
+  const cookies = new Cookies();
+  const token = cookies.get("jwt_token");
+  const permalink = cookies.get("permalink");
+
+  const { userSecret } = AuthContext(); // 나중에 token, permalink 이걸로 적용
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
-  const [title, setTitle] = useState<string>();
-  const [description, setDescription] = useState<string>();
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
 
   const clickImageInput = (event: any) => {
@@ -33,7 +39,7 @@ function UploadModal({ selectedFile }: any) {
         "https://api.soundwaffle.com/tracks",
         {
           title: title,
-          permalink: userSecret.permalink,
+          permalink: permalink,
           description: description,
           is_private: isPrivate,
           audio_filename: selectedFile.name,
@@ -41,12 +47,12 @@ function UploadModal({ selectedFile }: any) {
         },
         {
           headers: {
-            Authorization: `JWT ${userSecret.jwt}`,
+            Authorization: `JWT ${token}`,
           },
         }
       )
       .then((res) => {
-        console.log(res.data);
+        console.log(res);
       })
       .catch((err) => {
         console.log(err);
