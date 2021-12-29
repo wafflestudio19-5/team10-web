@@ -16,7 +16,7 @@ import Following from "./components/Library/Following/Following";
 import History from "./components/Library/History/History";
 import { AuthProvider } from "./Context";
 import Upload from "./components/Upload/Upload";
-import YourTracks from "./components/ArtistPage/Track/YourTracks/YourTracks";
+import YourTracks from "./components/Upload/YourTracks/YourTracks";
 import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
 import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
 

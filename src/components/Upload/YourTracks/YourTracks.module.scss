@@ -3,18 +3,33 @@
   font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans,
     Garuda, Verdana, Tahoma, sans-serif;
 }
+.yourTracksPage {
+  width: 100vw;
+  background: #f2f2f2;
+}
+.wrapper {
+  width: 1240px;
+  box-sizing: border-box;
+  margin: auto;
+  background: white;
+}
 .main {
   width: 1180px;
   box-sizing: border-box;
-  margin: 96px auto 0 auto;
+  margin: 0 auto;
   color: #333333;
   height: calc(100vh - 46px);
+}
+.uploadHeader {
+  margin-top: 46px;
+  margin-left: -30px;
 }
 .header {
   width: 1180px;
   height: 121px;
   box-sizing: border-box;
   border-bottom: 1px solid #f2f2f2;
+  margin-top: -35px;
 }
 .title {
   width: 1180px;
@@ -58,6 +73,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-left: 10px;
   margin-right: 5px;
   svg {
     font-size: 13px;
@@ -67,6 +83,7 @@
   ul {
     padding: 0;
     margin: 0;
+    margin-left: 10px;
     background: #ffffff;
     border: 1px solid #e5e5e5;
     width: 123px;
