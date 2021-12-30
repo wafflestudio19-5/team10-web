@@ -3,25 +3,19 @@ import ReactAudioPlayer from "react-audio-player";
 import { Grid } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Cookies from "universal-cookie";
+import { useParams } from "react-router-dom";
 
 function ArtistPage() {
-  //삭제예정
-  const cookies = new Cookies();
-  const token = cookies.get("jwt_token");
+  const params = useParams<any>();
+  const permalink = params.permalink;
 
   const [displayName, setDisplayName] = useState<string>();
 
   useEffect(() => {
-    const permalink = "permalink"; //url에서 가져오는 걸로 바꾸기
-
     //resolve api
+    const url = `https://soundwaffle.com/${permalink}`;
     axios
-      .get(`https://api.soundwaffle.com/resolve?url=${permalink}`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      })
+      .get(`/resolve?url=${url}`)
       .then((res) => {
         console.log(res);
       })
@@ -29,15 +23,9 @@ function ArtistPage() {
         console.log(err);
       });
 
-    //user_id 가져왔다 치고
     axios
-      .get(`https://api.soundwaffle.com/users/6`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      })
+      .get(`/users/6`)
       .then((res) => {
-        console.log(res);
         setDisplayName(res.data.display_name);
       })
       .catch((err) => {
@@ -61,12 +49,12 @@ function ArtistPage() {
 
         <div className={"menu-bar"}>
           <div className={"menu-left"}>
-            <a href={"/userid"}>All</a>
-            <a href={"/userid/popular-tracks"}>Popular tracks</a>
-            <a href={"/userid/tracks"}>Tracks</a>
-            <a href={"/userid/albums"}>Albums</a>
-            <a href={"/userid/sets"}>Playlists</a>
-            <a href={"/userid/reposts"}>Reposts</a>
+            <a href={`/${permalink}`}>All</a>
+            <a href={`/${permalink}/popular-tracks`}>Popular tracks</a>
+            <a href={`/${permalink}/tracks`}>Tracks</a>
+            <a href={`/${permalink}/albums`}>Albums</a>
+            <a href={`/${permalink}/sets`}>Playlists</a>
+            <a href={`/${permalink}/reposts`}>Reposts</a>
           </div>
           <div className={"menu-right"}>
             <button className="button1">

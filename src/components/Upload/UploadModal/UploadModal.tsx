@@ -1,16 +1,14 @@
 import axios from "axios";
 import { useState } from "react";
-import Cookies from "universal-cookie";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
 function UploadModal({ selectedFile }: any) {
-  // 삭제예정
-  const cookies = new Cookies();
-  const token = cookies.get("jwt_token");
-  const permalink = cookies.get("permalink");
+  const { userSecret } = useAuthContext();
 
-  const { userSecret } = useAuthContext(); // 나중에 token, permalink 이걸로 적용
+  const permalink = userSecret.permalink;
+  const token = userSecret.jwt;
+
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
@@ -52,12 +50,12 @@ function UploadModal({ selectedFile }: any) {
         }
       )
       .then((res) => {
-        console.log(res);
         const img_options = {
           headers: {
             "Content-Type": imageFile.type,
           },
         };
+
         axios
           .put(res.data.image_presigned_url, imageFile, img_options)
           .then((res) => {
@@ -70,8 +68,6 @@ function UploadModal({ selectedFile }: any) {
       .catch((err) => {
         console.log(err);
       });
-
-    console.log(userSecret);
   };
 
   return (
