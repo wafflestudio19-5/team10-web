@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useRef } from "react";
 import Cookies from "universal-cookie";
-import { AuthContext } from "../../Context";
+import { useAuthContext } from "../../context/AuthContext";
 import styles from "./Discover.module.scss";
 import LikeList from "./LikeList/LikeList";
 import MostList from "./MostList/MostList";
@@ -9,7 +9,7 @@ import NewList from "./NewList/NewList";
 
 const Discover = () => {
   const cookies = new Cookies();
-  const { userSecret, setUserSecret } = AuthContext();
+  const { userSecret, setUserSecret } = useAuthContext();
   useEffect(() => {
     const checkValid = async () => {
       const jwtToken = cookies.get("jwt_token");

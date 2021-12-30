@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import Cookies from "universal-cookie";
-import { AuthContext } from "../../../Context";
+import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
 function UploadModal({ selectedFile }: any) {
@@ -10,7 +10,7 @@ function UploadModal({ selectedFile }: any) {
   const token = cookies.get("jwt_token");
   const permalink = cookies.get("permalink");
 
-  const { userSecret } = AuthContext(); // 나중에 token, permalink 이걸로 적용
+  const { userSecret } = useAuthContext(); // 나중에 token, permalink 이걸로 적용
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
