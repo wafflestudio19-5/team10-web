@@ -14,14 +14,22 @@ import Albums from "./components/Library/Albums/Albums";
 import Stations from "./components/Library/Stations/Stations";
 import Following from "./components/Library/Following/Following";
 import History from "./components/Library/History/History";
-import { AuthProvider } from "./Context";
+import { useAuthContext, AuthProvider } from "./context/AuthContext";
 import Upload from "./components/Upload/Upload";
 import YourTracks from "./components/Upload/YourTracks/YourTracks";
 import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
 import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
+import axios from "axios";
 
 function App() {
   const location = useLocation();
+  const { userSecret } = useAuthContext();
+  axios.defaults.baseURL = "https://api.soundwaffle.com";
+  if (userSecret && userSecret.jwt !== undefined) {
+    axios.defaults.headers.common["Authorization"] = `JWT ${
+      userSecret && userSecret.jwt
+    }`;
+  }
   return (
     <AuthProvider>
       <div className={styles.wrapper}>
