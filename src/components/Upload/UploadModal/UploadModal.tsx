@@ -53,6 +53,19 @@ function UploadModal({ selectedFile }: any) {
       )
       .then((res) => {
         console.log(res);
+        const img_options = {
+          headers: {
+            "Content-Type": imageFile.type,
+          },
+        };
+        axios
+          .put(res.data.image_presigned_url, imageFile, img_options)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => {
         console.log(err);
