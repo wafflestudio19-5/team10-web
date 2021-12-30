@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import Cookies from "universal-cookie";
 import { AuthContext } from "../../Context";
 import styles from "./Discover.module.scss";
+import LikeList from "./LikeList/LikeList";
 import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
 
@@ -81,7 +82,7 @@ const Discover = () => {
             🤍 12 likes
             <button>View all</button>
           </div>
-          {/* 이자리에 like 리스트 컴포넌트 */}
+          <LikeList />
         </div>
         <div className={styles.following}>
           <div className={styles.header}>

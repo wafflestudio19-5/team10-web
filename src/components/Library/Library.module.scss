@@ -1,7 +1,11 @@
+.pageWrapper {
+  width: 100vw;
+  background-color: #f2f2f2;
+}
 .wrapper {
   margin: auto;
   padding: 46px 0 46px 0;
-  width: 1240px;
+  width: 1240px; //1240px하니깐 크기가 안맞던데, 다른분들은 어떻게 하셨을까요
   background-color: white;
   display: flex;
   flex-direction: column;
