@@ -8,18 +8,21 @@ import { useHistory } from "react-router";
 const InPlaylists = () => {
   const playlists = [
     {
+      id: 1,
       artistName: "Artist Name",
       listName: "Playlist Name",
       likes: "25.2K",
       reposts: "1,614",
     },
     {
+      id: 2,
       artistName: "Artist Name",
       listName: "Playlist Name",
       likes: "25.2K",
       reposts: "1,614",
     },
     {
+      id: 3,
       artistName: "Artist Name",
       listName: "Playlist Name",
       likes: "25.2K",
@@ -44,7 +47,7 @@ const InPlaylists = () => {
           const clickUsername = () => history.push(`/${playlist.artistName}`);
           const clickPlaylist = () => history.push(`/${playlist.listName}`);
           return (
-            <li className={styles.tracks}>
+            <li className={styles.tracks} key={playlist.id}>
               <div
                 className={styles.trackImage}
                 onClick={() => history.push(`${playlist.listName}`)}

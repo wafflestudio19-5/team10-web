@@ -1,8 +1,50 @@
 import "./ArtistPage.scss";
 import ReactAudioPlayer from "react-audio-player";
 import { Grid } from "semantic-ui-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Cookies from "universal-cookie";
 
 function ArtistPage() {
+  //삭제예정
+  const cookies = new Cookies();
+  const token = cookies.get("jwt_token");
+
+  const [displayName, setDisplayName] = useState<string>();
+
+  useEffect(() => {
+    const permalink = "permalink"; //url에서 가져오는 걸로 바꾸기
+
+    //resolve api
+    axios
+      .get(`https://api.soundwaffle.com/resolve?url=${permalink}`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    //user_id 가져왔다 치고
+    axios
+      .get(`https://api.soundwaffle.com/users/6`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setDisplayName(res.data.display_name);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+
   return (
     <div className="artistpage-wrapper">
       <div className={"artistpage"}>
@@ -12,7 +54,7 @@ function ArtistPage() {
             alt={"profileImg"}
           />
           <div className={"name"}>
-            <div className={"displayname"}>DisplayName</div>
+            <div className={"displayname"}>{displayName}</div>
             <div className={"username"}>UserName</div>
           </div>
         </div>

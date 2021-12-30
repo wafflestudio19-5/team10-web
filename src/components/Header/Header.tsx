@@ -1,10 +1,14 @@
 import { useHistory } from "react-router";
 import "./Header.scss";
 import Cookies from "universal-cookie";
+import { useEffect } from "react";
 
 function Header() {
   const history = useHistory();
   const cookies = new Cookies();
+  useEffect(() => {
+    cookies.get("jwt_token") === undefined ? history.push("/") : null;
+  }, []);
   const onSignOut = () => {
     cookies.remove("jwt_token");
     history.push("/logout");

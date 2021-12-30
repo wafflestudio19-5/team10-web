@@ -29,6 +29,10 @@
     &.repost svg {
       font-size: 17px;
     }
+    &.like svg,
+    &.like span {
+      color: #ea4e00;
+    }
   }
   .stats {
     color: #999999;

@@ -1,0 +1,196 @@
+@import url("https://use.typekit.net/wii1ijh.css");
+* {
+  font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans,
+    Garuda, Verdana, Tahoma, sans-serif;
+}
+.yourTracksPage {
+  width: 100vw;
+  background: #f2f2f2;
+}
+.wrapper {
+  width: 1240px;
+  box-sizing: border-box;
+  margin: auto;
+  background: white;
+}
+.main {
+  width: 1180px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  color: #333333;
+  height: calc(100vh - 46px);
+}
+.uploadHeader {
+  margin-top: 46px;
+  margin-left: -30px;
+}
+.header {
+  width: 1180px;
+  height: 121px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #f2f2f2;
+  margin-top: -35px;
+}
+.title {
+  width: 1180px;
+  height: 72px;
+  margin-bottom: 10px;
+  padding-top: 30px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  span {
+    font-size: 32px;
+    font-weight: 500;
+  }
+}
+.editButtons {
+  width: 100%;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.checkboxContainer {
+  width: 31px;
+  height: 31px;
+  box-sizing: border-box;
+  margin-left: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.editTracks {
+  width: 123px;
+  height: 26px;
+  box-sizing: border-box;
+  //   color: #333333;
+  color: #cccccc;
+  //   background: #ffffff;
+  background: #f2f2f2;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 10px;
+  margin-right: 5px;
+  svg {
+    font-size: 13px;
+  }
+}
+.dropdownContainer {
+  ul {
+    padding: 0;
+    margin: 0;
+    margin-left: 10px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    width: 123px;
+    box-sizing: border-box;
+    color: #333333;
+    font-size: 13px;
+    position: absolute;
+    &:first-child {
+      padding-top: 0.8em;
+    }
+  }
+  li {
+    padding: 7px;
+    list-style: none;
+  }
+}
+.addToPlaylist {
+  width: 139px;
+  height: 26px;
+  color: #cccccc;
+  background: #f2f2f2;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  svg {
+    margin-left: 4px;
+    font-size: 20px;
+  }
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+}
+.pageSelector {
+  position: absolute;
+  right: 15px;
+  width: 183px;
+  height: 26px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pageInfo {
+  font-size: 14px;
+}
+.pageButtons {
+  display: flex;
+  button {
+    height: 26px;
+    background: #f2f2f2ff;
+    color: #c8c8c8;
+    border: 1px solid #e5e5e5;
+    box-sizing: border-box;
+    svg {
+      font-size: 18px;
+    }
+  }
+  .backButton {
+    padding: 0 6px 0 5px;
+    border-right: none;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+  .nextButton {
+    padding: 0 5px 0 6px;
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+}
+.uploadTrack {
+  margin-top: 102px;
+  height: 236px;
+  .waveContainer {
+    width: 240px;
+    height: 167px;
+    border: 8px solid #efefef;
+    border-radius: 10px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    svg {
+      font-size: 150px;
+      color: #efefef;
+    }
+  }
+  .seemQuiet {
+    margin-top: 14px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+  }
+  .uploadLink {
+    margin-top: 8px;
+    color: #3388dd;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    font-weight: 500;
+    &:hover {
+      color: #333333;
+    }
+  }
+}

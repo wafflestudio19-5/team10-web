@@ -3,6 +3,7 @@ name: Workflow for S3 Deploy
 on:
   push:
     branches:
+      - master
       - sprint1
       - sprint2
       - sprint3
@@ -34,16 +35,16 @@ jobs:
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
             
-      - name: Install Dependencies   
-         run: npm install
+      - name: Install Dependencies
+        run: npm install
 
       - name: Build
-         run: npm run build     
+        run: npm run build     
 
       - name: Deploy
-          uses: lbertenasco/s3-deploy@v1
-          with:
-            folder: build
-            bucket: ${{ secrets.BUCKET_NAME }}
-            dist-id: ${{ secrets.DISTRIBUTION_ID }}
-            invalidation: / *
+        uses: lbertenasco/s3-deploy@v1
+        with:
+          folder: build
+          bucket: ${{ secrets.BUCKET_NAME }}
+          dist-id: ${{ secrets.DISTRIBUTION_ID }}
+          invalidation: / *

@@ -25,6 +25,7 @@ const RepostUsers = () => {
               className={styles.image}
               style={{ zIndex: index }}
               onClick={clickUser}
+              key={index}
             />
           );
         })}

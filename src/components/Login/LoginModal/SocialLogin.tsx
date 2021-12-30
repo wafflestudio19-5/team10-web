@@ -1,13 +1,16 @@
+import axios from "axios";
 import { useRef } from "react";
 
 const SocialLogin = ({
   handleInput,
   handleSignup,
   email,
+  handleSignIn,
 }: {
   handleInput: any;
   handleSignup: any;
   email: string;
+  handleSignIn: any;
 }) => {
   const input = useRef<HTMLInputElement>(null);
   input.current?.focus();
@@ -18,7 +21,17 @@ const SocialLogin = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleSignup();
+          axios
+            .post(`https://api.soundwaffle.com/signup`, {
+              email: email,
+            })
+            .catch((e) => {
+              e.response.status === 400
+                ? handleSignup()
+                : e.response.status === 409
+                ? handleSignIn()
+                : console.log("회원가입 에러입니다");
+            });
         }}
       >
         <input

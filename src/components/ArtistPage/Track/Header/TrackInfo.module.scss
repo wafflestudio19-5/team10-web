@@ -1,0 +1,23 @@
+.soundTitle {
+  display: grid;
+  grid-row: 2;
+  .titleContainer {
+    margin-left: 5px;
+    height: 37px;
+    box-sizing: border-box;
+    width: fit-content;
+    background-color: rgb(34, 34, 34);
+    color: white;
+    font-size: 24px;
+    padding: 4px 7px;
+  }
+  .usernameContainer {
+    margin: 5px 0 0 5px;
+    width: fit-content;
+    background-color: rgb(34, 34, 34);
+    color: lightgray;
+    padding: 2px 7px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+}

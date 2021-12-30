@@ -1,0 +1,221 @@
+.container {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 48px;
+  border-top: 1px solid #cecece;
+  box-sizing: border-box;
+  background-color: #f2f2f2;
+  color: #333333;
+  display: flex;
+  justify-content: center;
+  z-index: 20;
+}
+.main {
+  width: 1240px;
+  display: flex;
+  height: 100%;
+  button {
+    padding: 0;
+    background: none;
+    border: none;
+    width: 24px;
+    margin-left: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    svg {
+      font-size: 20px;
+    }
+    &.previousTrack,
+    &.nextTrack {
+      svg {
+        font-size: 16px;
+      }
+    }
+    &.playButton {
+      justify-content: end;
+    }
+    &.loopTrack {
+      color: #ff5500;
+    }
+  }
+  .trackContainer {
+    width: 632px;
+    height: 100%;
+    margin-left: 24px;
+    display: flex;
+    font-size: 12px;
+  }
+  .currentTime,
+  .duration {
+    width: 50px;
+    display: flex;
+    align-items: center;
+    font: 12px/1.4 Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda,
+      Verdana, Tahoma, sans-serif;
+  }
+  .currentTime {
+    justify-content: end;
+    color: #ff5500;
+  }
+  .track {
+    width: 512px;
+    margin: 13px 10px 0 10px;
+    padding: 10px 0;
+    height: 33px;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .duration {
+    justify-content: flex-start;
+  }
+}
+.progressBar {
+  --bar-bg: #cccccc;
+  --seek-before-width: 0;
+  --seek-before-color: #ff3f02;
+  --knobby: #ff3f02;
+
+  appearance: none;
+  background: var(--bar-bg);
+  width: 100%;
+  height: 1px;
+  outline: none;
+  position: absolute;
+  top: 10px;
+}
+//   Safari
+.progressBar::-webkit-slider-runnable-track {
+  background: none;
+  position: relative;
+  margin-top: 10px;
+  width: 100%;
+  height: 33px;
+  outline: none;
+  &:hover {
+    cursor: pointer;
+  }
+}
+//   Firefox
+.progressBar::-moz-range-track {
+  background: var(--bar-bg);
+  position: relative;
+  width: 100%;
+  height: 1px;
+  outline: none;
+}
+.progressBar::-moz-focus-outer {
+  border: 0;
+}
+// Chrome & Safari
+.progressBar::before {
+  content: "";
+  height: 1px;
+  width: calc(var(--seek-before-width) + 2px);
+  background-color: var(--seek-before-color);
+  position: absolute;
+  top: 0;
+  left: -2px;
+  z-index: 21;
+  cursor: pointer;
+}
+/* progress bar - firefox */
+.progressBar::-moz-range-progress {
+  background-color: var(--seek-before-color);
+  height: 1px;
+}
+/* knobby - chrome and safari */
+.progressBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background-color: var(--knobby);
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  margin-left: -0.5px;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  z-index: 22;
+  margin-top: 7px;
+  visibility: hidden;
+}
+/* knobby - firefox */
+.progressBar::-moz-range-thumb {
+  background-color: var(--knobby);
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  z-index: 22;
+  visibility: hidden;
+}
+.progressBar {
+  &:hover {
+    &::-webkit-slider-thumb {
+      visibility: visible;
+    }
+    &::-moz-range-thumb {
+      visibility: visible;
+    }
+  }
+}
+
+.trackInfo {
+  width: 360px;
+  height: 100%;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  img {
+    height: 30px;
+    width: 30px;
+  }
+  .artistTrackName {
+    margin: 0 8px;
+    width: 223px;
+    font: 12px/1.4 Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda,
+      Verdana, Tahoma, sans-serif;
+  }
+  .artistName {
+    line-height: 16px;
+    color: #999999;
+    cursor: pointer;
+    &:hover {
+      color: #000000;
+    }
+  }
+  .trackName {
+    line-height: 18px;
+    color: #666666;
+    span {
+      cursor: pointer;
+    }
+  }
+  .listenEngagement {
+    height: 24px;
+    width: 25px;
+    margin-left: 0;
+    svg {
+      font-size: 13px;
+    }
+  }
+  .likeTrack,
+  .unlikeTrack {
+    margin-left: 8px;
+  }
+  .unlikeTrack,
+  .unfollowArtist {
+    svg {
+      color: #ff3f02;
+    }
+  }
+  .nextUp {
+    svg {
+      font-size: 17px;
+    }
+  }
+}
