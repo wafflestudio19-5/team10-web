@@ -19,7 +19,7 @@ const CommentsInput = ({ fetchComments }: { fetchComments: () => void }) => {
     //   console.log(console.error());
     // }
     setInput("");
-    fetchComments;
+    fetchComments();
   };
 
   return (

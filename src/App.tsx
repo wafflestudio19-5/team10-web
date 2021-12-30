@@ -16,6 +16,9 @@ import Following from "./components/Library/Following/Following";
 import History from "./components/Library/History/History";
 import { AuthProvider } from "./Context";
 import Upload from "./components/Upload/Upload";
+import YourTracks from "./components/Upload/YourTracks/YourTracks";
+import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
+import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
 
 function App() {
   const location = useLocation();
@@ -38,7 +41,10 @@ function App() {
           <Route exact path="/you/following" component={Following} />
           <Route exact path="/you/history" component={History} />
           <Route exact path="/upload" component={Upload} />
+          <Route exact path="/you/tracks" component={YourTracks} />
         </Switch>
+        {location.pathname !== "/" && <TrackBar />}
+        {location.pathname !== "/" && <AudioTag />}
       </div>
     </AuthProvider>
   );

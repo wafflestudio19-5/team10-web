@@ -14,31 +14,37 @@ import {
   RiVolumeMuteFill,
 } from "react-icons/ri";
 import { MdVolumeUp, MdPlaylistPlay } from "react-icons/md";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useTrackContext } from "../../../../context/TrackContext";
 // import axios from "axios";
 
 const TrackBar = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
   const [likeTrack, setLikeTrack] = useState(false);
   const [followArtist, setFollowArtist] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+
+  const {
+    trackDuration,
+    trackIsPlaying,
+    setTrackIsPlaying,
+    playingTime,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    isMuted,
+    setIsMuted,
+    loop,
+    setLoop,
+  } = useTrackContext();
 
   const history = useHistory();
 
-  const audioPlayer = useRef<HTMLAudioElement>(new Audio());
-  const progressBar = useRef<any>(null);
-  const animationRef = useRef(0);
-
-  const onLoadedMetadata = () => {
-    const seconds = Math.floor(audioPlayer.current.duration);
-    setDuration(audioPlayer.current.duration);
-    progressBar.current.max = seconds;
-  };
+  //   const audioPlayer = useRef<HTMLAudioElement>(new Audio());
+  const progressBar = useRef<any>(null); // 재생 바 태그 접근(input)
+  const barAnimationRef = useRef(0); // 재생 애니메이션
 
   const calculateTime = (secs: number) => {
+    // 트랙 길이를 분:초 단위로 환산
     const minutes = Math.floor(secs / 60);
     const seconds = Math.floor(secs % 60);
     const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
@@ -46,41 +52,65 @@ const TrackBar = () => {
   };
 
   const changeRange = () => {
-    audioPlayer.current.currentTime = progressBar.current.value;
+    audioPlayer.current.currentTime = progressBar.current.value; // input slider와 트랙 연결
+    setPlayingTime(audioPlayer.current.currentTime);
     changePlayerCurrentTime();
   };
 
   const togglePlayPause = () => {
-    const prevValue = isPlaying;
-    setIsPlaying(!prevValue);
-    if (!prevValue) {
+    // 재생/일시정지 버튼 누를 때
+    const prevValue = trackIsPlaying;
+    setTrackIsPlaying(!prevValue);
+    const isPlaying =
+      audioPlayer.current.currentTime > 0 &&
+      !audioPlayer.current.paused &&
+      !audioPlayer.current.ended &&
+      audioPlayer.current.readyState > audioPlayer.current.HAVE_CURRENT_DATA;
+    if (!prevValue && !isPlaying) {
       audioPlayer.current.play();
-      animationRef.current = requestAnimationFrame(whilePlaying);
+      setPlayingTime(audioPlayer.current.currentTime);
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
     } else {
       audioPlayer.current.pause();
-      cancelAnimationFrame(animationRef.current);
+      setPlayingTime(audioPlayer.current.currentTime);
+      cancelAnimationFrame(barAnimationRef.current);
     }
   };
 
   const whilePlaying = () => {
-    progressBar.current.value = audioPlayer.current.currentTime;
-    changePlayerCurrentTime();
-    animationRef.current = requestAnimationFrame(whilePlaying);
+    // progressBar.current.value = audioPlayer.current.currentTime;
+    if (progressBar.current) {
+      setPlayingTime(progressBar.current.value);
+      changePlayerCurrentTime();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }
   };
 
   const changePlayerCurrentTime = () => {
-    progressBar.current.style.setProperty(
-      "--seek-before-width",
-      `${(progressBar.current.value / duration) * 100 + 0.5}%`
-    );
-    setCurrentTime(progressBar.current.value);
+    if (progressBar.current && audioPlayer.current) {
+      progressBar.current.value = audioPlayer.current.currentTime;
+      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+      progressBar.current.style.setProperty(
+        "--seek-before-width",
+        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+      );
+    }
+    setPlayingTime(audioPlayer.current.currentTime);
   };
 
-  const onEnded = () => {
-    setIsPlaying(false);
-    audioPlayer.current.pause();
+  useEffect(() => {
+    changePlayerCurrentTime();
+  }, [playingTime]);
+
+  const onPlayerClick = () => {
+    // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
+    setTrackIsPlaying(true);
+    setPlayingTime(progressBar.current.value);
+    audioPlayer.current.play();
+    barAnimationRef.current = requestAnimationFrame(whilePlaying);
   };
 
+  const toggleLoop = () => setLoop(!loop);
   const toggleMuteUnmute = () => setIsMuted(!isMuted);
 
   const clickArtist = () => history.push(`/username`);
@@ -139,13 +169,45 @@ const TrackBar = () => {
     setFollowArtist(false);
   };
 
+  const nextTrack = () => {
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setAudioSrc(
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+    );
+    audioPlayer.current.src =
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+
+    audioPlayer.current.load();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
+  };
+
+  const prevTrack = () => {
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setAudioSrc(
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    );
+    audioPlayer.current.src =
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+    audioPlayer.current.load();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.main}>
-        <button className={styles.previousTrack}>
+        <button className={styles.previousTrack} onClick={prevTrack}>
           <IoPlaySkipBackSharp />
         </button>
-        {isPlaying ? (
+        {trackIsPlaying ? (
           <button className={styles.playButton} onClick={togglePlayPause}>
             <IoPauseSharp />
           </button>
@@ -154,38 +216,34 @@ const TrackBar = () => {
             <IoPlaySharp />
           </button>
         )}
-        <button className={styles.nextTrack}>
+        <button className={styles.nextTrack} onClick={nextTrack}>
           <IoPlaySkipForwardSharp />
         </button>
         <button className={styles.shuffle}>
           <IoShuffleSharp />
         </button>
-        <button className={styles.loop}>
+        <button
+          className={`${styles.loop} ${loop && styles.loopTrack}`}
+          onClick={toggleLoop}
+        >
           <BiRepeat />
         </button>
         <div className={styles.trackContainer}>
-          <audio
-            ref={audioPlayer}
-            className={styles.audioPlayer}
-            src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-            preload="metadata"
-            onLoadedMetadata={onLoadedMetadata}
-            onEnded={onEnded}
-            muted={isMuted}
-          ></audio>
-          <div className={styles.currentTime}>{calculateTime(currentTime)}</div>
+          <div className={styles.currentTime}>{calculateTime(playingTime)}</div>
           <div className={styles.track}>
             <input
               ref={progressBar}
               type="range"
               className={styles.progressBar}
-              defaultValue="0"
               onChange={changeRange}
-              step="0.1"
+              step="0.3"
+              defaultValue="0"
+              onClick={onPlayerClick}
+              max={trackDuration}
             />
           </div>
           <div className={styles.duration}>
-            {!isNaN(duration) ? calculateTime(duration) : "0:00"}
+            {!isNaN(trackDuration) ? calculateTime(trackDuration) : "0:00"}
           </div>
         </div>
         {isMuted ? (

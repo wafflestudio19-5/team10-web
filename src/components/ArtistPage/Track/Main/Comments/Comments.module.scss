@@ -1,0 +1,134 @@
+.container {
+  margin-top: 25px;
+  header {
+    color: #999999;
+    font-size: 14px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid lightgray;
+    svg path {
+      fill: #999999;
+    }
+    span {
+      margin-left: 7px;
+    }
+  }
+}
+.commentsList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  li {
+    display: grid;
+    grid-template-columns: 50px 520px 90px;
+    padding: 15px 0;
+    .userImage {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      div {
+        --red: 0;
+        --green: 0;
+        --blue: 0;
+        --red2: 0;
+        --green2: 0;
+        --blue2: 0;
+        --bg-color: rgba(var(--red), var(--green), var(--blue), 1);
+        --bg-color2: rgba(var(--red2), var(--green2), var(--blue2), 1);
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        background: linear-gradient(120deg, var(--bg-color), var(--bg-color2));
+        box-sizing: border-box;
+      }
+    }
+    .mainComment {
+      color: #999999;
+      font-size: 12px;
+      .hoverClick {
+        cursor: pointer;
+        &:hover {
+          color: black;
+        }
+      }
+      .at {
+        color: #cccccc;
+      }
+      .comment {
+        margin-top: 8px;
+        color: black;
+      }
+    }
+    .timePassed {
+      font-size: 12px;
+      color: #999999;
+      text-align: right;
+      position: relative;
+      .replyButton {
+        visibility: hidden;
+        font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+          "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+        height: 22px;
+        width: 67px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 0;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        padding: 2px 9px 2px 8px;
+      }
+    }
+    &:hover .replyButton {
+      visibility: visible;
+    }
+  }
+  .replyContainer {
+    width: 649px;
+    height: 52px;
+    padding: 10px 10px 10px 0;
+    box-sizing: border-box;
+    margin: 0 0 0 20px;
+    display: none;
+    div {
+      width: 639px;
+      height: 32px;
+      border: 1px solid #e5e5e5;
+      display: flex;
+      background-color: #f2f2f2;
+      padding: 5px;
+      .userImage {
+        height: 20px;
+        width: 20px;
+        border: 1px solid black;
+        box-sizing: border-box;
+      }
+      .replyInput {
+        width: 607px;
+        height: 20px;
+        border: 1px solid #e5e5e5;
+        border-left: none;
+        box-sizing: border-box;
+        background-color: white;
+        input {
+          border: none;
+          padding: 0px 9px;
+          width: 100%;
+          font-size: 12px;
+          color: #333333;
+          font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+            "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+    }
+    &.shown {
+      display: block;
+    }
+  }
+}

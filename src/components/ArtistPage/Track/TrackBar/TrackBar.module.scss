@@ -37,6 +37,9 @@
     &.playButton {
       justify-content: end;
     }
+    &.loopTrack {
+      color: #ff5500;
+    }
   }
   .trackContainer {
     width: 632px;
@@ -110,7 +113,7 @@
 .progressBar::before {
   content: "";
   height: 1px;
-  width: var(--seek-before-width);
+  width: calc(var(--seek-before-width) + 2px);
   background-color: var(--seek-before-color);
   position: absolute;
   top: 0;
@@ -130,11 +133,13 @@
   height: 8px;
   width: 8px;
   border-radius: 50%;
+  margin-left: -0.5px;
   border: none;
   cursor: pointer;
   box-sizing: border-box;
   z-index: 22;
   margin-top: 7px;
+  visibility: hidden;
 }
 /* knobby - firefox */
 .progressBar::-moz-range-thumb {
@@ -145,6 +150,17 @@
   border: none;
   cursor: pointer;
   z-index: 22;
+  visibility: hidden;
+}
+.progressBar {
+  &:hover {
+    &::-webkit-slider-thumb {
+      visibility: visible;
+    }
+    &::-moz-range-thumb {
+      visibility: visible;
+    }
+  }
 }
 
 .trackInfo {
