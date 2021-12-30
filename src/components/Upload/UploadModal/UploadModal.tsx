@@ -1,8 +1,21 @@
+import axios from "axios";
 import { useState } from "react";
+import Cookies from "universal-cookie";
+import { AuthContext } from "../../../Context";
 import "./UploadModal.scss";
 
 function UploadModal({ selectedFile }: any) {
+  // 삭제예정
+  const cookies = new Cookies();
+  const token = cookies.get("jwt_token");
+  const permalink = cookies.get("permalink");
+
+  const { userSecret } = AuthContext(); // 나중에 token, permalink 이걸로 적용
   const [imageUrl, setImageUrl] = useState<any>(null);
+  const [imageFile, setImageFile] = useState<any>(null);
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -16,10 +29,49 @@ function UploadModal({ selectedFile }: any) {
     reader.onload = () => {
       setImageUrl(reader.result);
     };
+    setImageFile(event.target.files[0]);
   };
 
-  const handleUpload = () => {
-    console.log(selectedFile);
+  const handleUpload = (e: any) => {
+    e.preventDefault();
+    axios
+      .post(
+        "https://api.soundwaffle.com/tracks",
+        {
+          title: title,
+          permalink: permalink,
+          description: description,
+          is_private: isPrivate,
+          audio_filename: selectedFile.name,
+          image_filename: imageFile.name,
+        },
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        const img_options = {
+          headers: {
+            "Content-Type": imageFile.type,
+          },
+        };
+        axios
+          .put(res.data.image_presigned_url, imageFile, img_options)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    console.log(userSecret);
   };
 
   return (
@@ -56,7 +108,10 @@ function UploadModal({ selectedFile }: any) {
         <div className="upload-info">
           <div className="upload-info-title">
             <text>Title</text>
-            <input placeholder="Name your track" />
+            <input
+              placeholder="Name your track"
+              onChange={(e) => setTitle(e.target.value)}
+            />
             <div>soundcloud.com/username/title</div>
           </div>
           <div className="upload-info-genre">
@@ -72,7 +127,10 @@ function UploadModal({ selectedFile }: any) {
           </div>
           <div className="upload-info-description">
             <text>Description</text>
-            <input placeholder="Describe your track" />
+            <input
+              placeholder="Describe your track"
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
           <div className="upload-info-privacy">
             <text>Privacy:</text>
@@ -82,6 +140,7 @@ function UploadModal({ selectedFile }: any) {
                 type="radio"
                 name="flexRadioDefault"
                 id="flexRadioDefault2"
+                onChange={() => setIsPrivate(false)}
               />
               <label className="form-check-label">Public</label>
             </div>
@@ -91,6 +150,7 @@ function UploadModal({ selectedFile }: any) {
                 type="radio"
                 name="flexRadioDefault"
                 id="flexRadioDefault1"
+                onChange={() => setIsPrivate(true)}
               />
               <label className="form-check-label">Privacy</label>
             </div>

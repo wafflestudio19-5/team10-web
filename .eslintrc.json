@@ -8,5 +8,8 @@
         "endOfLine": "auto"
       }
     ]
+  },
+  "env": {
+    "broser": true
   }
 }
