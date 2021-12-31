@@ -4,15 +4,32 @@ import { Grid } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { useAuthContext } from "../../context/AuthContext";
 
 function ArtistPage() {
   const params = useParams<any>();
   const permalink = params.permalink;
+  const { userSecret } = useAuthContext();
+  const myPermalink = userSecret.permalink;
+  const [isMe, setIsMe] = useState(false);
 
   const [displayName, setDisplayName] = useState<string>();
 
+  const clickImageInput = (event: any) => {
+    event.preventDefault();
+    let fileInput = document.getElementById("file-input");
+    fileInput?.click();
+  };
+
   useEffect(() => {
-    //resolve api
+    // 내 페이지인지 확인
+    if (permalink == myPermalink) {
+      setIsMe(true);
+    } else {
+      setIsMe(false);
+    }
+
+    // resolve api
     const url = `https://soundwaffle.com/${permalink}`;
     axios
       .get(`/resolve?url=${url}`)
@@ -45,6 +62,19 @@ function ArtistPage() {
             <div className={"displayname"}>{displayName}</div>
             <div className={"username"}>UserName</div>
           </div>
+          {isMe && (
+            // 나중에 가능하면 헤더이미지 api 추가하기
+            <div className="upload-header-image">
+              <button onClick={clickImageInput}>
+                <img
+                  src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
+                  alt="img"
+                />
+                <div>Upload header image</div>
+              </button>
+              <input type="file" id="file-input" />
+            </div>
+          )}
         </div>
 
         <div className={"menu-bar"}>
@@ -56,41 +86,61 @@ function ArtistPage() {
             <a href={`/${permalink}/sets`}>Playlists</a>
             <a href={`/${permalink}/reposts`}>Reposts</a>
           </div>
-          <div className={"menu-right"}>
-            <button className="button1">
-              <img
-                src="https://a-v2.sndcdn.com/assets/images/start-station-ea018c5a.svg"
-                alt="station"
-              />
-              <div>Station</div>
-            </button>
-            <button className="button2">
-              <img
-                src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDE0IDE0Ij4KICA8cGF0aCBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTUuNTQyIDEuMTY3YzIuNzcgMCAzLjM4NiAyLjkxNiAyLjE1NSA2LjEyNSAzLjE2OSAxLjMwOCAzLjM4NiAzLjk3NyAzLjM4NiA0Ljk1OEgwYzAtLjk4MS4yMTgtMy42NSAzLjM4Ny00Ljk1OC0xLjIzMi0zLjIxOC0uNjE2LTYuMTI1IDIuMTU1LTYuMTI1em0wIDEuMTY2Yy0xLjU4NCAwLTIuMTI3IDEuNzctMS4wNjYgNC41NDIuMjI2LjU5LS4wNiAxLjI1NC0uNjQ0IDEuNDk1LTEuNTE3LjYyNi0yLjI2MyAxLjU3Mi0yLjUzNyAyLjcxM2g4LjQ5NGMtLjI3NS0xLjE0MS0xLjAyLTIuMDg3LTIuNTM3LTIuNzEzYTEuMTY3IDEuMTY3IDAgMCAxLS42NDQtMS40OTZjMS4wNi0yLjc2NC41MTYtNC41NC0xLjA2Ni00LjU0em02LjQxNC0uNTgzYy4xNyAwIC4yOTQuMTMuMjk0LjI5MlYzLjVoMS40NThjLjE1NyAwIC4yOTIuMTMyLjI5Mi4yOTR2LjU3OGMwIC4xNy0uMTMuMjk1LS4yOTIuMjk1SDEyLjI1djEuNDU4YS4yOTYuMjk2IDAgMCAxLS4yOTQuMjkyaC0uNTc4YS4yODkuMjg5IDAgMCAxLS4yOTUtLjI5MlY0LjY2N0g5LjYyNWEuMjk2LjI5NiAwIDAgMS0uMjkyLS4yOTV2LS41NzhjMC0uMTcuMTMxLS4yOTQuMjkyLS4yOTRoMS40NThWMi4wNDJjMC0uMTU3LjEzMi0uMjkyLjI5NS0uMjkyaC41Nzh6Ii8+Cjwvc3ZnPgo="
-                alt="follow"
-              />
-              <div>Follow</div>
-            </button>
-            <button className="button3">
-              <img
-                src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
-                alt="share"
-              />
-              <div>Share</div>
-            </button>
-            <button className="button4">
-              <img
-                src="https://a-v2.sndcdn.com/assets/images/message-a0c65ef1.svg"
-                alt="message"
-              />
-            </button>
-            <button className="button5">
-              <img
-                src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjE0cHgiIGhlaWdodD0iNHB4IiB2aWV3Qm94PSIwIDAgMTQgNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICA8dGl0bGU+bW9yZTwvdGl0bGU+CiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9InJnYigzNCwgMzQsIDM0KSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSI3IiBjeT0iMiIgcj0iMiIvPgogICAgPGNpcmNsZSBjeD0iMTIiIGN5PSIyIiByPSIyIi8+CiAgPC9nPgo8L3N2Zz4K"
-                alt="more"
-              />
-            </button>
-          </div>
+          {isMe && (
+            <div className="menu-right">
+              <button className="button3">
+                <img
+                  src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
+                  alt="share"
+                />
+                <div>Share</div>
+              </button>
+              <button className="button6">
+                <img
+                  src="https://a-v2.sndcdn.com/assets/images/edit-2fe52d66.svg"
+                  alt="edit"
+                />
+                <div>Edit</div>
+              </button>
+            </div>
+          )}
+          {!isMe && (
+            <div className={"menu-right"}>
+              <button className="button1">
+                <img
+                  src="https://a-v2.sndcdn.com/assets/images/start-station-ea018c5a.svg"
+                  alt="station"
+                />
+                <div>Station</div>
+              </button>
+              <button className="button2">
+                <img
+                  src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDE0IDE0Ij4KICA8cGF0aCBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTUuNTQyIDEuMTY3YzIuNzcgMCAzLjM4NiAyLjkxNiAyLjE1NSA2LjEyNSAzLjE2OSAxLjMwOCAzLjM4NiAzLjk3NyAzLjM4NiA0Ljk1OEgwYzAtLjk4MS4yMTgtMy42NSAzLjM4Ny00Ljk1OC0xLjIzMi0zLjIxOC0uNjE2LTYuMTI1IDIuMTU1LTYuMTI1em0wIDEuMTY2Yy0xLjU4NCAwLTIuMTI3IDEuNzctMS4wNjYgNC41NDIuMjI2LjU5LS4wNiAxLjI1NC0uNjQ0IDEuNDk1LTEuNTE3LjYyNi0yLjI2MyAxLjU3Mi0yLjUzNyAyLjcxM2g4LjQ5NGMtLjI3NS0xLjE0MS0xLjAyLTIuMDg3LTIuNTM3LTIuNzEzYTEuMTY3IDEuMTY3IDAgMCAxLS42NDQtMS40OTZjMS4wNi0yLjc2NC41MTYtNC41NC0xLjA2Ni00LjU0em02LjQxNC0uNTgzYy4xNyAwIC4yOTQuMTMuMjk0LjI5MlYzLjVoMS40NThjLjE1NyAwIC4yOTIuMTMyLjI5Mi4yOTR2LjU3OGMwIC4xNy0uMTMuMjk1LS4yOTIuMjk1SDEyLjI1djEuNDU4YS4yOTYuMjk2IDAgMCAxLS4yOTQuMjkyaC0uNTc4YS4yODkuMjg5IDAgMCAxLS4yOTUtLjI5MlY0LjY2N0g5LjYyNWEuMjk2LjI5NiAwIDAgMS0uMjkyLS4yOTV2LS41NzhjMC0uMTcuMTMxLS4yOTQuMjkyLS4yOTRoMS40NThWMi4wNDJjMC0uMTU3LjEzMi0uMjkyLjI5NS0uMjkyaC41Nzh6Ii8+Cjwvc3ZnPgo="
+                  alt="follow"
+                />
+                <div>Follow</div>
+              </button>
+              <button className="button3">
+                <img
+                  src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
+                  alt="share"
+                />
+                <div>Share</div>
+              </button>
+              <button className="button4">
+                <img
+                  src="https://a-v2.sndcdn.com/assets/images/message-a0c65ef1.svg"
+                  alt="message"
+                />
+              </button>
+              <button className="button5">
+                <img
+                  src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjE0cHgiIGhlaWdodD0iNHB4IiB2aWV3Qm94PSIwIDAgMTQgNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICA8dGl0bGU+bW9yZTwvdGl0bGU+CiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9InJnYigzNCwgMzQsIDM0KSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSI3IiBjeT0iMiIgcj0iMiIvPgogICAgPGNpcmNsZSBjeD0iMTIiIGN5PSIyIiByPSIyIi8+CiAgPC9nPgo8L3N2Zz4K"
+                  alt="more"
+                />
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="artist-body">

@@ -17,11 +17,42 @@
   background-image: url(https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg);
   display: flex;
   flex-direction: row;
+
   img {
     width: 200px;
     height: 200px;
     border-radius: 200px;
     margin: 30px;
+  }
+
+  .upload-header-image {
+    margin-left: 670px;
+    margin-top: 30px;
+
+    button {
+      width: 175px;
+      height: 26px;
+      border: 1px solid #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        width: 20px;
+        height: 20px;
+        border-radius: 0px;
+        margin: 0px;
+      }
+
+      div {
+        font-size: 14px;
+        margin-left: 5px;
+      }
+    }
+
+    input {
+      display: none;
+    }
   }
 }
 
@@ -120,6 +151,10 @@
 
   .button5 {
     width: 31px;
+  }
+
+  .button6 {
+    width: 65px;
   }
 
   div {
