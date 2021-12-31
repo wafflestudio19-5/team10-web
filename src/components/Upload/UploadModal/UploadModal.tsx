@@ -50,6 +50,21 @@ function UploadModal({ selectedFile }: any) {
         }
       )
       .then((res) => {
+        const music_options = {
+          headers: {
+            "Content-Type": selectedFile.type,
+          },
+        };
+
+        axios
+          .put(res.data.audio_presigned_url, selectedFile, music_options)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
         const img_options = {
           headers: {
             "Content-Type": imageFile.type,
