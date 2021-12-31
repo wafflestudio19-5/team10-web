@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
@@ -58,11 +59,11 @@ function UploadModal({ selectedFile }: any) {
 
         axios
           .put(res.data.audio_presigned_url, selectedFile, music_options)
-          .then((res) => {
-            console.log(res);
+          .then(() => {
+            toast("음악파일 업로드 완료");
           })
-          .catch((err) => {
-            console.log(err);
+          .catch(() => {
+            toast("음악파일 업로드 실패");
           });
 
         const img_options = {
@@ -73,15 +74,15 @@ function UploadModal({ selectedFile }: any) {
 
         axios
           .put(res.data.image_presigned_url, imageFile, img_options)
-          .then((res) => {
-            console.log(res);
+          .then(() => {
+            toast("이미지파일 업로드 완료");
           })
-          .catch((err) => {
-            console.log(err);
+          .catch(() => {
+            toast("이미지파일 업로드 실패");
           });
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        toast("업로드 실패");
       });
   };
 

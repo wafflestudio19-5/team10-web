@@ -6,12 +6,14 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import "semantic-ui-css/semantic.min.css";
 import { TrackProvider } from "../src/context/TrackContext";
+import { Toaster } from "react-hot-toast";
 
 ReactDOM.render(
   <React.StrictMode>
     <TrackProvider>
       <BrowserRouter>
         <App />
+        <Toaster />
       </BrowserRouter>
     </TrackProvider>
   </React.StrictMode>,
