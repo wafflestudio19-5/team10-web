@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
+import EditModal from "./EditModal/EditModal";
 
 function ArtistPage() {
   const params = useParams<any>();
@@ -12,6 +13,8 @@ function ArtistPage() {
   const { userSecret } = useAuthContext();
   const myPermalink = userSecret.permalink;
   const [isMe, setIsMe] = useState(false);
+
+  const [modal, setModal] = useState(false);
 
   const [displayName, setDisplayName] = useState<string>();
 
@@ -95,13 +98,14 @@ function ArtistPage() {
                 />
                 <div>Share</div>
               </button>
-              <button className="button6">
+              <button className="button6" onClick={() => setModal(true)}>
                 <img
                   src="https://a-v2.sndcdn.com/assets/images/edit-2fe52d66.svg"
                   alt="edit"
                 />
                 <div>Edit</div>
               </button>
+              <EditModal modal={modal} setModal={setModal} />
             </div>
           )}
           {!isMe && (

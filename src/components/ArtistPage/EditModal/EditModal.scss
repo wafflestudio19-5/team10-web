@@ -1,0 +1,161 @@
+.modal {
+    background-color: #f2f2f2;
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.modal-section {
+    width: 850px;
+    height: 720px;
+    margin: auto;
+    background-color: white;
+    animation: modal-show .3s;
+
+    .edit-modal-header {
+        width: 800px;
+        height: 32px;
+        border-bottom: 1px solid #f2f2f2;
+    }
+
+    .edit-modal-body{
+        display: flex;
+
+        .edit-image {
+            margin-left: 26px;
+
+            .edit-profile-img {
+                width: 260px;
+                height: 260px;
+                position: relative;
+            }
+
+            button {
+                position: relative;
+                top: -50px;
+                left: 65px;
+                width: 130px;
+                height: 26px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #f2f2f2;
+
+                div{
+                    margin-left: 10px;
+                }
+            }
+
+            input {
+                display: none;
+            }
+        }
+
+        .edit-info {
+            width: 470px;
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px;
+
+            .edit-info-dpname {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+
+                text {
+                    font-size: 12px;
+                    margin-bottom: 7px;
+                }
+
+                input {
+                    width: 470px;
+                    height: 26px;
+                    font-size: 14px;
+                    margin-bottom: 10px;
+                }
+            }
+
+            .edit-info-bio {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+
+                text {
+                    font-size: 12px;
+                    margin-bottom: 7px;
+                }
+
+                input {
+                    width: 470px;
+                    height: 130px;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
+    .edit-modal-button {
+        width: 800px;
+        border-top: 1px solid #f2f2f2;
+        font-size: 14px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        margin-top: 30px;
+
+        button {
+            margin-top: 30px;
+        }
+
+        .cancel-button {
+            width: 55px;
+            height: 26px;
+            line-height: 26px;
+            background-color: white;
+            color: #333;
+            border: none;
+        }
+
+        .save-button {
+            width: 55px;
+            height: 26px;
+            line-height: 26px;
+            background-color: #FF5500;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            margin-left: 10px;
+            margin-right: 25px;
+        }
+    }
+}
+
+.open {
+    display: flex;
+    align-items: center;
+    animation: modal-bg-show .3s;
+}
+
+@keyframes modal-show {
+    from {
+        opacity: 0;
+        margin-top: -50px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0;
+    }
+}
+
+@keyframes modal-bg-show {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
