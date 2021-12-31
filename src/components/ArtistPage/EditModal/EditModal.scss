@@ -11,7 +11,7 @@
 
 .modal-section {
     width: 850px;
-    height: 720px;
+    height: 650px;
     margin: auto;
     background-color: white;
     animation: modal-show .3s;
@@ -19,6 +19,10 @@
     .edit-modal-header {
         width: 800px;
         height: 32px;
+        margin-left: 25px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        font-size: 22px;
         border-bottom: 1px solid #f2f2f2;
     }
 
@@ -26,18 +30,19 @@
         display: flex;
 
         .edit-image {
-            margin-left: 26px;
+            margin-left: 25px;
 
             .edit-profile-img {
                 width: 260px;
                 height: 260px;
+                border-radius: 260px;
                 position: relative;
             }
 
             button {
                 position: relative;
                 top: -50px;
-                left: 65px;
+                left: 55px;
                 width: 130px;
                 height: 26px;
                 display: flex;
@@ -56,10 +61,10 @@
         }
 
         .edit-info {
-            width: 470px;
+            width: 515px;
             display: flex;
             flex-direction: column;
-            margin-left: 20px;
+            margin-left: 15px;
 
             .edit-info-dpname {
                 display: flex;
@@ -68,14 +73,58 @@
 
                 text {
                     font-size: 12px;
+                    font-weight: 450;
                     margin-bottom: 7px;
                 }
 
                 input {
-                    width: 470px;
+                    width: 515px;
+                    height: 40px;
+                    font-size: 18px;
+                    margin-bottom: 10px;
+                }
+            }
+
+            .edit-info-url {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+                width: 515px;
+                font-size: 12px;
+
+                text {
+                    font-weight: 450;
+                }
+
+                div {
+                    font-size: 12px;
+                    margin-left: -0.5px;
+                }
+            }
+
+            .edit-info-flname {
+                display: flex;
+                flex-direction: row;
+                margin-left: -1px;
+                margin-bottom: 20px;
+                width: 515px;
+
+                div {
+                    display: flex;
+                    flex-direction: column;
+                    margin-right: 3px;
+                }
+
+                text {
+                    font-size: 12px;
+                    font-weight: 450;
+                    margin-bottom: 7px;
+                }
+
+                input {
+                    width: 255px;
                     height: 26px;
                     font-size: 14px;
-                    margin-bottom: 10px;
                 }
             }
 
@@ -86,12 +135,13 @@
 
                 text {
                     font-size: 12px;
+                    font-weight: 450;
                     margin-bottom: 7px;
                 }
 
                 input {
-                    width: 470px;
-                    height: 130px;
+                    width: 515px;
+                    height: 66px;
                     font-size: 14px;
                 }
             }
@@ -99,7 +149,7 @@
     }
 
     .edit-modal-button {
-        width: 800px;
+        width: 850px;
         border-top: 1px solid #f2f2f2;
         font-size: 14px;
         display: flex;
@@ -121,7 +171,7 @@
         }
 
         .save-button {
-            width: 55px;
+            width: 110px;
             height: 26px;
             line-height: 26px;
             background-color: #FF5500;

@@ -41,7 +41,7 @@ function EditModal({ modal, setModal }: any) {
                   src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
                   alt="img"
                 />
-                <div>Upload image</div>
+                <div>Update image</div>
               </button>
               <input type="file" id="file-input" onChange={imageToUrl} />
             </div>
@@ -51,18 +51,42 @@ function EditModal({ modal, setModal }: any) {
                 <text>Display name</text>
                 <input placeholder="이름" />
               </div>
+              <div className="edit-info-url">
+                <text>Profile URL</text>
+                <div>soundcloud.com/permalink</div>
+              </div>
+              <div className="edit-info-flname">
+                <div>
+                  <text>First name</text>
+                  <input placeholder="이름" />
+                </div>
+                <div>
+                  <text>Last name</text>
+                  <input placeholder="성" />
+                </div>
+              </div>
+              <div className="edit-info-flname">
+                <div>
+                  <text>City</text>
+                  <input placeholder="도시" />
+                </div>
+                <div>
+                  <text>Country</text>
+                  <input placeholder="국가" />
+                </div>
+              </div>
               <div className="edit-info-bio">
-                <text>Description</text>
+                <text>Bio</text>
                 <input placeholder="Tell the world a little bit about yourself. The shorter the better." />
               </div>
             </div>
+          </div>
 
-            <div className="edit-modal-button">
-              <button className="cancel-button" onClick={() => setModal(false)}>
-                Cancel
-              </button>
-              <button className="save-button">Save</button>
-            </div>
+          <div className="edit-modal-button">
+            <button className="cancel-button" onClick={() => setModal(false)}>
+              Cancel
+            </button>
+            <button className="save-button">Save changes</button>
           </div>
         </section>
       ) : null}
