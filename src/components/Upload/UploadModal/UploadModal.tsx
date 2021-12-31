@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
-function UploadModal({ selectedFile }: any) {
+function UploadModal({ selectedFile, setModal }: any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
@@ -80,9 +80,12 @@ function UploadModal({ selectedFile }: any) {
           .catch(() => {
             toast("이미지파일 업로드 실패");
           });
+
+        setModal(false);
       })
       .catch(() => {
         toast("업로드 실패");
+        setModal(false);
       });
   };
 
