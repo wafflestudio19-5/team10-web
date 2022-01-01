@@ -1,9 +1,10 @@
 import styles from "./LikeItem.module.scss";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useState } from "react";
-import { FcComments, FcLike } from "react-icons/fc";
 import { BsFillPlayFill, BsThreeDots } from "react-icons/bs";
 import { BiRepost } from "react-icons/bi";
+import { AiFillHeart } from "react-icons/ai";
+import { FaCommentAlt } from "react-icons/fa";
 
 const LikeItems = ({
   title,
@@ -36,40 +37,40 @@ const LikeItems = ({
         <div className={styles.counts}>
           <div className={styles.playCount}>
             <BsFillPlayFill />
-            {count}
+            &nbsp; {count}
           </div>
           <div className={styles.likeCount}>
-            <FcLike />
-            {like}
+            <AiFillHeart />
+            &nbsp; {like}
           </div>
           <div className={styles.commentCount}>
-            <FcComments />
-            {comment}
+            <FaCommentAlt />
+            &nbsp; {comment}
           </div>
           <div className={styles.repostCount}>
             <BiRepost />
-            {repost}
+            &nbsp; {repost}
           </div>
         </div>
       </div>
-      <div className={styles.hover} onClick={handlePlay}>
+      <div className={styles.hover}>
         {play ? (
           <>
             <div className={styles.playButton}>
-              <IoMdPause />
+              <IoMdPause onClick={handlePlay} />
             </div>
             <div className={styles.functions}>
-              <FcLike className={styles.like} />
+              <AiFillHeart className={styles.like} />
               <BsThreeDots className={styles.details} />
             </div>
           </>
         ) : (
           <>
             <div className={styles.playButton}>
-              <IoMdPlay />
+              <IoMdPlay onClick={handlePlay} />
             </div>
             <div className={styles.functions}>
-              <FcLike className={styles.like} />
+              <AiFillHeart className={styles.like} />
               <BsThreeDots className={styles.details} />
             </div>
           </>
