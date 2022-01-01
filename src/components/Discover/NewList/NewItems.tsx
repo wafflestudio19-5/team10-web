@@ -1,12 +1,19 @@
 import styles from "./NewItems.module.scss";
-import play from "../play.png";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router";
+import { IoMdPause, IoMdPlay } from "react-icons/io";
+import { useState } from "react";
 
 const NewItems = ({ title, img }: { title: string; img: string }) => {
   const history = useHistory();
-  const goTrack = () => history.push("/username/trackname");
-
+  const goTrack = () => {
+    history.push("/username/trackname");
+  };
+  const [play, setPlay] = useState(false);
+  const handlePlay = (e: any) => {
+    e.stopPropagation();
+    setPlay(!play);
+  };
   return (
     <div className={styles.wrapper}>
       <img src={img} alt="track img" className={styles.track} />
@@ -14,7 +21,15 @@ const NewItems = ({ title, img }: { title: string; img: string }) => {
         {title}
       </Link>
       <div className={styles.hover} onClick={goTrack}>
-        <img src={play} alt="playButton" className={styles.play} />
+        {play ? (
+          <div className={styles.buttonWraaper} onClick={handlePlay}>
+            <IoMdPause />
+          </div>
+        ) : (
+          <div className={styles.buttonWraaper} onClick={handlePlay}>
+            <IoMdPlay />
+          </div>
+        )}
       </div>
     </div>
   );

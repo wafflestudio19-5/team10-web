@@ -5,15 +5,17 @@
   width: 200px;
   height: 250px;
   position: relative;
+  z-index: 0;
   &:hover {
     .hover {
       background-color: rgba($color: #000000, $alpha: 0.3);
       transition: all 0.5s ease;
       cursor: pointer;
-      .play {
+      .buttonWraaper {
         opacity: 1;
         transition: all 0.5s ease;
         cursor: pointer;
+        color: white;
       }
     }
   }
@@ -38,13 +40,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    .play {
+    z-index: 1;
+    .buttonWraaper {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       opacity: 0;
       z-index: 2;
-      left: 250px;
-      top: 50px;
-      width: 50px;
-      height: 50px;
+      height: 28px;
+      width: 28px;
+      background-color: #ff3300;
+      border-radius: 50%;
     }
   }
 }

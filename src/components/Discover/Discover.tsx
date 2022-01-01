@@ -34,7 +34,6 @@ const Discover = () => {
       left: 340,
       behavior: "smooth",
     });
-    console.log(listScroll.current?.scrollLeft);
   };
   const handleScrollLeft = () => {
     listScroll.current?.scrollTo({
