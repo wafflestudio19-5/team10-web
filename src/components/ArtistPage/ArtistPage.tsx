@@ -6,6 +6,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
 import EditModal from "./EditModal/EditModal";
+import toast from "react-hot-toast";
 
 function ArtistPage() {
   const params = useParams<any>();
@@ -18,6 +19,7 @@ function ArtistPage() {
 
   const [displayName, setDisplayName] = useState<string>();
   const [userName, setUserName] = useState<string>();
+  const [tracks, setTracks] = useState(null);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -49,21 +51,36 @@ function ArtistPage() {
             axios
               .get(`users/${response.data.id}`)
               .then((res) => {
-                console.log(res.data);
                 setDisplayName(res.data.display_name);
                 setUserName(res.data.first_name + res.data.last_name);
               })
-              .catch((err) => {
-                console.log(err);
+              .catch(() => {
+                toast("유저 정보 불러오기 실패");
+              });
+            // 트랙 불러오기
+            axios
+              .get("/tracks")
+              .then((res) => {
+                if (res.data) {
+                  setTracks(
+                    res.data.filter(
+                      (item: any) => item.artist == parseInt(response.data.id)
+                    )
+                  );
+                }
+              })
+              .catch(() => {
+                toast("트랙 정보 불러오기 실패");
               });
           } catch (error) {
-            console.log(error);
+            toast("유저 정보 불러오기 실패");
           }
         }
       }
     };
     getUser();
-  });
+    console.log(tracks);
+  }, []);
 
   return (
     <div className="artistpage-wrapper">
