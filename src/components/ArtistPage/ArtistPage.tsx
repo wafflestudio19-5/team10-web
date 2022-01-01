@@ -17,6 +17,7 @@ function ArtistPage() {
   const [modal, setModal] = useState(false);
 
   const [displayName, setDisplayName] = useState<string>();
+  const [userName, setUserName] = useState<string>();
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -34,23 +35,34 @@ function ArtistPage() {
 
     // resolve api
     const url = `https://soundwaffle.com/${permalink}`;
-    axios
-      .get(`/resolve?url=${url}`)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios
-      .get(`/users/6`)
-      .then((res) => {
-        setDisplayName(res.data.display_name);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const getUser = async () => {
+      try {
+        await axios.get(`resolve?url=${url}`);
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          const linkParts = error.response.data.link.split(
+            "api.soundwaffle.com/"
+          );
+          try {
+            const response = await axios.get(`/${linkParts[1]}`);
+            // 유저 정보
+            axios
+              .get(`users/${response.data.id}`)
+              .then((res) => {
+                console.log(res.data);
+                setDisplayName(res.data.display_name);
+                setUserName(res.data.first_name + res.data.last_name);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }
+    };
+    getUser();
   });
 
   return (
@@ -63,7 +75,7 @@ function ArtistPage() {
           />
           <div className={"name"}>
             <div className={"displayname"}>{displayName}</div>
-            <div className={"username"}>UserName</div>
+            {userName !== "" && <div className={"username"}>{userName}</div>}
           </div>
           {isMe && (
             // 나중에 가능하면 헤더이미지 api 추가하기
