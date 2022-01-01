@@ -24,8 +24,9 @@ const LikeItems = ({
   repost: number;
 }) => {
   const [play, setPlay] = useState(false);
+  const [heart, setHeart] = useState(false);
   const handlePlay = () => setPlay(!play);
-
+  const handleHeart = () => setHeart(!heart);
   return (
     <div className={styles.itemWrapper}>
       <div className={styles.imgWrapper}>
@@ -43,13 +44,13 @@ const LikeItems = ({
             <AiFillHeart />
             &nbsp; {like}
           </div>
-          <div className={styles.commentCount}>
-            <FaCommentAlt />
-            &nbsp; {comment}
-          </div>
           <div className={styles.repostCount}>
             <BiRepost />
             &nbsp; {repost}
+          </div>
+          <div className={styles.commentCount}>
+            <FaCommentAlt />
+            &nbsp; {comment}
           </div>
         </div>
       </div>
@@ -60,7 +61,7 @@ const LikeItems = ({
               <IoMdPause onClick={handlePlay} />
             </div>
             <div className={styles.functions}>
-              <AiFillHeart className={styles.like} />
+              <AiFillHeart className={heart ? styles.liked : styles.like} />
               <BsThreeDots className={styles.details} />
             </div>
           </>
@@ -70,7 +71,10 @@ const LikeItems = ({
               <IoMdPlay onClick={handlePlay} />
             </div>
             <div className={styles.functions}>
-              <AiFillHeart className={styles.like} />
+              <AiFillHeart
+                className={heart ? styles.liked : styles.like}
+                onClick={handleHeart}
+              />
               <BsThreeDots className={styles.details} />
             </div>
           </>
