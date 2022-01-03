@@ -206,111 +206,117 @@ const TrackBar = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.main}>
-        <button className={styles.previousTrack} onClick={prevTrack}>
-          <IoPlaySkipBackSharp />
-        </button>
-        {trackIsPlaying ? (
-          <button className={styles.playButton} onClick={togglePlayPause}>
-            <IoPauseSharp />
-          </button>
-        ) : (
-          <button className={styles.playButton} onClick={togglePlayPause}>
-            <IoPlaySharp />
-          </button>
-        )}
-        <button className={styles.nextTrack} onClick={nextTrack}>
-          <IoPlaySkipForwardSharp />
-        </button>
-        <button className={styles.shuffle}>
-          <IoShuffleSharp />
-        </button>
-        <button
-          className={`${styles.loop} ${loop && styles.loopTrack}`}
-          onClick={toggleLoop}
-        >
-          <BiRepeat />
-        </button>
-        <div className={styles.trackContainer}>
-          <div className={styles.currentTime}>{calculateTime(playingTime)}</div>
-          <div className={styles.track}>
-            <input
-              ref={progressBar}
-              type="range"
-              className={styles.progressBar}
-              onChange={changeRange}
-              step="0.3"
-              defaultValue="0"
-              onClick={onPlayerClick}
-              max={trackDuration}
-            />
-          </div>
-          <div className={styles.duration}>
-            {!isNaN(trackDuration) ? calculateTime(trackDuration) : "0:00"}
-          </div>
-        </div>
-        {isMuted ? (
-          <button className={styles.volume} onClick={toggleMuteUnmute}>
-            <RiVolumeMuteFill />
-          </button>
-        ) : (
-          <button className={styles.volume} onClick={toggleMuteUnmute}>
-            <MdVolumeUp />
-          </button>
-        )}
-        <div className={styles.trackInfo}>
-          {trackBarTrack.image.length !== 0 && (
-            <img
-              src={trackBarTrack.image}
-              alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
-            />
-          )}
-          <div className={styles.artistTrackName}>
-            <div className={styles.artistName} onClick={clickArtist}>
-              {trackBarArtist.display_name}
+    <>
+      {audioSrc.length && (
+        <div className={styles.container}>
+          <div className={styles.main}>
+            <button className={styles.previousTrack} onClick={prevTrack}>
+              <IoPlaySkipBackSharp />
+            </button>
+            {trackIsPlaying ? (
+              <button className={styles.playButton} onClick={togglePlayPause}>
+                <IoPauseSharp />
+              </button>
+            ) : (
+              <button className={styles.playButton} onClick={togglePlayPause}>
+                <IoPlaySharp />
+              </button>
+            )}
+            <button className={styles.nextTrack} onClick={nextTrack}>
+              <IoPlaySkipForwardSharp />
+            </button>
+            <button className={styles.shuffle}>
+              <IoShuffleSharp />
+            </button>
+            <button
+              className={`${styles.loop} ${loop && styles.loopTrack}`}
+              onClick={toggleLoop}
+            >
+              <BiRepeat />
+            </button>
+            <div className={styles.trackContainer}>
+              <div className={styles.currentTime}>
+                {calculateTime(playingTime)}
+              </div>
+              <div className={styles.track}>
+                <input
+                  ref={progressBar}
+                  type="range"
+                  className={styles.progressBar}
+                  onChange={changeRange}
+                  step="0.3"
+                  defaultValue="0"
+                  onClick={onPlayerClick}
+                  max={trackDuration}
+                />
+              </div>
+              <div className={styles.duration}>
+                {!isNaN(trackDuration) ? calculateTime(trackDuration) : "0:00"}
+              </div>
             </div>
-            <div className={styles.trackName} onClick={clickTrack}>
-              <span>{trackBarTrack.title}</span>
-            </div>
-          </div>
-          {likeTrack ? (
-            <button
-              className={`${styles.unlikeTrack} ${styles.listenEngagement}`}
-              onClick={unlikeTrack}
-            >
-              <BsFillSuitHeartFill />
-            </button>
-          ) : (
-            <button
-              className={`${styles.likeTrack} ${styles.listenEngagement}`}
-              onClick={onLikeTrack}
-            >
-              <BsFillSuitHeartFill />
-            </button>
-          )}
-          {followArtist ? (
-            <button
-              className={`${styles.unfollowArtist} ${styles.listenEngagement}`}
-              onClick={unfollowArtist}
-            >
-              <RiUserUnfollowFill />
-            </button>
-          ) : (
-            <button
-              className={`${styles.followAritst} ${styles.listenEngagement}`}
-              onClick={onFollowArtist}
-            >
-              <RiUserFollowFill />
-            </button>
-          )}
+            {isMuted ? (
+              <button className={styles.volume} onClick={toggleMuteUnmute}>
+                <RiVolumeMuteFill />
+              </button>
+            ) : (
+              <button className={styles.volume} onClick={toggleMuteUnmute}>
+                <MdVolumeUp />
+              </button>
+            )}
+            <div className={styles.trackInfo}>
+              {trackBarTrack.image.length !== 0 && (
+                <img
+                  src={trackBarTrack.image}
+                  alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
+                />
+              )}
+              <div className={styles.artistTrackName}>
+                <div className={styles.artistName} onClick={clickArtist}>
+                  {trackBarArtist.display_name}
+                </div>
+                <div className={styles.trackName} onClick={clickTrack}>
+                  <span>{trackBarTrack.title}</span>
+                </div>
+              </div>
+              {likeTrack ? (
+                <button
+                  className={`${styles.unlikeTrack} ${styles.listenEngagement}`}
+                  onClick={unlikeTrack}
+                >
+                  <BsFillSuitHeartFill />
+                </button>
+              ) : (
+                <button
+                  className={`${styles.likeTrack} ${styles.listenEngagement}`}
+                  onClick={onLikeTrack}
+                >
+                  <BsFillSuitHeartFill />
+                </button>
+              )}
+              {followArtist ? (
+                <button
+                  className={`${styles.unfollowArtist} ${styles.listenEngagement}`}
+                  onClick={unfollowArtist}
+                >
+                  <RiUserUnfollowFill />
+                </button>
+              ) : (
+                <button
+                  className={`${styles.followAritst} ${styles.listenEngagement}`}
+                  onClick={onFollowArtist}
+                >
+                  <RiUserFollowFill />
+                </button>
+              )}
 
-          <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
-            <MdPlaylistPlay />
-          </button>
+              <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
+                <MdPlaylistPlay />
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

@@ -1,9 +1,9 @@
 .trackHeader {
   height: 380px;
   --opacity: 0.6;
-  --red: 0;
-  --green: 0;
-  --blue: 0;
+  --red: 222;
+  --green: 224;
+  --blue: 236;
   --bg-color: rgba(var(--red), var(--green), var(--blue), 1);
   --bg-color-light: rgba(var(--red), var(--green), var(--blue), var(--opacity));
   background: linear-gradient(120deg, var(--bg-color), var(--bg-color-light));

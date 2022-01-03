@@ -12,6 +12,7 @@ import { useAuthContext } from "../../../../context/AuthContext";
 
 const ListenEngagement = ({ track }: { track: ITrack }) => {
   const [like, setLike] = useState(false);
+  const [repost, setRepost] = useState(false);
 
   const history = useHistory();
   const { userSecret } = useAuthContext();
@@ -61,6 +62,22 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
     } catch (error) {
       console.log(error);
     }
+    setRepost(true);
+    return;
+  };
+  const unrepostTrack = async () => {
+    console.log(axios.defaults.headers);
+    try {
+      const response = await axios.delete(`/reposts/tracks/${track.id}`, {
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+    setRepost(false);
     return;
   };
   const copyLink = async () => {
@@ -87,10 +104,17 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
             <span>Like</span>
           </button>
         )}
-        <button className={styles.repost} onClick={repostTrack}>
-          <BiRepost />
-          <span>Repost</span>
-        </button>
+        {repost ? (
+          <button className={styles.repost} onClick={unrepostTrack}>
+            <BiRepost />
+            <span>Reposted</span>
+          </button>
+        ) : (
+          <button className={styles.notRepost} onClick={repostTrack}>
+            <BiRepost />
+            <span>Repost</span>
+          </button>
+        )}
         <button className={styles.share}>
           <ImShare />
           <span>Share</span>

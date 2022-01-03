@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./TrackHeader.module.scss";
 import { IArtist, ITrack } from "../TrackPage";
-import { useColor } from "color-thief-react";
 import HeaderButton from "./HeaderButton";
 import TrackInfo from "./TrackInfo";
-import AlbumImage from "./AlbumImage";
 import TrackTag from "./TrackTag";
 import { useTrackContext } from "../../../../context/TrackContext";
 import { MdOutlineCancel } from "react-icons/md";
+import AlbumImage from "./AlbumImage";
 // import axios from "axios";
 // import { useParams } from "react-router-dom";
 // import WaveSurfer from "wavesurfer.js";
@@ -27,37 +26,8 @@ const TrackHeader = ({
   const [headerTrackDuration, setHeaderTrackDuration] = useState<
     number | undefined
   >(undefined); // 트랙 길이
+  const [trackLoading, setTrackLoading] = useState(true);
   const trackHeader = useRef<HTMLDivElement>(null); // 헤더 전체 div(재생과는 무관)
-  const { data, error } = useColor(track.image, "rgbArray", {
-    crossOrigin: "",
-    // 트랙 이미지에 따라 헤더 색을 자동으로 생성
-    quality: 10,
-  });
-  console.log("error", error);
-  useEffect(() => {
-    const { current } = trackHeader;
-    if (noTrack) {
-      if (current !== null) {
-        current.style.setProperty(
-          "--red",
-          `${Math.floor(Math.random() * 255)}`
-        );
-        current.style.setProperty(
-          "--green",
-          `${Math.floor(Math.random() * 255)}`
-        );
-        current.style.setProperty(
-          "--blue",
-          `${Math.floor(Math.random() * 255)}`
-        );
-      }
-    } else if (current !== null && data !== undefined) {
-      const [red, green, blue] = data;
-      current.style.setProperty("--red", `${red}`);
-      current.style.setProperty("--green", `${green}`);
-      current.style.setProperty("--blue", `${blue}`);
-    }
-  }, [trackHeader, track, data]);
 
   const {
     trackDuration,
@@ -97,8 +67,9 @@ const TrackHeader = ({
     changePlayerCurrentTime();
   };
 
+  const buttonDisabled = noTrack || trackLoading;
   const togglePlayPause = () => {
-    if (noTrack) {
+    if (buttonDisabled) {
       return;
     }
     // 재생/일시정지 버튼 누를 때
@@ -177,6 +148,7 @@ const TrackHeader = ({
   const headerPlayer = useRef<HTMLAudioElement>(null);
   const onLoadedMetadata = () => {
     setHeaderTrackDuration(headerPlayer.current?.duration);
+    setTrackLoading(false);
   };
 
   return (
@@ -186,7 +158,7 @@ const TrackHeader = ({
           isPlaying={trackIsPlaying}
           togglePlayPause={togglePlayPause}
           isSameTrack={isSameTrack}
-          noTrack={noTrack}
+          buttonDisabled={buttonDisabled}
         />
         <TrackInfo track={track} artist={artist} />
       </div>
@@ -235,7 +207,13 @@ const TrackHeader = ({
       )}
 
       {noTrack || <TrackTag track={track} />}
-      {noTrack || <AlbumImage openModal={openModal} track={track} />}
+      {noTrack || (
+        <AlbumImage
+          openModal={openModal}
+          track={track}
+          trackHeader={trackHeader}
+        />
+      )}
     </div>
   );
 

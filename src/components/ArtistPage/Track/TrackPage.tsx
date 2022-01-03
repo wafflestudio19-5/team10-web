@@ -59,6 +59,7 @@ const TrackPage = () => {
     id: 0,
     permalink: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   const { username, trackname } = useParams<IParams>();
 
@@ -92,6 +93,7 @@ const TrackPage = () => {
           id: artist.id,
           permalink: artist.permalink,
         });
+        setIsLoading(false);
       } catch (error) {
         if (
           axios.isAxiosError(error) &&
@@ -111,22 +113,24 @@ const TrackPage = () => {
 
   return (
     <div className={styles.trackWrapper}>
-      <div className={styles.track}>
-        <TrackModal
-          modal={modal}
-          closeModal={closeModal}
-          track={track}
-          artist={artist}
-        />
-        <TrackHeader
-          openModal={openModal}
-          track={track}
-          artist={artist}
-          noTrack={noTrack}
-        />
-        {noTrack || <TrackMain track={track} artist={artist} />}
-        {noTrack || <TrackBar />}
-      </div>
+      {isLoading || (
+        <div className={styles.track}>
+          <TrackModal
+            modal={modal}
+            closeModal={closeModal}
+            track={track}
+            artist={artist}
+          />
+          <TrackHeader
+            openModal={openModal}
+            track={track}
+            artist={artist}
+            noTrack={noTrack}
+          />
+          {noTrack || <TrackMain track={track} artist={artist} />}
+          {noTrack || <TrackBar />}
+        </div>
+      )}
     </div>
   );
 };
