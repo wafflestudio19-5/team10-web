@@ -2,7 +2,6 @@ import ReactAudioPlayer from "react-audio-player";
 import "./TrackBox.scss";
 
 function TrackBox({ item, artistName }: any) {
-  console.log(item.image);
   return (
     <div className={"recent-track"}>
       <img src={item.image} alt={"trackImg"} />

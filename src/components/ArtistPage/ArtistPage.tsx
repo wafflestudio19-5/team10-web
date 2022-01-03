@@ -14,6 +14,7 @@ function ArtistPage() {
   const { userSecret } = useAuthContext();
   const myPermalink = userSecret.permalink;
   const [isMe, setIsMe] = useState(false);
+  const [id, setId] = useState<number>();
 
   const [modal, setModal] = useState(false);
 
@@ -37,46 +38,36 @@ function ArtistPage() {
 
     // resolve api
     const url = `https://soundwaffle.com/${permalink}`;
-    const getUser = async () => {
-      try {
-        await axios.get(`resolve?url=${url}`);
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          const linkParts = error.response.data.link.split(
-            "api.soundwaffle.com/"
-          );
-          try {
-            const response = await axios.get(`/${linkParts[1]}`);
-            // 유저 정보
-            axios
-              .get(`users/${response.data.id}`)
-              .then((res) => {
-                setDisplayName(res.data.display_name);
-                setUserName(res.data.first_name + res.data.last_name);
-              })
-              .catch(() => {
-                toast("유저 정보 불러오기 실패");
-              });
-            // 트랙 불러오기
-            axios
-              .get("/tracks")
-              .then((res) => {
-                if (res.data) {
-                  setTracks(
-                    res.data.filter(
-                      (item: any) => item.artist == parseInt(response.data.id)
-                    )
-                  );
-                }
-              })
-              .catch(() => {
-                toast("트랙 정보 불러오기 실패");
-              });
-          } catch (error) {
-            toast("유저 정보 불러오기 실패");
-          }
-        }
-      }
+    const getUser = () => {
+      axios
+        .get(`resolve?url=${url}`)
+        .then((res) => {
+          setId(res.data.id);
+          // 유저 정보
+          axios
+            .get(`users/${res.data.id}`)
+            .then((res) => {
+              setDisplayName(res.data.display_name);
+              setUserName(res.data.first_name + res.data.last_name);
+            })
+            .catch(() => {
+              toast("유저 정보 불러오기 실패");
+            });
+          // 트랙 불러오기
+          axios
+            .get("/tracks")
+            .then((res) => {
+              if (res.data) {
+                setTracks(res.data.filter((item: any) => item.artist == id));
+              }
+            })
+            .catch(() => {
+              toast("트랙 정보 불러오기 실패");
+            });
+        })
+        .catch(() => {
+          toast("정보 불러오기 실패");
+        });
     };
     getUser();
   }, []);

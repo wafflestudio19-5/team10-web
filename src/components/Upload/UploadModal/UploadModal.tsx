@@ -83,8 +83,9 @@ function UploadModal({ selectedFile, setModal }: any) {
 
         setModal(false);
       })
-      .catch(() => {
+      .catch((err) => {
         toast("업로드 실패");
+        console.log(err);
         setModal(false);
       });
   };
