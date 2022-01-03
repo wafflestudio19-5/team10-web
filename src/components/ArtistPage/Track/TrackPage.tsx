@@ -1,97 +1,131 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TrackMain from "./Main/TrackMain";
 import TrackHeader from "./Header/TrackHeader";
 import styles from "./TrackPage.module.scss";
 import TrackModal from "./Modal/TrackModal";
 import TrackBar from "./TrackBar/TrackBar";
-// import axios from "axios";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 export interface ITrack {
+  id: number;
   title: string;
-  artist: string;
   permalink: string;
-  image: string;
   audio: string;
-  description: string;
-  created_at: string;
+  comment_count: number;
   count: number;
+  created_at: string;
+  description: string;
+  genre: null | string;
+  image: string;
+  like_count: number;
+  repost_count: number;
   tags: string[];
-  is_private: boolean;
-  likes: number;
-  reposts: number;
 }
+export interface IArtist {
+  city: string;
+  country: string;
+  display_name: string;
+  id: number;
+  permalink: string;
+}
+interface IParams {
+  username: string;
+  trackname: string;
+}
+
 const TrackPage = () => {
   const [modal, setModal] = useState(false);
-  // const [track, setTrack] = useState<ITrack>({
-  //   title: "Title",
-  //   artist: "aritst",
-  //   permalink: "example",
-  //   image:
-  //     "https://images.unsplash.com/photo-1521302080334-4bebac2763a6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29mZmVlfGVufDB8MnwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-  //   audio:
-  //     "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3",
-  //   description: "트랙 정보",
-  //   created_at: new Date().toString(),
-  //   count: 0,
-  //   tags: ["Piano"],
-  //   is_private: false,
-  //   likes: 2649,
-  //   reposts: 1161,
-  // });
-  const track = {
-    title: "Title",
-    artist: "username",
-    permalink: "example",
-    image:
-      "https://images.unsplash.com/photo-1507808973436-a4ed7b5e87c9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHwyfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-    description: "트랙 정보",
-    created_at: "1 year ago",
-    count: 134565,
-    tags: ["Piano"],
-    is_private: false,
-    likes: 2649,
-    reposts: 1161,
-  };
+  const [noTrack, setNoTrack] = useState(false);
+  const [track, setTrack] = useState<ITrack>({
+    id: 0,
+    title: "",
+    permalink: "",
+    audio: "",
+    comment_count: 0,
+    count: 0,
+    created_at: "",
+    description: "",
+    genre: null,
+    image: "",
+    like_count: 0,
+    repost_count: 0,
+    tags: [],
+  });
+  const [artist, setArtist] = useState<IArtist>({
+    city: "",
+    country: "",
+    display_name: "",
+    id: 0,
+    permalink: "",
+  });
+
+  const { username, trackname } = useParams<IParams>();
+
+  useEffect(() => {
+    const fetchTrack = async () => {
+      try {
+        const response = await axios.get(
+          `/resolve?url=https%3A%2F%2Fwww.soundwaffle.com%2F${username}%2F${trackname}`
+        );
+        const data = response.data;
+        const artist = response.data.artist;
+        setTrack({
+          id: data.id,
+          title: data.title,
+          permalink: data.permalink,
+          audio: data.audio,
+          comment_count: data.comment_count,
+          count: data.count,
+          created_at: data.created_at,
+          description: data.description,
+          genre: data.genre,
+          image: data.image,
+          like_count: data.like_count,
+          repost_count: data.repost_count,
+          tags: data.tags,
+        });
+        setArtist({
+          city: artist.city,
+          country: artist.country,
+          display_name: artist.display_name,
+          id: artist.id,
+          permalink: artist.permalink,
+        });
+      } catch (error) {
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 404
+        ) {
+          setNoTrack(true);
+        }
+      }
+      return;
+    };
+    fetchTrack();
+  }, []);
 
   const openModal = () => setModal(true);
   const closeModal = () => setModal(false);
 
-  // useEffect(() => {
-  //   const fetchTrack = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `https://api.soundwaffle.com/tracks/track_id`
-  //       );
-  //       const data = response.data;
-  //       setTrack({
-  //         title: data.title,
-  //         artist: data.artist,
-  //         permalink: data.permalink,
-  //         image: data.image,
-  //         audio: data.audio,
-  //         description: data.description,
-  //         created_at: data.date,
-  //         count: data.count,
-  //         tags: data.tags,
-  //         is_private: data.is_private,
-  //         likes: data.likes,
-  //         reposts: data.resposts,
-  //       });
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   fetchTrack();
-  // });
-
   return (
     <div className={styles.trackWrapper}>
       <div className={styles.track}>
-        <TrackModal modal={modal} closeModal={closeModal} track={track} />
-        <TrackHeader openModal={openModal} track={track} />
-        <TrackMain track={track} />
-        <TrackBar />
+        <TrackModal
+          modal={modal}
+          closeModal={closeModal}
+          track={track}
+          artist={artist}
+        />
+        <TrackHeader
+          openModal={openModal}
+          track={track}
+          artist={artist}
+          noTrack={noTrack}
+        />
+        {noTrack || <TrackMain track={track} artist={artist} />}
+        {noTrack || <TrackBar />}
       </div>
     </div>
   );

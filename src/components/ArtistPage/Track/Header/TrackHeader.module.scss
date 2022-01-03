@@ -17,6 +17,18 @@
   height: 63px;
   width: 650px;
 }
+.noTrackFound {
+  position: absolute;
+  top: 305px;
+  left: 40px;
+  font-size: 20px;
+  font-weight: 100;
+  color: white;
+  svg {
+    font-size: 50px;
+    margin-right: 20px;
+  }
+}
 .playingTrack {
   // border: 1px solid black;
   position: relative;

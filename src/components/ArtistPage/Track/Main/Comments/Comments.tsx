@@ -5,13 +5,20 @@ import { BsFillReplyFill } from "react-icons/bs";
 import { useHistory } from "react-router";
 // import axios from "axios";
 import { IComment } from "../TrackMain";
+import { ITrack } from "../../TrackPage";
 
-const Comments = ({ comments }: { comments: IComment[] }) => {
+const Comments = ({
+  comments,
+  track,
+}: {
+  comments: IComment[];
+  track: ITrack;
+}) => {
   return (
     <div className={styles.container}>
       <header>
         <FcComments />
-        <span>{comments.length || 0} comments</span>
+        <span>{track.comment_count} comments</span>
       </header>
       <ul className={styles.commentsList}>
         {comments.length

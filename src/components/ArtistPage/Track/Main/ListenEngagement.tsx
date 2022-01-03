@@ -7,23 +7,34 @@ import { FiLink2, FiMoreHorizontal } from "react-icons/fi";
 import { FaPlay } from "react-icons/fa";
 import { ITrack } from "../TrackPage";
 import { useHistory } from "react-router-dom";
-// import axios from "axios";
+import axios from "axios";
+import { useAuthContext } from "../../../../context/AuthContext";
 
 const ListenEngagement = ({ track }: { track: ITrack }) => {
   const [like, setLike] = useState(false);
 
   const history = useHistory();
+  const { userSecret } = useAuthContext();
+
+  //   const isLikeTrack = async () => {
+  //       try {
+  //           const response = await axios.get(`users/me/`)
+  //       }
+  //   }
 
   const likeTrack = async () => {
-    // try {
-    //   const response = await axios.post(
-    //     `https://api.soundwaffle.com/likes/tracks/track_id`
-    //   );
-    //   console.log(response);
-    //   setLike(true)
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    console.log(userSecret.jwt);
+    try {
+      const response = await axios.post(`/likes/tracks/${track.id}`, {
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+      });
+      console.log(response);
+      setLike(true);
+    } catch (error) {
+      console.log(error);
+    }
     setLike(true);
   };
   const unlikeTrack = async () => {
@@ -39,14 +50,17 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
     setLike(false);
   };
   const repostTrack = async () => {
-    // try {
-    //   const response = await axios.post(
-    //     `https://api.soundwaffle.com/reposts/tracks/track_id`
-    //   );
-    //   console.log(response);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    console.log(axios.defaults.headers);
+    try {
+      const response = await axios.post(`/reposts/tracks/${track.id}`, {
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
     return;
   };
   const copyLink = async () => {
@@ -98,13 +112,13 @@ const ListenEngagement = ({ track }: { track: ITrack }) => {
         <div className={styles.likeStats}>
           <BsSuitHeartFill />
           <span className={styles.pointer} onClick={trackLikes}>
-            {track.likes}
+            {track.like_count}
           </span>
         </div>
         <div className={styles.repostStats}>
           <BiRepost />
           <span className={styles.pointer} onClick={trackReposts}>
-            {track.reposts}
+            {track.repost_count}
           </span>
         </div>
       </div>

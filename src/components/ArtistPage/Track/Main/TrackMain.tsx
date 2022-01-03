@@ -9,7 +9,7 @@ import RelatedTracks from "./Side/RelatedTracks";
 import RepostUsers from "./Side/RepostUsers";
 import LikeUsers from "./Side/LikeUsers";
 import InPlaylists from "./Side/InPlaylists";
-import { ITrack } from "../TrackPage";
+import { IArtist, ITrack } from "../TrackPage";
 
 export interface IComment {
   id: number;
@@ -19,9 +19,7 @@ export interface IComment {
   created_at: string;
 }
 
-const TrackMain = ({ track }: { track: ITrack }) => {
-  const { artist, description } = track;
-
+const TrackMain = ({ track, artist }: { track: ITrack; artist: IArtist }) => {
   //   const [comments, setComments] = useState<IComment[]>([
   //     {
   //       id: 1,
@@ -111,8 +109,8 @@ const TrackMain = ({ track }: { track: ITrack }) => {
         <div className={styles.infoComments}>
           <ListenArtistInfo artist={artist} />
           <div>
-            <AudioInfo description={description} />
-            <Comments comments={comments} />
+            <AudioInfo description={track.description} />
+            <Comments comments={comments} track={track} />
           </div>
         </div>
       </div>

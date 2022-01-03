@@ -6,10 +6,12 @@ const HeaderButton = ({
   isPlaying,
   togglePlayPause,
   isSameTrack,
+  noTrack,
 }: {
   isPlaying: boolean;
   togglePlayPause: () => void;
   isSameTrack: boolean;
+  noTrack: boolean;
 }) => {
   return (
     <>
@@ -18,7 +20,11 @@ const HeaderButton = ({
           <IoMdPause />
         </button>
       ) : (
-        <button className={styles.playButton} onClick={togglePlayPause}>
+        <button
+          className={noTrack ? styles.noTrackButton : styles.playButton}
+          onClick={togglePlayPause}
+          disabled={noTrack}
+        >
           <IoMdPlay />
         </button>
       )}
