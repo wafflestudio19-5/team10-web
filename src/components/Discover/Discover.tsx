@@ -17,11 +17,28 @@ const Discover = () => {
     checkValid();
   }, []);
   useEffect(() => {
-    userSecret.permalink !== true // 나중에 === undefined 로 바꿔야함
-      ? null
-      : axios.get(`https://api.soundwaffle.com/users/${userSecret.permalink}`);
-    // 여기에 permalink가 아니라 해당 url을 통해 아래와 같이 정보를 얻을 수 있음
-    //HTTP GET: https://api.soundcloud.com/resolve.json?url=https%3A%2F%2Fsoundcloud.com%2Fmsmrsounds%2Fms-mr-hurricane-chvrches-remix&client_id=[permalink]
+    if (userSecret.permalink !== undefined) {
+      const fetchUserId = async () => {
+        try {
+          await axios.get(
+            `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${userSecret.permalink}`
+          );
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response) {
+            const linkParts = error.response.data.link.split(
+              "api.soundwaffle.com/"
+            );
+            try {
+              const response = await axios.get(`/${linkParts[1]}`);
+              console.log(response);
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }
+      };
+      fetchUserId();
+    }
   }, [userSecret]);
   const listScroll = useRef<HTMLDivElement>(null);
   const rightButton = useRef<HTMLButtonElement>(null);

@@ -8,7 +8,7 @@ const LikeList = () => {
       img: "https://image.bugsm.co.kr/album/images/500/6221/622131.jpg",
       id: 1,
       artist: "The Kid LAROI",
-      count: 3,
+      count: 312,
       like: 421,
       comment: 3,
       repost: 52,
@@ -18,7 +18,7 @@ const LikeList = () => {
       img: "https://image.bugsm.co.kr/album/images/1000/204336/20433609.jpg",
       id: 2,
       artist: "BE'O",
-      count: 3,
+      count: 321,
       like: 123,
       comment: 12,
       repost: 32,
@@ -61,6 +61,7 @@ const LikeList = () => {
           like={item.like}
           comment={item.comment}
           repost={item.repost}
+          key={item.id}
         />
       ))}
     </>

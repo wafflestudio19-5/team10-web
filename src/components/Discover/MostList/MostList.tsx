@@ -34,7 +34,7 @@ const MostList = () => {
   return (
     <div className={styles.mostList}>
       {mostTrackList.map((item) => (
-        <MostItems title={item.title} img={item.img} />
+        <MostItems title={item.title} img={item.img} key={item.id} />
       ))}
     </div>
   );
