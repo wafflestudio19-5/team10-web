@@ -308,7 +308,6 @@ const TrackBar = () => {
                   <RiUserFollowFill />
                 </button>
               )}
-
               <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
                 <MdPlaylistPlay />
               </button>

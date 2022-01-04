@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./ListenEngagement.module.scss";
 import { BsSuitHeartFill } from "react-icons/bs";
 import { BiRepost } from "react-icons/bi";
@@ -10,74 +10,180 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
 
-const ListenEngagement = ({ track }: { track: ITrack }) => {
+interface ILikeTrack {
+  id: number;
+}
+
+const ListenEngagement = ({
+  track,
+  fetchTrack,
+}: {
+  track: ITrack;
+  fetchTrack: () => void;
+}) => {
   const [like, setLike] = useState(false);
   const [repost, setRepost] = useState(false);
 
   const history = useHistory();
   const { userSecret } = useAuthContext();
 
-  //   const isLikeTrack = async () => {
-  //       try {
-  //           const response = await axios.get(`users/me/`)
-  //       }
-  //   }
-
-  const likeTrack = async () => {
-    console.log(userSecret.jwt);
-    try {
-      const response = await axios.post(`/likes/tracks/${track.id}`, {
+  useEffect(() => {
+    const isLikeTrack = async () => {
+      const config: any = {
+        method: "get",
+        url: `/users/me`,
         headers: {
           Authorization: `JWT ${userSecret.jwt}`,
         },
-      });
-      console.log(response);
-      setLike(true);
+        data: {},
+      };
+      try {
+        // 로그인한 유저 id 받아오기
+        const response = await axios(config);
+        if (response) {
+          const config: any = {
+            method: "get",
+            url: `/users/${response.data.id}/likes/tracks`,
+            headers: {
+              Authorization: `JWT ${userSecret.jwt}`,
+            },
+            data: {},
+          };
+          try {
+            // like 트랙 목록 받아오기
+            const likeTracks = await axios(config);
+            if (likeTracks.data.length === 0) {
+              return;
+            } else {
+              const trackExist = likeTracks.data.find(
+                (likeTrack: ILikeTrack) => likeTrack.id === track.id
+              );
+              if (trackExist !== undefined) {
+                setLike(true);
+              }
+            }
+          } catch (error) {
+            console.log(error);
+          }
+          const repostConfig: any = {
+            method: "get",
+            url: `/users/${response.data.id}/reposts/tracks`,
+            headers: {
+              Authorization: `JWT ${userSecret.jwt}`,
+            },
+            data: {},
+          };
+          try {
+            // repost 트랙 목록 받아오기
+            const repostTracks = await axios(repostConfig);
+            if (repostTracks.data.length === 0) {
+              return;
+            } else {
+              const trackExist = repostTracks.data.find(
+                (repostTrack: ILikeTrack) => repostTrack.id === track.id
+              );
+              if (trackExist !== undefined) {
+                setRepost(true);
+              }
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    isLikeTrack();
+  }, []);
+
+  const likeTrack = async () => {
+    const config: any = {
+      method: "post",
+      url: `/likes/tracks/${track.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        console.log("asdfsadj");
+        setLike(true);
+        fetchTrack();
+      }
     } catch (error) {
-      console.log(error);
+      if (
+        axios.isAxiosError(error) &&
+        error &&
+        error?.response?.status === 401
+      ) {
+        console.log("asdfasd");
+      }
     }
-    setLike(true);
+    // axios
+    //   .post(config)
+    //   .then((res) => console.log(res))
+    //   .catch((err) => console.log(err));
   };
+
   const unlikeTrack = async () => {
-    // try {
-    //   const response = await axios.delete(
-    //     `https://api.soundwaffle.com/likes/tracks/track_id`
-    //   );
-    //   console.log(response);
-    //   setLike(false);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    setLike(false);
+    const config: any = {
+      method: "delete",
+      url: `/likes/tracks/${track.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        console.log("asdfsadj");
+        setLike(false);
+        fetchTrack();
+      }
+    } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error &&
+        error?.response?.status === 401
+      ) {
+        console.log("asdfasd");
+      }
+    }
   };
   const repostTrack = async () => {
     console.log(axios.defaults.headers);
-    try {
-      const response = await axios.post(`/reposts/tracks/${track.id}`, {
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+    const config: any = {
+      method: "post",
+      url: `/reposts/tracks/${track.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    const { data } = await axios(config);
+    console.log(data);
     setRepost(true);
+    fetchTrack();
     return;
   };
   const unrepostTrack = async () => {
-    console.log(axios.defaults.headers);
-    try {
-      const response = await axios.delete(`/reposts/tracks/${track.id}`, {
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+    const config: any = {
+      method: "delete",
+      url: `/reposts/tracks/${track.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    const { data } = await axios(config);
+    console.log(data);
+
     setRepost(false);
+    fetchTrack();
     return;
   };
   const copyLink = async () => {

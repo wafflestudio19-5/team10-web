@@ -1,23 +1,36 @@
 // import axios from "axios";
 import React, { useState } from "react";
 import styles from "./CommentsInput.module.scss";
+import axios from "axios";
+import { ITrack } from "../../TrackPage";
+import { useAuthContext } from "../../../../../context/AuthContext";
 
-const CommentsInput = ({ fetchComments }: { fetchComments: () => void }) => {
+const CommentsInput = ({
+  fetchComments,
+  track,
+}: {
+  fetchComments: () => void;
+  track: ITrack;
+}) => {
   const [commentInput, setInput] = useState("");
+  const { userSecret } = useAuthContext();
   const onCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setInput(value);
   };
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // try {
-    //   const response = await axios.post(
-    //     `https://api.soundwaffle.com/tracks/{tracks_id}/comments`
-    //   );
-    //   console.log(response);
-    // } catch (error) {
-    //   console.log(console.error());
-    // }
+    try {
+      const response = await axios.post(`/tracks/${track.id}/comments`, {
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        content: commentInput,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(console.error());
+    }
     setInput("");
     fetchComments();
   };

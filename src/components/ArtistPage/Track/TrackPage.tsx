@@ -62,49 +62,48 @@ const TrackPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { username, trackname } = useParams<IParams>();
-
-  useEffect(() => {
-    const fetchTrack = async () => {
-      try {
-        const response = await axios.get(
-          `/resolve?url=https%3A%2F%2Fwww.soundwaffle.com%2F${username}%2F${trackname}`
-        );
-        const data = response.data;
-        const artist = response.data.artist;
-        setTrack({
-          id: data.id,
-          title: data.title,
-          permalink: data.permalink,
-          audio: data.audio,
-          comment_count: data.comment_count,
-          count: data.count,
-          created_at: data.created_at,
-          description: data.description,
-          genre: data.genre,
-          image: data.image,
-          like_count: data.like_count,
-          repost_count: data.repost_count,
-          tags: data.tags,
-        });
-        setArtist({
-          city: artist.city,
-          country: artist.country,
-          display_name: artist.display_name,
-          id: artist.id,
-          permalink: artist.permalink,
-        });
-        setIsLoading(false);
-      } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setNoTrack(true);
-        }
+  const fetchTrack = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.soundwaffle.com/resolve?url=https%3A%2F%2Fwww.soundwaffle.com%2F${username}%2F${trackname}`
+      );
+      const data = response.data;
+      const artist = response.data.artist;
+      setTrack({
+        id: data.id,
+        title: data.title,
+        permalink: data.permalink,
+        audio: data.audio,
+        comment_count: data.comment_count,
+        count: data.count,
+        created_at: data.created_at,
+        description: data.description,
+        genre: data.genre,
+        image: data.image,
+        like_count: data.like_count,
+        repost_count: data.repost_count,
+        tags: data.tags,
+      });
+      setArtist({
+        city: artist.city,
+        country: artist.country,
+        display_name: artist.display_name,
+        id: artist.id,
+        permalink: artist.permalink,
+      });
+      setIsLoading(false);
+    } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.status === 404
+      ) {
+        setNoTrack(true);
       }
-      return;
-    };
+    }
+    return;
+  };
+  useEffect(() => {
     fetchTrack();
   }, []);
 
@@ -127,7 +126,9 @@ const TrackPage = () => {
             artist={artist}
             noTrack={noTrack}
           />
-          {noTrack || <TrackMain track={track} artist={artist} />}
+          {noTrack || (
+            <TrackMain track={track} artist={artist} fetchTrack={fetchTrack} />
+          )}
           {noTrack || <TrackBar />}
         </div>
       )}

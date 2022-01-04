@@ -5,14 +5,17 @@ interface IUserSecret {
   permalink: string | undefined | null;
 }
 
-const initialState: any = {
-  userSecret: undefined,
-  sesetUserSecrettLogin: () => null,
-};
+interface IAuthContext {
+  userSecret: IUserSecret;
+  setUserSecret: React.Dispatch<React.SetStateAction<IUserSecret>>;
+}
 
-const AuthContext = createContext(initialState);
+const AuthContext = createContext<IAuthContext>({
+  userSecret: { jwt: undefined, permalink: undefined },
+  setUserSecret: () => {},
+});
 
-export const AuthProvider: React.FC = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userSecret, setUserSecret] = useState<IUserSecret>({
     jwt: undefined,
     permalink: undefined,

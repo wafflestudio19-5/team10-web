@@ -19,7 +19,7 @@ const Discover = () => {
     checkValid();
   }, []);
   useEffect(() => {
-    userSecret.permalink !== true // 나중에 === undefined 로 바꿔야함
+    userSecret.permalink === undefined // 나중에 === undefined 로 바꿔야함
       ? null
       : axios.get(`https://api.soundwaffle.com/users/${userSecret.permalink}`);
     // 여기에 permalink가 아니라 해당 url을 통해 아래와 같이 정보를 얻을 수 있음

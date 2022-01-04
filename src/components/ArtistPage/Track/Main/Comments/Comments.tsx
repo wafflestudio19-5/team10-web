@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Comments.module.scss";
 import { FcComments } from "react-icons/fc";
 import { BsFillReplyFill } from "react-icons/bs";
@@ -40,31 +40,6 @@ const CommentItem = ({ comment }: { comment: IComment }) => {
     setInput(value);
   };
 
-  const userImage = useRef<HTMLDivElement>(null);
-
-  const user_id = "asdfhkjsd";
-
-  useEffect(() => {
-    setInput(`@${user_id}: `);
-    const { current } = userImage;
-    if (current !== null) {
-      current.style.setProperty("--red", `${Math.floor(Math.random() * 255)}`);
-      current.style.setProperty(
-        "--green",
-        `${Math.floor(Math.random() * 255)}`
-      );
-      current.style.setProperty("--blue", `${Math.floor(Math.random() * 255)}`);
-      current.style.setProperty("--red2", `${Math.floor(Math.random() * 255)}`);
-      current.style.setProperty(
-        "--green2",
-        `${Math.floor(Math.random() * 255)}`
-      );
-      current.style.setProperty(
-        "--blue2",
-        `${Math.floor(Math.random() * 255)}`
-      );
-    }
-  }, [userImage]);
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // try {
@@ -75,29 +50,30 @@ const CommentItem = ({ comment }: { comment: IComment }) => {
     // } catch (error) {
     //   console.log(console.error());
     // }
-    setInput(`@${user_id}: `);
     // fetchComments();
   };
 
   const history = useHistory();
-  const clickUsername = () => history.push(`/${comment.display_name}`);
+  const clickUsername = () => history.push(`/${comment.writer.permalink}`);
+
+  const commentedTime = comment.created_at.slice(11, 16);
   return (
     <li key={comment.id}>
       <div className={styles.userImage} onClick={clickUsername}>
-        <div ref={userImage}></div>
+        <div></div>
       </div>
       <div className={styles.mainComment}>
         <div className={styles.commentInfo}>
           <span className={styles.hoverClick} onClick={clickUsername}>
-            {comment.display_name}
+            {comment.writer.permalink}
           </span>{" "}
           <span className={styles.at}>at</span>{" "}
-          <span className={styles.hoverClick}>{comment.commented_at}</span>
+          <span className={styles.hoverClick}>{commentedTime}</span>
         </div>
         <div className={styles.comment}>{comment.content}</div>
       </div>
       <div className={styles.timePassed}>
-        <span>{comment.created_at}</span>
+        <span>{comment.commented_at}</span>
         <button
           className={styles.replyButton}
           onClick={() => setShowReply(true)}

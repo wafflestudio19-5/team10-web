@@ -7,9 +7,12 @@ import styles from "./YourTracks.module.scss";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
 import UploadHeader from "../UploadHeader/UploadHeader";
+// import { useAuthContext } from "../../../context/AuthContext";
 
 const YourTracks = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
+  //   const { permalink } = useAuthContext();
+
   const editToggle = () => setIsEditOpen(!isEditOpen);
 
   const history = useHistory();
@@ -22,7 +25,6 @@ const YourTracks = () => {
           <div className={styles.uploadHeader}>
             <UploadHeader />
           </div>
-
           <div className={styles.header}>
             <div className={styles.title}>
               <span>Your tracks</span>
@@ -41,7 +43,6 @@ const YourTracks = () => {
                   <ul>
                     <li>Privacy and tags</li>
                     <li>Artwork</li>
-                    <li>Permissions</li>
                   </ul>
                 )}
               </div>
