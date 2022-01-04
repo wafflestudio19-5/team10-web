@@ -3,7 +3,6 @@ import { Grid } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { useAuthContext } from "../../context/AuthContext";
 import EditModal from "./EditModal/EditModal";
 import toast from "react-hot-toast";
 import TrackBox from "./TrackBox/TrackBox";
@@ -13,9 +12,7 @@ function ArtistPage() {
 
   const params = useParams<any>();
   const permalink = params.permalink;
-  const { userSecret } = useAuthContext();
-  const myPermalink = userSecret.permalink;
-  const [isMe, setIsMe] = useState<boolean>(false);
+  const [isMe, setIsMe] = useState<boolean>();
 
   const [modal, setModal] = useState(false);
 
@@ -32,11 +29,13 @@ function ArtistPage() {
   useEffect(() => {
     setIsLoading(true);
 
+    const myPermalink = localStorage.getItem("permalink");
+
     // 내 페이지인지 확인
     if (permalink === myPermalink) {
-      setIsMe(false);
-    } else {
       setIsMe(true);
+    } else {
+      setIsMe(false);
     }
 
     const getUser = () => {
@@ -93,7 +92,7 @@ function ArtistPage() {
               <div className={"displayname"}>{displayName}</div>
               {userName !== "" && <div className={"username"}>{userName}</div>}
             </div>
-            {isMe && (
+            {isMe === true && (
               // 나중에 가능하면 헤더이미지 api 추가하기
               <div className="upload-header-image">
                 <button onClick={clickImageInput}>
@@ -117,7 +116,7 @@ function ArtistPage() {
               <a href={`/${permalink}/sets`}>Playlists</a>
               <a href={`/${permalink}/reposts`}>Reposts</a>
             </div>
-            {isMe && (
+            {isMe === true && (
               <div className="menu-right">
                 <button className="button3">
                   <img
@@ -136,7 +135,7 @@ function ArtistPage() {
                 <EditModal modal={modal} setModal={setModal} />
               </div>
             )}
-            {!isMe && (
+            {isMe === false && (
               <div className={"menu-right"}>
                 <button className="button1">
                   <img
