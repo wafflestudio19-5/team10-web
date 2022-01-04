@@ -41,14 +41,12 @@ function ArtistPage() {
         Authorization: `JWT ${userSecret.jwt}`,
       },
     };
-    const { data } = await axios(config);
-    data
-      .then(() => {
-        setIsFollowing(true);
-      })
-      .catch(() => {
-        toast("팔로우 실패");
-      });
+    try {
+      await axios(config);
+      setIsFollowing(true);
+    } catch (error) {
+      toast("팔로우 실패");
+    }
   };
 
   const unfollowUser = async () => {
@@ -59,14 +57,12 @@ function ArtistPage() {
         Authorization: `JWT ${userSecret.jwt}`,
       },
     };
-    const { data } = await axios(config);
-    data
-      .then(() => {
-        setIsFollowing(false);
-      })
-      .catch(() => {
-        toast("언팔로우 실패");
-      });
+    try {
+      await axios(config);
+      setIsFollowing(false);
+    } catch (error) {
+      toast("언팔로우 실패");
+    }
   };
 
   useEffect(() => {
