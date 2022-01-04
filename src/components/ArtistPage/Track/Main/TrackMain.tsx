@@ -29,6 +29,7 @@ export interface IComment {
   created_at: string;
   commented_at: string;
   parent_comment: number;
+  children: IComment[];
 }
 
 const TrackMain = ({
@@ -58,6 +59,7 @@ const TrackMain = ({
     try {
       const response = await axios(config);
       const data = response.data;
+      console.log(data);
       setComments(data);
     } catch (error) {
       console.log(error);
@@ -88,7 +90,11 @@ const TrackMain = ({
           <ListenArtistInfo artist={artist} userMe={userMe} />
           <div>
             {track.description && <AudioInfo description={track.description} />}
-            <Comments comments={comments} track={track} />
+            <Comments
+              comments={comments}
+              track={track}
+              fetchComments={fetchComments}
+            />
           </div>
         </div>
       </div>
