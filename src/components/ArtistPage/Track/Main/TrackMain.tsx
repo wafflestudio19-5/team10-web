@@ -9,7 +9,7 @@ import RelatedTracks from "./Side/RelatedTracks";
 import RepostUsers from "./Side/RepostUsers";
 import LikeUsers from "./Side/LikeUsers";
 import InPlaylists from "./Side/InPlaylists";
-import { IArtist, ITrack } from "../TrackPage";
+import { IArtist, ITrack, IUserMe } from "../TrackPage";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
 
@@ -30,22 +30,20 @@ export interface IComment {
   commented_at: string;
   parent_comment: number;
 }
-export interface IUserMe {
-  id: number;
-  image_profile: string;
-}
 
 const TrackMain = ({
   track,
   artist,
   fetchTrack,
+  userMe,
 }: {
   track: ITrack;
   artist: IArtist;
+  userMe: IUserMe;
   fetchTrack: () => void;
 }) => {
   const [comments, setComments] = useState<IComment[]>([]);
-  const [userMe, setUserMe] = useState<IUserMe>({ id: 0, image_profile: "" });
+
   const { userSecret } = useAuthContext();
 
   const fetchComments = async () => {
@@ -66,44 +64,30 @@ const TrackMain = ({
     }
     return;
   };
-  const fetchMe = async () => {
-    const config: any = {
-      method: "get",
-      url: `/users/me`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    if (userMe.id !== 0) {
-      try {
-        const { data } = await axios(config);
-        setUserMe({
-          id: data.id,
-          image_profile: data.image_profile,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
 
   useEffect(() => {
     fetchComments();
-    fetchMe();
   }, [track]);
 
   return (
     <div className={styles.trackMain}>
       <div className={styles.leftSide}>
         <div className={styles.header}>
-          <CommentsInput fetchComments={fetchComments} track={track} />
-          <ListenEngagement track={track} fetchTrack={fetchTrack} />
+          <CommentsInput
+            fetchComments={fetchComments}
+            track={track}
+            userMe={userMe}
+          />
+          <ListenEngagement
+            track={track}
+            userMe={userMe}
+            fetchTrack={fetchTrack}
+          />
         </div>
         <div className={styles.infoComments}>
-          <ListenArtistInfo artist={artist} />
+          <ListenArtistInfo artist={artist} userMe={userMe} />
           <div>
-            <AudioInfo description={track.description} />
+            {track.description && <AudioInfo description={track.description} />}
             <Comments comments={comments} track={track} />
           </div>
         </div>

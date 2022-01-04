@@ -2,24 +2,33 @@ import React, { useEffect, useState } from "react";
 import styles from "./ListenArtistInfo.module.scss";
 import { BsPeopleFill } from "react-icons/bs";
 import { IoStatsChart } from "react-icons/io5";
-import { RiUserFollowFill } from "react-icons/ri";
-import { MdReport } from "react-icons/md";
+import { RiUserFollowFill, RiUserUnfollowLine } from "react-icons/ri";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
-import { IArtist } from "../TrackPage";
+import { IArtist, IUserMe } from "../TrackPage";
 
 interface IArtistInfo {
   image: string;
   followers: number;
   tracks: number;
 }
-const ListenArtistInfo = ({ artist }: { artist: IArtist }) => {
+interface IFollowings {
+  id: number;
+}
+const ListenArtistInfo = ({
+  artist,
+  userMe,
+}: {
+  artist: IArtist;
+  userMe: IUserMe;
+}) => {
   const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
     image: "",
     followers: 0,
     tracks: 0,
   });
+  const [followArtist, setFollowArtist] = useState(false);
 
   const { userSecret } = useAuthContext();
 
@@ -29,45 +38,105 @@ const ListenArtistInfo = ({ artist }: { artist: IArtist }) => {
   const clickFollowers = () => history.push(`/${permalink}/followers`);
   const clickTracks = () => history.push(`/${permalink}/tracks`);
 
-  useEffect(() => {
-    const fetchArtist = async () => {
+  const fetchArtist = async () => {
+    console.log("asdfasdfasdfasdf");
+    if (artist.id !== 0) {
+      const config: any = {
+        method: "get",
+        url: `/users/${artist.id}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
       try {
-        const response = await axios.get(`/users/${artist.id}/followers`);
-        console.log("유저", response.data);
+        const response = await axios(config);
         const data = response.data;
+        console.log(data);
         setArtistInfo({
-          ...artistInfo,
-          followers: data.length,
+          image: data.image_profile,
+          followers: data.follower_count,
+          tracks: data.track_count,
         });
       } catch (error) {
         console.log(error);
       }
-    };
-    if (artist.id !== 0) {
-      fetchArtist();
     }
-  }, [artist]);
-  console.log(artistInfo.followers);
-  const followUser = async () => {
-    try {
-      await axios.get(
-        `/resolve?url=https%3A%2F%2Fwww.soundwaffle.com%2F${userSecret.permalink}`
-      );
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const linkParts = error.response.data.link.split(
-          "api.soundwaffle.com/"
-        ); // ['https://', 'users/3']
-        try {
-          const response = await axios.get(`/${linkParts[1]}/followings`);
-          console.log(response.data);
-        } catch (error) {
-          console.log(error);
+  };
+  const isFollowing = async () => {
+    if (artist.id !== 0 && userMe.id !== 0) {
+      console.log(userMe);
+      const followConfig: any = {
+        method: "get",
+        url: `/users/${userMe.id}/followings`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const { data } = await axios(followConfig);
+        if (data.length === 0) {
+          return;
+        } else {
+          const trackExist = data.find(
+            (following: IFollowings) => following.id === artist.id
+          );
+          if (trackExist) {
+            setFollowArtist(true);
+          }
         }
+      } catch (error) {
+        console.log(error);
       }
     }
   };
+  useEffect(() => {
+    fetchArtist();
+  }, [artist]);
+  useEffect(() => {
+    isFollowing();
+  }, [userMe]);
 
+  const followUser = async () => {
+    const config: any = {
+      method: "post",
+      url: `/users/me/followings/${artist.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        setFollowArtist(true);
+        fetchArtist();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const unfollowUser = async () => {
+    const config: any = {
+      method: "delete",
+      url: `/users/me/followings/${artist.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        setFollowArtist(false);
+        fetchArtist();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(followArtist);
   return (
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}>
@@ -89,14 +158,17 @@ const ListenArtistInfo = ({ artist }: { artist: IArtist }) => {
           <span>{artistInfo.tracks}</span>
         </li>
       </ul>
-      <button onClick={followUser}>
-        <RiUserFollowFill />
-        <span>Follow</span>
-      </button>
-      <a>
-        <MdReport />
-        <span>Report</span>
-      </a>
+      {followArtist ? (
+        <button className={styles.unfollowArtist} onClick={unfollowUser}>
+          <RiUserUnfollowLine />
+          <span>Following</span>
+        </button>
+      ) : (
+        <button className={styles.followArtist} onClick={followUser}>
+          <RiUserFollowFill />
+          <span>Follow</span>
+        </button>
+      )}
     </div>
   );
 };

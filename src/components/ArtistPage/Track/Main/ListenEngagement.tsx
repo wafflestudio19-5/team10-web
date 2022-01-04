@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import styles from "./ListenEngagement.module.scss";
 import { BsSuitHeartFill } from "react-icons/bs";
 import { BiRepost } from "react-icons/bi";
-import { ImShare } from "react-icons/im";
-import { FiLink2, FiMoreHorizontal } from "react-icons/fi";
+// import { ImShare } from "react-icons/im";
+import { FiLink2 } from "react-icons/fi";
 import { FaPlay } from "react-icons/fa";
-import { ITrack } from "../TrackPage";
+import { ITrack, IUserMe } from "../TrackPage";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
@@ -16,9 +16,11 @@ interface ILikeTrack {
 
 const ListenEngagement = ({
   track,
+  userMe,
   fetchTrack,
 }: {
   track: ITrack;
+  userMe: IUserMe;
   fetchTrack: () => void;
 }) => {
   const [like, setLike] = useState(false);
@@ -29,73 +31,59 @@ const ListenEngagement = ({
 
   useEffect(() => {
     const isLikeTrack = async () => {
-      const config: any = {
-        method: "get",
-        url: `/users/me`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        // 로그인한 유저 id 받아오기
-        const response = await axios(config);
-        if (response) {
-          const config: any = {
-            method: "get",
-            url: `/users/${response.data.id}/likes/tracks`,
-            headers: {
-              Authorization: `JWT ${userSecret.jwt}`,
-            },
-            data: {},
-          };
-          try {
-            // like 트랙 목록 받아오기
-            const likeTracks = await axios(config);
-            if (likeTracks.data.length === 0) {
-              return;
-            } else {
-              const trackExist = likeTracks.data.find(
-                (likeTrack: ILikeTrack) => likeTrack.id === track.id
-              );
-              if (trackExist !== undefined) {
-                setLike(true);
-              }
+      if (userMe.id !== 0 && track.id !== 0) {
+        const config: any = {
+          method: "get",
+          url: `/users/${userMe.id}/likes/tracks`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          // like 트랙 목록 받아오기
+          const likeTracks = await axios(config);
+          if (likeTracks.data.length === 0) {
+            return;
+          } else {
+            const trackExist = likeTracks.data.find(
+              (likeTrack: ILikeTrack) => likeTrack.id === track.id
+            );
+            if (trackExist !== undefined) {
+              setLike(true);
             }
-          } catch (error) {
-            console.log(error);
           }
-          const repostConfig: any = {
-            method: "get",
-            url: `/users/${response.data.id}/reposts/tracks`,
-            headers: {
-              Authorization: `JWT ${userSecret.jwt}`,
-            },
-            data: {},
-          };
-          try {
-            // repost 트랙 목록 받아오기
-            const repostTracks = await axios(repostConfig);
-            if (repostTracks.data.length === 0) {
-              return;
-            } else {
-              const trackExist = repostTracks.data.find(
-                (repostTrack: ILikeTrack) => repostTrack.id === track.id
-              );
-              if (trackExist !== undefined) {
-                setRepost(true);
-              }
-            }
-          } catch (error) {
-            console.log(error);
-          }
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
+        const repostConfig: any = {
+          method: "get",
+          url: `/users/${userMe.id}/reposts/tracks`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          // repost 트랙 목록 받아오기
+          const repostTracks = await axios(repostConfig);
+          if (repostTracks.data.length === 0) {
+            return;
+          } else {
+            const trackExist = repostTracks.data.find(
+              (repostTrack: ILikeTrack) => repostTrack.id === track.id
+            );
+            if (trackExist !== undefined) {
+              setRepost(true);
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
     };
     isLikeTrack();
-  }, []);
+  }, [userMe]);
 
   const likeTrack = async () => {
     const config: any = {
@@ -122,10 +110,6 @@ const ListenEngagement = ({
         console.log("asdfasd");
       }
     }
-    // axios
-    //   .post(config)
-    //   .then((res) => console.log(res))
-    //   .catch((err) => console.log(err));
   };
 
   const unlikeTrack = async () => {
@@ -194,8 +178,6 @@ const ListenEngagement = ({
   const trackLikes = () => history.push(`/username/trackname/likes`);
   const trackReposts = () => history.push(`/username/trackname/reposts`);
 
-  console.log(like);
-
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>
@@ -221,18 +203,18 @@ const ListenEngagement = ({
             <span>Repost</span>
           </button>
         )}
-        <button className={styles.share}>
+        {/* <button className={styles.share}>
           <ImShare />
           <span>Share</span>
-        </button>
+        </button> */}
         <button className={styles.copyLink} onClick={copyLink}>
           <FiLink2 />
           <span>Copy Link</span>
         </button>
-        <button className={styles.more}>
+        {/* <button className={styles.more}>
           <FiMoreHorizontal />
           <span>More</span>
-        </button>
+        </button> */}
       </div>
       <div className={styles.stats}>
         <div className={styles.playStats}>

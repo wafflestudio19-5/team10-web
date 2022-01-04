@@ -6,6 +6,7 @@ import TrackModal from "./Modal/TrackModal";
 import TrackBar from "./TrackBar/TrackBar";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useAuthContext } from "../../../context/AuthContext";
 
 export interface ITrack {
   id: number;
@@ -33,6 +34,10 @@ interface IParams {
   username: string;
   trackname: string;
 }
+export interface IUserMe {
+  id: number;
+  image_profile: string;
+}
 
 const TrackPage = () => {
   const [modal, setModal] = useState(false);
@@ -59,8 +64,10 @@ const TrackPage = () => {
     id: 0,
     permalink: "",
   });
+  const [userMe, setUserMe] = useState<IUserMe>({ id: 0, image_profile: "" });
   const [isLoading, setIsLoading] = useState(true);
 
+  const { userSecret } = useAuthContext();
   const { username, trackname } = useParams<IParams>();
   const fetchTrack = async () => {
     try {
@@ -103,9 +110,30 @@ const TrackPage = () => {
     }
     return;
   };
+  const fetchMe = async () => {
+    if (userSecret.jwt) {
+      const config: any = {
+        method: "get",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const { data } = await axios(config);
+        setUserMe({ id: data.id, image_profile: data.image_profile });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   useEffect(() => {
     fetchTrack();
   }, []);
+  useEffect(() => {
+    fetchMe();
+  }, [userSecret.jwt]);
 
   const openModal = () => setModal(true);
   const closeModal = () => setModal(false);
@@ -127,7 +155,12 @@ const TrackPage = () => {
             noTrack={noTrack}
           />
           {noTrack || (
-            <TrackMain track={track} artist={artist} fetchTrack={fetchTrack} />
+            <TrackMain
+              track={track}
+              artist={artist}
+              userMe={userMe}
+              fetchTrack={fetchTrack}
+            />
           )}
           {noTrack || <TrackBar />}
         </div>

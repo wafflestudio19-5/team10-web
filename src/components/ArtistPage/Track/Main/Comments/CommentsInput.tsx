@@ -2,15 +2,17 @@
 import React, { useState } from "react";
 import styles from "./CommentsInput.module.scss";
 import axios from "axios";
-import { ITrack } from "../../TrackPage";
+import { ITrack, IUserMe } from "../../TrackPage";
 import { useAuthContext } from "../../../../../context/AuthContext";
 
 const CommentsInput = ({
   fetchComments,
   track,
+  userMe,
 }: {
   fetchComments: () => void;
   track: ITrack;
+  userMe: IUserMe;
 }) => {
   const [commentInput, setInput] = useState("");
   const { userSecret } = useAuthContext();
@@ -20,13 +22,16 @@ const CommentsInput = ({
   };
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const config: any = {
+      method: "post",
+      url: `/tracks/${track.id}/comments`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: { content: commentInput },
+    };
     try {
-      const response = await axios.post(`/tracks/${track.id}/comments`, {
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        content: commentInput,
-      });
+      const response = await axios(config);
       console.log(response);
     } catch (error) {
       console.log(console.error());
@@ -38,7 +43,7 @@ const CommentsInput = ({
   return (
     <div className={styles.main}>
       <div className={styles.commentInput}>
-        <div className={styles.userImage}></div>
+        <img src={userMe.image_profile} className={styles.userImage} />
         <form className={styles.inputContainer} onSubmit={onSubmit}>
           <input
             type="text"
