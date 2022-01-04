@@ -100,7 +100,7 @@ function ArtistPage() {
             .then((res) => {
               if (res.data) {
                 const allTracks = res.data.filter(
-                  (item: any) => item.artist == res1.data.id
+                  (item: any) => item.artist.id == res1.data.id
                 );
                 setTracks(allTracks);
                 setCountTracks(allTracks.length);
