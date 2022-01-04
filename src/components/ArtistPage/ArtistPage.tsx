@@ -6,14 +6,16 @@ import { useParams } from "react-router-dom";
 import EditModal from "./EditModal/EditModal";
 import toast from "react-hot-toast";
 import TrackBox from "./TrackBox/TrackBox";
+import { useAuthContext } from "../../context/AuthContext";
 
 function ArtistPage() {
   const [isLoading, setIsLoading] = useState<boolean>();
 
+  const { userSecret } = useAuthContext();
   const params = useParams<any>();
   const permalink = params.permalink;
-  const [myPermalink, setMypermalink] = useState<any>();
   const [isMe, setIsMe] = useState<boolean>();
+  const [pageId, setPageId] = useState<number>();
 
   const [modal, setModal] = useState(false);
 
@@ -31,42 +33,36 @@ function ArtistPage() {
     fileInput?.click();
   };
 
-  const followUser = () => {
-    // 내 id 받아오기
-    const url = `https://soundwaffle.com/${myPermalink}`;
-    axios
-      .get(`resolve?url=${url}`)
-      .then((res1) => {
-        // 팔로우 하기
-        axios
-          .post(`users/me/followings/${res1.data.id}`)
-          .then(() => {
-            setIsFollowing(true);
-          })
-          .catch(() => {
-            toast("팔로우 실패");
-          });
+  const followUser = async () => {
+    const config: any = {
+      method: "post",
+      url: `/users/me/followings/${pageId}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+    };
+    const { data } = await axios(config);
+    data
+      .then(() => {
+        setIsFollowing(true);
       })
       .catch(() => {
         toast("팔로우 실패");
       });
   };
 
-  const unfollowUser = () => {
-    // 내 id 받아오기
-    const url = `https://soundwaffle.com/${myPermalink}`;
-    axios
-      .get(`resolve?url=${url}`)
-      .then((res1) => {
-        // 언팔로우 하기
-        axios
-          .delete(`users/me/followings/${res1.data.id}`)
-          .then(() => {
-            setIsFollowing(false);
-          })
-          .catch(() => {
-            toast("언팔로우 실패");
-          });
+  const unfollowUser = async () => {
+    const config: any = {
+      method: "delete",
+      url: `/users/me/followings/${pageId}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+    };
+    const { data } = await axios(config);
+    data
+      .then(() => {
+        setIsFollowing(false);
       })
       .catch(() => {
         toast("언팔로우 실패");
@@ -77,7 +73,6 @@ function ArtistPage() {
     setIsLoading(true);
 
     const myPermalink = localStorage.getItem("permalink");
-    setMypermalink(myPermalink);
 
     // 내 페이지인지 확인
     if (permalink === myPermalink) {
@@ -92,6 +87,7 @@ function ArtistPage() {
       axios
         .get(`resolve?url=${url}`)
         .then((res1) => {
+          setPageId(res1.data.id);
           // 유저 정보
           axios
             .get(`users/${res1.data.id}`)
