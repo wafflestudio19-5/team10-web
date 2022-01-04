@@ -9,12 +9,17 @@ function UploadModal({ selectedFile, setModal }: any) {
 
   const permalink = userSecret.permalink;
   const token = userSecret.jwt;
+  const trackPermalink = selectedFile.name.substr(
+    0,
+    selectedFile.name.indexOf(".")
+  );
 
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -31,6 +36,10 @@ function UploadModal({ selectedFile, setModal }: any) {
     setImageFile(event.target.files[0]);
   };
 
+  const changeTrackPermalink = (event: any) => {
+    setTPermalink(event.target.value);
+  };
+
   const handleUpload = (e: any) => {
     e.preventDefault();
     axios
@@ -38,7 +47,7 @@ function UploadModal({ selectedFile, setModal }: any) {
         "https://api.soundwaffle.com/tracks",
         {
           title: title,
-          permalink: permalink,
+          permalink: tPermalink,
           description: description,
           is_private: isPrivate,
           audio_filename: selectedFile.name,
@@ -128,7 +137,10 @@ function UploadModal({ selectedFile, setModal }: any) {
               placeholder="Name your track"
               onChange={(e) => setTitle(e.target.value)}
             />
-            <div>soundcloud.com/username/title</div>
+            <div className="upload-info-permalink">
+              <div>{`soundcloud.com/${permalink}/`}</div>
+              <input value={tPermalink} onChange={changeTrackPermalink} />
+            </div>
           </div>
           <div className="upload-info-genre">
             <text>Genre</text>
