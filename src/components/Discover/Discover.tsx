@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useEffect, useRef } from "react";
-import Cookies from "universal-cookie";
 import { useAuthContext } from "../../context/AuthContext";
 import styles from "./Discover.module.scss";
 import LikeList from "./LikeList/LikeList";
@@ -8,22 +7,38 @@ import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
 
 const Discover = () => {
-  const cookies = new Cookies();
   const { userSecret, setUserSecret } = useAuthContext();
   useEffect(() => {
     const checkValid = async () => {
-      const jwtToken = cookies.get("jwt_token");
-      const permal = cookies.get("permalink");
+      const jwtToken = localStorage.getItem("jwt_token");
+      const permal = localStorage.getItem("permalink");
       await setUserSecret({ jwt: jwtToken, permalink: permal });
     };
     checkValid();
   }, []);
   useEffect(() => {
-    userSecret.permalink === undefined // 나중에 === undefined 로 바꿔야함
-      ? null
-      : axios.get(`https://api.soundwaffle.com/users/${userSecret.permalink}`);
-    // 여기에 permalink가 아니라 해당 url을 통해 아래와 같이 정보를 얻을 수 있음
-    //HTTP GET: https://api.soundcloud.com/resolve.json?url=https%3A%2F%2Fsoundcloud.com%2Fmsmrsounds%2Fms-mr-hurricane-chvrches-remix&client_id=[permalink]
+    if (userSecret.permalink !== undefined) {
+      const fetchUserId = async () => {
+        try {
+          await axios.get(
+            `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${userSecret.permalink}`
+          );
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response) {
+            const linkParts = error.response.data.link.split(
+              "api.soundwaffle.com/"
+            );
+            try {
+              const response = await axios.get(`/${linkParts[1]}`);
+              console.log(response);
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }
+      };
+      fetchUserId();
+    }
   }, [userSecret]);
   const listScroll = useRef<HTMLDivElement>(null);
   const rightButton = useRef<HTMLButtonElement>(null);
@@ -34,7 +49,6 @@ const Discover = () => {
       left: 340,
       behavior: "smooth",
     });
-    console.log(listScroll.current?.scrollLeft);
   };
   const handleScrollLeft = () => {
     listScroll.current?.scrollTo({
@@ -79,7 +93,7 @@ const Discover = () => {
       <div className={styles.fluid}>
         <div className={styles.likes}>
           <div className={styles.header}>
-            🤍 12 likes
+            🤍 4 likes
             <button>View all</button>
           </div>
           <LikeList />
