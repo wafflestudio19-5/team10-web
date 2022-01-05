@@ -15,7 +15,9 @@ function Upload() {
         {!modal && (
           <UploadBox setModal={setModal} setSelectedFile={setSelectedFile} />
         )}
-        {modal && <UploadModal selectedFile={selectedFile} />}
+        {modal && (
+          <UploadModal selectedFile={selectedFile} setModal={setModal} />
+        )}
       </div>
     </div>
   );
