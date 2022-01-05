@@ -63,7 +63,7 @@ const NewItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              <BsThreeDots className={styles.details} onClick={clickDots} />
+              <BsThreeDots className={styles.dots} onClick={clickDots} />
             </div>
           </div>
         ) : (

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useHistory } from "react-router";
+import { useAuthContext } from "../../../context/AuthContext";
 
 const SignIn = ({
   handleSignup,
