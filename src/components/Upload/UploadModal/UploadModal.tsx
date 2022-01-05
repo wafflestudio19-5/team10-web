@@ -1,21 +1,25 @@
 import axios from "axios";
 import { useState } from "react";
-import Cookies from "universal-cookie";
+import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
-function UploadModal({ selectedFile }: any) {
-  // 삭제예정
-  const cookies = new Cookies();
-  const token = cookies.get("jwt_token");
-  const permalink = cookies.get("permalink");
+function UploadModal({ selectedFile, setModal }: any) {
+  const { userSecret } = useAuthContext();
 
-  const { userSecret } = useAuthContext(); // 나중에 token, permalink 이걸로 적용
+  const permalink = userSecret.permalink;
+  const token = userSecret.jwt;
+  const trackPermalink = selectedFile.name.substr(
+    0,
+    selectedFile.name.indexOf(".")
+  );
+
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -32,6 +36,10 @@ function UploadModal({ selectedFile }: any) {
     setImageFile(event.target.files[0]);
   };
 
+  const changeTrackPermalink = (event: any) => {
+    setTPermalink(event.target.value);
+  };
+
   const handleUpload = (e: any) => {
     e.preventDefault();
     axios
@@ -39,7 +47,7 @@ function UploadModal({ selectedFile }: any) {
         "https://api.soundwaffle.com/tracks",
         {
           title: title,
-          permalink: permalink,
+          permalink: tPermalink,
           description: description,
           is_private: isPrivate,
           audio_filename: selectedFile.name,
@@ -52,26 +60,43 @@ function UploadModal({ selectedFile }: any) {
         }
       )
       .then((res) => {
-        console.log(res);
+        const music_options = {
+          headers: {
+            "Content-Type": selectedFile.type,
+          },
+        };
+
+        axios
+          .put(res.data.audio_presigned_url, selectedFile, music_options)
+          .then(() => {
+            toast("음악파일 업로드 완료");
+          })
+          .catch(() => {
+            toast("음악파일 업로드 실패");
+          });
+
         const img_options = {
           headers: {
             "Content-Type": imageFile.type,
           },
         };
+
         axios
           .put(res.data.image_presigned_url, imageFile, img_options)
-          .then((res) => {
-            console.log(res);
+          .then(() => {
+            toast("이미지파일 업로드 완료");
           })
-          .catch((err) => {
-            console.log(err);
+          .catch(() => {
+            toast("이미지파일 업로드 실패");
           });
+
+        setModal(false);
       })
       .catch((err) => {
+        toast("업로드 실패");
         console.log(err);
+        setModal(false);
       });
-
-    console.log(userSecret);
   };
 
   return (
@@ -112,7 +137,10 @@ function UploadModal({ selectedFile }: any) {
               placeholder="Name your track"
               onChange={(e) => setTitle(e.target.value)}
             />
-            <div>soundcloud.com/username/title</div>
+            <div className="upload-info-permalink">
+              <div>{`soundcloud.com/${permalink}/`}</div>
+              <input value={tPermalink} onChange={changeTrackPermalink} />
+            </div>
           </div>
           <div className="upload-info-genre">
             <text>Genre</text>
