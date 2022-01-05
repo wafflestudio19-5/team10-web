@@ -8,32 +8,32 @@ const NewList = ({ listScroll }: any) => {
     {
       title: "",
       image: "",
-      id: 0,
+      id: 999999,
     },
     {
       title: "",
       image: "",
-      id: 1,
+      id: 999998,
     },
     {
       title: "",
       image: "",
-      id: 2,
+      id: 999997,
     },
     {
       title: "",
       image: "",
-      id: 3,
+      id: 999996,
     },
     {
       title: "",
       image: "",
-      id: 4,
+      id: 999995,
     },
     {
       title: "",
       image: "",
-      id: 5,
+      id: 999994,
     },
   ]);
   useEffect(() => {
@@ -50,7 +50,12 @@ const NewList = ({ listScroll }: any) => {
   return (
     <div className={styles.newList} ref={listScroll}>
       {newTrackList.map((item) => (
-        <NewItems title={item.title} img={item.image} key={item.id} />
+        <NewItems
+          title={item.title}
+          img={item.image}
+          key={item.id}
+          trackIid={item.id}
+        />
       ))}
     </div>
   );

@@ -93,7 +93,7 @@ const Discover = () => {
       <div className={styles.fluid}>
         <div className={styles.likes}>
           <div className={styles.header}>
-            🤍 12 likes
+            🤍 4 likes
             <button>View all</button>
           </div>
           <LikeList />
