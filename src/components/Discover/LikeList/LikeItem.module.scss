@@ -5,7 +5,6 @@
 .itemWrapper {
   width: 300px;
   height: 63px;
-  border: 1px black solid;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -16,7 +15,6 @@
       display: flex;
       position: absolute;
       left: 35px;
-      cursor: pointer;
       flex-direction: row;
       justify-content: space-between;
       width: 220px;
@@ -31,22 +29,46 @@
         justify-content: center;
         align-items: center;
         z-index: 1;
+        cursor: pointer;
       }
       .functions {
-        .like {
+        .like,
+        .liked {
           border: solid 1px #999999;
-          width: 18px;
-          height: 18px;
+          width: 20px;
+          height: 20px;
+          padding: auto;
           border-radius: 20%;
+          cursor: pointer;
+          margin: 0 5px 0 20px;
+          position: relative;
+          z-index: 2;
+          &:hover {
+            border: solid 1px #666666;
+          }
+        }
+        .liked {
+          color: red;
         }
         .details {
           border: solid 1px #999999;
-          width: 18px;
-          height: 18px;
+          width: 20px;
+          height: 20px;
           border-radius: 20%;
+          cursor: pointer;
+          position: relative;
+          z-index: 2;
+          &:hover {
+            border: solid 1px #666666;
+          }
         }
       }
     }
+  }
+  .like,
+  .liked .details {
+    border: solid 1px black;
+    z-index: 2;
   }
   .imgWrapper {
     justify-content: center;
@@ -67,28 +89,36 @@
     .artist {
       height: 20px;
       color: #999999;
+      cursor: pointer;
+      &:hover {
+        color: #666666;
+      }
     }
     .trackName {
       height: 20px;
-      color: #838383;
+      color: #666666;
+      cursor: pointer;
+      z-index: 1;
     }
     .counts {
       height: 20px;
+      font-weight: 10px;
+      font-size: 13px;
       color: #999999;
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
       .playCount {
-        width: 40px;
+        width: 50px;
       }
       .likeCount {
-        width: 40px;
+        width: 50px;
       }
       .commentCount {
-        width: 40px;
+        width: 50px;
       }
       .repostCount {
-        width: 40px;
+        width: 50px;
       }
     }
   }
