@@ -1,21 +1,30 @@
-.playButton {
+.playButton,
+.noTrackButton {
   margin-top: 2px;
   width: 60px;
   height: 60px;
   float: left;
   border-radius: 50%;
   border: none;
-  background-color: rgb(255, 81, 0);
-  cursor: pointer;
   display: grid;
   justify-content: center;
   align-items: center;
   color: white;
   font-size: 35px;
+}
+.playButton {
+  background-color: rgb(255, 81, 0);
+  cursor: pointer;
   svg path {
     fill: white;
   }
   &:hover {
     background-color: #ff3300;
+  }
+}
+.noTrackButton {
+  background-color: #bf725b;
+  svg path {
+    fill: #c0b4b5;
   }
 }

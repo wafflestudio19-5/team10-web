@@ -26,12 +26,19 @@
     span {
       margin-left: 3px;
     }
-    &.repost svg {
+    &.repost svg,
+    &.notRepost svg {
       font-size: 17px;
     }
     &.like svg,
-    &.like span {
-      color: #ea4e00;
+    &.like span,
+    &.repost svg,
+    &.repost span {
+      color: #ff5500;
+    }
+    &.like,
+    &.repost {
+      border: 1px solid #ff5500;
     }
   }
   .stats {

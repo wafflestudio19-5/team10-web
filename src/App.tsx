@@ -14,7 +14,7 @@ import Albums from "./components/Library/Albums/Albums";
 import Stations from "./components/Library/Stations/Stations";
 import Following from "./components/Library/Following/Following";
 import History from "./components/Library/History/History";
-import { useAuthContext, AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import Upload from "./components/Upload/Upload";
 import YourTracks from "./components/Upload/YourTracks/YourTracks";
 import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
@@ -23,13 +23,8 @@ import axios from "axios";
 
 function App() {
   const location = useLocation();
-  const { userSecret } = useAuthContext();
-  axios.defaults.baseURL = "https://api.soundwaffle.com";
-  if (userSecret && userSecret.jwt !== undefined) {
-    axios.defaults.headers.common["Authorization"] = `JWT ${
-      userSecret && userSecret.jwt
-    }`;
-  }
+  axios.defaults.baseURL = "https://api.soundwaffle.com"; // axios defaults 설정
+
   return (
     <AuthProvider>
       <div className={styles.wrapper}>
@@ -39,7 +34,6 @@ function App() {
           <Route exact path="/" component={Login} />
           <Route exact path="/discover" component={Discover} />
           <Route exact path="/username" component={ArtistPage} />
-          <Route exact path="/username/trackname" component={TrackPage} />
           <Route exact path="/logout" component={Logout} />
           <Route exact path="/you/library" component={Library} />
           <Route exact path="/you/likes" component={Likes} />
@@ -50,6 +44,7 @@ function App() {
           <Route exact path="/you/history" component={History} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
+          <Route exact path="/:username/:trackname" component={TrackPage} />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
         {location.pathname !== "/" && <AudioTag />}

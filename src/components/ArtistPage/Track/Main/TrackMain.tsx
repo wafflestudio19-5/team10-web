@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AudioInfo from "./AudioInfo";
 import CommentsInput from "./Comments/CommentsInput";
 import ListenArtistInfo from "./ListenArtistInfo";
@@ -9,110 +9,92 @@ import RelatedTracks from "./Side/RelatedTracks";
 import RepostUsers from "./Side/RepostUsers";
 import LikeUsers from "./Side/LikeUsers";
 import InPlaylists from "./Side/InPlaylists";
-import { ITrack } from "../TrackPage";
+import { IArtist, ITrack, IUserMe } from "../TrackPage";
+import axios from "axios";
+import { useAuthContext } from "../../../../context/AuthContext";
 
 export interface IComment {
   id: number;
-  display_name: string;
-  commented_at: string;
+  writer: {
+    id: number;
+    permalink: string;
+    email: string;
+    image_profile: string;
+    follower_count: number;
+    track_count: number;
+    first_name: string;
+    last_name: string;
+  };
   content: string;
   created_at: string;
+  commented_at: string;
+  parent_comment: number;
+  children: IComment[];
 }
 
-const TrackMain = ({ track }: { track: ITrack }) => {
-  const { artist, description } = track;
+const TrackMain = ({
+  track,
+  artist,
+  fetchTrack,
+  userMe,
+}: {
+  track: ITrack;
+  artist: IArtist;
+  userMe: IUserMe;
+  fetchTrack: () => void;
+}) => {
+  const [comments, setComments] = useState<IComment[]>([]);
 
-  //   const [comments, setComments] = useState<IComment[]>([
-  //     {
-  //       id: 1,
-  //       display_name: "김와플",
-  //       commented_at: "0:14",
-  //       content: "댓글",
-  //       created_at: "1 day ago",
-  //     },
-  //     {
-  //       id: 2,
-  //       display_name: "박와플",
-  //       commented_at: "0:14",
-  //       content: "댓글",
-  //       created_at: "2 day ago",
-  //     },
-  //     {
-  //       id: 3,
-  //       display_name: "이와플",
-  //       commented_at: "0:14",
-  //       content: "댓글",
-  //       created_at: "3 day ago",
-  //     },
-  //     {
-  //       id: 4,
-  //       display_name: "김김김",
-  //       commented_at: "0:14",
-  //       content: "댓글",
-  //       created_at: "4 day ago",
-  //     },
-  //   ]);
+  const { userSecret } = useAuthContext();
 
   const fetchComments = async () => {
-    // try {
-    //   const response = await axios.get(
-    //     `https://api.soundwaffle.com/tracks/{track_id}/comments`
-    //   );
-    //   const data = response.data;
-    //   setComments(data);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    const config: any = {
+      method: "get",
+      url: `/tracks/${track.id}/comments`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      const data = response.data;
+      console.log(data);
+      setComments(data);
+    } catch (error) {
+      console.log(error);
+    }
     return;
   };
 
   useEffect(() => {
     fetchComments();
-  }, []);
-
-  const comments: IComment[] = [
-    {
-      id: 1,
-      display_name: "김와플",
-      commented_at: "0:14",
-      content: "댓글",
-      created_at: "1 day ago",
-    },
-    {
-      id: 2,
-      display_name: "박와플",
-      commented_at: "0:14",
-      content: "댓글",
-      created_at: "2 day ago",
-    },
-    {
-      id: 3,
-      display_name: "이와플",
-      commented_at: "0:14",
-      content: "댓글",
-      created_at: "3 day ago",
-    },
-    {
-      id: 4,
-      display_name: "김김김",
-      commented_at: "0:14",
-      content: "댓글",
-      created_at: "4 day ago",
-    },
-  ];
+  }, [track]);
 
   return (
     <div className={styles.trackMain}>
       <div className={styles.leftSide}>
         <div className={styles.header}>
-          <CommentsInput fetchComments={fetchComments} />
-          <ListenEngagement track={track} />
+          <CommentsInput
+            fetchComments={fetchComments}
+            track={track}
+            userMe={userMe}
+          />
+          <ListenEngagement
+            track={track}
+            userMe={userMe}
+            fetchTrack={fetchTrack}
+          />
         </div>
         <div className={styles.infoComments}>
-          <ListenArtistInfo artist={artist} />
+          <ListenArtistInfo artist={artist} userMe={userMe} />
           <div>
-            <AudioInfo description={description} />
-            <Comments comments={comments} />
+            {track.description && <AudioInfo description={track.description} />}
+            <Comments
+              comments={comments}
+              track={track}
+              fetchComments={fetchComments}
+            />
           </div>
         </div>
       </div>

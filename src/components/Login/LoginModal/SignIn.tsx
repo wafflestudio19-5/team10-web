@@ -20,6 +20,7 @@ const SignIn = ({
   useEffect(() => {
     input.current?.focus();
   }, []);
+  const { setUserSecret } = useAuthContext();
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
       <div className="prevEmail" onClick={handleSignup}>
@@ -36,6 +37,7 @@ const SignIn = ({
             .then(async (res) => {
               localStorage.setItem("permalink", res.data.permalink); // 민석님이 제안하신대로 로컬스토리지에 저장하도록 했습니다!
               localStorage.setItem("jwt_token", res.data.token);
+              setUserSecret(res.data.token);
               history.push("/discover");
             })
             .catch(() => toast.error("비밀번호가 올바르지 않습니다"));
