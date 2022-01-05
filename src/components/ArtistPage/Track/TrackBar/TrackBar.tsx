@@ -90,6 +90,14 @@ const TrackBar = () => {
     }
   };
 
+  useEffect(() => {
+    if (trackIsPlaying) {
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    } else {
+      cancelAnimationFrame(barAnimationRef.current);
+    }
+  }, [trackIsPlaying]);
+
   const changePlayerCurrentTime = () => {
     if (progressBar.current && audioPlayer.current) {
       progressBar.current.value = audioPlayer.current.currentTime;

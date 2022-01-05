@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import styles from "./Login.module.scss";
 import LoginModal from "./LoginModal/LoginModal";
 
@@ -7,6 +8,13 @@ const Login = () => {
   const handleModal = () => {
     setModal(!modal);
   };
+  const history = useHistory();
+  useEffect(() => {
+    if (localStorage.getItem("jwt_token")) {
+      history.push("/discover");
+    }
+  }, []);
+
   return (
     <div className={styles.box}>
       <LoginModal modal={modal} handleModal={handleModal} />

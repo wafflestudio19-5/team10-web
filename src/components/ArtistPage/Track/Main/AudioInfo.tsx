@@ -5,7 +5,7 @@ const AudioInfo = ({ description }: { description: string }) => {
   return (
     <div className={styles.main}>
       {description}
-      <button>Show more</button>
+      {/* <button>Show more</button> */}
     </div>
   );
 };

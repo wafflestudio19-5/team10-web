@@ -1,16 +1,21 @@
 .main {
-  height: 150px;
-  border: 1px dotted gray;
+  max-height: 150px;
+  overflow-y: scroll;
+
+  //   border: 1px dotted gray;
   position: relative;
-  button {
-    display: block;
-    background-color: white;
-    border: none;
-    padding: 0;
-    position: absolute;
-    bottom: 0;
-    font-size: 12px;
-    cursor: pointer;
-  }
+  //   button {
+  //     display: block;
+  //     background-color: white;
+  //     border: none;
+  //     padding: 0;
+  //     position: absolute;
+  //     bottom: 0;
+  //     font-size: 12px;
+  //     cursor: pointer;
+  //   }
   margin-bottom: 25px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
