@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
-import Cookies from "universal-cookie";
 
 const SignupAge = ({
   age,
@@ -18,7 +17,6 @@ const SignupAge = ({
   displayName: string;
   inputs: any;
 }) => {
-  const cookies = new Cookies();
   const history = useHistory();
   const input = useRef<HTMLInputElement>(null);
   const input2 = useRef<HTMLInputElement>(null);
@@ -36,14 +34,8 @@ const SignupAge = ({
         gender: gender,
       })
       .then(async (res) => {
-        cookies.set("permalink", res.data.permalink, {
-          path: "/",
-          expires: new Date(Date.now() + 3600000),
-        });
-        cookies.set("jwt_token", res.data.token, {
-          path: "/",
-          expires: new Date(Date.now() + 3600000),
-        }); // 쿠키가 저장이 안됨. 이유를 모르겠음.
+        localStorage.setItem("permalink", res.data.permalink);
+        localStorage.setItem("jwt_token", res.data.token); // 쿠키가 저장이 안됨. 이유를 모르겠음.
         history.push("/discover");
       })
       .catch(() => {

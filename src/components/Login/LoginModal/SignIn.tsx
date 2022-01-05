@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useHistory } from "react-router";
-import Cookies from "universal-cookie";
 
 const SignIn = ({
   handleSignup,
@@ -17,7 +16,6 @@ const SignIn = ({
 }) => {
   const input = useRef<HTMLInputElement>(null);
   input.current?.focus();
-  const cookies = new Cookies();
   const history = useHistory();
   useEffect(() => {
     input.current?.focus();
@@ -36,14 +34,6 @@ const SignIn = ({
               password: password,
             })
             .then(async (res) => {
-              cookies.set("permalink", res.data.permalink, {
-                path: "/",
-                expires: new Date(Date.now() + 3600000),
-              });
-              cookies.set("jwt_token", res.data.token, {
-                path: "/",
-                expires: new Date(Date.now() + 3600000),
-              }); // 쿠키가 저장이 안됨. 이유를 모르겠음.
               localStorage.setItem("permalink", res.data.permalink); // 민석님이 제안하신대로 로컬스토리지에 저장하도록 했습니다!
               localStorage.setItem("jwt_token", res.data.token);
               history.push("/discover");
