@@ -29,6 +29,7 @@ const ListenArtistInfo = ({
     tracks: 0,
   });
   const [followArtist, setFollowArtist] = useState(false);
+  const [followLoading, setFollowLoading] = useState(true);
 
   const { userSecret } = useAuthContext();
 
@@ -85,6 +86,7 @@ const ListenArtistInfo = ({
           if (trackExist) {
             setFollowArtist(true);
           }
+          setFollowLoading(false);
         }
       } catch (error) {
         console.log(error);
@@ -164,7 +166,11 @@ const ListenArtistInfo = ({
           <span>Following</span>
         </button>
       ) : (
-        <button className={styles.followArtist} onClick={followUser}>
+        <button
+          className={styles.followArtist}
+          onClick={followUser}
+          disabled={followLoading}
+        >
           <RiUserFollowFill />
           <span>Follow</span>
         </button>

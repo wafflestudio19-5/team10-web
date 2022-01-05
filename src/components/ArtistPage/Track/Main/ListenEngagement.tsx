@@ -8,6 +8,7 @@ import { FaPlay } from "react-icons/fa";
 import { ITrack, IUserMe } from "../TrackPage";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { useAuthContext } from "../../../../context/AuthContext";
 
 interface ILikeTrack {
@@ -25,6 +26,8 @@ const ListenEngagement = ({
 }) => {
   const [like, setLike] = useState(false);
   const [repost, setRepost] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(true);
+  const [repostLoading, setRepostLoading] = useState(true);
 
   const history = useHistory();
   const { userSecret } = useAuthContext();
@@ -52,6 +55,7 @@ const ListenEngagement = ({
             if (trackExist !== undefined) {
               setLike(true);
             }
+            setLikeLoading(false);
           }
         } catch (error) {
           console.log(error);
@@ -76,6 +80,7 @@ const ListenEngagement = ({
             if (trackExist !== undefined) {
               setRepost(true);
             }
+            setRepostLoading(false);
           }
         } catch (error) {
           console.log(error);
@@ -172,7 +177,9 @@ const ListenEngagement = ({
   };
   const copyLink = async () => {
     await navigator.clipboard.writeText(location.href);
-    console.log("success");
+    toast.success("Link has been copied to the clipboard!", {
+      position: "top-right",
+    });
   };
 
   const trackLikes = () => history.push(`/username/trackname/likes`);
@@ -187,7 +194,11 @@ const ListenEngagement = ({
             <span>Liked</span>
           </button>
         ) : (
-          <button className={styles.notLike} onClick={likeTrack}>
+          <button
+            className={styles.notLike}
+            onClick={likeTrack}
+            disabled={likeLoading}
+          >
             <BsSuitHeartFill />
             <span>Like</span>
           </button>
@@ -198,7 +209,11 @@ const ListenEngagement = ({
             <span>Reposted</span>
           </button>
         ) : (
-          <button className={styles.notRepost} onClick={repostTrack}>
+          <button
+            className={styles.notRepost}
+            onClick={repostTrack}
+            disabled={repostLoading}
+          >
             <BiRepost />
             <span>Repost</span>
           </button>

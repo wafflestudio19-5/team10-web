@@ -121,7 +121,10 @@ const CommentItem = ({
     <>
       <li key={comment.id}>
         <div className={styles.userImage} onClick={clickUsername}>
-          <img src={comment.writer.image_profile} />
+          <img
+            src={comment.writer.image_profile}
+            alt={`${comment.writer.first_name} ${comment.writer.last_name}의 프로필 사진`}
+          />
         </div>
         <div className={styles.mainComment}>
           <div className={styles.commentInfo}>
@@ -149,7 +152,10 @@ const CommentItem = ({
             return (
               <li key={child.id}>
                 <div className={styles.userImage} onClick={clickUsername}>
-                  <img src={child.writer.image_profile} />
+                  <img
+                    src={child.writer.image_profile}
+                    alt={`${child.writer.first_name} ${child.writer.last_name}의 프로필 사진`}
+                  />
                 </div>
                 <div className={styles.mainComment}>
                   <div className={styles.commentInfo}>

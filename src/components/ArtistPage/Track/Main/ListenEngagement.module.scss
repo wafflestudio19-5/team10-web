@@ -34,7 +34,11 @@
     &.like span,
     &.repost svg,
     &.repost span {
-      color: #ea4e00;
+      color: #ff5500;
+    }
+    &.like,
+    &.repost {
+      border: 1px solid #ff5500;
     }
   }
   .stats {
