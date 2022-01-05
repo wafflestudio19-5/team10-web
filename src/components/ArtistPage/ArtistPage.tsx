@@ -16,6 +16,7 @@ function ArtistPage() {
   const permalink = params.permalink;
   const [isMe, setIsMe] = useState<boolean>();
   const [pageId, setPageId] = useState<number>();
+  const [myId, setMyId] = useState<number>();
 
   const [modal, setModal] = useState(false);
 
@@ -76,6 +77,17 @@ function ArtistPage() {
     } else {
       setIsMe(false);
     }
+
+    // 내 아이디 받아오기
+    const myResolve = `https://soundwaffle.com/${myPermalink}`;
+    axios
+      .get(`resolve?url=${myResolve}`)
+      .then((res) => {
+        setMyId(res.data.id);
+      })
+      .catch(() => {
+        toast("유저 아이디 불러오기 실패");
+      });
 
     const getUser = () => {
       // resolve api
@@ -257,7 +269,7 @@ function ArtistPage() {
               <text>Recent</text>
               {tracks &&
                 tracks.map((item: any) => (
-                  <TrackBox item={item} artistName={displayName} />
+                  <TrackBox item={item} artistName={displayName} myId={myId} />
                 ))}
             </div>
 
