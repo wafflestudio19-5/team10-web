@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useRef } from "react";
 import Cookies from "universal-cookie";
-import { AuthContext } from "../../Context";
+import { useAuthContext } from "../../context/AuthContext";
 import styles from "./Discover.module.scss";
 import LikeList from "./LikeList/LikeList";
 import MostList from "./MostList/MostList";
@@ -9,7 +9,7 @@ import NewList from "./NewList/NewList";
 
 const Discover = () => {
   const cookies = new Cookies();
-  const { userSecret, setUserSecret } = AuthContext();
+  const { userSecret, setUserSecret } = useAuthContext();
   useEffect(() => {
     const checkValid = async () => {
       const jwtToken = cookies.get("jwt_token");
@@ -19,7 +19,7 @@ const Discover = () => {
     checkValid();
   }, []);
   useEffect(() => {
-    userSecret.permalink !== true // 나중에 === undefined 로 바꿔야함
+    userSecret.permalink === undefined // 나중에 === undefined 로 바꿔야함
       ? null
       : axios.get(`https://api.soundwaffle.com/users/${userSecret.permalink}`);
     // 여기에 permalink가 아니라 해당 url을 통해 아래와 같이 정보를 얻을 수 있음

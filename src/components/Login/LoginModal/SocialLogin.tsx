@@ -22,7 +22,7 @@ const SocialLogin = ({
         onSubmit={(e) => {
           e.preventDefault();
           axios
-            .post(`https://api.soundwaffle.com/signup`, {
+            .post(`/signup`, {
               email: email,
             })
             .catch((e) => {
@@ -37,7 +37,7 @@ const SocialLogin = ({
         <input
           ref={input}
           type="email"
-          placeholder="Your email addressor profile URL"
+          placeholder="Your email address or profile URL"
           onChange={handleInput}
           name="email"
           value={email}

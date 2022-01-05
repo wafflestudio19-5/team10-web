@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useRef, useState } from "react";
+import { IArtist, ITrack } from "../components/ArtistPage/Track/TrackPage";
 
 // 토큰 타입 지정
 interface ITrackContext {
@@ -15,6 +16,10 @@ interface ITrackContext {
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
   loop: boolean;
   setLoop: React.Dispatch<React.SetStateAction<boolean>>;
+  trackBarArtist: IArtist;
+  setTrackBarArtist: React.Dispatch<React.SetStateAction<IArtist>>;
+  trackBarTrack: ITrack;
+  setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrack>>;
 }
 
 const TrackContext = createContext<ITrackContext>({
@@ -31,6 +36,30 @@ const TrackContext = createContext<ITrackContext>({
   setIsMuted: () => Boolean,
   loop: false,
   setLoop: () => Boolean,
+  trackBarArtist: {
+    display_name: "",
+    country: "",
+    city: "",
+    id: 0,
+    permalink: "",
+  },
+  setTrackBarArtist: () => {},
+  trackBarTrack: {
+    id: 0,
+    title: "",
+    permalink: "",
+    audio: "",
+    comment_count: 0,
+    count: 0,
+    created_at: "",
+    description: "",
+    genre: null,
+    image: "",
+    like_count: 0,
+    repost_count: 0,
+    tags: [],
+  },
+  setTrackBarTrack: () => {},
 });
 
 export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
@@ -41,11 +70,31 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
   const [playingTime, setPlayingTime] =
     useState<ITrackContext["playingTime"]>(0);
   const audioPlayer = useRef(new Audio());
-  const [audioSrc, setAudioSrc] = useState<ITrackContext["audioSrc"]>(
-    "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-  );
+  const [audioSrc, setAudioSrc] = useState<ITrackContext["audioSrc"]>("");
   const [isMuted, setIsMuted] = useState(false);
   const [loop, setLoop] = useState(false);
+  const [trackBarArtist, setTrackBarArtist] = useState<IArtist>({
+    display_name: "",
+    country: "",
+    city: "",
+    id: 0,
+    permalink: "",
+  });
+  const [trackBarTrack, setTrackBarTrack] = useState<ITrack>({
+    id: 0,
+    title: "",
+    permalink: "",
+    audio: "",
+    comment_count: 0,
+    count: 0,
+    created_at: "",
+    description: "",
+    genre: null,
+    image: "",
+    like_count: 0,
+    repost_count: 0,
+    tags: [],
+  });
 
   return (
     <TrackContext.Provider
@@ -63,6 +112,10 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
         setIsMuted,
         loop,
         setLoop,
+        trackBarArtist,
+        setTrackBarArtist,
+        trackBarTrack,
+        setTrackBarTrack,
       }}
     >
       {children}
