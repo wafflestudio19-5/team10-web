@@ -10,6 +10,7 @@ function TrackBox({ item, artistName, myId }: any) {
 
   const [isLiking, setIsLiking] = useState<boolean>();
   const [reposted, setReposted] = useState<boolean>();
+  const [comment, setComment] = useState<string>();
 
   const likeTrack = async () => {
     const config: any = {
@@ -75,6 +76,29 @@ function TrackBox({ item, artistName, myId }: any) {
     }
   };
 
+  const postComment = (e: any) => {
+    if (e.key === "Enter") {
+      axios
+        .post(
+          `/tracks/${item.id}/comments`,
+          {
+            content: comment,
+          },
+          {
+            headers: {
+              Authorization: `JWT ${userSecret.jwt}`,
+            },
+          }
+        )
+        .then(() => {
+          setComment("");
+        })
+        .catch(() => {
+          toast("댓글 작성 실패");
+        });
+    }
+  };
+
   useEffect(() => {
     const getIsLiking = () => {
       axios.get(`/users/${myId}/likes/tracks`).then((res) => {
@@ -110,7 +134,7 @@ function TrackBox({ item, artistName, myId }: any) {
     };
     getIsLiking();
     getReposted();
-  });
+  }, []);
 
   return (
     <div className={"recent-track"}>
@@ -140,7 +164,11 @@ function TrackBox({ item, artistName, myId }: any) {
             src="https://lovemewithoutall.github.io/assets/images/kiki.jpg"
             alt="me"
           />
-          <input placeholder={"Write a comment"} />
+          <input
+            placeholder={"Write a comment"}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyPress={postComment}
+          />
         </div>
         <div className={"track-buttons"}>
           {isLiking === false && (
