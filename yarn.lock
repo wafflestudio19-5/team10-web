@@ -9818,6 +9818,11 @@
   dependencies:
     "node-vibrant" "^3.0.0"
 
+"react-confirm-alert@^2.7.0":
+  "integrity" "sha512-21NWtGK/e85+ZX3TLRpMc3IsU5Kj6Z9ElCOrkTIlwMzV9EancyXNlkqHGbtKP63a2iS6g5hOxROokmJOqKQiXA=="
+  "resolved" "https://registry.npmjs.org/react-confirm-alert/-/react-confirm-alert-2.7.0.tgz"
+  "version" "2.7.0"
+
 "react-dayjs@^0.3.2":
   "integrity" "sha512-N9ozA6KNunzvnhwRbDi0JTa1Ine8AWQxNQ1u6sPugBenpl2mXMf0c5nOxBcs8id0z9kaKVlF2NOYzWGMoEzelg=="
   "resolved" "https://registry.npmjs.org/react-dayjs/-/react-dayjs-0.3.2.tgz"

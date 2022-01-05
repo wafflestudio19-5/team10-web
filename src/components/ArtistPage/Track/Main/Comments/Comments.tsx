@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Comments.module.scss";
 import { FcComments } from "react-icons/fc";
-import { BsFillReplyFill } from "react-icons/bs";
+import { BsFillReplyFill, BsTrashFill } from "react-icons/bs";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { IComment } from "../TrackMain";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 import { ITrack } from "../../TrackPage";
 import { useAuthContext } from "../../../../../context/AuthContext";
-dayjs.extend(relativeTime);
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 const Comments = ({
   comments,
@@ -20,38 +22,15 @@ const Comments = ({
   track: ITrack;
   fetchComments: () => void;
 }) => {
-  const [nestedComments, setNestedComments] = useState<IComment[]>([]);
-  useEffect(() => {
-    const nestComments = () => {
-      const commentList = comments.map((comment) => ({ ...comment }));
-      const commentMap: IComment[] = [];
-      // move all the comments into a map of id => comment
-      commentList.forEach((comment) => (commentMap[comment.id] = comment));
-      // iterate over the comments again and correctly nest the children
-      commentList.forEach((comment) => {
-        if (comment.parent_comment !== null) {
-          const parent = commentMap[comment.parent_comment];
-          (parent.children = parent.children || []).push(comment);
-        }
-      });
-      // filter the list to return a list of correctly nested comments
-      const commentsToBeRendered = commentList.filter((comment) => {
-        return comment.parent_comment === null;
-      });
-      setNestedComments(commentsToBeRendered);
-    };
-    nestComments();
-  }, [comments]);
-
   return (
     <div className={styles.container}>
       <header>
         <FcComments />
-        <span>{comments.length} comments</span>
+        <span>{track.comment_count} comments</span>
       </header>
       <ul className={styles.commentsList}>
-        {comments.length
-          ? nestedComments.map((comment) => {
+        {comments.length !== 0
+          ? comments.reverse().map((comment) => {
               return (
                 <CommentItem
                   comment={comment}
@@ -94,7 +73,10 @@ const CommentItem = ({
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
-      data: { content: commentInput, parent_id: comment.id },
+      data: {
+        content: commentInput,
+        parent_id: comment.children[comment.children.length - 1].id,
+      },
     };
     try {
       const response = await axios(config);
@@ -117,6 +99,43 @@ const CommentItem = ({
   const commentedFromNow = (comment: IComment) => {
     return dayjs(comment.created_at).fromNow();
   };
+
+  const deleteComment = async (id: number) => {
+    confirmAlert({
+      message: "Do you really want to remove this comment?",
+      buttons: [
+        {
+          label: "Cancel",
+          onClick: () => {
+            return null;
+          },
+        },
+        {
+          label: "Yes",
+          onClick: async () => {
+            const config: any = {
+              method: "delete",
+              url: `/tracks/${track.id}/comments/${id}`,
+              headers: {
+                Authorization: `JWT ${userSecret.jwt}`,
+              },
+              data: {},
+            };
+            try {
+              const response = await axios(config);
+              if (response) {
+                fetchComments();
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          },
+        },
+      ],
+    });
+    return;
+  };
+
   return (
     <>
       <li key={comment.id}>
@@ -144,6 +163,14 @@ const CommentItem = ({
           >
             <BsFillReplyFill /> Reply
           </button>
+          {comment.writer.permalink === userSecret.permalink && (
+            <button
+              className={styles.deleteButton}
+              onClick={() => deleteComment(comment.id)}
+            >
+              <BsTrashFill />
+            </button>
+          )}
         </div>
       </li>
       {Object.prototype.hasOwnProperty.call(comment, "children") && (
@@ -177,6 +204,14 @@ const CommentItem = ({
                   >
                     <BsFillReplyFill /> Reply
                   </button>
+                  {child.writer.permalink === userSecret.permalink && (
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => deleteComment(child.id)}
+                    >
+                      <BsTrashFill />
+                    </button>
+                  )}
                 </div>
               </li>
             );

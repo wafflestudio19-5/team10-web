@@ -22,6 +22,7 @@ export interface ITrack {
   like_count: number;
   repost_count: number;
   tags: string[];
+  is_private: boolean;
 }
 export interface IArtist {
   city: string;
@@ -29,6 +30,10 @@ export interface IArtist {
   display_name: string;
   id: number;
   permalink: string;
+}
+export interface ITag {
+  id: number;
+  name: string;
 }
 interface IParams {
   username: string;
@@ -56,6 +61,7 @@ const TrackPage = () => {
     like_count: 0,
     repost_count: 0,
     tags: [],
+    is_private: false,
   });
   const [artist, setArtist] = useState<IArtist>({
     city: "",
@@ -76,6 +82,7 @@ const TrackPage = () => {
       );
       const data = response.data;
       const artist = response.data.artist;
+      const tagList = data.tags.map((value: ITag) => value.name);
       setTrack({
         id: data.id,
         title: data.title,
@@ -89,7 +96,8 @@ const TrackPage = () => {
         image: data.image,
         like_count: data.like_count,
         repost_count: data.repost_count,
-        tags: data.tags,
+        tags: tagList,
+        is_private: data.is_private,
       });
       setArtist({
         city: artist.city,

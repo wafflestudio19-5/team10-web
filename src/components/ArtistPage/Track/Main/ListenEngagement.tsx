@@ -47,7 +47,7 @@ const ListenEngagement = ({
           // like 트랙 목록 받아오기
           const likeTracks = await axios(config);
           if (likeTracks.data.length === 0) {
-            return;
+            setLikeLoading(false);
           } else {
             const trackExist = likeTracks.data.find(
               (likeTrack: ILikeTrack) => likeTrack.id === track.id
@@ -72,7 +72,7 @@ const ListenEngagement = ({
           // repost 트랙 목록 받아오기
           const repostTracks = await axios(repostConfig);
           if (repostTracks.data.length === 0) {
-            return;
+            setRepostLoading(false);
           } else {
             const trackExist = repostTracks.data.find(
               (repostTrack: ILikeTrack) => repostTrack.id === track.id
@@ -88,7 +88,7 @@ const ListenEngagement = ({
       }
     };
     isLikeTrack();
-  }, [userMe]);
+  }, [userMe, userSecret]);
 
   const likeTrack = async () => {
     const config: any = {

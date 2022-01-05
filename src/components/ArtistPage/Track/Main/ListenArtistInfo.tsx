@@ -78,7 +78,7 @@ const ListenArtistInfo = ({
       try {
         const { data } = await axios(followConfig);
         if (data.length === 0) {
-          return;
+          setFollowLoading(false);
         } else {
           const trackExist = data.find(
             (following: IFollowings) => following.id === artist.id
@@ -98,7 +98,7 @@ const ListenArtistInfo = ({
   }, [artist]);
   useEffect(() => {
     isFollowing();
-  }, [userMe]);
+  }, [userMe, userSecret]);
 
   const followUser = async () => {
     const config: any = {
@@ -138,7 +138,7 @@ const ListenArtistInfo = ({
       console.log(error);
     }
   };
-  console.log(followArtist);
+  console.log(followLoading);
   return (
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}>

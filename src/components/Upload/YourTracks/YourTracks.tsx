@@ -16,10 +16,11 @@ import UploadHeader from "../UploadHeader/UploadHeader";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
 import ReactTooltip from "react-tooltip";
-import { ITrack } from "../../ArtistPage/Track/TrackPage";
+import { ITag, ITrack } from "../../ArtistPage/Track/TrackPage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTrackContext } from "../../../context/TrackContext";
+import EditModal from "./EditModal";
 dayjs.extend(relativeTime);
 
 interface IYourTracks {
@@ -40,45 +41,48 @@ const YourTracks = () => {
   const [yourTracks, setYourTracks] = useState<IYourTracks[]>([]);
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [username, setUsername] = useState("");
+  const [modal, setModal] = useState(false);
+  const [editTrack, setEditTrack] = useState<ITrack>();
+  const [loading, setLoading] = useState(true);
   const { userSecret } = useAuthContext();
 
-  useEffect(() => {
-    const fetchYourTracks = async () => {
-      if (userSecret.jwt) {
-        const config: any = {
+  const fetchYourTracks = async () => {
+    if (userSecret.jwt) {
+      const config: any = {
+        method: "get",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const response = await axios(config);
+        const userId = response.data.id;
+        setUsername(response.data.display_name);
+        const tracksConfig: any = {
           method: "get",
-          url: `/users/me`,
+          url: `/users/${userId}/tracks`,
           headers: {
             Authorization: `JWT ${userSecret.jwt}`,
           },
           data: {},
         };
         try {
-          const response = await axios(config);
-          const userId = response.data.id;
-          setUsername(response.data.display_name);
-          const tracksConfig: any = {
-            method: "get",
-            url: `/users/${userId}/tracks`,
-            headers: {
-              Authorization: `JWT ${userSecret.jwt}`,
-            },
-            data: {},
-          };
-          try {
-            const { data } = await axios(tracksConfig);
-            setYourTracks(data);
-          } catch (error) {
-            console.log(error);
-          }
+          const { data } = await axios(tracksConfig);
+          setYourTracks(data);
+          setLoading(false);
         } catch (error) {
           console.log(error);
         }
+      } catch (error) {
+        console.log(error);
       }
-    };
+    }
+  };
+  useEffect(() => {
     fetchYourTracks();
-  }, [userSecret]);
-  console.log(yourTracks);
+  }, [userSecret.jwt]);
 
   const editToggle = () => setIsEditOpen(!isEditOpen);
 
@@ -97,6 +101,13 @@ const YourTracks = () => {
 
   return (
     <div className={styles.yourTracksPage}>
+      {modal && editTrack && (
+        <EditModal
+          setModal={setModal}
+          track={editTrack}
+          fetchYourTracks={fetchYourTracks}
+        />
+      )}
       <div className={styles.wrapper}>
         <div className={styles.main}>
           <div className={styles.uploadHeader}>
@@ -142,7 +153,7 @@ const YourTracks = () => {
               </div>
             </div>
           </div>
-          {yourTracks.length !== 0 ? (
+          {!loading && yourTracks.length !== 0 && (
             <ul className={styles.trackContainer}>
               {yourTracks.map((track) => {
                 return (
@@ -151,11 +162,14 @@ const YourTracks = () => {
                     track={track}
                     checkedItemHandler={checkedItemHandler}
                     username={username}
+                    setModal={setModal}
+                    setEditTrack={setEditTrack}
                   />
                 );
               })}
             </ul>
-          ) : (
+          )}
+          {!loading && yourTracks.length === 0 && (
             <div className={styles.uploadTrack}>
               <div className={styles.waveContainer}>
                 <BsSoundwave />
@@ -178,10 +192,14 @@ const Track = ({
   track,
   checkedItemHandler,
   username,
+  setModal,
+  setEditTrack,
 }: {
   track: IYourTracks;
   checkedItemHandler: (id: number, isChecked: boolean) => void;
   username: string;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
 }) => {
   const [checked, setChecked] = useState(false);
   const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
@@ -216,8 +234,24 @@ const Track = ({
           data: {},
         };
         try {
-          const response = await axios(config);
-          setFetchedTrack(response.data);
+          const { data } = await axios(config);
+          const tagList = data.tags.map((value: ITag) => value.name);
+          setFetchedTrack({
+            id: data.id,
+            title: data.title,
+            permalink: data.permalink,
+            audio: data.audio,
+            comment_count: data.comment_count,
+            count: data.count,
+            created_at: data.created_at,
+            description: data.description,
+            genre: data.genre,
+            image: data.image,
+            like_count: data.like_count,
+            repost_count: data.repost_count,
+            tags: tagList,
+            is_private: data.is_private,
+          });
         } catch (error) {
           console.log(error);
         }
@@ -277,6 +311,13 @@ const Track = ({
   const clickTitle = () =>
     history.push(`/${userSecret.permalink}/${track.permalink}`);
 
+  const onEditTrack = () => {
+    if (fetchedTrack) {
+      setModal(true);
+      setEditTrack(fetchedTrack);
+    }
+  };
+
   return (
     <li key={track.id}>
       <audio
@@ -335,7 +376,7 @@ const Track = ({
         <div className={styles.additional}>
           <div className={styles.actions}>
             <div className={styles.smallButtons}>
-              <button>
+              <button onClick={onEditTrack}>
                 <BiPencil />
               </button>
               <button>
@@ -344,12 +385,14 @@ const Track = ({
             </div>
           </div>
           <div className={styles.extra}>
-            <div className={styles.private}>
-              <span data-tip="This track is private.">
-                <BsFillFileLock2Fill />
-              </span>
-              <ReactTooltip />
-            </div>
+            {fetchedTrack?.is_private && (
+              <div className={styles.private}>
+                <span data-tip="This track is private.">
+                  <BsFillFileLock2Fill />
+                </span>
+                <ReactTooltip />
+              </div>
+            )}
           </div>
           <div className={styles.duration}>
             <span>{duration !== 0 && calculateTime(duration)}</span>

@@ -60,7 +60,7 @@ const TrackMain = ({
       const response = await axios(config);
       const data = response.data;
       console.log(data);
-      setComments(data);
+      setComments(data.results);
     } catch (error) {
       console.log(error);
     }

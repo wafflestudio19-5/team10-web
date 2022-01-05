@@ -58,6 +58,7 @@ const TrackContext = createContext<ITrackContext>({
     like_count: 0,
     repost_count: 0,
     tags: [],
+    is_private: false,
   },
   setTrackBarTrack: () => {},
 });
@@ -94,6 +95,7 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     like_count: 0,
     repost_count: 0,
     tags: [],
+    is_private: false,
   });
 
   return (

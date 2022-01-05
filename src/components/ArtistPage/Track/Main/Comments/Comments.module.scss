@@ -64,6 +64,24 @@
       color: #999999;
       text-align: right;
       position: relative;
+      .deleteButton {
+        visibility: hidden;
+        height: 22px;
+        width: 22px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 70px;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+      }
       .replyButton {
         visibility: hidden;
         font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
@@ -83,7 +101,8 @@
         padding: 2px 9px 2px 8px;
       }
     }
-    &:hover .replyButton {
+    &:hover .replyButton,
+    &:hover .deleteButton {
       visibility: visible;
     }
   }
@@ -185,6 +204,24 @@
       color: #999999;
       text-align: right;
       position: relative;
+      .deleteButton {
+        visibility: hidden;
+        height: 22px;
+        width: 22px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 70px;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+      }
       .replyButton {
         visibility: hidden;
         font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
@@ -204,7 +241,8 @@
         padding: 2px 9px 2px 8px;
       }
     }
-    &:hover .replyButton {
+    &:hover .replyButton,
+    &:hover .deleteButton {
       visibility: visible;
     }
   }
