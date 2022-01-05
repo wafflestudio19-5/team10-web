@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MostItems from "./MostItems";
 import styles from "./MostList.module.scss";
 
-const MostList = () => {
+const MostList = ({ likeList }: { likeList: any }) => {
   const [mostTrackList, setMostTrackList] = useState([
     {
       title: "Stay",
@@ -29,6 +29,8 @@ const MostList = () => {
     //setMostTrackList안쓰면 오류나서 일시적으로 해놓은 코드
     if (mostTrackList[0].id >= 1000) {
       setMostTrackList([...mostTrackList]);
+      const likeListIds = likeList.map((item: any) => item.id);
+      console.log(likeListIds);
     }
   }, []);
   return (

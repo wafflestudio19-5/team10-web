@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import styles from "./Discover.module.scss";
 import LikeList from "./LikeList/LikeList";
@@ -8,6 +8,22 @@ import NewList from "./NewList/NewList";
 
 const Discover = () => {
   const { userSecret, setUserSecret } = useAuthContext();
+  const [likeList, setLikeList] = useState([
+    {
+      artist: {
+        permalink: "",
+      },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
+      id: null,
+    },
+  ]);
   useEffect(() => {
     const checkValid = async () => {
       const jwtToken = localStorage.getItem("jwt_token");
@@ -20,21 +36,18 @@ const Discover = () => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
         try {
-          await axios.get(
-            `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${userSecret.permalink}`
-          );
+          await axios
+            .get(
+              `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${userSecret.permalink}`
+            )
+            .then((r) => {
+              const userId = r.data.id;
+              axios
+                .get(`/users/${userId}/likes/tracks`)
+                .then((res) => setLikeList(res.data));
+            });
         } catch (error) {
-          if (axios.isAxiosError(error) && error.response) {
-            const linkParts = error.response.data.link.split(
-              "api.soundwaffle.com/"
-            );
-            try {
-              const response = await axios.get(`/${linkParts[1]}`);
-              console.log(response);
-            } catch (e) {
-              console.log(e);
-            }
-          }
+          console.log(error);
         }
       };
       fetchUserId();
@@ -65,7 +78,7 @@ const Discover = () => {
             <h2>More of what you like</h2>
             <div>Suggestions based on what you've liked or played</div>
           </div>
-          <MostList />
+          <MostList likeList={likeList} />
           {/* 아티스트 프로필이 있어야 가능 */}
         </div>
         <div className={styles.new}>
@@ -85,7 +98,7 @@ const Discover = () => {
             >
               &gt;
             </button>
-            <NewList listScroll={listScroll} />
+            <NewList listScroll={listScroll} likeList={likeList} />
             {/* 아티스트 프로필이 있어야 가능 */}
           </div>
         </div>

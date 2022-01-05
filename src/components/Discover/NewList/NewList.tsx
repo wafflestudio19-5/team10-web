@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import NewItems from "./NewItems";
 import styles from "./NewList.module.scss";
 
-const NewList = ({ listScroll }: any) => {
+const NewList = ({ listScroll, likeList }: any) => {
   const [newTrackList, setNewTrackList] = useState([
     {
       title: "",
@@ -36,17 +36,21 @@ const NewList = ({ listScroll }: any) => {
       id: 999994,
     },
   ]);
+  const [likeListId, setLikeListId] = useState([]);
   useEffect(() => {
     const fetchNewList = () => {
       axios.get("/tracks").then((r: any) => {
-        const newList = r.data.slice(-6);
-        console.log(newList);
+        const newList = r.data.results.splice(-6);
         setNewTrackList(newList);
       });
     };
     fetchNewList();
   }, []);
-
+  useEffect(() => {
+    if (likeList[0].id !== null) {
+      setLikeListId(likeList.map((item: any) => item.id));
+    }
+  }, [likeList]);
   return (
     <div className={styles.newList} ref={listScroll}>
       {newTrackList.map((item) => (
@@ -54,7 +58,8 @@ const NewList = ({ listScroll }: any) => {
           title={item.title}
           img={item.image}
           key={item.id}
-          trackIid={item.id}
+          trackId={item.id}
+          likeListId={likeListId}
         />
       ))}
     </div>

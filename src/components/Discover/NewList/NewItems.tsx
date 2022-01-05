@@ -6,15 +6,18 @@ import { useEffect, useState } from "react";
 import { AiFillHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import axios from "axios";
+import { useAuthContext } from "../../../context/AuthContext";
 
 const NewItems = ({
   title,
   img,
-  trackIid,
+  trackId,
+  likeListId,
 }: {
   title: string;
   img: string;
-  trackIid: number | string;
+  trackId: number | string;
+  likeListId: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -26,32 +29,51 @@ const NewItems = ({
     artistPermal: "",
     trackPermal: "",
   });
+  const { userSecret } = useAuthContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
     setPlay(!play);
   };
-  const handleHeart = (e: any) => {
+  const handleHeart = async (e: any) => {
     e.stopPropagation();
-    setHeart(!heart);
+    if (heart === false) {
+      await axios({
+        method: "post",
+        url: `/likes/tracks/${trackId}`,
+        headers: { Authorization: `JWT ${userSecret.jwt}` },
+      });
+      setHeart(!heart);
+    } else {
+      await axios({
+        method: "delete",
+        url: `/likes/tracks/${trackId}`,
+        headers: { Authorization: `JWT ${userSecret.jwt}` },
+      });
+      setHeart(!heart);
+    }
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
   };
   useEffect(() => {
-    trackIid <= 999990
-      ? axios.get(`/tracks/${trackIid}`).then((r) => {
-          const permalink = {
-            artistPermal: r.data.artist.permalink,
-            trackPermal: r.data.permalink,
-          };
-          setPermalink(permalink);
-        })
-      : null;
-  }, [trackIid]);
+    if (trackId <= 999990 && likeListId[0] !== undefined) {
+      axios.get(`/tracks/${trackId}`).then((r) => {
+        const permalink = {
+          artistPermal: r.data.artist.permalink,
+          trackPermal: r.data.permalink,
+        };
+        setPermalink(permalink);
+      });
+      setHeart(likeListId.includes(trackId));
+    }
+  }, [trackId, likeListId]);
   return (
     <div className={styles.wrapper}>
       <img src={img} alt="track img" className={styles.track} />
-      <Link className={styles.link} to="/username/trackname">
+      <Link
+        className={styles.link}
+        to={`/${permalink.artistPermal}/${permalink.trackPermal}`}
+      >
         {title}
       </Link>
       <div className={styles.hover} onClick={goTrack}>
