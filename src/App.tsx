@@ -33,7 +33,6 @@ function App() {
         <Switch>
           <Route exact path="/" component={Login} />
           <Route exact path="/discover" component={Discover} />
-          <Route exact path="/username" component={ArtistPage} />
           <Route exact path="/logout" component={Logout} />
           <Route exact path="/you/library" component={Library} />
           <Route exact path="/you/likes" component={Likes} />
@@ -44,6 +43,7 @@ function App() {
           <Route exact path="/you/history" component={History} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
+          <Route exact path="/:permalink" component={ArtistPage} />
           <Route exact path="/:username/:trackname" component={TrackPage} />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
