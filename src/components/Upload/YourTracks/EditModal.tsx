@@ -17,9 +17,6 @@ const EditModal = ({
 }) => {
   const { userSecret } = useAuthContext();
 
-  //   const permalink = userSecret.permalink;
-  //   const token = userSecret.jwt;
-
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
@@ -97,24 +94,14 @@ const EditModal = ({
     try {
       const response = await axios(config);
       if (response) {
-        try {
-          const config: any = {
-            method: "patch",
-            url: `${response.data.image_presigned_url}`,
-            headers: {
-              "Content-Type": imageFile.type,
-            },
-            data: {
-              imageFile,
-            },
-          };
-          const { data } = await axios(config);
-          if (data) {
-            fetchYourTracks();
-          }
-        } catch (error) {
-          console.log(error);
-        }
+        setTitle("ㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴ");
+        setTPermalink("");
+        setDescription("");
+        setIsPrivate(false);
+        setTags([]);
+        setImageUrl("");
+        fetchYourTracks();
+        setModal(false);
       }
     } catch (error) {
       console.log(error);
@@ -143,7 +130,7 @@ const EditModal = ({
               <img
                 className={styles["upload-track-img"]}
                 src={imageUrl}
-                alt="img"
+                alt={`${track.title}의 이미지`}
               />
             )}
             <button onClick={openFileSelector}>

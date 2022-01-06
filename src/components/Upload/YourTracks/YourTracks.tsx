@@ -21,6 +21,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTrackContext } from "../../../context/TrackContext";
 import EditModal from "./EditModal";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 dayjs.extend(relativeTime);
 
 interface IYourTracks {
@@ -164,6 +166,8 @@ const YourTracks = () => {
                     username={username}
                     setModal={setModal}
                     setEditTrack={setEditTrack}
+                    fetchYourTracks={fetchYourTracks}
+                    yourTracks={yourTracks}
                   />
                 );
               })}
@@ -194,12 +198,16 @@ const Track = ({
   username,
   setModal,
   setEditTrack,
+  fetchYourTracks,
+  yourTracks,
 }: {
   track: IYourTracks;
   checkedItemHandler: (id: number, isChecked: boolean) => void;
   username: string;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
+  fetchYourTracks: () => void;
+  yourTracks: IYourTracks[];
 }) => {
   const [checked, setChecked] = useState(false);
   const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
@@ -258,9 +266,11 @@ const Track = ({
       }
     };
     fetchTrack();
-  }, [userSecret]);
+  }, [userSecret, yourTracks]);
+  const headerTrackSrc = track.audio.split("?")[0];
+  const barTrackSrc = audioSrc.split("?")[0];
   useEffect(() => {
-    if (audioSrc === track.audio && trackIsPlaying) {
+    if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
       setPlay(true);
     } else {
       setPlay(false);
@@ -284,21 +294,18 @@ const Track = ({
   const togglePlayButton = () => {
     if (fetchedTrack) {
       if (!play) {
-        if (audioSrc !== track.audio) {
+        if (headerTrackSrc !== barTrackSrc) {
           setPlayingTime(0);
-          audioPlayer.current.src =
-            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+          audioPlayer.current.src = track.audio;
+          setAudioSrc(track.audio);
           audioPlayer.current.load();
-          setTimeout(() => {
-            audioPlayer.current.play();
-          }, 1);
-        } else {
-          audioPlayer.current.play();
+          setTrackBarTrack(fetchedTrack);
         }
         setPlay(true);
-        setAudioSrc(track.audio);
         setTrackIsPlaying(true);
-        setTrackBarTrack(fetchedTrack);
+        setTimeout(() => {
+          audioPlayer.current.play();
+        }, 1);
       } else {
         audioPlayer.current.pause();
         setPlay(false);
@@ -316,6 +323,41 @@ const Track = ({
       setModal(true);
       setEditTrack(fetchedTrack);
     }
+  };
+  const deleteTrack = async (id: number) => {
+    confirmAlert({
+      message: "Do you really want to delete this track?",
+      buttons: [
+        {
+          label: "Cancel",
+          onClick: () => {
+            return null;
+          },
+        },
+        {
+          label: "Yes",
+          onClick: async () => {
+            const config: any = {
+              method: "delete",
+              url: `/tracks/${id}`,
+              headers: {
+                Authorization: `JWT ${userSecret.jwt}`,
+              },
+              data: {},
+            };
+            try {
+              const response = await axios(config);
+              if (response) {
+                fetchYourTracks();
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          },
+        },
+      ],
+    });
+    return;
   };
 
   return (
@@ -379,7 +421,7 @@ const Track = ({
               <button onClick={onEditTrack}>
                 <BiPencil />
               </button>
-              <button>
+              <button onClick={() => deleteTrack(track.id)}>
                 <BsTrashFill />
               </button>
             </div>

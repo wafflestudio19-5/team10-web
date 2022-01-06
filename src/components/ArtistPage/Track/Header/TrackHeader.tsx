@@ -27,6 +27,9 @@ const TrackHeader = ({
     number | undefined
   >(undefined); // 트랙 길이
   const [trackLoading, setTrackLoading] = useState(true);
+  const [isSameTrack, setIsSameTrack] = useState<boolean | undefined>(
+    undefined
+  );
   const trackHeader = useRef<HTMLDivElement>(null); // 헤더 전체 div(재생과는 무관)
 
   const {
@@ -41,13 +44,21 @@ const TrackHeader = ({
     setTrackBarArtist,
     setTrackBarTrack,
   } = useTrackContext();
-  let isSameTrack = audioSrc === track.audio;
+  const headerTrackSrc = track.audio.split("?")[0];
+  const barTrackSrc = audioSrc.split("?")[0];
+  useEffect(() => {
+    if (barTrackSrc === headerTrackSrc) {
+      setIsSameTrack(true);
+    } else {
+      setIsSameTrack(false);
+    }
+  }, [track]);
 
   useEffect(() => {
-    if (isSameTrack) {
+    if (barTrackSrc === headerTrackSrc) {
       setHeaderTrackDuration(trackDuration);
     }
-  }, [isSameTrack, trackDuration]);
+  }, [track, isSameTrack, trackDuration]);
 
   //   const audioPlayer = useRef<HTMLAudioElement>(new Audio()); // 오디오 태그 접근
   const progressBar = useRef<any>(null); // 재생 바 태그 접근(input)
@@ -73,7 +84,7 @@ const TrackHeader = ({
       return;
     }
     // 재생/일시정지 버튼 누를 때
-    if (audioSrc === track.audio) {
+    if (barTrackSrc === headerTrackSrc) {
       const prevValue = trackIsPlaying;
       setTrackIsPlaying(!prevValue);
       if (!prevValue) {
@@ -90,7 +101,7 @@ const TrackHeader = ({
       setTrackIsPlaying(true);
       setTrackBarArtist(artist);
       setTrackBarTrack(track);
-      isSameTrack = true;
+      setIsSameTrack(true);
       audioPlayer.current.src = track.audio;
       audioPlayer.current.load();
       setTimeout(() => {
@@ -100,6 +111,7 @@ const TrackHeader = ({
       }, 1);
     }
   };
+  console.log(track.audio);
 
   const whilePlaying = () => {
     // progressBar.current.value = audioPlayer.current.currentTime;
@@ -172,7 +184,7 @@ const TrackHeader = ({
           <div className={styles.trackPlayer}>
             <div className={styles.time}>
               <div className={styles.currentTime}>
-                {audioSrc === track.audio && calculateTime(playingTime)}
+                {isSameTrack && calculateTime(playingTime)}
               </div>
               <div className={styles.duration}>
                 {typeof headerTrackDuration === "number" &&

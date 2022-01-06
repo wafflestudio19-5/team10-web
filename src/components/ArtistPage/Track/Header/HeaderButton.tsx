@@ -10,7 +10,7 @@ const HeaderButton = ({
 }: {
   isPlaying: boolean;
   togglePlayPause: () => void;
-  isSameTrack: boolean;
+  isSameTrack: boolean | undefined;
   buttonDisabled: boolean;
 }) => {
   return (
