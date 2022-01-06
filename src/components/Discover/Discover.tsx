@@ -12,6 +12,7 @@ const Discover = () => {
     {
       artist: {
         permalink: "",
+        display_name: "",
       },
       permailink: "",
       title: "",
@@ -21,7 +22,62 @@ const Discover = () => {
       count: 0,
       audio: "",
       image: "",
-      id: null,
+      id: -1,
+    },
+  ]);
+  const [likeListId, setLikeListId] = useState([-1]);
+  const [mostTrackList, setMostTrackList] = useState([
+    {
+      title: "",
+      image: "",
+      id: 999999,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999998,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999997,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999996,
+    },
+  ]);
+  const [newTrackList, setNewTrackList] = useState([
+    {
+      title: "",
+      image: "",
+      id: 999999,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999998,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999997,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999996,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999995,
+    },
+    {
+      title: "",
+      image: "",
+      id: 999994,
     },
   ]);
   useEffect(() => {
@@ -30,8 +86,23 @@ const Discover = () => {
       const permal = localStorage.getItem("permalink");
       await setUserSecret({ jwt: jwtToken, permalink: permal });
     };
+    const fetchMostNewList = () => {
+      axios.get("/tracks").then((r: any) => {
+        const mostList = r.data.results.slice(0, 4);
+        const newList = r.data.results.slice(-6);
+        console.log(newList);
+        setMostTrackList(mostList);
+        setNewTrackList(newList);
+      });
+    };
     checkValid();
+    fetchMostNewList();
   }, []);
+  useEffect(() => {
+    if (likeList[0].id !== -1) {
+      setLikeListId(likeList.map((item) => item.id));
+    }
+  }, [likeList]);
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
@@ -42,9 +113,9 @@ const Discover = () => {
             )
             .then((r) => {
               const userId = r.data.id;
-              axios
-                .get(`/users/${userId}/likes/tracks`)
-                .then((res) => setLikeList(res.data));
+              axios.get(`/users/${userId}/likes/tracks`).then((res) => {
+                setLikeList(res.data.results);
+              });
             });
         } catch (error) {
           console.log(error);
@@ -71,52 +142,58 @@ const Discover = () => {
     });
   };
   return (
-    <div className={styles.box}>
-      <div className={styles.main}>
-        <div className={styles.most}>
-          <div>
-            <h2>More of what you like</h2>
-            <div>Suggestions based on what you've liked or played</div>
-          </div>
-          <MostList likeList={likeList} />
-          {/* 아티스트 프로필이 있어야 가능 */}
-        </div>
-        <div className={styles.new}>
-          <h2>New tracks</h2>
-          <div>
-            <button
-              className={styles.left}
-              ref={leftButton}
-              onClick={handleScrollLeft}
-            >
-              &lt;
-            </button>
-            <button
-              className={styles.right}
-              ref={rightButton}
-              onClick={handleScrollRight}
-            >
-              &gt;
-            </button>
-            <NewList listScroll={listScroll} likeList={likeList} />
+    <div className={styles.pageWrapper}>
+      <div className={styles.box}>
+        <div className={styles.main}>
+          <div className={styles.most}>
+            <div>
+              <h2>More of what you like</h2>
+              <div>Suggestions based on what you've liked or played</div>
+            </div>
+            <MostList mostTrackList={mostTrackList} likeListId={likeListId} />
             {/* 아티스트 프로필이 있어야 가능 */}
           </div>
-        </div>
-      </div>
-      <div className={styles.fluid}>
-        <div className={styles.likes}>
-          <div className={styles.header}>
-            🤍 4 likes
-            <button>View all</button>
+          <div className={styles.new}>
+            <h2>New tracks</h2>
+            <div>
+              <button
+                className={styles.left}
+                ref={leftButton}
+                onClick={handleScrollLeft}
+              >
+                &lt;
+              </button>
+              <button
+                className={styles.right}
+                ref={rightButton}
+                onClick={handleScrollRight}
+              >
+                &gt;
+              </button>
+              <NewList
+                listScroll={listScroll}
+                newTrackList={newTrackList}
+                likeListId={likeListId}
+              />
+              {/* 아티스트 프로필이 있어야 가능 */}
+            </div>
           </div>
-          <LikeList />
         </div>
-        <div className={styles.following}>
-          <div className={styles.header}>
-            📅 following artists
-            <button>View all</button>
+        <div className={styles.fluid}>
+          <div className={styles.likes}>
+            <div className={styles.header}>
+              🤍 {likeListId.length} likes
+              <button>View all</button>
+            </div>
+            <LikeList likeList={likeList} />
           </div>
-          {/* 이자리에 following artists 리스트 컴포넌트 */}
+          <div className={styles.following}>
+            <div className={styles.header}>
+              📅 following artists
+              <button>View all</button>
+            </div>
+            {/* 이자리에 following artists 리스트 컴포넌트 */}
+          </div>
         </div>
       </div>
     </div>

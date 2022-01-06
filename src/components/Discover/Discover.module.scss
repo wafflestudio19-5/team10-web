@@ -1,8 +1,12 @@
+.pageWrapper {
+  width: 100vw;
+  background-color: #f2f2f2;
+}
 .box {
   margin: auto;
   padding: 46px 0 46px 0;
   width: 1240px;
-  height: calc(100vh);
+  height: 100%;
   background-color: white;
   display: flex;
   flex-direction: row;
