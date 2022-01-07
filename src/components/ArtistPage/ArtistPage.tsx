@@ -59,6 +59,9 @@ function ArtistPage() {
             event.target.files[0],
             img_options
           )
+          .then(() => {
+            getUser(user.id);
+          })
           .catch(() => {
             toast("헤더이미지 업로드 실패");
           });
@@ -227,17 +230,21 @@ function ArtistPage() {
     return (
       <div className="artistpage-wrapper">
         <div className={"artistpage"}>
-          <div
-            className={"profile-header"}
-            style={{
-              backgroundImage: header,
-            }}
-          >
+          <div className={"profile-header"}>
+            <img className="header-img" src={header} />
             {user.image_profile === null && (
-              <img src={"img/user_img.png"} alt={"profileImg"} />
+              <img
+                className="profile-img"
+                src={"img/user_img.png"}
+                alt={"profileImg"}
+              />
             )}
             {user.image_profile !== null && (
-              <img src={user.image_profile} alt={"profileImg"} />
+              <img
+                className="profile-img"
+                src={user.image_profile}
+                alt={"profileImg"}
+              />
             )}
             <div className={"name"}>
               <div className={"displayname"}>{user.display_name}</div>
