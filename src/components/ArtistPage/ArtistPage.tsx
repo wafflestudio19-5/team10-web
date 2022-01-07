@@ -23,14 +23,52 @@ function ArtistPage() {
 
   const [user, setUser] = useState<any>();
 
+  const [header, setHeader] = useState<any>();
+
   const [tracks, setTracks] = useState<any>();
   const [trackPage, setTrackPage] = useState<any>();
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
-    let fileInput = document.getElementById("file-input");
+    let fileInput = document.getElementById("file-input3");
     fileInput?.click();
+  };
+
+  const changeHeader = (event: any) => {
+    const changeHeaderImg = async () => {
+      const config: any = {
+        method: "patch",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {
+          image_header_filename: event.target.files[0].name,
+        },
+      };
+      try {
+        const res = await axios(config);
+        const img_options = {
+          headers: {
+            "Content-Type": event.target.files[0].type,
+          },
+        };
+        axios
+          .put(
+            res.data.image_header_presigned_url,
+            event.target.files[0],
+            img_options
+          )
+          .catch(() => {
+            toast("헤더이미지 업로드 실패");
+          });
+      } catch (error) {
+        toast("헤더이미지 업로드 실패");
+      }
+    };
+    changeHeaderImg();
+    getUser(pageId);
   };
 
   const handleScroll = () => {
@@ -50,6 +88,13 @@ function ArtistPage() {
       .get(`users/${id}`)
       .then((res) => {
         setUser(res.data);
+        if (res.data.image_header === null) {
+          setHeader(
+            "url(https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg)"
+          );
+        } else {
+          setHeader(res.data.image_header);
+        }
       })
       .catch(() => {
         toast("유저 정보 불러오기 실패");
@@ -189,7 +234,12 @@ function ArtistPage() {
     return (
       <div className="artistpage-wrapper">
         <div className={"artistpage"}>
-          <div className={"profile-header"}>
+          <div
+            className={"profile-header"}
+            style={{
+              backgroundImage: header,
+            }}
+          >
             {user.image_profile === null && (
               <img src={"img/user_img.png"} alt={"profileImg"} />
             )}
@@ -213,7 +263,7 @@ function ArtistPage() {
                   />
                   <div>Upload header image</div>
                 </button>
-                <input type="file" id="file-input" />
+                <input type="file" id="file-input3" onChange={changeHeader} />
               </div>
             )}
           </div>
