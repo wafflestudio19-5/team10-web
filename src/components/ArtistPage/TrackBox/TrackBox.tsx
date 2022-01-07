@@ -1,6 +1,7 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import ReactAudioPlayer from "react-audio-player";
+import { useEffect, useRef, useState } from "react";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./TrackBox.scss";
@@ -19,10 +20,17 @@ function TrackBox({
   const [reposted, setReposted] = useState<boolean>();
   const [comment, setComment] = useState<string>();
 
-  const clickPlayer = (event: any) => {
-    event.preventDefault();
-    let player = document.getElementById("player");
-    console.log(player);
+  const player = useRef<any>();
+  const [isPlaying, setIsPlaying] = useState<boolean>();
+
+  const playMusic = () => {
+    setIsPlaying(true);
+    player.current.audio.current.play();
+  };
+
+  const pauseMusic = () => {
+    setIsPlaying(false);
+    player.current.audio.current.pause();
   };
 
   const likeTrack = async () => {
@@ -184,29 +192,40 @@ function TrackBox({
       <img src={item.image} alt={"trackImg"} />
       <div className={"track-right"}>
         <div className={"track-info"}>
-          <button onClick={clickPlayer}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              fill="white"
-              className="bi bi-caret-right-fill"
-              viewBox="0 0 16 16"
-            >
-              <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
-            </svg>
-          </button>
+          {!isPlaying && (
+            <button onClick={playMusic}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="25"
+                height="25"
+                fill="white"
+                className="bi bi-caret-right-fill"
+                viewBox="0 0 16 16"
+              >
+                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+              </svg>
+            </button>
+          )}
+          {isPlaying && (
+            <button onClick={pauseMusic}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="25"
+                height="25"
+                fill="white"
+                className="bi bi-pause-fill"
+                viewBox="0 0 16 16"
+              >
+                <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
+              </svg>
+            </button>
+          )}
           <div className={"track-info-name"}>
             <div className={"artistname"}>{artistName}</div>
             <div className={"trackname"}>{item.title}</div>
           </div>
         </div>
-        <ReactAudioPlayer
-          id="player"
-          className="player"
-          controls
-          src={item.audio}
-        />
+        <AudioPlayer className="player" src={item.audio} ref={player} />
         <div className={"comment"}>
           <img
             src="https://lovemewithoutall.github.io/assets/images/kiki.jpg"
