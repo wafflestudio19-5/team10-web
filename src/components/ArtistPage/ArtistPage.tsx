@@ -1,6 +1,6 @@
 import "./ArtistPage.scss";
 import { Grid } from "semantic-ui-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import EditModal from "./EditModal/EditModal";
@@ -16,21 +16,92 @@ function ArtistPage() {
   const permalink = params.permalink;
   const [isMe, setIsMe] = useState<boolean>();
   const [pageId, setPageId] = useState<number>();
+  const [myId, setMyId] = useState<number>();
 
   const [modal, setModal] = useState(false);
+  const myRef = useRef<any>({});
 
-  const [displayName, setDisplayName] = useState<string>();
-  const [userName, setUserName] = useState<string>();
+  const [user, setUser] = useState<any>();
+
   const [tracks, setTracks] = useState<any>();
-  const [followers, setFollowers] = useState<number>();
-  const [followings, setFollowings] = useState<number>();
-  const [countTracks, setCountTracks] = useState<number>();
+  const [trackPage, setTrackPage] = useState<any>();
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
     let fileInput = document.getElementById("file-input");
     fileInput?.click();
+  };
+
+  const handleScroll = () => {
+    if (
+      myRef.current.scrollHeight -
+        myRef.current.scrollTop -
+        myRef.current.clientHeight ===
+        0 &&
+      trackPage !== null
+    ) {
+      getTracks(pageId, trackPage);
+    }
+  };
+
+  const getUser = (id: any) => {
+    axios
+      .get(`users/${id}`)
+      .then((res) => {
+        setUser(res.data);
+      })
+      .catch(() => {
+        toast("유저 정보 불러오기 실패");
+      });
+  };
+
+  const getTracks = async (id: any, page: any) => {
+    axios
+      .get(`/users/${id}/tracks?page=${page}`)
+      .then((res) => {
+        if (page === 1) {
+          setTracks(res.data.results);
+        } else {
+          setTracks((item: any) => [...item, ...res.data.results]);
+        }
+        if (res.data.next === null) {
+          setTrackPage(null);
+        } else {
+          setTrackPage(page + 1);
+        }
+      })
+      .catch(() => {
+        toast("트랙 정보 불러오기 실패");
+      });
+  };
+
+  const getFollowers = (id: any, myPermalink: any) => {
+    // 팔로워 불러오기
+    axios
+      .get(`users/${id}/followers`)
+      .then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/followers?page=${page}`).then((res) => {
+            const filter = res.data.results.filter(
+              (item: any) => item.permalink == myPermalink
+            );
+            if (filter.length === 0) {
+              setIsFollowing(false);
+            } else {
+              setIsFollowing(true);
+            }
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast("팔로워 불러오기 실패");
+      });
   };
 
   const followUser = async () => {
@@ -44,6 +115,7 @@ function ArtistPage() {
     try {
       await axios(config);
       setIsFollowing(true);
+      getUser(pageId);
     } catch (error) {
       toast("팔로우 실패");
     }
@@ -60,6 +132,7 @@ function ArtistPage() {
     try {
       await axios(config);
       setIsFollowing(false);
+      getUser(pageId);
     } catch (error) {
       toast("언팔로우 실패");
     }
@@ -77,7 +150,18 @@ function ArtistPage() {
       setIsMe(false);
     }
 
-    const getUser = () => {
+    // 내 아이디 받아오기 (나중에 context로 바꾸기)
+    const myResolve = `https://soundwaffle.com/${myPermalink}`;
+    axios
+      .get(`resolve?url=${myResolve}`)
+      .then((res) => {
+        setMyId(res.data.id);
+      })
+      .catch(() => {
+        toast("유저 아이디 불러오기 실패");
+      });
+
+    const getInfo = () => {
       // resolve api
       const url = `https://soundwaffle.com/${permalink}`;
       axios
@@ -85,82 +169,42 @@ function ArtistPage() {
         .then((res1) => {
           setPageId(res1.data.id);
           // 유저 정보
-          axios
-            .get(`users/${res1.data.id}`)
-            .then((res) => {
-              setDisplayName(res.data.display_name);
-              setUserName(res.data.first_name + res.data.last_name);
-            })
-            .catch(() => {
-              toast("유저 정보 불러오기 실패");
-            });
-          // 트랙 불러오기
-          axios
-            .get("/tracks")
-            .then((res) => {
-              if (res.data) {
-                const allTracks = res.data.filter(
-                  (item: any) => item.artist.id == res1.data.id
-                );
-                setTracks(allTracks);
-                setCountTracks(allTracks.length);
-              }
-            })
-            .catch(() => {
-              toast("트랙 정보 불러오기 실패");
-            });
-          // 팔로워 불러오기
-          axios
-            .get(`users/${res1.data.id}/followers`)
-            .then((res) => {
-              setFollowers(res.data.length);
-              const filterMe = res.data.filter(
-                (item: any) => item.permalink == myPermalink
-              );
-              if (filterMe.length == 0) {
-                setIsFollowing(false);
-              } else {
-                setIsFollowing(true);
-              }
-            })
-            .catch(() => {
-              toast("팔로워 불러오기 실패");
-            });
-          // 팔로잉 불러오기
-          axios
-            .get(`users/${res1.data.id}/followings`)
-            .then((res) => {
-              setFollowings(res.data.length);
-            })
-            .catch(() => {
-              toast("팔로잉 불러오기 실패");
-            });
+          getUser(res1.data.id);
+          //트랙 불러오기
+          getTracks(res1.data.id, 1);
+          //팔로워 불러오기
+          getFollowers(res1.data.id, myPermalink);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
         });
     };
-    getUser();
+    getInfo();
     setIsLoading(false);
   }, []);
 
-  if (isLoading) {
+  if (isLoading || user === undefined) {
     return <div>Loading...</div>;
   } else {
     return (
       <div className="artistpage-wrapper">
         <div className={"artistpage"}>
           <div className={"profile-header"}>
-            <img
-              src={"https://lovemewithoutall.github.io/assets/images/kiki.jpg"}
-              alt={"profileImg"}
-            />
+            {user.image_profile === null && (
+              <img src={"img/user_img.png"} alt={"profileImg"} />
+            )}
+            {user.image_profile !== null && (
+              <img src={user.image_profile} alt={"profileImg"} />
+            )}
             <div className={"name"}>
-              <div className={"displayname"}>{displayName}</div>
-              {userName !== "" && <div className={"username"}>{userName}</div>}
+              <div className={"displayname"}>{user.display_name}</div>
+              {user.first_name + user.last_name !== "" && (
+                <div className={"username"}>
+                  {user.first_name + user.last_name}
+                </div>
+              )}
             </div>
             {isMe === true && (
-              // 나중에 가능하면 헤더이미지 api 추가하기
               <div className="upload-header-image">
                 <button onClick={clickImageInput}>
                   <img
@@ -199,7 +243,12 @@ function ArtistPage() {
                   />
                   <div>Edit</div>
                 </button>
-                <EditModal modal={modal} setModal={setModal} />
+                <EditModal
+                  user={user}
+                  modal={modal}
+                  setModal={setModal}
+                  getUser={getUser}
+                />
               </div>
             )}
             {isMe === false && (
@@ -253,11 +302,17 @@ function ArtistPage() {
           </div>
 
           <div className="artist-body">
-            <div className={"recent"}>
-              <text>Recent</text>
+            <div className={"recent"} ref={myRef} onScroll={handleScroll}>
               {tracks &&
                 tracks.map((item: any) => (
-                  <TrackBox item={item} artistName={displayName} />
+                  <TrackBox
+                    item={item}
+                    artistName={user.display_name}
+                    myId={myId}
+                    getTracks={getTracks}
+                    pageId={pageId}
+                    trackPage={trackPage}
+                  />
                 ))}
             </div>
 
@@ -265,15 +320,15 @@ function ArtistPage() {
               <Grid.Row>
                 <Grid.Column className="artist-info-text">
                   <div>Followers</div>
-                  <text>{followers}</text>
+                  <text>{user.follower_count}</text>
                 </Grid.Column>
                 <Grid.Column className="artist-info-text">
                   <div>Following</div>
-                  <text>{followings}</text>
+                  <text>{user.following_count}</text>
                 </Grid.Column>
                 <Grid.Column className="artist-info-text">
                   <div>Tracks</div>
-                  <text>{countTracks}</text>
+                  <text>{user.track_count}</text>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
