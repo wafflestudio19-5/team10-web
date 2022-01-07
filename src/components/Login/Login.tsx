@@ -9,6 +9,7 @@ const Login = () => {
     setModal(!modal);
   };
   const history = useHistory();
+
   useEffect(() => {
     if (localStorage.getItem("jwt_token")) {
       history.push("/discover");

@@ -23,6 +23,7 @@
     "react-confirm-alert": "^2.7.0",
     "react-dayjs": "^0.3.2",
     "react-dom": "^17.0.2",
+    "react-google-login": "^5.2.2",
     "react-h5-audio-player": "^3.6.0",
     "react-hot-toast": "^2.2.0",
     "react-icons": "^4.3.1",
@@ -71,6 +72,7 @@
     "babel-eslint": "^10.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "http-proxy-middleware": "^2.0.1",
     "prettier": "^2.4.1"
   }
 }
