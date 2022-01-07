@@ -1,34 +1,42 @@
-import styles from "./MostItems.module.scss";
-import { Link } from "react-router-dom";
-import { useHistory } from "react-router";
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { IoMdPause, IoMdPlay } from "react-icons/io";
 import { AiFillHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
+import { FaUserCheck, FaUserPlus } from "react-icons/fa";
+import { IoMdPause, IoMdPlay } from "react-icons/io";
+import { Link, useHistory } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
-import axios from "axios";
+import styles from "./LikeItem.module.scss";
 
-const MostItems = ({
+const LikeItem = ({
   title,
   img,
   trackId,
-  likeListId,
+  artist,
+  artistId,
+  trackPermal,
+  artistPermal,
+  followList,
 }: {
   title: string;
   img: string;
-  trackId: number | string;
-  likeListId: any;
+  trackId: number;
+  artist: string;
+  artistId: number;
+  trackPermal: string;
+  artistPermal: string;
+  followList: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
-    history.push(`/${permalink.artistPermal}/${permalink.trackPermal}`);
+    history.push(`/${artistPermal}/${trackPermal}`);
+  };
+  const goArtist = () => {
+    history.push(`/${artistPermal}`);
   };
   const [play, setPlay] = useState(false);
-  const [heart, setHeart] = useState(false);
-  const [permalink, setPermalink] = useState({
-    artistPermal: "",
-    trackPermal: "",
-  });
+  const [heart, setHeart] = useState(true);
+  const [follow, setFollow] = useState(false);
   const { userSecret } = useAuthContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
@@ -52,21 +60,32 @@ const MostItems = ({
       setHeart(!heart);
     }
   };
+  const handleFollow = async (e: any) => {
+    e.stopPropagation();
+    if (follow === false) {
+      await axios({
+        method: "post",
+        url: `/users/me/followings/${artistId}`,
+        headers: { Authorization: `JWT ${userSecret.jwt}` },
+      });
+      setFollow(!follow);
+    } else {
+      await axios({
+        method: "delete",
+        url: `/users/me/followings/${artistId}`,
+        headers: { Authorization: `JWT ${userSecret.jwt}` },
+      });
+      setFollow(!follow);
+    }
+  };
   const clickDots = (e: any) => {
     e.stopPropagation();
   };
   useEffect(() => {
-    if (trackId <= 999990 && likeListId[0] !== -1) {
-      axios.get(`/tracks/${trackId}`).then((r) => {
-        const permalink = {
-          artistPermal: r.data.artist.permalink,
-          trackPermal: r.data.permalink,
-        };
-        setPermalink(permalink);
-      });
-      setHeart(likeListId.includes(trackId));
+    if (followList.length !== 0) {
+      followList.includes(artistId) ? setFollow(!follow) : null;
     }
-  }, [trackId, likeListId]);
+  }, [followList]);
   return (
     <div className={styles.wrapper}>
       {img === null ? (
@@ -116,12 +135,13 @@ const MostItems = ({
       ) : (
         <img src={img} alt="track img" className={styles.track} />
       )}
-      <Link
-        className={styles.link}
-        to={`/${permalink.artistPermal}/${permalink.trackPermal}`}
-      >
-        {title}
+      <Link className={styles.link} to={`/${artistPermal}/${trackPermal}`}>
+        <AiFillHeart className={styles.titleHeart} />
+        &nbsp;{title}
       </Link>
+      <div className={styles.artist} onClick={goArtist}>
+        {artist}
+      </div>
       <div className={styles.hover} onClick={goTrack}>
         {play ? (
           <div className={styles.buttonWraaper} onClick={handlePlay}>
@@ -131,6 +151,14 @@ const MostItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
+              {follow ? (
+                <FaUserCheck className={styles.follow} onClick={handleFollow} />
+              ) : (
+                <FaUserPlus
+                  className={styles.unfollow}
+                  onClick={handleFollow}
+                />
+              )}
               <BsThreeDots className={styles.dots} onClick={clickDots} />
             </div>
           </div>
@@ -142,6 +170,14 @@ const MostItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
+              {follow ? (
+                <FaUserCheck className={styles.follow} onClick={handleFollow} />
+              ) : (
+                <FaUserPlus
+                  className={styles.unfollow}
+                  onClick={handleFollow}
+                />
+              )}
               <BsThreeDots className={styles.dots} onClick={clickDots} />
             </div>
           </div>
@@ -151,4 +187,4 @@ const MostItems = ({
   );
 };
 
-export default MostItems;
+export default LikeItem;

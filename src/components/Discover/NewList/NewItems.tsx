@@ -6,15 +6,18 @@ import { useEffect, useState } from "react";
 import { AiFillHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import axios from "axios";
+import { useAuthContext } from "../../../context/AuthContext";
 
 const NewItems = ({
   title,
   img,
-  trackIid,
+  trackId,
+  likeListId,
 }: {
   title: string;
   img: string;
-  trackIid: number | string;
+  trackId: number | string;
+  likeListId: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -26,32 +29,98 @@ const NewItems = ({
     artistPermal: "",
     trackPermal: "",
   });
+  const { userSecret } = useAuthContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
     setPlay(!play);
   };
-  const handleHeart = (e: any) => {
+  const handleHeart = async (e: any) => {
     e.stopPropagation();
-    setHeart(!heart);
+    if (heart === false) {
+      await axios({
+        method: "post",
+        url: `/likes/tracks/${trackId}`,
+        headers: { Authorization: `JWT ${userSecret.jwt}` },
+      });
+      setHeart(!heart);
+    } else {
+      await axios({
+        method: "delete",
+        url: `/likes/tracks/${trackId}`,
+        headers: { Authorization: `JWT ${userSecret.jwt}` },
+      });
+      setHeart(!heart);
+    }
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
   };
   useEffect(() => {
-    trackIid <= 999990
-      ? axios.get(`/tracks/${trackIid}`).then((r) => {
-          const permalink = {
-            artistPermal: r.data.artist.permalink,
-            trackPermal: r.data.permalink,
-          };
-          setPermalink(permalink);
-        })
-      : null;
-  }, [trackIid]);
+    if (trackId <= 999990 && likeListId[0] !== -1) {
+      axios.get(`/tracks/${trackId}`).then((r) => {
+        const permalink = {
+          artistPermal: r.data.artist.permalink,
+          trackPermal: r.data.permalink,
+        };
+        setPermalink(permalink);
+      });
+      setHeart(likeListId.includes(trackId));
+    }
+  }, [trackId, likeListId]);
   return (
     <div className={styles.wrapper}>
-      <img src={img} alt="track img" className={styles.track} />
-      <Link className={styles.link} to="/username/trackname">
+      {img === null ? (
+        <svg
+          className={styles.track}
+          width="220"
+          height="220"
+          viewBox="0 0 220 220"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="155.294"
+            y="155.294"
+            width="64.7059"
+            height="64.7059"
+            fill="#ED8573"
+          />
+          <rect
+            x="64.7059"
+            y="155.294"
+            width="64.7059"
+            height="64.7059"
+            fill="#F0975E"
+          />
+          <rect
+            x="155.294"
+            y="64.7059"
+            width="64.7059"
+            height="64.7059"
+            fill="#F0975E"
+          />
+          <rect
+            x="64.7059"
+            y="64.7059"
+            width="64.7059"
+            height="64.7059"
+            fill="#F0975E"
+          />
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M64.7059 0H38.8236V38.8235H0V64.7059H38.8236V129.412H0V155.294H38.8236V220H64.7059V155.294H129.412V220H155.294V155.294H220V129.412H155.294V64.7059H220V38.8235H155.294V0H129.412V38.8235H64.7059V0ZM129.412 129.412V64.7059H64.7059V129.412H129.412Z"
+            fill="#27181D"
+          />
+        </svg>
+      ) : (
+        <img src={img} alt="track img" className={styles.track} />
+      )}
+
+      <Link
+        className={styles.link}
+        to={`/${permalink.artistPermal}/${permalink.trackPermal}`}
+      >
         {title}
       </Link>
       <div className={styles.hover} onClick={goTrack}>
@@ -63,7 +132,7 @@ const NewItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              <BsThreeDots className={styles.details} onClick={clickDots} />
+              <BsThreeDots className={styles.dots} onClick={clickDots} />
             </div>
           </div>
         ) : (
