@@ -189,7 +189,10 @@ function TrackBox({
 
   return (
     <div className={"recent-track"}>
-      <img src={item.image} alt={"trackImg"} />
+      {item.image !== null && <img src={item.image} alt={"trackImg"} />}
+      {item.image === null && (
+        <img src={"img/default.track_image.svg"} alt={"trackImg"} />
+      )}
       <div className={"track-right"}>
         <div className={"track-info"}>
           {!isPlaying && (
