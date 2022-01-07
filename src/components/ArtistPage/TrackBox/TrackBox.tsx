@@ -102,36 +102,46 @@ function TrackBox({ item, artistName, myId }: any) {
   useEffect(() => {
     const getIsLiking = () => {
       axios.get(`/users/${myId}/likes/tracks`).then((res) => {
-        if (res.data) {
-          const likeCheck = res.data.filter(
-            (track: any) => track.id == item.id
-          );
-          if (likeCheck.length !== 0) {
-            setIsLiking(true);
-          } else {
-            setIsLiking(false);
-          }
-        } else {
-          setIsLiking(false);
-        }
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
+            const filter = res.data.results.filter(
+              (track: any) => track.id == item.id
+            );
+            if (filter.length !== 0) {
+              setIsLiking(true);
+            } else {
+              setIsLiking(false);
+            }
+          });
+        });
       });
     };
+
     const getReposted = () => {
       axios.get(`/users/${myId}/reposts/tracks`).then((res) => {
-        if (res.data) {
-          const repostCheck = res.data.filter(
-            (track: any) => track.id == item.id
-          );
-          if (repostCheck.length !== 0) {
-            setReposted(true);
-          } else {
-            setReposted(false);
-          }
-        } else {
-          setReposted(false);
-        }
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
+            const filter = res.data.results.filter(
+              (track: any) => track.id == item.id
+            );
+            if (filter.length !== 0) {
+              setReposted(true);
+            } else {
+              setReposted(false);
+            }
+          });
+        });
       });
     };
+
     getIsLiking();
     getReposted();
   }, []);

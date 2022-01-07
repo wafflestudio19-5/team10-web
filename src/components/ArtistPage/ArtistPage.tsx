@@ -23,6 +23,8 @@ function ArtistPage() {
 
   const [displayName, setDisplayName] = useState<string>();
   const [userName, setUserName] = useState<string>();
+  const [imgProfile, setImgProfile] = useState<string>();
+  const [imgHeader, setImgHeader] = useState<string>();
   const [tracks, setTracks] = useState<any>();
   const [trackPage, setTrackPage] = useState<any>();
   const [followers, setFollowers] = useState<number>();
@@ -137,9 +139,13 @@ function ArtistPage() {
             .then((res) => {
               setDisplayName(res.data.display_name);
               setUserName(res.data.first_name + res.data.last_name);
+              setImgProfile(res.data.image_profile);
               setFollowers(res.data.follower_count);
               setFollowings(res.data.following_count);
               setCountTracks(res.data.track_count);
+              setImgHeader(res.data.image_header);
+              // 헤더 이미지 추가하기
+              console.log(imgHeader);
             })
             .catch(() => {
               toast("유저 정보 불러오기 실패");
@@ -189,16 +195,15 @@ function ArtistPage() {
       <div className="artistpage-wrapper">
         <div className={"artistpage"}>
           <div className={"profile-header"}>
-            <img
-              src={"https://lovemewithoutall.github.io/assets/images/kiki.jpg"}
-              alt={"profileImg"}
-            />
+            {imgProfile === null && (
+              <img src={"img/user_img.png"} alt={"profileImg"} />
+            )}
+            {imgProfile !== null && <img src={imgProfile} alt={"profileImg"} />}
             <div className={"name"}>
               <div className={"displayname"}>{displayName}</div>
               {userName !== "" && <div className={"username"}>{userName}</div>}
             </div>
             {isMe === true && (
-              // 나중에 가능하면 헤더이미지 api 추가하기
               <div className="upload-header-image">
                 <button onClick={clickImageInput}>
                   <img
