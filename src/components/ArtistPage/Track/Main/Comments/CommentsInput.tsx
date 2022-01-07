@@ -43,7 +43,10 @@ const CommentsInput = ({
   return (
     <div className={styles.main}>
       <div className={styles.commentInput}>
-        <img src={userMe.image_profile} className={styles.userImage} />
+        <img
+          src={userMe.image_profile || "/default_user_image.png"}
+          className={styles.userImage}
+        />
         <form className={styles.inputContainer} onSubmit={onSubmit}>
           <input
             type="text"

@@ -94,12 +94,6 @@ const EditModal = ({
     try {
       const response = await axios(config);
       if (response) {
-        setTitle("ㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴ");
-        setTPermalink("");
-        setDescription("");
-        setIsPrivate(false);
-        setTags([]);
-        setImageUrl("");
         fetchYourTracks();
         setModal(false);
       }

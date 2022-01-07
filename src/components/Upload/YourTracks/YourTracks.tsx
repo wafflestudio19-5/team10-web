@@ -72,7 +72,7 @@ const YourTracks = () => {
         };
         try {
           const { data } = await axios(tracksConfig);
-          setYourTracks(data);
+          setYourTracks(data.results);
           setLoading(false);
         } catch (error) {
           console.log(error);

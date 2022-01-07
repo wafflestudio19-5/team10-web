@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./TrackHeader.module.scss";
 import { IArtist, ITrack } from "../TrackPage";
 import HeaderButton from "./HeaderButton";
@@ -7,6 +7,9 @@ import TrackTag from "./TrackTag";
 import { useTrackContext } from "../../../../context/TrackContext";
 import { MdOutlineCancel } from "react-icons/md";
 import AlbumImage from "./AlbumImage";
+import { throttle } from "lodash";
+// import { throttle } from "lodash";
+// import throttle from "lodash/throttle";
 // import axios from "axios";
 // import { useParams } from "react-router-dom";
 // import WaveSurfer from "wavesurfer.js";
@@ -77,12 +80,10 @@ const TrackHeader = ({
     setPlayingTime(audioPlayer.current.currentTime);
     changePlayerCurrentTime();
   };
+  //   const throttleChangeRange = () => throttle(changeRange, 300);
 
   const buttonDisabled = noTrack || trackLoading;
   const togglePlayPause = () => {
-    if (buttonDisabled) {
-      return;
-    }
     // 재생/일시정지 버튼 누를 때
     if (barTrackSrc === headerTrackSrc) {
       const prevValue = trackIsPlaying;
@@ -103,7 +104,6 @@ const TrackHeader = ({
       setTrackBarTrack(track);
       setIsSameTrack(true);
       audioPlayer.current.src = track.audio;
-      audioPlayer.current.load();
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
@@ -111,7 +111,6 @@ const TrackHeader = ({
       }, 1);
     }
   };
-  console.log(track.audio);
 
   const whilePlaying = () => {
     // progressBar.current.value = audioPlayer.current.currentTime;
@@ -122,25 +121,25 @@ const TrackHeader = ({
     }
   };
 
-  const changePlayerCurrentTime = () => {
-    if (progressBar.current && audioPlayer.current && isSameTrack) {
-      progressBar.current.value = audioPlayer.current.currentTime;
-      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
-      progressBar.current.style.setProperty(
-        "--seek-before-width",
-        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
-      );
-      setPlayingTime(audioPlayer.current.currentTime);
-    } else if (progressBar.current) {
-      setPlayingTime(0);
-      progressBar.current.value = 0;
-      progressBar.current.style.setProperty("--seek-before-width", `0%`);
-    }
-  };
-
-  useEffect(() => {
-    changePlayerCurrentTime();
-  }, [playingTime]);
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      if (progressBar.current && audioPlayer.current && isSameTrack) {
+        progressBar.current.value = audioPlayer.current.currentTime;
+        // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+        progressBar.current.style.setProperty(
+          "--seek-before-width",
+          `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+        );
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else if (progressBar.current) {
+        setPlayingTime(0);
+        progressBar.current.value = 0;
+        progressBar.current.style.setProperty("--seek-before-width", `0%`);
+      }
+    }, 3000),
+    [playingTime]
+  );
+  changePlayerCurrentTime();
 
   const onPlayerClick = () => {
     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
@@ -158,10 +157,10 @@ const TrackHeader = ({
   };
 
   const headerPlayer = useRef<HTMLAudioElement>(null);
-  const onLoadedMetadata = () => {
+  const onLoadedMetadata = useCallback(() => {
     setHeaderTrackDuration(headerPlayer.current?.duration);
     setTrackLoading(false);
-  };
+  }, [audioSrc]);
 
   return (
     <div ref={trackHeader} className={styles.trackHeader}>
@@ -174,7 +173,7 @@ const TrackHeader = ({
         />
         <TrackInfo track={track} artist={artist} />
       </div>
-      {noTrack ? (
+      {noTrack === true ? (
         <div className={styles.noTrackFound}>
           <MdOutlineCancel />
           This track was not found. Maybe it has been removed
