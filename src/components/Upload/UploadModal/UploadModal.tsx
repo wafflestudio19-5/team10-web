@@ -140,8 +140,8 @@ function UploadModal({ selectedFile, setModal }: any) {
           if (title === null) {
             toast("제목은 필수입니다.");
           }
-          if (!/[ㄱ-ㅎ|가-힣]/.test(title)) {
-            toast("제목은 영어 또는 숫자만 가능합니다.");
+          if (/[ㄱ-ㅎ|가-힣]/.test(tPermalink)) {
+            toast("트랙 url은 영어 / 영어+숫자만 가능합니다");
           }
         });
     }

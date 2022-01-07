@@ -1,6 +1,6 @@
 import "./ArtistPage.scss";
 import { Grid } from "semantic-ui-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import EditModal from "./EditModal/EditModal";
@@ -19,7 +19,6 @@ function ArtistPage() {
   const [myId, setMyId] = useState<number>();
 
   const [modal, setModal] = useState(false);
-  const myRef = useRef<any>({});
 
   const [user, setUser] = useState<any>();
 
@@ -72,13 +71,10 @@ function ArtistPage() {
   };
 
   const handleScroll = () => {
-    if (
-      myRef.current.scrollHeight -
-        myRef.current.scrollTop -
-        myRef.current.clientHeight ===
-        0 &&
-      trackPage !== null
-    ) {
+    const scrollObject = document.documentElement;
+    const browser = scrollObject.scrollHeight;
+    const seen = scrollObject.clientHeight + window.scrollY;
+    if (seen === browser && trackPage !== null) {
       getTracks(pageId, trackPage);
     }
   };
@@ -352,7 +348,7 @@ function ArtistPage() {
           </div>
 
           <div className="artist-body">
-            <div className={"recent"} ref={myRef} onScroll={handleScroll}>
+            <div className={"recent"} onScroll={handleScroll}>
               {tracks &&
                 tracks.map((item: any) => (
                   <TrackBox
