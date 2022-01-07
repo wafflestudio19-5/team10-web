@@ -23,6 +23,7 @@ function ArtistPage() {
   const [displayName, setDisplayName] = useState<string>();
   const [userName, setUserName] = useState<string>();
   const [tracks, setTracks] = useState<any>();
+  const [trackPage, setTrackPage] = useState<any>();
   const [followers, setFollowers] = useState<number>();
   const [followings, setFollowings] = useState<number>();
   const [countTracks, setCountTracks] = useState<number>();
@@ -32,6 +33,27 @@ function ArtistPage() {
     event.preventDefault();
     let fileInput = document.getElementById("file-input");
     fileInput?.click();
+  };
+
+  const getTracks = async (id: number, page: any) => {
+    axios
+      .get(`/users/${id}/tracks?page=${page}`)
+      .then((res) => {
+        if (page === 1) {
+          setTracks(res.data.results);
+        } else {
+          setTracks((item: any) => [...item, ...res.data.results]);
+        }
+        if (res.data.next === null) {
+          setTrackPage(null);
+        } else {
+          setTrackPage(page + 1);
+          console.log(trackPage);
+        }
+      })
+      .catch(() => {
+        toast("트랙 정보 불러오기 실패");
+      });
   };
 
   const followUser = async () => {
@@ -78,7 +100,7 @@ function ArtistPage() {
       setIsMe(false);
     }
 
-    // 내 아이디 받아오기
+    // 내 아이디 받아오기 (나중에 context로 바꾸기)
     const myResolve = `https://soundwaffle.com/${myPermalink}`;
     axios
       .get(`resolve?url=${myResolve}`)
@@ -102,30 +124,19 @@ function ArtistPage() {
             .then((res) => {
               setDisplayName(res.data.display_name);
               setUserName(res.data.first_name + res.data.last_name);
+              setFollowers(res.data.follower_count);
+              setFollowings(res.data.following_count);
+              setCountTracks(res.data.track_count);
             })
             .catch(() => {
               toast("유저 정보 불러오기 실패");
             });
-          // 트랙 불러오기
-          axios
-            .get("/tracks")
-            .then((res) => {
-              if (res.data) {
-                const allTracks = res.data.filter(
-                  (item: any) => item.artist.id == res1.data.id
-                );
-                setTracks(allTracks);
-                setCountTracks(allTracks.length);
-              }
-            })
-            .catch(() => {
-              toast("트랙 정보 불러오기 실패");
-            });
+          //트랙 불러오기
+          getTracks(res1.data.id, 1);
           // 팔로워 불러오기
           axios
             .get(`users/${res1.data.id}/followers`)
             .then((res) => {
-              setFollowers(res.data.length);
               const filterMe = res.data.filter(
                 (item: any) => item.permalink == myPermalink
               );
@@ -137,15 +148,6 @@ function ArtistPage() {
             })
             .catch(() => {
               toast("팔로워 불러오기 실패");
-            });
-          // 팔로잉 불러오기
-          axios
-            .get(`users/${res1.data.id}/followings`)
-            .then((res) => {
-              setFollowings(res.data.length);
-            })
-            .catch(() => {
-              toast("팔로잉 불러오기 실패");
             });
         })
         .catch(() => {
