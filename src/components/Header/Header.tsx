@@ -1,14 +1,19 @@
 import { useHistory } from "react-router";
 import "./Header.scss";
 import { useEffect } from "react";
+import Cookies from "universal-cookie";
 
 function Header() {
   const history = useHistory();
+  const cookies = new Cookies();
   useEffect(() => {
-    localStorage.getItem("jwt_token") === null ? history.push("/") : null;
+    cookies.get("is_logged_in") === null ? history.push("/") : null;
   }, []);
   const onSignOut = () => {
     localStorage.removeItem("jwt_token");
+    localStorage.removeItem("permalink");
+    localStorage.removeItem("id");
+    cookies.remove("jwt_token");
     history.push("/logout");
   };
   return (

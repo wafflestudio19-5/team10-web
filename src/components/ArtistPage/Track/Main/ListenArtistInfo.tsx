@@ -13,15 +13,17 @@ interface IArtistInfo {
   followers: number;
   tracks: number;
 }
-interface IFollowings {
+export interface IFollowings {
   id: number;
 }
 const ListenArtistInfo = ({
   artist,
   userMe,
+  isMyTrack,
 }: {
   artist: IArtist;
   userMe: IUserMe;
+  isMyTrack: boolean | undefined;
 }) => {
   const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
     image: "",
@@ -40,7 +42,6 @@ const ListenArtistInfo = ({
   const clickTracks = () => history.push(`/${permalink}/tracks`);
 
   const fetchArtist = async () => {
-    console.log("asdfasdfasdfasdf");
     if (artist.id !== 0) {
       const config: any = {
         method: "get",
@@ -53,7 +54,6 @@ const ListenArtistInfo = ({
       try {
         const response = await axios(config);
         const data = response.data;
-        console.log(data);
         setArtistInfo({
           image: data.image_profile,
           followers: data.follower_count,
@@ -66,7 +66,6 @@ const ListenArtistInfo = ({
   };
   const isFollowing = async () => {
     if (artist.id !== 0 && userMe.id !== 0) {
-      console.log(userMe);
       const followConfig: any = {
         method: "get",
         url: `/users/${userMe.id}/followings`,
@@ -77,10 +76,10 @@ const ListenArtistInfo = ({
       };
       try {
         const { data } = await axios(followConfig);
-        if (data.length === 0) {
-          return;
+        if (data.results.length === 0) {
+          setFollowLoading(false);
         } else {
-          const trackExist = data.find(
+          const trackExist = data.results.find(
             (following: IFollowings) => following.id === artist.id
           );
           if (trackExist) {
@@ -98,7 +97,7 @@ const ListenArtistInfo = ({
   }, [artist]);
   useEffect(() => {
     isFollowing();
-  }, [userMe]);
+  }, [userMe, userSecret]);
 
   const followUser = async () => {
     const config: any = {
@@ -138,12 +137,12 @@ const ListenArtistInfo = ({
       console.log(error);
     }
   };
-  console.log(followArtist);
+
   return (
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}>
         <img
-          src={artistInfo.image}
+          src={artistInfo.image || "/default_user_image.png"}
           alt={`${artist.display_name}의 프로필 사진`}
         />
       </div>
@@ -160,12 +159,13 @@ const ListenArtistInfo = ({
           <span>{artistInfo.tracks}</span>
         </li>
       </ul>
-      {followArtist ? (
+      {isMyTrack === false && followArtist && (
         <button className={styles.unfollowArtist} onClick={unfollowUser}>
           <RiUserUnfollowLine />
           <span>Following</span>
         </button>
-      ) : (
+      )}
+      {isMyTrack === false && !followArtist && (
         <button
           className={styles.followArtist}
           onClick={followUser}

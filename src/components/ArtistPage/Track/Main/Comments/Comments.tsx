@@ -1,63 +1,58 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Comments.module.scss";
 import { FcComments } from "react-icons/fc";
-import { BsFillReplyFill } from "react-icons/bs";
+import { BsFillReplyFill, BsTrashFill } from "react-icons/bs";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { IComment } from "../TrackMain";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { ITrack } from "../../TrackPage";
-import { useAuthContext } from "../../../../../context/AuthContext";
 dayjs.extend(relativeTime);
+import { ITrack, IUserMe } from "../../TrackPage";
+import { useAuthContext } from "../../../../../context/AuthContext";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 const Comments = ({
   comments,
   track,
   fetchComments,
+  userMe,
+  commentCount,
+  isFinalComment,
 }: {
   comments: IComment[];
   track: ITrack;
   fetchComments: () => void;
+  userMe: IUserMe;
+  commentCount: number;
+  isFinalComment: boolean;
 }) => {
-  const [nestedComments, setNestedComments] = useState<IComment[]>([]);
-  useEffect(() => {
-    const nestComments = () => {
-      const commentList = comments.map((comment) => ({ ...comment }));
-      const commentMap: IComment[] = [];
-      // move all the comments into a map of id => comment
-      commentList.forEach((comment) => (commentMap[comment.id] = comment));
-      // iterate over the comments again and correctly nest the children
-      commentList.forEach((comment) => {
-        if (comment.parent_comment !== null) {
-          const parent = commentMap[comment.parent_comment];
-          (parent.children = parent.children || []).push(comment);
-        }
-      });
-      // filter the list to return a list of correctly nested comments
-      const commentsToBeRendered = commentList.filter((comment) => {
-        return comment.parent_comment === null;
-      });
-      setNestedComments(commentsToBeRendered);
-    };
-    nestComments();
-  }, [comments]);
-
+  const sortedComments = comments.reduce((sorted: any, comment: IComment) => {
+    if (!sorted[comment.group]) {
+      sorted[comment.group] = [];
+    }
+    sorted[comment.group].push(comment);
+    return sorted;
+  }, []);
   return (
-    <div className={styles.container}>
+    <div
+      className={`${styles.container} ${isFinalComment && styles.bottomBorder}`}
+    >
       <header>
         <FcComments />
-        <span>{comments.length} comments</span>
+        <span>{commentCount} comments</span>
       </header>
       <ul className={styles.commentsList}>
-        {comments.length
-          ? nestedComments.map((comment) => {
+        {comments.length !== 0
+          ? sortedComments.reverse().map((comments: IComment[]) => {
               return (
                 <CommentItem
-                  comment={comment}
-                  key={comment.id}
+                  comments={comments}
+                  key={comments[0].group}
                   track={track}
                   fetchComments={fetchComments}
+                  userMe={userMe}
                 />
               );
             })
@@ -68,13 +63,15 @@ const Comments = ({
 };
 
 const CommentItem = ({
-  comment,
+  comments,
   track,
   fetchComments,
+  userMe,
 }: {
-  comment: IComment;
+  comments: IComment[];
   track: ITrack;
   fetchComments: () => void;
+  userMe: IUserMe;
 }) => {
   const [showReply, setShowReply] = useState(false);
   const [commentInput, setInput] = useState("");
@@ -94,7 +91,10 @@ const CommentItem = ({
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
-      data: { content: commentInput, parent_id: comment.id },
+      data: {
+        content: commentInput,
+        group: comments[0].group,
+      },
     };
     try {
       const response = await axios(config);
@@ -109,7 +109,9 @@ const CommentItem = ({
   };
 
   const history = useHistory();
-  const clickUsername = () => history.push(`/${comment.writer.permalink}`);
+  const clickUsername = (id: number) => {
+    return history.push(`/${comments[id].writer.permalink}`);
+  };
 
   //   const commentedTime = (comment: IComment) => {
   //     return comment.created_at.slice(11, 16);
@@ -117,51 +119,114 @@ const CommentItem = ({
   const commentedFromNow = (comment: IComment) => {
     return dayjs(comment.created_at).fromNow();
   };
+
+  const deleteComment = async (id: number) => {
+    confirmAlert({
+      message: "Do you really want to remove this comment?",
+      buttons: [
+        {
+          label: "Cancel",
+          onClick: () => {
+            return null;
+          },
+        },
+        {
+          label: "Yes",
+          onClick: async () => {
+            const config: any = {
+              method: "delete",
+              url: `/tracks/${track.id}/comments/${id}`,
+              headers: {
+                Authorization: `JWT ${userSecret.jwt}`,
+              },
+              data: {},
+            };
+            try {
+              const response = await axios(config);
+              if (response) {
+                fetchComments();
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          },
+        },
+      ],
+    });
+    return;
+  };
+
   return (
     <>
-      <li key={comment.id}>
-        <div className={styles.userImage} onClick={clickUsername}>
+      <li key={comments[0].id}>
+        <div
+          className={styles.userImage}
+          onClick={() => clickUsername(comments[0].writer.id)}
+        >
           <img
-            src={comment.writer.image_profile}
-            alt={`${comment.writer.first_name} ${comment.writer.last_name}의 프로필 사진`}
+            src={comments[0].writer.image_profile || "/default_user_image.png"}
+            alt={`${comments[0].writer.display_name}의 프로필 사진`}
           />
         </div>
         <div className={styles.mainComment}>
           <div className={styles.commentInfo}>
-            <span className={styles.hoverClick} onClick={clickUsername}>
-              {comment.writer.permalink}
-            </span>{" "}
+            <span
+              className={styles.hoverClick}
+              onClick={() => clickUsername(comments[0].writer.id)}
+            >
+              {comments[0].writer.id === userSecret.id
+                ? "You"
+                : comments[0].writer.display_name}
+            </span>
             {/* <span className={styles.at}>at</span>{" "}
             <span className={styles.hoverClick}>{commentedTime(comment)}</span> */}
           </div>
-          <div className={styles.comment}>{comment.content}</div>
+          <div className={styles.comment}>{comments[0].content}</div>
         </div>
         <div className={styles.timePassed}>
-          <span>{commentedFromNow(comment)}</span>
+          <span>{commentedFromNow(comments[0])}</span>
           <button
             className={styles.replyButton}
             onClick={() => setShowReply(true)}
           >
             <BsFillReplyFill /> Reply
           </button>
+          {comments[0].writer.permalink === userSecret.permalink && (
+            <button
+              className={styles.deleteButton}
+              onClick={() => deleteComment(comments[0].id)}
+            >
+              <BsTrashFill />
+            </button>
+          )}
         </div>
       </li>
-      {Object.prototype.hasOwnProperty.call(comment, "children") && (
+      {comments.length > 1 && (
         <div className={styles.replyCommentContainer}>
-          {comment.children.map((child) => {
+          {comments.slice(1).map((child) => {
             return (
               <li key={child.id}>
-                <div className={styles.userImage} onClick={clickUsername}>
+                <div
+                  className={styles.userImage}
+                  onClick={() => clickUsername(child.writer.id)}
+                >
                   <img
-                    src={child.writer.image_profile}
-                    alt={`${child.writer.first_name} ${child.writer.last_name}의 프로필 사진`}
+                    src={
+                      child.writer.image_profile || "/default_user_image.png"
+                    }
+                    alt={`${child.writer.display_name}의 프로필 사진`}
                   />
                 </div>
                 <div className={styles.mainComment}>
                   <div className={styles.commentInfo}>
-                    <span className={styles.hoverClick} onClick={clickUsername}>
-                      {child.writer.permalink}
-                    </span>{" "}
+                    <span
+                      className={styles.hoverClick}
+                      onClick={() => clickUsername(child.writer.id)}
+                    >
+                      {child.writer.id === userSecret.id
+                        ? "You"
+                        : child.writer.display_name}
+                    </span>
                     {/* <span className={styles.at}>at</span>{" "}
                     <span className={styles.hoverClick}>
                       {commentedTime(child)}
@@ -177,6 +242,14 @@ const CommentItem = ({
                   >
                     <BsFillReplyFill /> Reply
                   </button>
+                  {child.writer.permalink === userSecret.permalink && (
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => deleteComment(child.id)}
+                    >
+                      <BsTrashFill />
+                    </button>
+                  )}
                 </div>
               </li>
             );
@@ -185,7 +258,10 @@ const CommentItem = ({
       )}
       <div className={`${styles.replyContainer} ${showReply && styles.shown}`}>
         <div>
-          <div className={styles.replyUserImage} />
+          <img
+            className={styles.replyUserImage}
+            src={userMe.image_profile || "/default_user_image.png"}
+          />
           <form className={styles.replyInput} onSubmit={onSubmit}>
             <input
               onChange={onCommentChange}

@@ -7,6 +7,7 @@ import TrackBar from "./TrackBar/TrackBar";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
+import EditModal from "../../Upload/YourTracks/EditModal";
 
 export interface ITrack {
   id: number;
@@ -22,6 +23,7 @@ export interface ITrack {
   like_count: number;
   repost_count: number;
   tags: string[];
+  is_private: boolean;
 }
 export interface IArtist {
   city: string;
@@ -29,6 +31,10 @@ export interface IArtist {
   display_name: string;
   id: number;
   permalink: string;
+}
+export interface ITag {
+  id: number;
+  name: string;
 }
 interface IParams {
   username: string;
@@ -56,6 +62,7 @@ const TrackPage = () => {
     like_count: 0,
     repost_count: 0,
     tags: [],
+    is_private: false,
   });
   const [artist, setArtist] = useState<IArtist>({
     city: "",
@@ -66,9 +73,19 @@ const TrackPage = () => {
   });
   const [userMe, setUserMe] = useState<IUserMe>({ id: 0, image_profile: "" });
   const [isLoading, setIsLoading] = useState(true);
+  const [isMyTrack, setIsMyTrack] = useState<boolean | undefined>(false);
+  const [editModal, setEditModal] = useState(false);
 
   const { userSecret } = useAuthContext();
   const { username, trackname } = useParams<IParams>();
+  useEffect(() => {
+    if (username === userSecret.permalink) {
+      setIsMyTrack(true);
+    } else if (username !== userSecret.permalink && track.is_private) {
+      setNoTrack(true);
+    }
+  });
+
   const fetchTrack = async () => {
     try {
       const response = await axios.get(
@@ -76,6 +93,7 @@ const TrackPage = () => {
       );
       const data = response.data;
       const artist = response.data.artist;
+      const tagList = data.tags.map((value: ITag) => value.name);
       setTrack({
         id: data.id,
         title: data.title,
@@ -89,7 +107,8 @@ const TrackPage = () => {
         image: data.image,
         like_count: data.like_count,
         repost_count: data.repost_count,
-        tags: data.tags,
+        tags: tagList,
+        is_private: data.is_private,
       });
       setArtist({
         city: artist.city,
@@ -106,6 +125,7 @@ const TrackPage = () => {
         error.response.status === 404
       ) {
         setNoTrack(true);
+        setIsLoading(false);
       }
     }
     return;
@@ -140,6 +160,13 @@ const TrackPage = () => {
 
   return (
     <div className={styles.trackWrapper}>
+      {editModal === true && (
+        <EditModal
+          setModal={setEditModal}
+          track={track}
+          fetchYourTracks={fetchTrack}
+        />
+      )}
       {isLoading || (
         <div className={styles.track}>
           <TrackModal
@@ -160,6 +187,8 @@ const TrackPage = () => {
               artist={artist}
               userMe={userMe}
               fetchTrack={fetchTrack}
+              isMyTrack={isMyTrack}
+              setEditModal={setEditModal}
             />
           )}
           {noTrack || <TrackBar />}

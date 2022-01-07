@@ -1,15 +1,22 @@
 import "./UploadHeader.scss";
 
 function UploadHeader() {
+  const checked = (url: string) => {
+    return window.location.href.includes(url) ? "upload-menu" : undefined;
+  };
   return (
     <div className={"upload-header"}>
       <div className={"upload-header-left"}>
-        <a href={"/upload"} className="upload-menu">
+        <a href={"/upload"} className={checked("upload")}>
           Upload
         </a>
         <a href={"/you/mastering"}>Mastering</a>
-        <a href={"/you/tracks"}>Your tracks</a>
-        <a href={"/pro"}>Pro Plans</a>
+        <a href={"/you/tracks"} className={checked("you/tracks")}>
+          Your tracks
+        </a>
+        <a href={"/pro"} className="">
+          Pro Plans
+        </a>
       </div>
       <div className="upload-header-right">
         <a href="https://community.soundcloud.com/">

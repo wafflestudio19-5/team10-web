@@ -1,4 +1,7 @@
 .container {
+  &.bottomBorder {
+    border-bottom: 1px solid lightgray;
+  }
   header {
     color: #999999;
     font-size: 14px;
@@ -29,18 +32,10 @@
       border: 1px solid lightgray;
       box-sizing: border-box;
       max-height: 40px;
-      div {
-        // --red: 0;
-        // --green: 0;
-        // --blue: 0;
-        // --red2: 0;
-        // --green2: 0;
-        // --blue2: 0;
-        // --bg-color: rgba(var(--red), var(--green), var(--blue), 1);
-        // --bg-color2: rgba(var(--red2), var(--green2), var(--blue2), 1);
+      overflow: hidden;
+      img {
         height: 40px;
         width: 40px;
-        // background: linear-gradient(120deg, var(--bg-color), var(--bg-color2));
       }
     }
     .mainComment {
@@ -64,6 +59,24 @@
       color: #999999;
       text-align: right;
       position: relative;
+      .deleteButton {
+        visibility: hidden;
+        height: 22px;
+        width: 22px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 70px;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+      }
       .replyButton {
         visibility: hidden;
         font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
@@ -83,7 +96,8 @@
         padding: 2px 9px 2px 8px;
       }
     }
-    &:hover .replyButton {
+    &:hover .replyButton,
+    &:hover .deleteButton {
       visibility: visible;
     }
   }
@@ -103,7 +117,7 @@
       .replyUserImage {
         height: 20px;
         width: 20px;
-        border: 1px solid black;
+        border: 1px solid #e5e5e5;
         box-sizing: border-box;
       }
       .replyInput {
@@ -150,18 +164,9 @@
       border: 1px solid lightgray;
       box-sizing: border-box;
       max-height: 40px;
-      div {
-        // --red: 0;
-        // --green: 0;
-        // --blue: 0;
-        // --red2: 0;
-        // --green2: 0;
-        // --blue2: 0;
-        // --bg-color: rgba(var(--red), var(--green), var(--blue), 1);
-        // --bg-color2: rgba(var(--red2), var(--green2), var(--blue2), 1);
+      img {
         height: 40px;
         width: 40px;
-        // background: linear-gradient(120deg, var(--bg-color), var(--bg-color2));
       }
     }
     .mainComment {
@@ -185,6 +190,24 @@
       color: #999999;
       text-align: right;
       position: relative;
+      .deleteButton {
+        visibility: hidden;
+        height: 22px;
+        width: 22px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 70px;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+      }
       .replyButton {
         visibility: hidden;
         font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
@@ -204,7 +227,8 @@
         padding: 2px 9px 2px 8px;
       }
     }
-    &:hover .replyButton {
+    &:hover .replyButton,
+    &:hover .deleteButton {
       visibility: visible;
     }
   }
