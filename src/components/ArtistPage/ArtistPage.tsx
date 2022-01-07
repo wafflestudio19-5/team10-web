@@ -1,6 +1,6 @@
 import "./ArtistPage.scss";
 import { Grid } from "semantic-ui-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import EditModal from "./EditModal/EditModal";
@@ -19,6 +19,7 @@ function ArtistPage() {
   const [myId, setMyId] = useState<number>();
 
   const [modal, setModal] = useState(false);
+  const myRef = useRef<any>({});
 
   const [displayName, setDisplayName] = useState<string>();
   const [userName, setUserName] = useState<string>();
@@ -35,7 +36,19 @@ function ArtistPage() {
     fileInput?.click();
   };
 
-  const getTracks = async (id: number, page: any) => {
+  const handleScroll = () => {
+    if (
+      myRef.current.scrollHeight -
+        myRef.current.scrollTop -
+        myRef.current.clientHeight ===
+        0 &&
+      trackPage !== null
+    ) {
+      getTracks(pageId, trackPage);
+    }
+  };
+
+  const getTracks = async (id: any, page: any) => {
     axios
       .get(`/users/${id}/tracks?page=${page}`)
       .then((res) => {
@@ -137,16 +150,27 @@ function ArtistPage() {
           axios
             .get(`users/${res1.data.id}/followers`)
             .then((res) => {
-              const filterMe = res.data.filter(
-                (item: any) => item.permalink == myPermalink
+              const pages = Array.from(
+                { length: Math.floor(res.data.count / 10) + 1 },
+                (_, i) => i + 1
               );
-              if (filterMe.length == 0) {
-                setIsFollowing(false);
-              } else {
-                setIsFollowing(true);
-              }
+              pages.map((page) => {
+                axios
+                  .get(`users/${res1.data.id}/followers?page=${page}`)
+                  .then((res) => {
+                    const filter = res.data.results.filter(
+                      (item: any) => item.permalink == myPermalink
+                    );
+                    if (filter.length === 0) {
+                      setIsFollowing(false);
+                    } else {
+                      setIsFollowing(true);
+                    }
+                  });
+              });
             })
-            .catch(() => {
+            .catch((err) => {
+              console.log(err);
               toast("팔로워 불러오기 실패");
             });
         })
@@ -267,8 +291,7 @@ function ArtistPage() {
           </div>
 
           <div className="artist-body">
-            <div className={"recent"}>
-              <text>Recent</text>
+            <div className={"recent"} ref={myRef} onScroll={handleScroll}>
               {tracks &&
                 tracks.map((item: any) => (
                   <TrackBox item={item} artistName={displayName} myId={myId} />
