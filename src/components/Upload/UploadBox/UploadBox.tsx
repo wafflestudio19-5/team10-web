@@ -25,7 +25,7 @@ function UploadBox({ setSelectedFile, setModal }: any) {
           className="file-input"
           onChange={handleFileInput}
         />
-        <div className="upload-playlist">
+        {/* <div className="upload-playlist">
           <div className="form-check">
             <input
               className="form-check-input"
@@ -37,8 +37,8 @@ function UploadBox({ setSelectedFile, setModal }: any) {
               Make a playlist when multiple files are selected
             </label>
           </div>
-        </div>
-        <div className="upload-privacy">
+        </div> */}
+        {/* <div className="upload-privacy">
           <text>Privacy:</text>
           <div className="form-check">
             <input
@@ -58,7 +58,7 @@ function UploadBox({ setSelectedFile, setModal }: any) {
             />
             <label className="form-check-label">Privacy</label>
           </div>
-        </div>
+        </div> */}
       </form>
     </div>
   );

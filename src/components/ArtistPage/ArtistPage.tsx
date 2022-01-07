@@ -1,12 +1,13 @@
 import "./ArtistPage.scss";
 import { Grid } from "semantic-ui-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import EditModal from "./EditModal/EditModal";
 import toast from "react-hot-toast";
 import TrackBox from "./TrackBox/TrackBox";
 import { useAuthContext } from "../../context/AuthContext";
+import { useInView } from "react-intersection-observer";
 
 function ArtistPage() {
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -19,11 +20,9 @@ function ArtistPage() {
   const [myId, setMyId] = useState<number>();
 
   const [modal, setModal] = useState(false);
-  const myRef = useRef<any>({});
-
   const [user, setUser] = useState<any>();
-
   const [header, setHeader] = useState<any>();
+  const [ref, inView] = useInView();
 
   const [tracks, setTracks] = useState<any>();
   const [trackPage, setTrackPage] = useState<any>();
@@ -60,27 +59,19 @@ function ArtistPage() {
             event.target.files[0],
             img_options
           )
+          .then(() => {
+            getUser(user.id);
+          })
           .catch(() => {
             toast("헤더이미지 업로드 실패");
           });
       } catch (error) {
         toast("헤더이미지 업로드 실패");
+        toast("파일 이름이 영문이어야 합니다. \n png 파일이어야 합니다");
       }
     };
     changeHeaderImg();
     getUser(pageId);
-  };
-
-  const handleScroll = () => {
-    if (
-      myRef.current.scrollHeight -
-        myRef.current.scrollTop -
-        myRef.current.clientHeight ===
-        0 &&
-      trackPage !== null
-    ) {
-      getTracks(pageId, trackPage);
-    }
   };
 
   const getUser = (id: any) => {
@@ -90,7 +81,7 @@ function ArtistPage() {
         setUser(res.data);
         if (res.data.image_header === null) {
           setHeader(
-            "url(https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg)"
+            "https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
           );
         } else {
           setHeader(res.data.image_header);
@@ -228,23 +219,33 @@ function ArtistPage() {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (inView) {
+      getTracks(pageId, trackPage);
+    }
+  }, [inView]);
+
   if (isLoading || user === undefined) {
     return <div>Loading...</div>;
   } else {
     return (
       <div className="artistpage-wrapper">
         <div className={"artistpage"}>
-          <div
-            className={"profile-header"}
-            style={{
-              backgroundImage: header,
-            }}
-          >
+          <div className={"profile-header"}>
+            <img className="header-img" src={header} />
             {user.image_profile === null && (
-              <img src={"img/user_img.png"} alt={"profileImg"} />
+              <img
+                className="profile-img"
+                src={"img/user_img.png"}
+                alt={"profileImg"}
+              />
             )}
             {user.image_profile !== null && (
-              <img src={user.image_profile} alt={"profileImg"} />
+              <img
+                className="profile-img"
+                src={user.image_profile}
+                alt={"profileImg"}
+              />
             )}
             <div className={"name"}>
               <div className={"displayname"}>{user.display_name}</div>
@@ -352,18 +353,20 @@ function ArtistPage() {
           </div>
 
           <div className="artist-body">
-            <div className={"recent"} ref={myRef} onScroll={handleScroll}>
+            <div className={"recent"}>
+              <text>My Track</text>
               {tracks &&
                 tracks.map((item: any) => (
                   <TrackBox
                     item={item}
                     artistName={user.display_name}
                     myId={myId}
-                    getTracks={getTracks}
-                    pageId={pageId}
-                    trackPage={trackPage}
+                    user={user}
                   />
                 ))}
+              <div ref={ref} className="inView">
+                text
+              </div>
             </div>
 
             <Grid className={"artist-info"} columns={3} divided>

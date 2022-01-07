@@ -3,18 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
+import { useHistory } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./TrackBox.scss";
 
-function TrackBox({
-  item,
-  artistName,
-  myId,
-  getTracks,
-  pageId,
-  trackPage,
-}: any) {
+function TrackBox({ item, artistName, myId, user }: any) {
   const { userSecret } = useAuthContext();
+  const history = useHistory();
 
   const [isLiking, setIsLiking] = useState<boolean>();
   const [reposted, setReposted] = useState<boolean>();
@@ -44,11 +39,11 @@ function TrackBox({
     try {
       await axios(config);
       setIsLiking(true);
-      if (trackPage === null) {
-        getTracks(pageId, 1);
-      } else {
-        getTracks(pageId, trackPage - 1);
-      }
+      // if (trackPage === null) {
+      //   getTracks(pageId, 1);
+      // } else {
+      //   getTracks(pageId, trackPage - 1);
+      // }
     } catch (error) {
       toast("트랙 좋아요 실패");
     }
@@ -65,11 +60,11 @@ function TrackBox({
     try {
       await axios(config);
       setIsLiking(false);
-      if (trackPage === null) {
-        getTracks(pageId, 1);
-      } else {
-        getTracks(pageId, trackPage - 1);
-      }
+      // if (trackPage === null) {
+      //   getTracks(pageId, 1);
+      // } else {
+      //   getTracks(pageId, trackPage - 1);
+      // }
     } catch (error) {
       toast("트랙 좋아요 취소 실패");
     }
@@ -86,11 +81,11 @@ function TrackBox({
     try {
       await axios(config);
       setReposted(true);
-      if (trackPage === null) {
-        getTracks(pageId, 1);
-      } else {
-        getTracks(pageId, trackPage - 1);
-      }
+      // if (trackPage === null) {
+      //   getTracks(pageId, 1);
+      // } else {
+      //   getTracks(pageId, trackPage - 1);
+      // }
     } catch (error) {
       toast("트랙 리포스트 실패");
     }
@@ -107,11 +102,11 @@ function TrackBox({
     try {
       await axios(config);
       setReposted(false);
-      if (trackPage === null) {
-        getTracks(pageId, 1);
-      } else {
-        getTracks(pageId, trackPage - 1);
-      }
+      // if (trackPage === null) {
+      //   getTracks(pageId, 1);
+      // } else {
+      //   getTracks(pageId, trackPage - 1);
+      // }
     } catch (error) {
       toast("트랙 리포스트 취소 실패");
     }
@@ -189,7 +184,24 @@ function TrackBox({
 
   return (
     <div className={"recent-track"}>
-      <img src={item.image} alt={"trackImg"} />
+      {item.image !== null && (
+        <img
+          src={item.image}
+          alt={"trackImg"}
+          onClick={() =>
+            history.push(`/${userSecret.permalink}/${item.permalink}`)
+          }
+        />
+      )}
+      {item.image === null && (
+        <img
+          src={"img/default.track_image.svg"}
+          alt={"trackImg"}
+          onClick={() =>
+            history.push(`/${userSecret.permalink}/${item.permalink}`)
+          }
+        />
+      )}
       <div className={"track-right"}>
         <div className={"track-info"}>
           {!isPlaying && (
@@ -227,12 +239,15 @@ function TrackBox({
         </div>
         <AudioPlayer className="player" src={item.audio} ref={player} />
         <div className={"comment"}>
-          <img
-            src="https://lovemewithoutall.github.io/assets/images/kiki.jpg"
-            alt="me"
-          />
+          {user.image_profile === null && (
+            <img src="img/user_img.png" alt="me" />
+          )}
+          {user.image_profile !== null && (
+            <img src={user.image_profile} alt="me" />
+          )}
           <input
             placeholder={"Write a comment"}
+            value={comment}
             onChange={(e) => setComment(e.target.value)}
             onKeyPress={postComment}
           />

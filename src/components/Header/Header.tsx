@@ -1,13 +1,34 @@
 import { useHistory } from "react-router";
 import "./Header.scss";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 function Header() {
   const history = useHistory();
   const cookies = new Cookies();
+  const [me, setMe] = useState<any>();
+
   useEffect(() => {
     cookies.get("is_logged_in") === null ? history.push("/") : null;
+    const jwt = localStorage.getItem("jwt_token");
+    const getMe = async () => {
+      const config: any = {
+        method: "get",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${jwt}`,
+        },
+      };
+      try {
+        const res = await axios(config);
+        setMe(res.data);
+      } catch (error) {
+        toast("헤더 정보 로드 실패");
+      }
+    };
+    getMe();
   }, []);
   const onSignOut = () => {
     localStorage.removeItem("jwt_token");
@@ -16,6 +37,7 @@ function Header() {
     cookies.remove("jwt_token");
     history.push("/logout");
   };
+
   return (
     <div className={"header_bar"}>
       <div className={"header"}>
@@ -40,42 +62,67 @@ function Header() {
         <div className={"header_user"}>
           <div className="dropdown">
             <button type="button" data-bs-toggle="dropdown">
-              <div>
-                <img
-                  src={
-                    "https://lovemewithoutall.github.io/assets/images/kiki.jpg"
-                  }
-                  alt={"user"}
-                />
-                <text>김와플</text>
-              </div>
+              {me !== undefined && (
+                <div>
+                  {me.image_profile !== null && (
+                    <img src={me.image_profile} alt={"user"} />
+                  )}
+                  {me.image_profile === null && (
+                    <img src={"img/user_img.png"} alt={"user"} />
+                  )}
+                  <text>{me.display_name}</text>
+                </div>
+              )}
+              {me === undefined && (
+                <div>
+                  <img src={""} alt={"user"} />
+                  <text>user</text>
+                </div>
+              )}
             </button>
             <ul className="dropdown-menu">
               <li>
-                <a className="dropdown-item" href="#">
-                  Profile
-                </a>
+                {me !== undefined && (
+                  <a
+                    className="dropdown-item"
+                    onClick={() => history.push(`/${me.permalink}`)}
+                  >
+                    Profile
+                  </a>
+                )}
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a
+                  className="dropdown-item"
+                  onClick={() => history.push("/you/likes")}
+                >
                   Likes
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a
+                  className="dropdown-item"
+                  onClick={() => history.push("/you/stations")}
+                >
                   Stations
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a
+                  className="dropdown-item"
+                  onClick={() => history.push("/you/following")}
+                >
                   Following
                 </a>
               </li>
             </ul>
           </div>
 
-          <a href={"/notifications"} className={"notifications"} />
-          <a href={"/messages"} className={"messages"} />
+          <a
+            onClick={() => history.push("/notifications")}
+            className={"notifications"}
+          />
+          <a onClick={() => history.push("/messages")} className={"messages"} />
         </div>
 
         <div className={"header_more"}>
