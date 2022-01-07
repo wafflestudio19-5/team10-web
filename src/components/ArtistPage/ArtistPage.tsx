@@ -352,9 +352,7 @@ function ArtistPage() {
                     item={item}
                     artistName={user.display_name}
                     myId={myId}
-                    getTracks={getTracks}
-                    pageId={pageId}
-                    trackPage={trackPage}
+                    user={user}
                   />
                 ))}
               <div ref={ref} className="inView">
