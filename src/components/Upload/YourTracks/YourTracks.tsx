@@ -49,6 +49,7 @@ const YourTracks = () => {
   const [trackCount, setTrackCount] = useState<number | null>(null);
   const [isFinalPage, setIsFinalPage] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageRendered, setPageRendered] = useState(1);
   const [currentTracks, setCurrentTracks] = useState<IYourTracks[]>([]);
   const nextPage = useRef(1);
   const finalPage = useRef(0);
@@ -82,10 +83,10 @@ const YourTracks = () => {
           setCurrentTracks(data.results);
           setLoading(false);
           if (data.next) {
-            // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+            // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
             nextPage.current += 1;
           } else {
-            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
             finalPage.current = nextPage.current;
             setIsFinalPage(true);
           }
@@ -98,43 +99,58 @@ const YourTracks = () => {
     }
   };
   const fetchNextTracks = async () => {
-    setLoading(true);
-    const tracksConfig: any = {
-      method: "get",
-      url: `/users/${userSecret.id}/tracks?page=${
-        nextPage.current
-      }&page_size=${10}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const { data } = await axios(tracksConfig);
-      setTrackCount(data.count);
-      setYourTracks(yourTracks.concat(data.results));
-      setCurrentPage(currentPage + 1);
-      setLoading(false);
-      if (data.next) {
-        // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
-        nextPage.current += 1;
-      } else {
-        // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
-        finalPage.current = nextPage.current;
-        setIsFinalPage(true);
+    if (pageRendered > currentPage && trackCount) {
+      const nextPage = currentPage + 1;
+      const nextTracks = yourTracks.slice(
+        (nextPage - 1) * 10,
+        trackCount >= (currentPage - 1) * 10 + 11
+          ? (nextPage - 1) * 10 + 10
+          : trackCount
+      );
+      setCurrentTracks(nextTracks);
+      setCurrentPage(nextPage);
+    } else {
+      setLoading(true);
+      const tracksConfig: any = {
+        method: "get",
+        url: `/users/${userSecret.id}/tracks?page=${
+          nextPage.current
+        }&page_size=${10}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const { data } = await axios(tracksConfig);
+        setYourTracks(yourTracks.concat(data.results));
+        setCurrentTracks(data.results);
+        setCurrentPage(currentPage + 1);
+        setPageRendered(pageRendered + 1);
+        setLoading(false);
+        if (data.next) {
+          // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+          nextPage.current += 1;
+        } else {
+          // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+          finalPage.current = nextPage.current;
+          setIsFinalPage(true);
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
+  };
+  const getPreviousTracks = () => {
+    const previousPage = currentPage - 1;
+    setCurrentTracks(
+      yourTracks.slice((previousPage - 1) * 10, (previousPage - 1) * 10 + 10)
+    );
+    setCurrentPage(previousPage);
   };
   useEffect(() => {
     fetchYourTracks();
   }, [userSecret.jwt]);
-  useEffect(() => {
-    if (yourTracks.length > 10) {
-      setCurrentTracks(yourTracks.slice(-10));
-    }
-  }, [yourTracks]);
 
   const editToggle = () => setIsEditOpen(!isEditOpen);
 
@@ -150,6 +166,8 @@ const YourTracks = () => {
       setCheckedItems(checkedItems);
     }
   };
+
+  console.log(nextPage, yourTracks);
 
   return (
     <div className={styles.yourTracksPage}>
@@ -193,18 +211,23 @@ const YourTracks = () => {
               </button>
               <div className={styles.pageSelector}>
                 <div className={styles.pageInfo}>
-                  1 - {yourTracks.length} of {trackCount} tracks
+                  {(currentPage - 1) * 10 + 1} -{" "}
+                  {trackCount && trackCount >= (currentPage - 1) * 10 + 11
+                    ? (currentPage - 1) * 10 + 10
+                    : trackCount}{" "}
+                  of {trackCount} tracks
                 </div>
                 <div className={styles.pageButtons}>
                   <button
                     className={styles.backButton}
                     disabled={currentPage === 1}
+                    onClick={getPreviousTracks}
                   >
                     <AiFillCaretLeft />
                   </button>
                   <button
                     className={styles.nextButton}
-                    disabled={isFinalPage}
+                    disabled={isFinalPage && pageRendered === currentPage}
                     onClick={fetchNextTracks}
                   >
                     <AiFillCaretRight />
@@ -226,6 +249,8 @@ const YourTracks = () => {
                     setEditTrack={setEditTrack}
                     fetchYourTracks={fetchYourTracks}
                     yourTracks={currentTracks}
+                    finalPage={finalPage.current}
+                    currentPage={currentPage}
                   />
                 );
               })}
@@ -258,6 +283,8 @@ const Track = ({
   setEditTrack,
   fetchYourTracks,
   yourTracks,
+  finalPage,
+  currentPage,
 }: {
   track: IYourTracks;
   checkedItemHandler: (id: number, isChecked: boolean) => void;
@@ -266,6 +293,8 @@ const Track = ({
   setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
   fetchYourTracks: () => void;
   yourTracks: IYourTracks[];
+  finalPage: number;
+  currentPage: number;
 }) => {
   const [checked, setChecked] = useState(false);
   const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
@@ -290,7 +319,7 @@ const Track = ({
   };
   useEffect(() => {
     const fetchTrack = async () => {
-      if (userSecret.jwt) {
+      if (userSecret.jwt && currentPage > finalPage) {
         const config: any = {
           method: "get",
           url: `/tracks/${track.id}`,
@@ -435,7 +464,10 @@ const Track = ({
         checked={checked}
         onChange={(event) => checkHandler(event)}
       />
-      <div className={styles.playContainer}>
+      <div
+        className={styles.playContainer}
+        onClick={(event) => event.stopPropagation()}
+      >
         <img
           className={styles.trackImage}
           src={track.image || "/default.track_image.svg"}

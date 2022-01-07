@@ -6,6 +6,12 @@ import styles from "./EditModal.module.scss";
 import { ITrack } from "../../ArtistPage/Track/TrackPage";
 import axios from "axios";
 import { GrClose } from "react-icons/gr";
+import toast from "react-hot-toast";
+
+interface ITrackPermalink {
+  permalink: string;
+  id: number;
+}
 
 const EditModal = ({
   setModal,
@@ -25,6 +31,7 @@ const EditModal = ({
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [tPermalink, setTPermalink] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
+  const [permalinkList, setPermalinkList] = useState<ITrackPermalink[]>([]);
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -58,6 +65,48 @@ const EditModal = ({
 
   const changeTrackPermalink = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTPermalink(event.target.value);
+    if (event.target.value.length === 0) {
+      toast.error("링크를 작성해주세요");
+    }
+    if (
+      permalinkList &&
+      permalinkList.find(
+        (link: ITrackPermalink) =>
+          link.permalink === tPermalink && link.id !== track.id
+      )
+    ) {
+      toast.error(`동일한 링크의 다른 트랙이 존재합니다(${tPermalink})`);
+    }
+  };
+
+  useEffect(() => {
+    const getPermalinks = async () => {
+      if (userSecret.jwt) {
+        const config: any = {
+          method: "get",
+          url: `/users/${userSecret.id}/tracks`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          const { data } = await axios(config);
+          const results = data.results;
+          setPermalinkList(results);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    getPermalinks();
+  }, [userSecret.jwt]);
+
+  const changeTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+    if (event.target.value.length === 0) {
+      toast.error("제목을 작성해주세요");
+    }
   };
 
   const onSaveChanges = async () => {
@@ -148,10 +197,7 @@ const EditModal = ({
           <div className={styles["upload-info"]}>
             <div className={styles["upload-info-title"]}>
               <text>Title</text>
-              <input
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-              />
+              <input value={title} onChange={changeTitle} />
               <div className={styles["upload-info-permalink"]}>
                 <div>{`soundcloud.com/${userSecret.permalink}/`}</div>
                 <input value={tPermalink} onChange={changeTrackPermalink} />
@@ -219,7 +265,16 @@ const EditModal = ({
           >
             Cancel
           </button>
-          <button className={styles["save-button"]} onClick={onSaveChanges}>
+          <button
+            className={styles["save-button"]}
+            onClick={onSaveChanges}
+            disabled={
+              !title ||
+              !tPermalink ||
+              permalinkList.find((link) => link.permalink === tPermalink) !==
+                undefined
+            }
+          >
             Save
           </button>
         </div>

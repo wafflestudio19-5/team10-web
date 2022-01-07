@@ -12,13 +12,14 @@
   box-sizing: border-box;
   margin: auto;
   background: white;
+  min-height: calc(100vh);
 }
 .main {
   width: 1180px;
   box-sizing: border-box;
   margin: 0 auto;
   color: #333333;
-  height: calc(100vh - 46px);
+  padding-bottom: 70px;
 }
 .uploadHeader {
   margin-top: 46px;
@@ -200,6 +201,7 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
+  margin-bottom: 70px;
   li {
     list-style: none;
     height: 73px;
