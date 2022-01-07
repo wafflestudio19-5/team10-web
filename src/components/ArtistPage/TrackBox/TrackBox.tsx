@@ -5,7 +5,14 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./TrackBox.scss";
 
-function TrackBox({ item, artistName, myId }: any) {
+function TrackBox({
+  item,
+  artistName,
+  myId,
+  getTracks,
+  pageId,
+  trackPage,
+}: any) {
   const { userSecret } = useAuthContext();
 
   const [isLiking, setIsLiking] = useState<boolean>();
@@ -23,6 +30,11 @@ function TrackBox({ item, artistName, myId }: any) {
     try {
       await axios(config);
       setIsLiking(true);
+      if (trackPage === null) {
+        getTracks(pageId, 1);
+      } else {
+        getTracks(pageId, trackPage - 1);
+      }
     } catch (error) {
       toast("트랙 좋아요 실패");
     }
@@ -39,6 +51,11 @@ function TrackBox({ item, artistName, myId }: any) {
     try {
       await axios(config);
       setIsLiking(false);
+      if (trackPage === null) {
+        getTracks(pageId, 1);
+      } else {
+        getTracks(pageId, trackPage - 1);
+      }
     } catch (error) {
       toast("트랙 좋아요 취소 실패");
     }
@@ -55,6 +72,11 @@ function TrackBox({ item, artistName, myId }: any) {
     try {
       await axios(config);
       setReposted(true);
+      if (trackPage === null) {
+        getTracks(pageId, 1);
+      } else {
+        getTracks(pageId, trackPage - 1);
+      }
     } catch (error) {
       toast("트랙 리포스트 실패");
     }
@@ -71,6 +93,11 @@ function TrackBox({ item, artistName, myId }: any) {
     try {
       await axios(config);
       setReposted(false);
+      if (trackPage === null) {
+        getTracks(pageId, 1);
+      } else {
+        getTracks(pageId, trackPage - 1);
+      }
     } catch (error) {
       toast("트랙 리포스트 취소 실패");
     }

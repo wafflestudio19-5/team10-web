@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./EditModal.scss";
 
-function EditModal({ user, modal, setModal }: any) {
+function EditModal({ user, modal, setModal, getUser }: any) {
   const { userSecret } = useAuthContext();
 
   const [displayName, setDisplayName] = useState<string>(user.display_name);
@@ -59,6 +59,7 @@ function EditModal({ user, modal, setModal }: any) {
         toast("프로필 업데이트 성공");
         console.log(imgFile);
         setModal(false);
+        getUser(user.id);
       } catch (error) {
         toast("프로필 업데이트 실패");
       }

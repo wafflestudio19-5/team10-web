@@ -45,6 +45,17 @@ function ArtistPage() {
     }
   };
 
+  const getUser = (id: any) => {
+    axios
+      .get(`users/${id}`)
+      .then((res) => {
+        setUser(res.data);
+      })
+      .catch(() => {
+        toast("유저 정보 불러오기 실패");
+      });
+  };
+
   const getTracks = async (id: any, page: any) => {
     axios
       .get(`/users/${id}/tracks?page=${page}`)
@@ -58,11 +69,38 @@ function ArtistPage() {
           setTrackPage(null);
         } else {
           setTrackPage(page + 1);
-          console.log(trackPage);
         }
       })
       .catch(() => {
         toast("트랙 정보 불러오기 실패");
+      });
+  };
+
+  const getFollowers = (id: any, myPermalink: any) => {
+    // 팔로워 불러오기
+    axios
+      .get(`users/${id}/followers`)
+      .then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/followers?page=${page}`).then((res) => {
+            const filter = res.data.results.filter(
+              (item: any) => item.permalink == myPermalink
+            );
+            if (filter.length === 0) {
+              setIsFollowing(false);
+            } else {
+              setIsFollowing(true);
+            }
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast("팔로워 불러오기 실패");
       });
   };
 
@@ -77,6 +115,7 @@ function ArtistPage() {
     try {
       await axios(config);
       setIsFollowing(true);
+      getUser(pageId);
     } catch (error) {
       toast("팔로우 실패");
     }
@@ -93,6 +132,7 @@ function ArtistPage() {
     try {
       await axios(config);
       setIsFollowing(false);
+      getUser(pageId);
     } catch (error) {
       toast("언팔로우 실패");
     }
@@ -121,7 +161,7 @@ function ArtistPage() {
         toast("유저 아이디 불러오기 실패");
       });
 
-    const getUser = () => {
+    const getInfo = () => {
       // resolve api
       const url = `https://soundwaffle.com/${permalink}`;
       axios
@@ -129,49 +169,17 @@ function ArtistPage() {
         .then((res1) => {
           setPageId(res1.data.id);
           // 유저 정보
-          axios
-            .get(`users/${res1.data.id}`)
-            .then((res) => {
-              setUser(res.data);
-            })
-            .catch(() => {
-              toast("유저 정보 불러오기 실패");
-            });
+          getUser(res1.data.id);
           //트랙 불러오기
           getTracks(res1.data.id, 1);
-          // 팔로워 불러오기
-          axios
-            .get(`users/${res1.data.id}/followers`)
-            .then((res) => {
-              const pages = Array.from(
-                { length: Math.floor(res.data.count / 10) + 1 },
-                (_, i) => i + 1
-              );
-              pages.map((page) => {
-                axios
-                  .get(`users/${res1.data.id}/followers?page=${page}`)
-                  .then((res) => {
-                    const filter = res.data.results.filter(
-                      (item: any) => item.permalink == myPermalink
-                    );
-                    if (filter.length === 0) {
-                      setIsFollowing(false);
-                    } else {
-                      setIsFollowing(true);
-                    }
-                  });
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              toast("팔로워 불러오기 실패");
-            });
+          //팔로워 불러오기
+          getFollowers(res1.data.id, myPermalink);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
         });
     };
-    getUser();
+    getInfo();
     setIsLoading(false);
   }, []);
 
@@ -235,7 +243,12 @@ function ArtistPage() {
                   />
                   <div>Edit</div>
                 </button>
-                <EditModal user={user} modal={modal} setModal={setModal} />
+                <EditModal
+                  user={user}
+                  modal={modal}
+                  setModal={setModal}
+                  getUser={getUser}
+                />
               </div>
             )}
             {isMe === false && (
@@ -296,6 +309,9 @@ function ArtistPage() {
                     item={item}
                     artistName={user.display_name}
                     myId={myId}
+                    getTracks={getTracks}
+                    pageId={pageId}
+                    trackPage={trackPage}
                   />
                 ))}
             </div>
