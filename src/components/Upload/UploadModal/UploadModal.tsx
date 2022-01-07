@@ -51,7 +51,7 @@ function UploadModal({ selectedFile, setModal }: any) {
           description: description,
           is_private: isPrivate,
           audio_filename: selectedFile.name,
-          image_filename: imageFile && imageFile.name,
+          // image_filename: imageFile && imageFile.name,
         },
         {
           headers: {
@@ -92,10 +92,11 @@ function UploadModal({ selectedFile, setModal }: any) {
 
         setModal(false);
       })
-      .catch((err) => {
+      .catch(() => {
         toast("업로드 실패");
-        console.log(err);
-        setModal(false);
+        if (title === null || imageFile === null) {
+          toast("트랙 이미지와 제목은 필수입니다.");
+        }
       });
   };
 
@@ -125,14 +126,14 @@ function UploadModal({ selectedFile, setModal }: any) {
               src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
               alt="img"
             />
-            <div>Upload image</div>
+            <div>Upload image *</div>
           </button>
           <input type="file" id="file-input" onChange={imageToUrl} />
         </div>
 
         <div className="upload-info">
           <div className="upload-info-title">
-            <text>Title</text>
+            <text>Title *</text>
             <input
               placeholder="Name your track"
               onChange={(e) => setTitle(e.target.value)}
