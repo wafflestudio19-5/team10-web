@@ -235,7 +235,7 @@ function ArtistPage() {
                   />
                   <div>Edit</div>
                 </button>
-                <EditModal modal={modal} setModal={setModal} />
+                <EditModal user={user} modal={modal} setModal={setModal} />
               </div>
             )}
             {isMe === false && (
