@@ -19,6 +19,12 @@ function TrackBox({
   const [reposted, setReposted] = useState<boolean>();
   const [comment, setComment] = useState<string>();
 
+  const clickPlayer = (event: any) => {
+    event.preventDefault();
+    let player = document.getElementById("player");
+    console.log(player);
+  };
+
   const likeTrack = async () => {
     const config: any = {
       method: "post",
@@ -178,7 +184,7 @@ function TrackBox({
       <img src={item.image} alt={"trackImg"} />
       <div className={"track-right"}>
         <div className={"track-info"}>
-          <button>
+          <button onClick={clickPlayer}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="25"
@@ -195,7 +201,12 @@ function TrackBox({
             <div className={"trackname"}>{item.title}</div>
           </div>
         </div>
-        <ReactAudioPlayer className="player" controls src={item.audio} />
+        <ReactAudioPlayer
+          id="player"
+          className="player"
+          controls
+          src={item.audio}
+        />
         <div className={"comment"}>
           <img
             src="https://lovemewithoutall.github.io/assets/images/kiki.jpg"
