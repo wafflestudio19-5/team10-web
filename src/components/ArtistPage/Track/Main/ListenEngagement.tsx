@@ -269,12 +269,14 @@ const ListenEngagement = ({
             {track.like_count}
           </span>
         </div>
-        <div className={styles.repostStats}>
-          <BiRepost />
-          <span className={styles.pointer} onClick={trackReposts}>
-            {track.repost_count}
-          </span>
-        </div>
+        {isMyTrack === false && (
+          <div className={styles.repostStats}>
+            <BiRepost />
+            <span className={styles.pointer} onClick={trackReposts}>
+              {track.repost_count}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
