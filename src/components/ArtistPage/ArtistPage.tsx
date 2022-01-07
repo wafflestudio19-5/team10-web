@@ -67,6 +67,7 @@ function ArtistPage() {
           });
       } catch (error) {
         toast("헤더이미지 업로드 실패");
+        toast("파일 이름이 영문이어야 합니다. \n png 파일이어야 합니다");
       }
     };
     changeHeaderImg();
@@ -80,7 +81,7 @@ function ArtistPage() {
         setUser(res.data);
         if (res.data.image_header === null) {
           setHeader(
-            "url(https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg)"
+            "https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
           );
         } else {
           setHeader(res.data.image_header);
@@ -353,6 +354,7 @@ function ArtistPage() {
 
           <div className="artist-body">
             <div className={"recent"}>
+              <text>My Track</text>
               {tracks &&
                 tracks.map((item: any) => (
                   <TrackBox
