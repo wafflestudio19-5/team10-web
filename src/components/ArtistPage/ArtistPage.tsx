@@ -7,6 +7,7 @@ import EditModal from "./EditModal/EditModal";
 import toast from "react-hot-toast";
 import TrackBox from "./TrackBox/TrackBox";
 import { useAuthContext } from "../../context/AuthContext";
+import { useInView } from "react-intersection-observer";
 
 function ArtistPage() {
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -19,10 +20,9 @@ function ArtistPage() {
   const [myId, setMyId] = useState<number>();
 
   const [modal, setModal] = useState(false);
-
   const [user, setUser] = useState<any>();
-
   const [header, setHeader] = useState<any>();
+  const [ref, inView] = useInView();
 
   const [tracks, setTracks] = useState<any>();
   const [trackPage, setTrackPage] = useState<any>();
@@ -68,15 +68,6 @@ function ArtistPage() {
     };
     changeHeaderImg();
     getUser(pageId);
-  };
-
-  const handleScroll = () => {
-    const scrollObject = document.documentElement;
-    const browser = scrollObject.scrollHeight;
-    const seen = scrollObject.clientHeight + window.scrollY;
-    if (seen === browser && trackPage !== null) {
-      getTracks(pageId, trackPage);
-    }
   };
 
   const getUser = (id: any) => {
@@ -224,6 +215,12 @@ function ArtistPage() {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (inView) {
+      getTracks(pageId, trackPage);
+    }
+  }, [inView]);
+
   if (isLoading || user === undefined) {
     return <div>Loading...</div>;
   } else {
@@ -348,7 +345,7 @@ function ArtistPage() {
           </div>
 
           <div className="artist-body">
-            <div className={"recent"} onScroll={handleScroll}>
+            <div className={"recent"}>
               {tracks &&
                 tracks.map((item: any) => (
                   <TrackBox
@@ -360,6 +357,9 @@ function ArtistPage() {
                     trackPage={trackPage}
                   />
                 ))}
+              <div ref={ref} className="inView">
+                text
+              </div>
             </div>
 
             <Grid className={"artist-info"} columns={3} divided>
