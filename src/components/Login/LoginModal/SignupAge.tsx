@@ -35,7 +35,7 @@ const SignupAge = ({
       })
       .then(async (res) => {
         localStorage.setItem("permalink", res.data.permalink);
-        localStorage.setItem("jwt_token", res.data.token); // 쿠키가 저장이 안됨. 이유를 모르겠음.
+        localStorage.setItem("jwt_token", res.data.token);
         history.push("/discover");
       })
       .catch(() => {
