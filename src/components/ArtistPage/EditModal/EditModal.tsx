@@ -2,19 +2,23 @@ import { useState } from "react";
 import "./EditModal.scss";
 
 function EditModal({ modal, setModal }: any) {
-  const [imageUrl, setImageUrl] = useState<any>(null);
+  const [imgUrl, setImgUrl] = useState<any>();
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
-    let fileInput = document.getElementById("file-input");
+    let fileInput = document.getElementById("file-input2");
     fileInput?.click();
   };
 
-  const imageToUrl = (event: any) => {
+  const clearEvent = (event: any) => {
+    event.target.value = null;
+  };
+
+  const imgToUrl = (event: any) => {
     const reader = new FileReader();
     reader.readAsDataURL(event.target.files[0]);
     reader.onload = () => {
-      setImageUrl(reader.result);
+      setImgUrl(reader.result);
     };
   };
 
@@ -26,15 +30,15 @@ function EditModal({ modal, setModal }: any) {
 
           <div className="edit-modal-body">
             <div className="edit-image">
-              {!imageUrl && (
+              {!imgUrl && (
                 <img
                   className="edit-profile-img"
                   src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
                   alt="track-img"
                 />
               )}
-              {imageUrl && (
-                <img className="edit-profile-img" src={imageUrl} alt="img" />
+              {imgUrl && (
+                <img className="edit-profile-img" src={imgUrl} alt="img" />
               )}
               <button onClick={clickImageInput}>
                 <img
@@ -43,7 +47,12 @@ function EditModal({ modal, setModal }: any) {
                 />
                 <div>Update image</div>
               </button>
-              <input type="file" id="file-input" onChange={imageToUrl} />
+              <input
+                type="file"
+                id="file-input2"
+                onClick={clearEvent}
+                onChange={imgToUrl}
+              />
             </div>
 
             <div className="edit-info">

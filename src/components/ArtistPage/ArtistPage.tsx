@@ -21,15 +21,10 @@ function ArtistPage() {
   const [modal, setModal] = useState(false);
   const myRef = useRef<any>({});
 
-  const [displayName, setDisplayName] = useState<string>();
-  const [userName, setUserName] = useState<string>();
-  const [imgProfile, setImgProfile] = useState<string>();
-  const [imgHeader, setImgHeader] = useState<string>();
+  const [user, setUser] = useState<any>();
+
   const [tracks, setTracks] = useState<any>();
   const [trackPage, setTrackPage] = useState<any>();
-  const [followers, setFollowers] = useState<number>();
-  const [followings, setFollowings] = useState<number>();
-  const [countTracks, setCountTracks] = useState<number>();
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
   const clickImageInput = (event: any) => {
@@ -137,15 +132,7 @@ function ArtistPage() {
           axios
             .get(`users/${res1.data.id}`)
             .then((res) => {
-              setDisplayName(res.data.display_name);
-              setUserName(res.data.first_name + res.data.last_name);
-              setImgProfile(res.data.image_profile);
-              setFollowers(res.data.follower_count);
-              setFollowings(res.data.following_count);
-              setCountTracks(res.data.track_count);
-              setImgHeader(res.data.image_header);
-              // 헤더 이미지 추가하기
-              console.log(imgHeader);
+              setUser(res.data);
             })
             .catch(() => {
               toast("유저 정보 불러오기 실패");
@@ -188,20 +175,26 @@ function ArtistPage() {
     setIsLoading(false);
   }, []);
 
-  if (isLoading) {
+  if (isLoading || user === undefined) {
     return <div>Loading...</div>;
   } else {
     return (
       <div className="artistpage-wrapper">
         <div className={"artistpage"}>
           <div className={"profile-header"}>
-            {imgProfile === null && (
+            {user.image_profile === null && (
               <img src={"img/user_img.png"} alt={"profileImg"} />
             )}
-            {imgProfile !== null && <img src={imgProfile} alt={"profileImg"} />}
+            {user.image_profile !== null && (
+              <img src={user.image_profile} alt={"profileImg"} />
+            )}
             <div className={"name"}>
-              <div className={"displayname"}>{displayName}</div>
-              {userName !== "" && <div className={"username"}>{userName}</div>}
+              <div className={"displayname"}>{user.display_name}</div>
+              {user.first_name + user.last_name !== "" && (
+                <div className={"username"}>
+                  {user.first_name + user.last_name}
+                </div>
+              )}
             </div>
             {isMe === true && (
               <div className="upload-header-image">
@@ -299,7 +292,11 @@ function ArtistPage() {
             <div className={"recent"} ref={myRef} onScroll={handleScroll}>
               {tracks &&
                 tracks.map((item: any) => (
-                  <TrackBox item={item} artistName={displayName} myId={myId} />
+                  <TrackBox
+                    item={item}
+                    artistName={user.display_name}
+                    myId={myId}
+                  />
                 ))}
             </div>
 
@@ -307,15 +304,15 @@ function ArtistPage() {
               <Grid.Row>
                 <Grid.Column className="artist-info-text">
                   <div>Followers</div>
-                  <text>{followers}</text>
+                  <text>{user.follower_count}</text>
                 </Grid.Column>
                 <Grid.Column className="artist-info-text">
                   <div>Following</div>
-                  <text>{followings}</text>
+                  <text>{user.following_count}</text>
                 </Grid.Column>
                 <Grid.Column className="artist-info-text">
                   <div>Tracks</div>
-                  <text>{countTracks}</text>
+                  <text>{user.track_count}</text>
                 </Grid.Column>
               </Grid.Row>
             </Grid>

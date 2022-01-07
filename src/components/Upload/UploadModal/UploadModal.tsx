@@ -34,6 +34,7 @@ function UploadModal({ selectedFile, setModal }: any) {
       setImageUrl(reader.result);
     };
     setImageFile(event.target.files[0]);
+    event.target.value = "";
   };
 
   const changeTrackPermalink = (event: any) => {
