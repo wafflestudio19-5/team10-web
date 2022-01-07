@@ -1,16 +1,20 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import styles from "./Login.module.scss";
 import LoginModal from "./LoginModal/LoginModal";
 
 const Login = () => {
   const [modal, setModal] = useState(false);
-  useEffect(() => {
-    axios.get("/google").then((r) => console.log(r.headers));
-  }, []);
   const handleModal = () => {
     setModal(!modal);
   };
+  const history = useHistory();
+  useEffect(() => {
+    if (localStorage.getItem("jwt_token")) {
+      history.push("/discover");
+    }
+  }, []);
+
   return (
     <div className={styles.box}>
       <LoginModal modal={modal} handleModal={handleModal} />

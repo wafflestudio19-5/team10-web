@@ -84,7 +84,7 @@ const Discover = () => {
     const checkValid = async () => {
       const jwtToken = localStorage.getItem("jwt_token");
       const permal = localStorage.getItem("permalink");
-      await setUserSecret({ jwt: jwtToken, permalink: permal });
+      await setUserSecret({ ...userSecret, jwt: jwtToken, permalink: permal });
     };
     const fetchMostNewList = () => {
       axios.get("/tracks").then((r: any) => {

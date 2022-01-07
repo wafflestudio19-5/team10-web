@@ -1,4 +1,7 @@
 import { useTrackContext } from "../../../../context/TrackContext";
+// import { useAuthContext } from "../../../../context/AuthContext";
+// import axios from "axios";
+// import { useEffect } from "react";
 
 const AudioTag = () => {
   const {
@@ -8,7 +11,12 @@ const AudioTag = () => {
     setTrackIsPlaying,
     isMuted,
     loop,
+    // playingTime,
+    // trackDuration,
+    // trackBarTrack,
+    // trackIsPlaying,
   } = useTrackContext();
+  //   const { userSecret } = useAuthContext();
   const onLoadedMetadata = () => {
     // 트랙 metadata가 로드되었을 때 실행
     setTrackDuration(audioPlayer.current.duration);
@@ -20,6 +28,29 @@ const AudioTag = () => {
       audioPlayer.current.pause();
     }
   };
+
+  //   useEffect(() => {
+  //     const patchCount = async () => {
+  //       console.log(playingTime);
+  //       if (playingTime === trackDuration / 3 && trackIsPlaying) {
+  //         const config: any = {
+  //           method: "patch",
+  //           url: `/tracks/${trackBarTrack.id}`,
+  //           headers: {
+  //             Authorization: `JWT ${userSecret.jwt}`,
+  //           },
+  //           data: { count: trackBarTrack.count + 1 },
+  //         };
+  //         try {
+  //           const response = await axios(config);
+  //           console.log(response);
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       }
+  //     };
+  //     patchCount();
+  //   }, [playingTime]);
 
   return (
     <audio
