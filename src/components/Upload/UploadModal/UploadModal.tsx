@@ -51,7 +51,7 @@ function UploadModal({ selectedFile, setModal }: any) {
           description: description,
           is_private: isPrivate,
           audio_filename: selectedFile.name,
-          image_filename: imageFile.name,
+          image_filename: imageFile && imageFile.name,
         },
         {
           headers: {
