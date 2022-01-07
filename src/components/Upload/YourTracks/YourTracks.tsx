@@ -130,10 +130,11 @@ const YourTracks = () => {
                   <AiOutlineDown />
                 </button>
                 {isEditOpen && (
-                  <ul>
-                    <li>Privacy and tags</li>
-                    <li>Artwork</li>
-                  </ul>
+                  <div></div>
+                  //   <ul>
+                  //     <li>Privacy and tags</li>
+                  //     <li>Artwork</li>
+                  //   </ul>
                 )}
               </div>
               <button className={styles.addToPlaylist}>
@@ -142,7 +143,7 @@ const YourTracks = () => {
               </button>
               <div className={styles.pageSelector}>
                 <div className={styles.pageInfo}>
-                  1 - 0 of {yourTracks.length} tracks
+                  1 - {yourTracks.length} of {yourTracks.length} tracks
                 </div>
                 <div className={styles.pageButtons}>
                   <button className={styles.backButton}>

@@ -43,7 +43,7 @@ const SignIn = ({
               localStorage.setItem("id", res.data.id);
               cookies.set("is_logged_in", true, {
                 path: "/",
-                expires: new Date(Date.now() + 3600 * 2),
+                expires: new Date(Date.now() + 1000 * 3600 * 2),
               });
               setUserSecret({
                 id: res.data.id,

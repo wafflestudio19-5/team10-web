@@ -7,9 +7,7 @@ import TrackTag from "./TrackTag";
 import { useTrackContext } from "../../../../context/TrackContext";
 import { MdOutlineCancel } from "react-icons/md";
 import AlbumImage from "./AlbumImage";
-import { throttle } from "lodash";
-// import { throttle } from "lodash";
-// import throttle from "lodash/throttle";
+import throttle from "lodash/throttle";
 // import axios from "axios";
 // import { useParams } from "react-router-dom";
 // import WaveSurfer from "wavesurfer.js";
@@ -107,8 +105,8 @@ const TrackHeader = ({
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
-        animationRef.current = requestAnimationFrame(whilePlaying);
       }, 1);
+      animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
 
@@ -136,7 +134,7 @@ const TrackHeader = ({
         progressBar.current.value = 0;
         progressBar.current.style.setProperty("--seek-before-width", `0%`);
       }
-    }, 3000),
+    }, 30000),
     [playingTime]
   );
   changePlayerCurrentTime();
@@ -166,7 +164,6 @@ const TrackHeader = ({
     <div ref={trackHeader} className={styles.trackHeader}>
       <div className={styles.trackInfo}>
         <HeaderButton
-          isPlaying={trackIsPlaying}
           togglePlayPause={togglePlayPause}
           isSameTrack={isSameTrack}
           buttonDisabled={buttonDisabled}

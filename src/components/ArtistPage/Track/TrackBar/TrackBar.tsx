@@ -397,7 +397,7 @@ const TrackBar = () => {
                   <span>{trackBarTrack.title}</span>
                 </div>
               </div>
-              {trackBarArtist.id !== userSecret.id && (
+              {trackBarArtist.id === userSecret.id || (
                 <>
                   {likeTrack === true && (
                     <button

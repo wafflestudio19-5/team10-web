@@ -7,7 +7,7 @@ import TrackBar from "./TrackBar/TrackBar";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
-import EditModal from "../EditModal/EditModal";
+import EditModal from "../../Upload/YourTracks/EditModal";
 
 export interface ITrack {
   id: number;
@@ -157,7 +157,6 @@ const TrackPage = () => {
 
   const openModal = () => setModal(true);
   const closeModal = () => setModal(false);
-  console.log(editModal);
 
   return (
     <div className={styles.trackWrapper}>

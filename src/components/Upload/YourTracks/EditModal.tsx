@@ -5,6 +5,7 @@ import { useAuthContext } from "../../../context/AuthContext";
 import styles from "./EditModal.module.scss";
 import { ITrack } from "../../ArtistPage/Track/TrackPage";
 import axios from "axios";
+import { GrClose } from "react-icons/gr";
 
 const EditModal = ({
   setModal,
@@ -103,8 +104,14 @@ const EditModal = ({
   };
 
   return (
-    <div className={styles.modalWrapper}>
-      <div className={styles["upload-modal"]}>
+    <div className={styles.modalWrapper} onClick={() => setModal(false)}>
+      <div className={styles.closeButton} onClick={() => setModal(false)}>
+        <GrClose />
+      </div>
+      <div
+        className={styles["upload-modal"]}
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className={styles["upload-modal-header"]}>
           <div className={styles["upload-basic-info"]}>Basic info</div>
           {/* <div>Metadata</div>
