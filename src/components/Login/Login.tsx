@@ -1,9 +1,13 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import styles from "./Login.module.scss";
 import LoginModal from "./LoginModal/LoginModal";
 
 const Login = () => {
   const [modal, setModal] = useState(false);
+  useEffect(() => {
+    axios.get("/google").then((r) => console.log(r.headers));
+  }, []);
   const handleModal = () => {
     setModal(!modal);
   };

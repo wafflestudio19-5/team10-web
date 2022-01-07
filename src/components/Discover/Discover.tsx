@@ -8,7 +8,7 @@ import NewList from "./NewList/NewList";
 
 const Discover = () => {
   const { userSecret, setUserSecret } = useAuthContext();
-  const [likeList, setLikeList] = useState([
+  const [likeList, setLikeList] = useState<any>([
     {
       artist: {
         permalink: "",
@@ -90,7 +90,6 @@ const Discover = () => {
       axios.get("/tracks").then((r: any) => {
         const mostList = r.data.results.slice(0, 4);
         const newList = r.data.results.slice(-6);
-        console.log(newList);
         setMostTrackList(mostList);
         setNewTrackList(newList);
       });
@@ -99,8 +98,9 @@ const Discover = () => {
     fetchMostNewList();
   }, []);
   useEffect(() => {
-    if (likeList[0].id !== -1) {
-      setLikeListId(likeList.map((item) => item.id));
+    console.log();
+    if (likeList !== [] || likeList[0].id !== -1) {
+      setLikeListId(likeList.map((item: any) => item.id));
     }
   }, [likeList]);
   useEffect(() => {
