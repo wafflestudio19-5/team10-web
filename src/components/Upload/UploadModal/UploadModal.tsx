@@ -42,62 +42,109 @@ function UploadModal({ selectedFile, setModal }: any) {
 
   const handleUpload = (e: any) => {
     e.preventDefault();
-    axios
-      .post(
-        "https://api.soundwaffle.com/tracks",
-        {
-          title: title,
-          permalink: tPermalink,
-          description: description,
-          is_private: isPrivate,
-          audio_filename: selectedFile.name,
-          // image_filename: imageFile && imageFile.name,
-        },
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
+    if (imageFile) {
+      axios
+        .post(
+          "https://api.soundwaffle.com/tracks",
+          {
+            title: title,
+            permalink: tPermalink,
+            description: description,
+            is_private: isPrivate,
+            audio_filename: selectedFile.name,
+            image_filename: imageFile.name,
           },
-        }
-      )
-      .then((res) => {
-        const music_options = {
-          headers: {
-            "Content-Type": selectedFile.type,
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          const music_options = {
+            headers: {
+              "Content-Type": selectedFile.type,
+            },
+          };
+
+          axios
+            .put(res.data.audio_presigned_url, selectedFile, music_options)
+            .then(() => {
+              toast("음악파일 업로드 완료");
+            })
+            .catch(() => {
+              toast("음악파일 업로드 실패");
+            });
+
+          const img_options = {
+            headers: {
+              "Content-Type": imageFile.type,
+            },
+          };
+
+          axios
+            .put(res.data.image_presigned_url, imageFile, img_options)
+            .then(() => {
+              toast("이미지파일 업로드 완료");
+            })
+            .catch(() => {
+              toast("이미지파일 업로드 실패");
+            });
+
+          setModal(false);
+        })
+        .catch(() => {
+          toast("업로드 실패");
+          if (title === null) {
+            toast("제목은 필수입니다.");
+          }
+        });
+    } else {
+      axios
+        .post(
+          "https://api.soundwaffle.com/tracks",
+          {
+            title: title,
+            permalink: tPermalink,
+            description: description,
+            is_private: isPrivate,
+            audio_filename: selectedFile.name,
           },
-        };
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          const music_options = {
+            headers: {
+              "Content-Type": selectedFile.type,
+            },
+          };
 
-        axios
-          .put(res.data.audio_presigned_url, selectedFile, music_options)
-          .then(() => {
-            toast("음악파일 업로드 완료");
-          })
-          .catch(() => {
-            toast("음악파일 업로드 실패");
-          });
+          axios
+            .put(res.data.audio_presigned_url, selectedFile, music_options)
+            .then(() => {
+              toast("음악파일 업로드 완료");
+            })
+            .catch(() => {
+              toast("음악파일 업로드 실패");
+            });
 
-        const img_options = {
-          headers: {
-            "Content-Type": imageFile.type,
-          },
-        };
-
-        axios
-          .put(res.data.image_presigned_url, imageFile, img_options)
-          .then(() => {
-            toast("이미지파일 업로드 완료");
-          })
-          .catch(() => {
-            toast("이미지파일 업로드 실패");
-          });
-
-        setModal(false);
-      })
-      .catch(() => {
-        toast("업로드 실패");
-        if (title === null || imageFile === null) {
-          toast("트랙 이미지와 제목은 필수입니다.");
-        }
-      });
+          setModal(false);
+        })
+        .catch(() => {
+          toast("업로드 실패");
+          toast("트랙 url이 중복되었는지 확인해주세요");
+          if (title === null) {
+            toast("제목은 필수입니다.");
+          }
+          if (!/[ㄱ-ㅎ|가-힣]/.test(title)) {
+            toast("제목은 영어 또는 숫자만 가능합니다.");
+          }
+        });
+    }
   };
 
   return (
@@ -126,7 +173,7 @@ function UploadModal({ selectedFile, setModal }: any) {
               src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
               alt="img"
             />
-            <div>Upload image *</div>
+            <div>Upload image</div>
           </button>
           <input type="file" id="file-input" onChange={imageToUrl} />
         </div>
