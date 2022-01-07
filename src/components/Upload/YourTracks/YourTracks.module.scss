@@ -139,7 +139,7 @@
   display: flex;
   button {
     height: 26px;
-    background: #f2f2f2ff;
+    background: white;
     color: #c8c8c8;
     border: 1px solid #e5e5e5;
     box-sizing: border-box;
@@ -208,7 +208,6 @@
     margin: 10px auto;
     padding: 5px 10px 5px 42px;
     position: relative;
-    cursor: pointer;
     &:hover {
       background: #f2f2f2;
     }

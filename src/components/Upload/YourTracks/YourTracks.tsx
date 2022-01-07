@@ -46,6 +46,12 @@ const YourTracks = () => {
   const [modal, setModal] = useState(false);
   const [editTrack, setEditTrack] = useState<ITrack>();
   const [loading, setLoading] = useState(true);
+  const [trackCount, setTrackCount] = useState<number | null>(null);
+  const [isFinalPage, setIsFinalPage] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentTracks, setCurrentTracks] = useState<IYourTracks[]>([]);
+  const nextPage = useRef(1);
+  const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
 
   const fetchYourTracks = async () => {
@@ -60,11 +66,10 @@ const YourTracks = () => {
       };
       try {
         const response = await axios(config);
-        const userId = response.data.id;
         setUsername(response.data.display_name);
         const tracksConfig: any = {
           method: "get",
-          url: `/users/${userId}/tracks`,
+          url: `/users/${userSecret.id}/tracks?page=${1}&page_size=${10}`,
           headers: {
             Authorization: `JWT ${userSecret.jwt}`,
           },
@@ -72,8 +77,18 @@ const YourTracks = () => {
         };
         try {
           const { data } = await axios(tracksConfig);
+          setTrackCount(data.count);
           setYourTracks(data.results);
+          setCurrentTracks(data.results);
           setLoading(false);
+          if (data.next) {
+            // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+            nextPage.current += 1;
+          } else {
+            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+            finalPage.current = nextPage.current;
+            setIsFinalPage(true);
+          }
         } catch (error) {
           console.log(error);
         }
@@ -82,9 +97,44 @@ const YourTracks = () => {
       }
     }
   };
+  const fetchNextTracks = async () => {
+    setLoading(true);
+    const tracksConfig: any = {
+      method: "get",
+      url: `/users/${userSecret.id}/tracks?page=${
+        nextPage.current
+      }&page_size=${10}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const { data } = await axios(tracksConfig);
+      setTrackCount(data.count);
+      setYourTracks(yourTracks.concat(data.results));
+      setCurrentPage(currentPage + 1);
+      setLoading(false);
+      if (data.next) {
+        // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+        nextPage.current += 1;
+      } else {
+        // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+        finalPage.current = nextPage.current;
+        setIsFinalPage(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     fetchYourTracks();
   }, [userSecret.jwt]);
+  useEffect(() => {
+    if (yourTracks.length > 10) {
+      setCurrentTracks(yourTracks.slice(-10));
+    }
+  }, [yourTracks]);
 
   const editToggle = () => setIsEditOpen(!isEditOpen);
 
@@ -143,13 +193,20 @@ const YourTracks = () => {
               </button>
               <div className={styles.pageSelector}>
                 <div className={styles.pageInfo}>
-                  1 - {yourTracks.length} of {yourTracks.length} tracks
+                  1 - {yourTracks.length} of {trackCount} tracks
                 </div>
                 <div className={styles.pageButtons}>
-                  <button className={styles.backButton}>
+                  <button
+                    className={styles.backButton}
+                    disabled={currentPage === 1}
+                  >
                     <AiFillCaretLeft />
                   </button>
-                  <button className={styles.nextButton}>
+                  <button
+                    className={styles.nextButton}
+                    disabled={isFinalPage}
+                    onClick={fetchNextTracks}
+                  >
                     <AiFillCaretRight />
                   </button>
                 </div>
@@ -158,7 +215,7 @@ const YourTracks = () => {
           </div>
           {!loading && yourTracks.length !== 0 && (
             <ul className={styles.trackContainer}>
-              {yourTracks.map((track) => {
+              {currentTracks.map((track) => {
                 return (
                   <Track
                     key={track.id}
@@ -168,7 +225,7 @@ const YourTracks = () => {
                     setModal={setModal}
                     setEditTrack={setEditTrack}
                     fetchYourTracks={fetchYourTracks}
-                    yourTracks={yourTracks}
+                    yourTracks={currentTracks}
                   />
                 );
               })}
@@ -319,13 +376,15 @@ const Track = ({
   const clickTitle = () =>
     history.push(`/${userSecret.permalink}/${track.permalink}`);
 
-  const onEditTrack = () => {
+  const onEditTrack: React.MouseEventHandler = (event) => {
+    event.stopPropagation();
     if (fetchedTrack) {
       setModal(true);
       setEditTrack(fetchedTrack);
     }
   };
-  const deleteTrack = async (id: number) => {
+  const deleteTrack = async (event: React.MouseEvent, id: number) => {
+    event.stopPropagation();
     confirmAlert({
       message: "Do you really want to delete this track?",
       buttons: [
@@ -360,9 +419,10 @@ const Track = ({
     });
     return;
   };
+  const onClickName = () => history.push(`/${userSecret.permalink}`);
 
   return (
-    <li key={track.id}>
+    <li key={track.id} onClick={() => setChecked(!checked)}>
       <audio
         ref={player}
         src={fetchedTrack?.audio}
@@ -376,7 +436,10 @@ const Track = ({
         onChange={(event) => checkHandler(event)}
       />
       <div className={styles.playContainer}>
-        <img className={styles.trackImage} src={track.image} />
+        <img
+          className={styles.trackImage}
+          src={track.image || "/default.track_image.svg"}
+        />
         <div className={styles.playButton} onClick={togglePlayButton}>
           {play ? <IoMdPause /> : <IoMdPlay />}
         </div>
@@ -384,7 +447,7 @@ const Track = ({
       <div className={styles.contentContainer}>
         <div className={styles.content}>
           <div className={styles.username}>
-            <span>{username}</span>
+            <span onClick={onClickName}>{username}</span>
           </div>
           <div className={styles.title}>
             <span onClick={clickTitle}>{track.title}</span>
@@ -422,7 +485,7 @@ const Track = ({
               <button onClick={onEditTrack}>
                 <BiPencil />
               </button>
-              <button onClick={() => deleteTrack(track.id)}>
+              <button onClick={(event) => deleteTrack(event, track.id)}>
                 <BsTrashFill />
               </button>
             </div>

@@ -19,7 +19,7 @@ export interface ITrack {
   created_at: string;
   description: string;
   genre: null | string;
-  image: string;
+  image: null | string;
   like_count: number;
   repost_count: number;
   tags: string[];

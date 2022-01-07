@@ -130,7 +130,7 @@ const EditModal = ({
             {imageUrl && (
               <img
                 className={styles["upload-track-img"]}
-                src={imageUrl}
+                src={imageUrl || track.image || "/default.track_image.svg"}
                 alt={`${track.title}의 이미지`}
               />
             )}

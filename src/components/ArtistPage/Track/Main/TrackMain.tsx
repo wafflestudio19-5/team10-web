@@ -174,11 +174,11 @@ const TrackMain = ({
   const fetchLikers = async () => {
     const config: any = {
       method: "get",
-      url: `/tracks/${track.id}/likers`,
+      url: `/tracks/${track.id}/likers?page=${1}&page_size=${9}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
-      data: { page: 1, page_size: 9 },
+      data: {},
     };
     try {
       const { data } = await axios(config);
@@ -191,11 +191,11 @@ const TrackMain = ({
   const fetchReposters = async () => {
     const config: any = {
       method: "get",
-      url: `/tracks/${track.id}/reposters`,
+      url: `/tracks/${track.id}/reposters?page=${1}&page_size=${9}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
-      data: { page: 1, page_size: 9 },
+      data: {},
     };
     try {
       const { data } = await axios(config);
@@ -223,6 +223,7 @@ const TrackMain = ({
           />
           <ListenEngagement
             track={track}
+            artist={artist}
             userMe={userMe}
             fetchTrack={fetchTrack}
             isMyTrack={isMyTrack}

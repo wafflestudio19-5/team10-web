@@ -136,9 +136,24 @@ const TrackBar = () => {
   const toggleLoop = () => setLoop(!loop);
   const toggleMuteUnmute = () => setIsMuted(!isMuted);
 
-  const clickArtist = () => history.push(`/${trackBarArtist.permalink}`);
-  const clickTrack = () =>
+  const clickArtist = () => {
+    if (
+      window.location.href.split("soundwaffle.com")[1] ===
+      `/${trackBarArtist.permalink}`
+    ) {
+      return;
+    }
+    history.push(`/${trackBarArtist.permalink}`);
+  };
+  const clickTrack = () => {
+    if (
+      window.location.href.split("soundwaffle.com")[1] ===
+      `/${trackBarArtist.permalink}/${trackBarTrack.permalink}`
+    ) {
+      return;
+    }
     history.push(`/${trackBarArtist.permalink}/${trackBarTrack.permalink}`);
+  };
 
   const isLikeTrack = async () => {
     if (userSecret.id !== 0 && trackBarTrack.id !== 0) {
@@ -383,12 +398,10 @@ const TrackBar = () => {
               </button>
             )}
             <div className={styles.trackInfo}>
-              {trackBarTrack.image.length !== 0 && (
-                <img
-                  src={trackBarTrack.image}
-                  alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
-                />
-              )}
+              <img
+                src={trackBarTrack.image || "/default.track_image.svg"}
+                alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
+              />
               <div className={styles.artistTrackName}>
                 <div className={styles.artistName} onClick={clickArtist}>
                   {trackBarArtist.display_name}
