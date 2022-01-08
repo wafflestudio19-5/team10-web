@@ -25,7 +25,7 @@ function ArtistPage() {
   const [ref, inView] = useInView();
 
   const [tracks, setTracks] = useState<any>();
-  const [trackPage, setTrackPage] = useState<any>();
+  const [trackPage, setTrackPage] = useState<any>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
   const clickImageInput = (event: any) => {
@@ -220,8 +220,10 @@ function ArtistPage() {
   }, []);
 
   useEffect(() => {
-    if (inView) {
-      getTracks(pageId, trackPage);
+    if (!isLoading && trackPage !== null) {
+      if (inView) {
+        getTracks(pageId, trackPage);
+      }
     }
   }, [inView]);
 
