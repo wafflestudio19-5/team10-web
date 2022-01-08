@@ -3,7 +3,8 @@ import { BiPencil } from "react-icons/bi";
 import { MdPlaylistAdd } from "react-icons/md";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 import { AiOutlineDown } from "react-icons/ai";
-import { BsSoundwave, BsFillFileLock2Fill } from "react-icons/bs";
+import { BsSoundwave } from "react-icons/bs";
+// import { BsFillFileLock2Fill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import { FcComments } from "react-icons/fc";
 import { BsSuitHeartFill, BsTrashFill } from "react-icons/bs";
@@ -15,7 +16,7 @@ import { useEffect, useState } from "react";
 import UploadHeader from "../UploadHeader/UploadHeader";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
-import ReactTooltip from "react-tooltip";
+// import ReactTooltip from "react-tooltip";
 import { ITag, ITrack } from "../../ArtistPage/Track/TrackPage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -46,6 +47,13 @@ const YourTracks = () => {
   const [modal, setModal] = useState(false);
   const [editTrack, setEditTrack] = useState<ITrack>();
   const [loading, setLoading] = useState(true);
+  const [trackCount, setTrackCount] = useState<number | null>(null);
+  const [isFinalPage, setIsFinalPage] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageRendered, setPageRendered] = useState(1);
+  const [currentTracks, setCurrentTracks] = useState<IYourTracks[]>([]);
+  const nextPage = useRef(1);
+  const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
 
   const fetchYourTracks = async () => {
@@ -60,11 +68,10 @@ const YourTracks = () => {
       };
       try {
         const response = await axios(config);
-        const userId = response.data.id;
         setUsername(response.data.display_name);
         const tracksConfig: any = {
           method: "get",
-          url: `/users/${userId}/tracks`,
+          url: `/users/${userSecret.id}/tracks?page=${1}&page_size=${10}`,
           headers: {
             Authorization: `JWT ${userSecret.jwt}`,
           },
@@ -72,8 +79,18 @@ const YourTracks = () => {
         };
         try {
           const { data } = await axios(tracksConfig);
+          setTrackCount(data.count);
           setYourTracks(data.results);
+          setCurrentTracks(data.results);
           setLoading(false);
+          if (data.next) {
+            // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
+            nextPage.current += 1;
+          } else {
+            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
+            finalPage.current = nextPage.current;
+            setIsFinalPage(true);
+          }
         } catch (error) {
           console.log(error);
         }
@@ -81,6 +98,56 @@ const YourTracks = () => {
         console.log(error);
       }
     }
+  };
+  const fetchNextTracks = async () => {
+    if (pageRendered > currentPage && trackCount) {
+      const nextPage = currentPage + 1;
+      const nextTracks = yourTracks.slice(
+        (nextPage - 1) * 10,
+        trackCount >= (currentPage - 1) * 10 + 11
+          ? (nextPage - 1) * 10 + 10
+          : trackCount
+      );
+      setCurrentTracks(nextTracks);
+      setCurrentPage(nextPage);
+    } else {
+      setLoading(true);
+      const tracksConfig: any = {
+        method: "get",
+        url: `/users/${userSecret.id}/tracks?page=${
+          nextPage.current
+        }&page_size=${10}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const { data } = await axios(tracksConfig);
+        setYourTracks(yourTracks.concat(data.results));
+        setCurrentTracks(data.results);
+        setCurrentPage(currentPage + 1);
+        setPageRendered(pageRendered + 1);
+        setLoading(false);
+        if (data.next) {
+          // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+          nextPage.current += 1;
+        } else {
+          // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+          finalPage.current = nextPage.current;
+          setIsFinalPage(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+  const getPreviousTracks = () => {
+    const previousPage = currentPage - 1;
+    setCurrentTracks(
+      yourTracks.slice((previousPage - 1) * 10, (previousPage - 1) * 10 + 10)
+    );
+    setCurrentPage(previousPage);
   };
   useEffect(() => {
     fetchYourTracks();
@@ -100,6 +167,8 @@ const YourTracks = () => {
       setCheckedItems(checkedItems);
     }
   };
+
+  console.log(nextPage, yourTracks);
 
   return (
     <div className={styles.yourTracksPage}>
@@ -143,13 +212,25 @@ const YourTracks = () => {
               </button>
               <div className={styles.pageSelector}>
                 <div className={styles.pageInfo}>
-                  1 - {yourTracks.length} of {yourTracks.length} tracks
+                  {(currentPage - 1) * 10 + 1} -{" "}
+                  {trackCount && trackCount >= (currentPage - 1) * 10 + 11
+                    ? (currentPage - 1) * 10 + 10
+                    : trackCount}{" "}
+                  of {trackCount} tracks
                 </div>
                 <div className={styles.pageButtons}>
-                  <button className={styles.backButton}>
+                  <button
+                    className={styles.backButton}
+                    disabled={currentPage === 1}
+                    onClick={getPreviousTracks}
+                  >
                     <AiFillCaretLeft />
                   </button>
-                  <button className={styles.nextButton}>
+                  <button
+                    className={styles.nextButton}
+                    disabled={isFinalPage && pageRendered === currentPage}
+                    onClick={fetchNextTracks}
+                  >
                     <AiFillCaretRight />
                   </button>
                 </div>
@@ -158,7 +239,7 @@ const YourTracks = () => {
           </div>
           {!loading && yourTracks.length !== 0 && (
             <ul className={styles.trackContainer}>
-              {yourTracks.map((track) => {
+              {currentTracks.map((track) => {
                 return (
                   <Track
                     key={track.id}
@@ -168,7 +249,9 @@ const YourTracks = () => {
                     setModal={setModal}
                     setEditTrack={setEditTrack}
                     fetchYourTracks={fetchYourTracks}
-                    yourTracks={yourTracks}
+                    yourTracks={currentTracks}
+                    finalPage={finalPage.current}
+                    currentPage={currentPage}
                   />
                 );
               })}
@@ -201,6 +284,8 @@ const Track = ({
   setEditTrack,
   fetchYourTracks,
   yourTracks,
+  finalPage,
+  currentPage,
 }: {
   track: IYourTracks;
   checkedItemHandler: (id: number, isChecked: boolean) => void;
@@ -209,10 +294,12 @@ const Track = ({
   setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
   fetchYourTracks: () => void;
   yourTracks: IYourTracks[];
+  finalPage: number;
+  currentPage: number;
 }) => {
   const [checked, setChecked] = useState(false);
   const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
-  const [duration, setDuration] = useState(0);
+  //   const [duration, setDuration] = useState(0);
   const [play, setPlay] = useState(false);
   const player = useRef<HTMLAudioElement>(null);
   const { userSecret } = useAuthContext();
@@ -233,7 +320,7 @@ const Track = ({
   };
   useEffect(() => {
     const fetchTrack = async () => {
-      if (userSecret.jwt) {
+      if (userSecret.jwt && currentPage > finalPage) {
         const config: any = {
           method: "get",
           url: `/tracks/${track.id}`,
@@ -260,6 +347,7 @@ const Track = ({
             repost_count: data.repost_count,
             tags: tagList,
             is_private: data.is_private,
+            audio_length: 0,
           });
         } catch (error) {
           console.log(error);
@@ -278,19 +366,19 @@ const Track = ({
     }
   }, [audioSrc, trackIsPlaying]);
 
-  const calculateTime = (secs: number) => {
-    // 트랙 길이를 분:초 단위로 환산
-    const minutes = Math.floor(secs / 60);
-    const seconds = Math.floor(secs % 60);
-    const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-    return `${minutes}:${returnedSeconds}`;
-  };
+  //   const calculateTime = (secs: number) => {
+  //     // 트랙 길이를 분:초 단위로 환산
+  //     const minutes = Math.floor(secs / 60);
+  //     const seconds = Math.floor(secs % 60);
+  //     const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+  //     return `${minutes}:${returnedSeconds}`;
+  //   };
 
-  const onLoadedMetadata = () => {
-    if (player.current) {
-      setDuration(player.current.duration);
-    }
-  };
+  //   const onLoadedMetadata = () => {
+  //     if (player.current) {
+  //       setDuration(player.current.duration);
+  //     }
+  //   };
 
   const togglePlayButton = () => {
     if (fetchedTrack) {
@@ -315,17 +403,19 @@ const Track = ({
     }
   };
 
-  const releasedDate = dayjs(fetchedTrack?.created_at).fromNow();
+  //   const releasedDate = dayjs(fetchedTrack?.created_at).fromNow();
   const clickTitle = () =>
     history.push(`/${userSecret.permalink}/${track.permalink}`);
 
-  const onEditTrack = () => {
+  const onEditTrack: React.MouseEventHandler = (event) => {
+    event.stopPropagation();
     if (fetchedTrack) {
       setModal(true);
       setEditTrack(fetchedTrack);
     }
   };
-  const deleteTrack = async (id: number) => {
+  const deleteTrack = async (event: React.MouseEvent, id: number) => {
+    event.stopPropagation();
     confirmAlert({
       message: "Do you really want to delete this track?",
       buttons: [
@@ -360,14 +450,15 @@ const Track = ({
     });
     return;
   };
+  const onClickName = () => history.push(`/${userSecret.permalink}`);
 
   return (
-    <li key={track.id}>
+    <li key={track.id} onClick={() => setChecked(!checked)}>
       <audio
         ref={player}
         src={fetchedTrack?.audio}
         preload="metadata"
-        onLoadedMetadata={onLoadedMetadata}
+        // onLoadedMetadata={onLoadedMetadata}
       />
       <input
         type="checkbox"
@@ -375,8 +466,14 @@ const Track = ({
         checked={checked}
         onChange={(event) => checkHandler(event)}
       />
-      <div className={styles.playContainer}>
-        <img className={styles.trackImage} src={track.image} />
+      <div
+        className={styles.playContainer}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <img
+          className={styles.trackImage}
+          src={track.image || "/default.track_image.svg"}
+        />
         <div className={styles.playButton} onClick={togglePlayButton}>
           {play ? <IoMdPause /> : <IoMdPlay />}
         </div>
@@ -384,7 +481,7 @@ const Track = ({
       <div className={styles.contentContainer}>
         <div className={styles.content}>
           <div className={styles.username}>
-            <span>{username}</span>
+            <span onClick={onClickName}>{username}</span>
           </div>
           <div className={styles.title}>
             <span onClick={clickTitle}>{track.title}</span>
@@ -422,12 +519,12 @@ const Track = ({
               <button onClick={onEditTrack}>
                 <BiPencil />
               </button>
-              <button onClick={() => deleteTrack(track.id)}>
+              <button onClick={(event) => deleteTrack(event, track.id)}>
                 <BsTrashFill />
               </button>
             </div>
           </div>
-          <div className={styles.extra}>
+          {/* <div className={styles.extra}>
             {fetchedTrack?.is_private && (
               <div className={styles.private}>
                 <span data-tip="This track is private.">
@@ -436,11 +533,11 @@ const Track = ({
                 <ReactTooltip />
               </div>
             )}
-          </div>
-          <div className={styles.duration}>
+          </div> */}
+          {/* <div className={styles.duration}>
             <span>{duration !== 0 && calculateTime(duration)}</span>
           </div>
-          <div className={styles.uploadTime}>{releasedDate}</div>
+          <div className={styles.uploadTime}>{releasedDate}</div> */}
         </div>
       </div>
     </li>

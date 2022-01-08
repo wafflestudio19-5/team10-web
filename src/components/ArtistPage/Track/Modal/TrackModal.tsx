@@ -31,11 +31,11 @@ const TrackModal = ({
               {track.title} - {artist.display_name}
             </div>
             <div className={styles.trackImage}>
-              {track.image.length ? (
-                <img src={track.image} alt={`${track.title}의 트랙 이미지`} />
-              ) : (
-                <div />
-              )}
+              <img
+                src={track.image || "/default.track_image.svg"}
+                alt={`${track.title}의 트랙 이미지`}
+              />
+              <div />)
             </div>
           </main>
         </section>

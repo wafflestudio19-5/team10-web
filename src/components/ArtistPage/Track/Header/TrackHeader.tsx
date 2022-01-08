@@ -139,20 +139,22 @@ const TrackHeader = ({
   );
   changePlayerCurrentTime();
 
-  const onPlayerClick = () => {
-    // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-    if (!isSameTrack) {
-      setAudioSrc(track.audio);
-      audioPlayer.current.src = track.audio;
-      audioPlayer.current.load();
-    }
-    setTrackIsPlaying(true);
-    setPlayingTime(progressBar.current.value);
-    setTimeout(() => {
-      audioPlayer.current.play();
-    }, 1);
-    animationRef.current = requestAnimationFrame(whilePlaying);
-  };
+  //   const onPlayerClick = () => {
+  //     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
+  //     if (!isSameTrack) {
+  //       setAudioSrc(track.audio);
+  //       setIsSameTrack(true);
+  //       audioPlayer.current.src = track.audio;
+  //       audioPlayer.current.load();
+  //     }
+  //     setTrackIsPlaying(true);
+  //     audioPlayer.current.currentTime = progressBar.current.value;
+  //     setPlayingTime(audioPlayer.current.currentTime);
+  //     setTimeout(() => {
+  //       audioPlayer.current.play();
+  //     }, 1);
+  //     animationRef.current = requestAnimationFrame(whilePlaying);
+  //   };
 
   const headerPlayer = useRef<HTMLAudioElement>(null);
   const onLoadedMetadata = useCallback(() => {
@@ -202,7 +204,9 @@ const TrackHeader = ({
                 defaultValue="0"
                 onChange={audioSrc === track.audio ? changeRange : () => null}
                 step="0.3"
-                onClick={onPlayerClick}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                }}
                 max={
                   audioSrc === track.audio && headerTrackDuration
                     ? trackDuration

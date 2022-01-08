@@ -223,6 +223,7 @@ const TrackMain = ({
           />
           <ListenEngagement
             track={track}
+            artist={artist}
             userMe={userMe}
             fetchTrack={fetchTrack}
             isMyTrack={isMyTrack}

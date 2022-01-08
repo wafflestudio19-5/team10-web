@@ -9,7 +9,7 @@ import { useAuthContext } from "../../../../context/AuthContext";
 import { IArtist, IUserMe } from "../TrackPage";
 
 interface IArtistInfo {
-  image: string;
+  image: null | string;
   followers: number;
   tracks: number;
 }
@@ -26,7 +26,7 @@ const ListenArtistInfo = ({
   isMyTrack: boolean | undefined;
 }) => {
   const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
-    image: "",
+    image: null,
     followers: 0,
     tracks: 0,
   });
