@@ -223,7 +223,7 @@ function UploadModal({ selectedFile, setModal }: any) {
                 id="flexRadioDefault2"
                 onChange={() => setIsPrivate(false)}
               />
-              <label className="form-check-label">Public</label>
+              <label className="form-check-label">Public (defualt)</label>
             </div>
             <div className="form-check">
               <input
