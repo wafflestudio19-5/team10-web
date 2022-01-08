@@ -23,6 +23,7 @@ function UploadBox({ setSelectedFile, setModal }: any) {
           type="file"
           id="file-input"
           className="file-input"
+          accept=".mp3, .wav"
           onChange={handleFileInput}
         />
         {/* <div className="upload-playlist">

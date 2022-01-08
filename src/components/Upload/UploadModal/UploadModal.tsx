@@ -175,7 +175,12 @@ function UploadModal({ selectedFile, setModal }: any) {
             />
             <div>Upload image</div>
           </button>
-          <input type="file" id="file-input" onChange={imageToUrl} />
+          <input
+            type="file"
+            id="file-input"
+            accept=".png"
+            onChange={imageToUrl}
+          />
         </div>
 
         <div className="upload-info">

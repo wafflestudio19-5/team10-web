@@ -266,7 +266,12 @@ function ArtistPage() {
                   />
                   <div>Upload header image</div>
                 </button>
-                <input type="file" id="file-input3" onChange={changeHeader} />
+                <input
+                  type="file"
+                  id="file-input3"
+                  accept=".png"
+                  onChange={changeHeader}
+                />
               </div>
             )}
           </div>

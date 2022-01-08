@@ -125,6 +125,7 @@ function EditModal({ user, modal, setModal, getUser }: any) {
               <input
                 type="file"
                 id="file-input2"
+                accept=".png"
                 onClick={clearEvent}
                 onChange={imgToUrl}
               />
