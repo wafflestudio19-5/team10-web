@@ -20,46 +20,29 @@ const SocialLogin = ({
   const history = useHistory();
   const responseGoogle = (response: any) => {
     axios({
-      method: "post",
-      url: "/signup",
-      data: { email: response.profileObj.email },
-    }).catch((e) => {
-      e.response.status === 400
-        ? axios({
-            method: "post",
-            url: "/signup",
-            data: {
-              display_name: response.profileObj.name,
-              email: response.profileObj.email,
-              password: response.googleId,
-              gender: "yet",
-              age: 20,
-            },
-          })
-            .then(async (res) => {
-              localStorage.setItem("permalink", res.data.permalink);
-              localStorage.setItem("jwt_token", res.data.token);
-              history.push("/discover");
-            })
-            .catch(() => {
-              toast.error("회원가입 실패");
-            })
-        : e.response.status === 409
-        ? toast.error("지금은 소셜로그인이 안됩니다 500 error")
-        : console.log("회원가입 에러입니다");
-    });
-    // axios({
-    //   method: "get",
-    //   url: "/google/callback",
-    //   data: {
-    //     email: profile.email,
-    //     family_name: profile.familyName === undefined ? "" : profile.familyName,
-    //     given_name: profile.givenName === undefined ? "" : profile.givenName,
-    //     name: profile.name,
-    //   },
-    // })
-    //   .then((r) => console.log(r))
-    //   .catch((e) => console.dir(e));
+      method: "put",
+      url: "/google/callback",
+      data: {
+        email: response.profileObj.email,
+        family_name:
+          response.profileObj.familyName === undefined
+            ? ""
+            : response.profileObj.familyName,
+        given_name:
+          response.profileObj.givenName === undefined
+            ? ""
+            : response.profileObj.givenName,
+        name: response.profileObj.name,
+      },
+    })
+      .then(async (res) => {
+        localStorage.setItem("permalink", res.data.permalink);
+        localStorage.setItem("jwt_token", res.data.token);
+        history.push("/discover");
+      })
+      .catch(() => {
+        toast.error("회원가입 실패");
+      });
   };
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
