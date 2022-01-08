@@ -15,25 +15,23 @@ const AlbumImage = ({
   const imgRef = useRef(null);
   return (
     <div className={styles.albumImage} onClick={openModal}>
-      {track.image ? (
-        <img
-          ref={imgRef}
-          src={track.image}
-          alt={`${track.title}의 트랙 이미지`}
-          crossOrigin="anonymous"
-          onLoad={() => {
-            const colorThief = new ColorThief();
-            const colors = colorThief.getColor(imgRef.current);
-            const { current }: any = trackHeader;
-            const [red, green, blue] = colors;
-            if (current !== null) {
-              current.style.setProperty("--red", `${red}`);
-              current.style.setProperty("--green", `${green}`);
-              current.style.setProperty("--blue", `${blue}`);
-            }
-          }}
-        />
-      ) : null}
+      <img
+        ref={imgRef}
+        src={track.image || "/default.track_image.svg"}
+        alt={`${track.title}의 트랙 이미지`}
+        crossOrigin="anonymous"
+        onLoad={() => {
+          const colorThief = new ColorThief();
+          const colors = colorThief.getColor(imgRef.current);
+          const { current }: any = trackHeader;
+          const [red, green, blue] = colors;
+          if (current !== null) {
+            current.style.setProperty("--red", `${red}`);
+            current.style.setProperty("--green", `${green}`);
+            current.style.setProperty("--blue", `${blue}`);
+          }
+        }}
+      />
     </div>
   );
 };
