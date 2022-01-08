@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AudioInfo from "./AudioInfo";
 import CommentsInput from "./Comments/CommentsInput";
 import ListenArtistInfo from "./ListenArtistInfo";
@@ -59,18 +59,21 @@ const TrackMain = ({
   setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [comments, setComments] = useState<IComment[]>([]);
+  const [commentCount, setCommentCount] = useState(0);
   const [trackLikers, setTrackLikers] = useState<ITrackReposter[]>([]);
   const [likersCount, setLikersCount] = useState(0);
   const [trackReposters, setTrackReposters] = useState<ITrackReposter[]>([]);
   const [repostersCount, setRepostersCount] = useState(0);
-  const [nextUrl, setNextUrl] = useState("");
+  const [isFinalComment, setIsFinalComment] = useState(false);
+  const nextPage = useRef(1);
+  const finalPage = useRef(0);
 
   const { userSecret } = useAuthContext();
 
   const fetchComments = async () => {
     const config: any = {
       method: "get",
-      url: `/tracks/${track.id}/comments`,
+      url: `/tracks/${track.id}/comments?page=${1}&page_size=${30}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
@@ -79,18 +82,27 @@ const TrackMain = ({
     try {
       const response = await axios(config);
       const data = response.data;
+      setCommentCount(data.count);
       setComments(data.results);
-      setNextUrl(data.next);
+      if (data.next) {
+        // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+        nextPage.current += 1;
+      } else {
+        // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+        finalPage.current = nextPage.current;
+        setIsFinalComment(true);
+      }
     } catch (error) {
       console.log(error);
     }
   };
   const fetchNextComments = async () => {
-    if (nextUrl !== null) {
+    if (nextPage.current !== finalPage.current) {
       const config: any = {
         method: "get",
-        url: nextUrl.split("http:")[1],
-        baseURL: "http:/",
+        url: `/tracks/${track.id}/comments?page=${
+          nextPage.current
+        }&page_size=${30}`,
         headers: {
           Authorization: `JWT ${userSecret.jwt}`,
         },
@@ -99,12 +111,47 @@ const TrackMain = ({
       try {
         const response = await axios(config);
         const data = response.data;
+        setCommentCount(data.count);
         setComments(comments.concat(data.results));
-        setNextUrl(data.next);
+        if (data.next) {
+          // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+          nextPage.current += 1;
+        } else {
+          // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+          finalPage.current = nextPage.current;
+          setIsFinalComment(true);
+        }
       } catch (error) {
         console.log(error);
       }
     }
+  };
+
+  const fetchCommentsAgain = async () => {
+    const currentPage =
+      nextPage.current === finalPage.current
+        ? finalPage.current
+        : nextPage.current - 1;
+    const refetchedComments = [];
+    for (let i = 1; i <= currentPage; i++) {
+      const config: any = {
+        method: "get",
+        url: `/tracks/${track.id}/comments?page=${i}&page_size=${30}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const response = await axios(config);
+        setCommentCount(response.data.count);
+        refetchedComments.push(...response.data.results);
+        console.log(refetchedComments);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    setComments([...refetchedComments]);
   };
 
   const handleScroll = () => {
@@ -127,11 +174,11 @@ const TrackMain = ({
   const fetchLikers = async () => {
     const config: any = {
       method: "get",
-      url: `/tracks/${track.id}/likers?page=${1}&page_size=${9}`,
+      url: `/tracks/${track.id}/likers`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
-      data: {},
+      data: { page: 1, page_size: 9 },
     };
     try {
       const { data } = await axios(config);
@@ -144,11 +191,11 @@ const TrackMain = ({
   const fetchReposters = async () => {
     const config: any = {
       method: "get",
-      url: `/tracks/${track.id}/reposters?page=${1}&page_size=${9}`,
+      url: `/tracks/${track.id}/reposters`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
-      data: {},
+      data: { page: 1, page_size: 9 },
     };
     try {
       const { data } = await axios(config);
@@ -170,7 +217,7 @@ const TrackMain = ({
       <div className={styles.leftSide}>
         <div className={styles.header}>
           <CommentsInput
-            fetchComments={fetchNextComments}
+            fetchComments={fetchCommentsAgain}
             track={track}
             userMe={userMe}
           />
@@ -201,9 +248,10 @@ const TrackMain = ({
             <Comments
               comments={comments}
               track={track}
-              fetchComments={fetchNextComments}
+              fetchComments={fetchCommentsAgain}
               userMe={userMe}
-              fetchTrack={fetchTrack}
+              commentCount={commentCount}
+              isFinalComment={isFinalComment}
             />
           </div>
         </div>

@@ -59,6 +59,7 @@ const TrackContext = createContext<ITrackContext>({
     repost_count: 0,
     tags: [],
     is_private: false,
+    audio_length: 0,
   },
   setTrackBarTrack: () => {},
 });
@@ -96,6 +97,7 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     repost_count: 0,
     tags: [],
     is_private: false,
+    audio_length: 0,
   });
 
   return (

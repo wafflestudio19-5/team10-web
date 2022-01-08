@@ -3,7 +3,6 @@ import TrackMain from "./Main/TrackMain";
 import TrackHeader from "./Header/TrackHeader";
 import styles from "./TrackPage.module.scss";
 import TrackModal from "./Modal/TrackModal";
-import TrackBar from "./TrackBar/TrackBar";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
@@ -24,6 +23,7 @@ export interface ITrack {
   repost_count: number;
   tags: string[];
   is_private: boolean;
+  audio_length: number;
 }
 export interface IArtist {
   city: string;
@@ -63,6 +63,7 @@ const TrackPage = () => {
     repost_count: 0,
     tags: [],
     is_private: false,
+    audio_length: 0,
   });
   const [artist, setArtist] = useState<IArtist>({
     city: "",
@@ -109,6 +110,7 @@ const TrackPage = () => {
         repost_count: data.repost_count,
         tags: tagList,
         is_private: data.is_private,
+        audio_length: 0,
       });
       setArtist({
         city: artist.city,
@@ -191,7 +193,6 @@ const TrackPage = () => {
               setEditModal={setEditModal}
             />
           )}
-          {noTrack || <TrackBar />}
         </div>
       )}
     </div>

@@ -335,7 +335,7 @@ const TrackBar = () => {
 
   return (
     <>
-      {audioSrc.length && (
+      {!!audioSrc.length && (
         <div className={styles.container}>
           <div className={styles.main}>
             <button
@@ -416,7 +416,7 @@ const TrackBar = () => {
                     <button
                       className={`${styles.unlikeTrack} ${styles.listenEngagement}`}
                       onClick={unlikeTrack}
-                      disabled={likeLoading}
+                      disabled={likeLoading || likeTrack}
                     >
                       <BsFillSuitHeartFill />
                     </button>
@@ -425,7 +425,7 @@ const TrackBar = () => {
                     <button
                       className={`${styles.likeTrack} ${styles.listenEngagement}`}
                       onClick={onLikeTrack}
-                      disabled={likeLoading}
+                      disabled={likeLoading || !likeTrack}
                     >
                       <BsFillSuitHeartFill />
                     </button>
@@ -434,7 +434,7 @@ const TrackBar = () => {
                     <button
                       className={`${styles.unfollowArtist} ${styles.listenEngagement}`}
                       onClick={unfollowArtist}
-                      disabled={followLoading}
+                      disabled={followLoading || followArtist}
                     >
                       <RiUserUnfollowFill />
                     </button>
@@ -443,7 +443,7 @@ const TrackBar = () => {
                     <button
                       className={`${styles.followAritst} ${styles.listenEngagement}`}
                       onClick={onFollowArtist}
-                      disabled={followLoading}
+                      disabled={followLoading || !followArtist}
                     >
                       <RiUserFollowFill />
                     </button>

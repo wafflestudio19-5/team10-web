@@ -110,6 +110,14 @@ const EditModal = ({
   };
 
   const onSaveChanges = async () => {
+    // if (
+    //   !title ||
+    //   !tPermalink ||
+    //   permalinkList.find((link) => link.permalink === tPermalink) !== undefined
+    // ) {
+    //   toast.error("제목과 링크를 확인해 주세요");
+    //   return;
+    // }
     let config: any;
     if (imageFile) {
       config = {
@@ -148,6 +156,13 @@ const EditModal = ({
         setModal(false);
       }
     } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.status === 400
+      ) {
+        toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+      }
       console.log(error);
     }
   };
@@ -265,16 +280,7 @@ const EditModal = ({
           >
             Cancel
           </button>
-          <button
-            className={styles["save-button"]}
-            onClick={onSaveChanges}
-            disabled={
-              !title ||
-              !tPermalink ||
-              permalinkList.find((link) => link.permalink === tPermalink) !==
-                undefined
-            }
-          >
+          <button className={styles["save-button"]} onClick={onSaveChanges}>
             Save
           </button>
         </div>

@@ -3,7 +3,8 @@ import { BiPencil } from "react-icons/bi";
 import { MdPlaylistAdd } from "react-icons/md";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 import { AiOutlineDown } from "react-icons/ai";
-import { BsSoundwave, BsFillFileLock2Fill } from "react-icons/bs";
+import { BsSoundwave } from "react-icons/bs";
+// import { BsFillFileLock2Fill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import { FcComments } from "react-icons/fc";
 import { BsSuitHeartFill, BsTrashFill } from "react-icons/bs";
@@ -15,7 +16,7 @@ import { useEffect, useState } from "react";
 import UploadHeader from "../UploadHeader/UploadHeader";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
-import ReactTooltip from "react-tooltip";
+// import ReactTooltip from "react-tooltip";
 import { ITag, ITrack } from "../../ArtistPage/Track/TrackPage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -298,7 +299,7 @@ const Track = ({
 }) => {
   const [checked, setChecked] = useState(false);
   const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
-  const [duration, setDuration] = useState(0);
+  //   const [duration, setDuration] = useState(0);
   const [play, setPlay] = useState(false);
   const player = useRef<HTMLAudioElement>(null);
   const { userSecret } = useAuthContext();
@@ -346,6 +347,7 @@ const Track = ({
             repost_count: data.repost_count,
             tags: tagList,
             is_private: data.is_private,
+            audio_length: 0,
           });
         } catch (error) {
           console.log(error);
@@ -364,19 +366,19 @@ const Track = ({
     }
   }, [audioSrc, trackIsPlaying]);
 
-  const calculateTime = (secs: number) => {
-    // 트랙 길이를 분:초 단위로 환산
-    const minutes = Math.floor(secs / 60);
-    const seconds = Math.floor(secs % 60);
-    const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
-    return `${minutes}:${returnedSeconds}`;
-  };
+  //   const calculateTime = (secs: number) => {
+  //     // 트랙 길이를 분:초 단위로 환산
+  //     const minutes = Math.floor(secs / 60);
+  //     const seconds = Math.floor(secs % 60);
+  //     const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+  //     return `${minutes}:${returnedSeconds}`;
+  //   };
 
-  const onLoadedMetadata = () => {
-    if (player.current) {
-      setDuration(player.current.duration);
-    }
-  };
+  //   const onLoadedMetadata = () => {
+  //     if (player.current) {
+  //       setDuration(player.current.duration);
+  //     }
+  //   };
 
   const togglePlayButton = () => {
     if (fetchedTrack) {
@@ -401,7 +403,7 @@ const Track = ({
     }
   };
 
-  const releasedDate = dayjs(fetchedTrack?.created_at).fromNow();
+  //   const releasedDate = dayjs(fetchedTrack?.created_at).fromNow();
   const clickTitle = () =>
     history.push(`/${userSecret.permalink}/${track.permalink}`);
 
@@ -456,7 +458,7 @@ const Track = ({
         ref={player}
         src={fetchedTrack?.audio}
         preload="metadata"
-        onLoadedMetadata={onLoadedMetadata}
+        // onLoadedMetadata={onLoadedMetadata}
       />
       <input
         type="checkbox"
@@ -522,7 +524,7 @@ const Track = ({
               </button>
             </div>
           </div>
-          <div className={styles.extra}>
+          {/* <div className={styles.extra}>
             {fetchedTrack?.is_private && (
               <div className={styles.private}>
                 <span data-tip="This track is private.">
@@ -531,11 +533,11 @@ const Track = ({
                 <ReactTooltip />
               </div>
             )}
-          </div>
-          <div className={styles.duration}>
+          </div> */}
+          {/* <div className={styles.duration}>
             <span>{duration !== 0 && calculateTime(duration)}</span>
           </div>
-          <div className={styles.uploadTime}>{releasedDate}</div>
+          <div className={styles.uploadTime}>{releasedDate}</div> */}
         </div>
       </div>
     </li>

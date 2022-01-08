@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Comments.module.scss";
 import { FcComments } from "react-icons/fc";
 import { BsFillReplyFill, BsTrashFill } from "react-icons/bs";
@@ -18,21 +18,16 @@ const Comments = ({
   track,
   fetchComments,
   userMe,
-  fetchTrack,
+  commentCount,
+  isFinalComment,
 }: {
   comments: IComment[];
   track: ITrack;
   fetchComments: () => void;
   userMe: IUserMe;
-  fetchTrack: () => void;
+  commentCount: number;
+  isFinalComment: boolean;
 }) => {
-  const [isFinalComment, setIsFinalComment] = useState(false);
-  useEffect(() => {
-    if (track.comment_count === comments.length) {
-      setIsFinalComment(true);
-    }
-  }, [comments]);
-
   const sortedComments = comments.reduce((sorted: any, comment: IComment) => {
     if (!sorted[comment.group]) {
       sorted[comment.group] = [];
@@ -46,7 +41,7 @@ const Comments = ({
     >
       <header>
         <FcComments />
-        <span>{track.count} comments</span>
+        <span>{commentCount} comments</span>
       </header>
       <ul className={styles.commentsList}>
         {comments.length !== 0
@@ -58,7 +53,6 @@ const Comments = ({
                   track={track}
                   fetchComments={fetchComments}
                   userMe={userMe}
-                  fetchTrack={fetchTrack}
                 />
               );
             })
@@ -73,13 +67,11 @@ const CommentItem = ({
   track,
   fetchComments,
   userMe,
-  fetchTrack,
 }: {
   comments: IComment[];
   track: ITrack;
   fetchComments: () => void;
   userMe: IUserMe;
-  fetchTrack: () => void;
 }) => {
   const [showReply, setShowReply] = useState(false);
   const [commentInput, setInput] = useState("");
@@ -108,7 +100,6 @@ const CommentItem = ({
       const response = await axios(config);
       console.log(response);
       fetchComments();
-      fetchTrack();
     } catch (error) {
       console.log(console.error());
     }
