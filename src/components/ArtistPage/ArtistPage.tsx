@@ -97,9 +97,16 @@ function ArtistPage() {
       .get(`/users/${id}/tracks?page=${page}`)
       .then((res) => {
         if (page === 1) {
-          setTracks(res.data.results);
+          setTracks(
+            res.data.results.filter((item: any) => item.is_private === false)
+          );
         } else {
-          setTracks((item: any) => [...item, ...res.data.results]);
+          setTracks((item: any) => [
+            ...item,
+            ...res.data.results.filter(
+              (item: any) => item.is_private === false
+            ),
+          ]);
         }
         if (res.data.next === null) {
           setTrackPage(null);
