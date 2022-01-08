@@ -38,7 +38,7 @@ const SignIn = ({
               password: password,
             })
             .then(async (res) => {
-              if (localStorage.getItem("jwt_token") !== res.data.permalink) {
+              if (localStorage.getItem("jwt_token") !== res.data.token) {
                 localStorage.setItem("permalink", res.data.permalink); // 민석님이 제안하신대로 로컬스토리지에 저장하도록 했습니다!
                 localStorage.setItem("jwt_token", res.data.token);
                 localStorage.setItem("id", res.data.id);
