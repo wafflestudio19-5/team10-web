@@ -1,5 +1,8 @@
 import axios from "axios";
 import { useRef } from "react";
+import { GoogleLogin } from "react-google-login";
+import toast from "react-hot-toast";
+import { useHistory } from "react-router-dom";
 
 const SocialLogin = ({
   handleInput,
@@ -14,15 +17,50 @@ const SocialLogin = ({
 }) => {
   const input = useRef<HTMLInputElement>(null);
   input.current?.focus();
+  const history = useHistory();
+  const responseGoogle = (response: any) => {
+    axios({
+      method: "put",
+      url: "/google/callback",
+      data: {
+        email: response.profileObj.email,
+        family_name:
+          response.profileObj.familyName === undefined
+            ? ""
+            : response.profileObj.familyName,
+        given_name:
+          response.profileObj.givenName === undefined
+            ? ""
+            : response.profileObj.givenName,
+        name: response.profileObj.name,
+      },
+    })
+      .then(async (res) => {
+        localStorage.setItem("permalink", res.data.permalink);
+        localStorage.setItem("jwt_token", res.data.token);
+        history.push("/discover");
+      })
+      .catch(() => {
+        toast.error("회원가입 실패");
+      });
+  };
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <div className="social">대충 소셜로그인</div>
+      <div className="social">
+        <GoogleLogin
+          clientId="576044232702-6jhp3bvsksuedov3pd4sjhdcvqntog4e.apps.googleusercontent.com"
+          buttonText="Login"
+          onSuccess={responseGoogle}
+          onFailure={responseGoogle}
+          cookiePolicy={"single_host_origin"}
+        />
+      </div>
       <div className="or">——————————— &nbsp;or&nbsp; ———————————</div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
           axios
-            .post(`https://api.soundwaffle.com/signup`, {
+            .post(`/signup`, {
               email: email,
             })
             .catch((e) => {
@@ -37,7 +75,7 @@ const SocialLogin = ({
         <input
           ref={input}
           type="email"
-          placeholder="Your email addressor profile URL"
+          placeholder="Your email address or profile URL"
           onChange={handleInput}
           name="email"
           value={email}

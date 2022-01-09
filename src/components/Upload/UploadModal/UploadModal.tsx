@@ -1,21 +1,25 @@
 import axios from "axios";
 import { useState } from "react";
-import Cookies from "universal-cookie";
-import { AuthContext } from "../../../Context";
+import toast from "react-hot-toast";
+import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
-function UploadModal({ selectedFile }: any) {
-  // 삭제예정
-  const cookies = new Cookies();
-  const token = cookies.get("jwt_token");
-  const permalink = cookies.get("permalink");
+function UploadModal({ selectedFile, setModal }: any) {
+  const { userSecret } = useAuthContext();
 
-  const { userSecret } = AuthContext(); // 나중에 token, permalink 이걸로 적용
+  const permalink = userSecret.permalink;
+  const token = userSecret.jwt;
+  const trackPermalink = selectedFile.name.substr(
+    0,
+    selectedFile.name.indexOf(".")
+  );
+
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -32,46 +36,115 @@ function UploadModal({ selectedFile }: any) {
     setImageFile(event.target.files[0]);
   };
 
+  const changeTrackPermalink = (event: any) => {
+    setTPermalink(event.target.value);
+  };
+
   const handleUpload = (e: any) => {
     e.preventDefault();
-    axios
-      .post(
-        "https://api.soundwaffle.com/tracks",
-        {
-          title: title,
-          permalink: permalink,
-          description: description,
-          is_private: isPrivate,
-          audio_filename: selectedFile.name,
-          image_filename: imageFile.name,
-        },
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
+    if (imageFile) {
+      axios
+        .post(
+          "https://api.soundwaffle.com/tracks",
+          {
+            title: title,
+            permalink: tPermalink,
+            description: description,
+            is_private: isPrivate,
+            audio_filename: selectedFile.name,
+            image_filename: imageFile.name,
           },
-        }
-      )
-      .then((res) => {
-        console.log(res);
-        const img_options = {
-          headers: {
-            "Content-Type": imageFile.type,
-          },
-        };
-        axios
-          .put(res.data.image_presigned_url, imageFile, img_options)
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          const music_options = {
+            headers: {
+              "Content-Type": selectedFile.type,
+            },
+          };
 
-    console.log(userSecret);
+          axios
+            .put(res.data.audio_presigned_url, selectedFile, music_options)
+            .then(() => {
+              toast("음악파일 업로드 완료");
+            })
+            .catch(() => {
+              toast("음악파일 업로드 실패");
+            });
+
+          const img_options = {
+            headers: {
+              "Content-Type": imageFile.type,
+            },
+          };
+
+          axios
+            .put(res.data.image_presigned_url, imageFile, img_options)
+            .then(() => {
+              toast("이미지파일 업로드 완료");
+            })
+            .catch(() => {
+              toast("이미지파일 업로드 실패");
+            });
+
+          setModal(false);
+        })
+        .catch(() => {
+          toast("업로드 실패");
+          if (title === null) {
+            toast("제목은 필수입니다.");
+          }
+        });
+    } else {
+      axios
+        .post(
+          "https://api.soundwaffle.com/tracks",
+          {
+            title: title,
+            permalink: tPermalink,
+            description: description,
+            is_private: isPrivate,
+            audio_filename: selectedFile.name,
+          },
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          const music_options = {
+            headers: {
+              "Content-Type": selectedFile.type,
+            },
+          };
+
+          axios
+            .put(res.data.audio_presigned_url, selectedFile, music_options)
+            .then(() => {
+              toast("음악파일 업로드 완료");
+            })
+            .catch(() => {
+              toast("음악파일 업로드 실패");
+            });
+
+          setModal(false);
+        })
+        .catch(() => {
+          toast("업로드 실패");
+          toast("트랙 url이 중복되었는지 확인해주세요");
+          if (title === null) {
+            toast("제목은 필수입니다.");
+          }
+          if (/[ㄱ-ㅎ|가-힣]/.test(tPermalink)) {
+            toast("트랙 url은 영어 / 영어+숫자만 가능합니다");
+          }
+        });
+    }
   };
 
   return (
@@ -102,17 +175,25 @@ function UploadModal({ selectedFile }: any) {
             />
             <div>Upload image</div>
           </button>
-          <input type="file" id="file-input" onChange={imageToUrl} />
+          <input
+            type="file"
+            id="file-input"
+            accept=".png"
+            onChange={imageToUrl}
+          />
         </div>
 
         <div className="upload-info">
           <div className="upload-info-title">
-            <text>Title</text>
+            <text>Title *</text>
             <input
               placeholder="Name your track"
               onChange={(e) => setTitle(e.target.value)}
             />
-            <div>soundcloud.com/username/title</div>
+            <div className="upload-info-permalink">
+              <div>{`soundcloud.com/${permalink}/`}</div>
+              <input value={tPermalink} onChange={changeTrackPermalink} />
+            </div>
           </div>
           <div className="upload-info-genre">
             <text>Genre</text>
@@ -142,7 +223,7 @@ function UploadModal({ selectedFile }: any) {
                 id="flexRadioDefault2"
                 onChange={() => setIsPrivate(false)}
               />
-              <label className="form-check-label">Public</label>
+              <label className="form-check-label">Public (defualt)</label>
             </div>
             <div className="form-check">
               <input

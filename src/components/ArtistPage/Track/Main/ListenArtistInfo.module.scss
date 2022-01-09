@@ -8,8 +8,6 @@
     padding: 2px 9px 2px 8px;
     border: none;
     border-radius: 4px;
-    background-color: #ff5500;
-    color: white;
     cursor: pointer;
     svg,
     span {
@@ -19,20 +17,14 @@
       margin-left: 3px;
     }
   }
-  a {
-    display: block;
-    color: #333333;
-    margin-top: 26px;
-    cursor: pointer;
-    svg,
-    span {
-      vertical-align: middle;
-      font-size: 13px;
-    }
-    span {
-      margin-left: 5px;
-      font-size: 11px;
-    }
+  .followArtist {
+    background-color: #ff5500;
+    color: white;
+  }
+  .unfollowArtist {
+    background-color: white;
+    color: #ff5500;
+    border: 1px solid #ff5500;
   }
 }
 .profileImg {

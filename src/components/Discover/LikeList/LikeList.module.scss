@@ -1,0 +1,15 @@
+.noLikeWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .noLike {
+    width: 150px;
+    height: 150px;
+    color: #999999;
+  }
+  div {
+    color: #999999;
+    font-size: 14px;
+  }
+}

@@ -1,205 +1,409 @@
 import "./ArtistPage.scss";
-import ReactAudioPlayer from "react-audio-player";
 import { Grid } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Cookies from "universal-cookie";
+import { useParams } from "react-router-dom";
+import EditModal from "./EditModal/EditModal";
+import toast from "react-hot-toast";
+import TrackBox from "./TrackBox/TrackBox";
+import { useAuthContext } from "../../context/AuthContext";
+import { useInView } from "react-intersection-observer";
 
 function ArtistPage() {
-  //삭제예정
-  const cookies = new Cookies();
-  const token = cookies.get("jwt_token");
+  const [isLoading, setIsLoading] = useState<boolean>();
 
-  const [displayName, setDisplayName] = useState<string>();
+  const { userSecret } = useAuthContext();
+  const params = useParams<any>();
+  const permalink = params.permalink;
+  const [isMe, setIsMe] = useState<boolean>();
+  const [pageId, setPageId] = useState<number>();
+  const [myId, setMyId] = useState<number>();
+
+  const [modal, setModal] = useState(false);
+  const [user, setUser] = useState<any>();
+  const [header, setHeader] = useState<any>();
+  const [ref, inView] = useInView();
+
+  const [tracks, setTracks] = useState<any>();
+  const [trackPage, setTrackPage] = useState<any>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>();
+
+  const clickImageInput = (event: any) => {
+    event.preventDefault();
+    let fileInput = document.getElementById("file-input3");
+    fileInput?.click();
+  };
+
+  const changeHeader = (event: any) => {
+    const changeHeaderImg = async () => {
+      const config: any = {
+        method: "patch",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {
+          image_header_filename: event.target.files[0].name,
+        },
+      };
+      try {
+        const res = await axios(config);
+        const img_options = {
+          headers: {
+            "Content-Type": event.target.files[0].type,
+          },
+        };
+        axios
+          .put(
+            res.data.image_header_presigned_url,
+            event.target.files[0],
+            img_options
+          )
+          .then(() => {
+            getUser(user.id);
+          })
+          .catch(() => {
+            toast("헤더이미지 업로드 실패");
+          });
+      } catch (error) {
+        toast("헤더이미지 업로드 실패");
+        toast("파일 이름이 영문이어야 합니다. \n png 파일이어야 합니다");
+      }
+    };
+    changeHeaderImg();
+    getUser(pageId);
+  };
+
+  const getUser = (id: any) => {
+    axios
+      .get(`users/${id}`)
+      .then((res) => {
+        setUser(res.data);
+        if (res.data.image_header === null) {
+          setHeader(
+            "https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
+          );
+        } else {
+          setHeader(res.data.image_header);
+        }
+      })
+      .catch(() => {
+        toast("유저 정보 불러오기 실패");
+      });
+  };
+
+  const getTracks = async (id: any, page: any) => {
+    axios
+      .get(`/users/${id}/tracks?page=${page}`)
+      .then((res) => {
+        if (page === 1) {
+          setTracks(
+            res.data.results.filter((item: any) => item.is_private === false)
+          );
+        } else {
+          setTracks((item: any) => [
+            ...item,
+            ...res.data.results.filter(
+              (item: any) => item.is_private === false
+            ),
+          ]);
+        }
+        if (res.data.next === null) {
+          setTrackPage(null);
+        } else {
+          setTrackPage(page + 1);
+        }
+      })
+      .catch(() => {
+        toast("트랙 정보 불러오기 실패");
+      });
+  };
+
+  const getFollowers = (id: any, myPermalink: any) => {
+    // 팔로워 불러오기
+    axios
+      .get(`users/${id}/followers`)
+      .then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/followers?page=${page}`).then((res) => {
+            const filter = res.data.results.filter(
+              (item: any) => item.permalink == myPermalink
+            );
+            if (filter.length === 0) {
+              setIsFollowing(false);
+            } else {
+              setIsFollowing(true);
+            }
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast("팔로워 불러오기 실패");
+      });
+  };
+
+  const followUser = async () => {
+    const config: any = {
+      method: "post",
+      url: `/users/me/followings/${pageId}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+    };
+    try {
+      await axios(config);
+      setIsFollowing(true);
+      getUser(pageId);
+    } catch (error) {
+      toast("팔로우 실패");
+    }
+  };
+
+  const unfollowUser = async () => {
+    const config: any = {
+      method: "delete",
+      url: `/users/me/followings/${pageId}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+    };
+    try {
+      await axios(config);
+      setIsFollowing(false);
+      getUser(pageId);
+    } catch (error) {
+      toast("언팔로우 실패");
+    }
+  };
 
   useEffect(() => {
-    const permalink = "permalink"; //url에서 가져오는 걸로 바꾸기
+    setIsLoading(true);
 
-    //resolve api
+    const myPermalink = localStorage.getItem("permalink");
+
+    // 내 페이지인지 확인
+    if (permalink === myPermalink) {
+      setIsMe(true);
+    } else {
+      setIsMe(false);
+    }
+
+    // 내 아이디 받아오기 (나중에 context로 바꾸기)
+    const myResolve = `https://soundwaffle.com/${myPermalink}`;
     axios
-      .get(`https://api.soundwaffle.com/resolve?url=${permalink}`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      })
+      .get(`resolve?url=${myResolve}`)
       .then((res) => {
-        console.log(res);
+        setMyId(res.data.id);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        toast("유저 아이디 불러오기 실패");
       });
 
-    //user_id 가져왔다 치고
-    axios
-      .get(`https://api.soundwaffle.com/users/6`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        setDisplayName(res.data.display_name);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
+    const getInfo = () => {
+      // resolve api
+      const url = `https://soundwaffle.com/${permalink}`;
+      axios
+        .get(`resolve?url=${url}`)
+        .then((res1) => {
+          setPageId(res1.data.id);
+          // 유저 정보
+          getUser(res1.data.id);
+          //트랙 불러오기
+          getTracks(res1.data.id, 1);
+          //팔로워 불러오기
+          getFollowers(res1.data.id, myPermalink);
+        })
+        .catch(() => {
+          toast("정보 불러오기 실패");
+        });
+    };
+    getInfo();
+    setIsLoading(false);
+  }, []);
 
-  return (
-    <div className="artistpage-wrapper">
-      <div className={"artistpage"}>
-        <div className={"profile-header"}>
-          <img
-            src={"https://lovemewithoutall.github.io/assets/images/kiki.jpg"}
-            alt={"profileImg"}
-          />
-          <div className={"name"}>
-            <div className={"displayname"}>{displayName}</div>
-            <div className={"username"}>UserName</div>
-          </div>
-        </div>
+  useEffect(() => {
+    if (!isLoading && trackPage !== null) {
+      if (inView) {
+        getTracks(pageId, trackPage);
+      }
+    }
+  }, [inView]);
 
-        <div className={"menu-bar"}>
-          <div className={"menu-left"}>
-            <a href={"/userid"}>All</a>
-            <a href={"/userid/popular-tracks"}>Popular tracks</a>
-            <a href={"/userid/tracks"}>Tracks</a>
-            <a href={"/userid/albums"}>Albums</a>
-            <a href={"/userid/sets"}>Playlists</a>
-            <a href={"/userid/reposts"}>Reposts</a>
-          </div>
-          <div className={"menu-right"}>
-            <button className="button1">
+  if (isLoading || user === undefined) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <div className="artistpage-wrapper">
+        <div className={"artistpage"}>
+          <div className={"profile-header"}>
+            <img className="header-img" src={header} />
+            {user.image_profile === null && (
               <img
-                src="https://a-v2.sndcdn.com/assets/images/start-station-ea018c5a.svg"
-                alt="station"
+                className="profile-img"
+                src={"img/user_img.png"}
+                alt={"profileImg"}
               />
-              <div>Station</div>
-            </button>
-            <button className="button2">
+            )}
+            {user.image_profile !== null && (
               <img
-                src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDE0IDE0Ij4KICA8cGF0aCBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTUuNTQyIDEuMTY3YzIuNzcgMCAzLjM4NiAyLjkxNiAyLjE1NSA2LjEyNSAzLjE2OSAxLjMwOCAzLjM4NiAzLjk3NyAzLjM4NiA0Ljk1OEgwYzAtLjk4MS4yMTgtMy42NSAzLjM4Ny00Ljk1OC0xLjIzMi0zLjIxOC0uNjE2LTYuMTI1IDIuMTU1LTYuMTI1em0wIDEuMTY2Yy0xLjU4NCAwLTIuMTI3IDEuNzctMS4wNjYgNC41NDIuMjI2LjU5LS4wNiAxLjI1NC0uNjQ0IDEuNDk1LTEuNTE3LjYyNi0yLjI2MyAxLjU3Mi0yLjUzNyAyLjcxM2g4LjQ5NGMtLjI3NS0xLjE0MS0xLjAyLTIuMDg3LTIuNTM3LTIuNzEzYTEuMTY3IDEuMTY3IDAgMCAxLS42NDQtMS40OTZjMS4wNi0yLjc2NC41MTYtNC41NC0xLjA2Ni00LjU0em02LjQxNC0uNTgzYy4xNyAwIC4yOTQuMTMuMjk0LjI5MlYzLjVoMS40NThjLjE1NyAwIC4yOTIuMTMyLjI5Mi4yOTR2LjU3OGMwIC4xNy0uMTMuMjk1LS4yOTIuMjk1SDEyLjI1djEuNDU4YS4yOTYuMjk2IDAgMCAxLS4yOTQuMjkyaC0uNTc4YS4yODkuMjg5IDAgMCAxLS4yOTUtLjI5MlY0LjY2N0g5LjYyNWEuMjk2LjI5NiAwIDAgMS0uMjkyLS4yOTV2LS41NzhjMC0uMTcuMTMxLS4yOTQuMjkyLS4yOTRoMS40NThWMi4wNDJjMC0uMTU3LjEzMi0uMjkyLjI5NS0uMjkyaC41Nzh6Ii8+Cjwvc3ZnPgo="
-                alt="follow"
+                className="profile-img"
+                src={user.image_profile}
+                alt={"profileImg"}
               />
-              <div>Follow</div>
-            </button>
-            <button className="button3">
-              <img
-                src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
-                alt="share"
-              />
-              <div>Share</div>
-            </button>
-            <button className="button4">
-              <img
-                src="https://a-v2.sndcdn.com/assets/images/message-a0c65ef1.svg"
-                alt="message"
-              />
-            </button>
-            <button className="button5">
-              <img
-                src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjE0cHgiIGhlaWdodD0iNHB4IiB2aWV3Qm94PSIwIDAgMTQgNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICA8dGl0bGU+bW9yZTwvdGl0bGU+CiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9InJnYigzNCwgMzQsIDM0KSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSI3IiBjeT0iMiIgcj0iMiIvPgogICAgPGNpcmNsZSBjeD0iMTIiIGN5PSIyIiByPSIyIi8+CiAgPC9nPgo8L3N2Zz4K"
-                alt="more"
-              />
-            </button>
-          </div>
-        </div>
-
-        <div className="artist-body">
-          <div className={"recent"}>
-            <text>Recent</text>
-            <div className={"recent-track"}>
-              <img
-                src={
-                  "https://i1.sndcdn.com/artworks-000365835504-u9iyi3-t500x500.jpg"
-                }
-                alt={"trackImg"}
-              />
-              <div className={"track-right"}>
-                <div className={"track-info"}>
-                  <button>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="25"
-                      height="25"
-                      fill="white"
-                      className="bi bi-caret-right-fill"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
-                    </svg>
-                  </button>
-                  <div className={"track-info-name"}>
-                    <div className={"artistname"}>ArtistName</div>
-                    <div className={"trackname"}>TrackName</div>
-                  </div>
+            )}
+            <div className={"name"}>
+              <div className={"displayname"}>{user.display_name}</div>
+              {user.first_name + user.last_name !== "" && (
+                <div className={"username"}>
+                  {user.first_name + user.last_name}
                 </div>
-                <ReactAudioPlayer
-                  className="player"
-                  controls
-                  src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-                />
-                <div className={"comment"}>
+              )}
+            </div>
+            {isMe === true && (
+              <div className="upload-header-image">
+                <button onClick={clickImageInput}>
                   <img
-                    src="https://lovemewithoutall.github.io/assets/images/kiki.jpg"
-                    alt="me"
+                    src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
+                    alt="img"
                   />
-                  <input placeholder={"Write a comment"} />
-                </div>
-                <div className={"track-buttons"}>
-                  <button>
+                  <div>Upload header image</div>
+                </button>
+                <input
+                  type="file"
+                  id="file-input3"
+                  accept=".png"
+                  onChange={changeHeader}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className={"menu-bar"}>
+            <div className={"menu-left"}>
+              <a href={`/${permalink}`}>All</a>
+              <a href={`/${permalink}/popular-tracks`}>Popular tracks</a>
+              <a href={`/${permalink}/tracks`}>Tracks</a>
+              <a href={`/${permalink}/albums`}>Albums</a>
+              <a href={`/${permalink}/sets`}>Playlists</a>
+              <a href={`/${permalink}/reposts`}>Reposts</a>
+            </div>
+            {isMe === true && (
+              <div className="menu-right">
+                <button className="button3">
+                  <img
+                    src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
+                    alt="share"
+                  />
+                  <div>Share</div>
+                </button>
+                <button className="button6" onClick={() => setModal(true)}>
+                  <img
+                    src="https://a-v2.sndcdn.com/assets/images/edit-2fe52d66.svg"
+                    alt="edit"
+                  />
+                  <div>Edit</div>
+                </button>
+                <EditModal
+                  user={user}
+                  modal={modal}
+                  setModal={setModal}
+                  getUser={getUser}
+                />
+              </div>
+            )}
+            {isMe === false && (
+              <div className={"menu-right"}>
+                <button className="button1">
+                  <img
+                    src="https://a-v2.sndcdn.com/assets/images/start-station-ea018c5a.svg"
+                    alt="station"
+                  />
+                  <div>Station</div>
+                </button>
+                {isFollowing === false && (
+                  <button className="button2" onClick={followUser}>
                     <img
-                      src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjAuMyAoNzg5MSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+DQogICAgPHRpdGxlPnN0YXRzX2xpa2VzX2dyZXk8L3RpdGxlPg0KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPg0KICAgIDxkZWZzLz4NCiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBza2V0Y2g6dHlwZT0iTVNQYWdlIj4NCiAgICAgICAgPHBhdGggZD0iTTEwLjgwNDk4MTgsMyBDOC43ODQ3MTU3OSwzIDguMDAwNjUyODUsNS4zNDQ4NjQ4NiA4LjAwMDY1Mjg1LDUuMzQ0ODY0ODYgQzguMDAwNjUyODUsNS4zNDQ4NjQ4NiA3LjIxMjk2Mzg3LDMgNS4xOTYwNDQ5NCwzIEMzLjQ5NDMxMzE4LDMgMS43NDgzNzQsNC4wOTU5MjY5NCAyLjAzMDA4OTk2LDYuNTE0MzA1MzIgQzIuMzczNzI3NjUsOS40NjY3Mzc3NSA3Ljc1NDkxOTE3LDEyLjk5Mjg3MzggNy45OTMxMDk1OCwxMy4wMDEwNTU3IEM4LjIzMTI5OTk4LDEzLjAwOTIzNzggMTMuNzMwOTgyOCw5LjI3ODUzNzggMTMuOTgxNDU5LDYuNTAxMjQwNSBDMTQuMTg3ODY0Nyw0LjIwMDk3MDIzIDEyLjUwNjcxMzYsMyAxMC44MDQ5ODE4LDMgWiIgaWQ9IkltcG9ydGVkLUxheWVycyIgZmlsbD0icmdiKDM0LCAzNCwgMzQpIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIi8+DQogICAgPC9nPg0KPC9zdmc+DQo="
-                      alt="heart"
+                      src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDE0IDE0Ij4KICA8cGF0aCBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTUuNTQyIDEuMTY3YzIuNzcgMCAzLjM4NiAyLjkxNiAyLjE1NSA2LjEyNSAzLjE2OSAxLjMwOCAzLjM4NiAzLjk3NyAzLjM4NiA0Ljk1OEgwYzAtLjk4MS4yMTgtMy42NSAzLjM4Ny00Ljk1OC0xLjIzMi0zLjIxOC0uNjE2LTYuMTI1IDIuMTU1LTYuMTI1em0wIDEuMTY2Yy0xLjU4NCAwLTIuMTI3IDEuNzctMS4wNjYgNC41NDIuMjI2LjU5LS4wNiAxLjI1NC0uNjQ0IDEuNDk1LTEuNTE3LjYyNi0yLjI2MyAxLjU3Mi0yLjUzNyAyLjcxM2g4LjQ5NGMtLjI3NS0xLjE0MS0xLjAyLTIuMDg3LTIuNTM3LTIuNzEzYTEuMTY3IDEuMTY3IDAgMCAxLS42NDQtMS40OTZjMS4wNi0yLjc2NC41MTYtNC41NC0xLjA2Ni00LjU0em02LjQxNC0uNTgzYy4xNyAwIC4yOTQuMTMuMjk0LjI5MlYzLjVoMS40NThjLjE1NyAwIC4yOTIuMTMyLjI5Mi4yOTR2LjU3OGMwIC4xNy0uMTMuMjk1LS4yOTIuMjk1SDEyLjI1djEuNDU4YS4yOTYuMjk2IDAgMCAxLS4yOTQuMjkyaC0uNTc4YS4yODkuMjg5IDAgMCAxLS4yOTUtLjI5MlY0LjY2N0g5LjYyNWEuMjk2LjI5NiAwIDAgMS0uMjkyLS4yOTV2LS41NzhjMC0uMTcuMTMxLS4yOTQuMjkyLS4yOTRoMS40NThWMi4wNDJjMC0uMTU3LjEzMi0uMjkyLjI5NS0uMjkyaC41Nzh6Ii8+Cjwvc3ZnPgo="
+                      alt="follow"
                     />
-                    <div>121K</div>
+                    <div>Follow</div>
                   </button>
-                  <button>
+                )}
+                {isFollowing === true && (
+                  <button className="button7" onClick={unfollowUser}>
                     <img
-                      src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggMy4wLjMgKDc4OTEpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPg0KICA8dGl0bGU+c3RhdHNfcmVwb3N0PC90aXRsZT4NCiAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogIDxkZWZzLz4NCiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+DQogICAgPGcgaWQ9InJlcG9zdC0iIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9InJnYig1MSwgNTEsIDUxKSI+DQogICAgICA8cGF0aCBkPSJNMiw2IEwyLDExLjAwMDM4NSBDMiwxMi4xMDQ3NDE5IDIuOTAxOTUwMzYsMTMgNC4wMDg1MzAyLDEzIEwxMC45OTU3MzQ5LDEzIEwxMC45OTU3MzQ5LDEzIEwxMCwxMyBMMTAsMTMgTDgsMTEgTDQsMTEgTDQsNiBMMy41LDYgTDYsNiBMMywzIEwwLDYgTDIsNiBMMiw2IFogTTYsMyBMNS4wMDQyNjUxLDMgTDExLjk5MTQ2OTgsMyBDMTMuMDk4MDQ5NiwzIDE0LDMuODk1MjU4MTIgMTQsNC45OTk2MTQ5OCBMMTQsMTAgTDEyLDEwIEwxMiw1IEw4LDUgTDYsMyBaIE0xNiwxMCBMMTAsMTAgTDEzLDEzIEwxNiwxMCBaIiBpZD0iUmVjdGFuZ2xlLTQzIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIi8+DQogICAgPC9nPg0KICA8L2c+DQo8L3N2Zz4NCg=="
-                      alt="repost"
+                      src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDE0IDE0Ij4KICA8cGF0aCBmaWxsPSJyZ2IoMjU1LCA4NSwgMCkiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTUuNTQyIDEuMTY3YzIuMTA3IDAgMi43OTUgMi4yNDYgMS42MSA1LjMzMi0uNDQ0Ljc5My4wMyAxLjIxMS4zMjIgMS4zMzIgMi4wMjYuODM2IDIuODc1IDIuMjEzIDMuMDI2IDMuODM2di41ODNILjU4M3YtLjU4M2MuMTUxLTEuNjIzIDEtMyAzLjAyNi0zLjgzNi4yOTItLjEyLjc2Ni0uNTQuMzIyLTEuMzMxLTEuMTg0LTMuMDk1LS40OTctNS4zMzMgMS42MS01LjMzM3pNMTMuNDcgMy4xOGwuMDU4LjA1LjIzLjIyOGEuNDE1LjQxNSAwIDAgMSAuMDU3LjUyNmwtLjA1My4wNjUtMi43MTQgMi43MTRhLjQwOS40MDkgMCAwIDEtLjUuMDY2bC0uMDQ1LS4wMy0uMDQzLS4wMzgtMS40NzItMS40NzJhLjQyMi40MjIgMCAwIDEtLjA1MS0uNTI3bC4wNTQtLjA2Ni4yMjktLjIzYS40MTUuNDE1IDAgMCAxIC41MjgtLjA1NWwuMDY1LjA1My45NDIuOTQzIDIuMTgyLTIuMTgzYS40MS40MSAwIDAgMSAuNTMzLS4wNDR6Ii8+Cjwvc3ZnPgo="
+                      alt="following"
                     />
-                    <div>4,664</div>
+                    <div>Following</div>
                   </button>
-                  <button>
-                    <img
-                      src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
-                      alt="share"
-                    />
-                    <div>Share</div>
-                  </button>
-                  <button>
-                    <img
-                      src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjE0cHgiIGhlaWdodD0iNHB4IiB2aWV3Qm94PSIwIDAgMTQgNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICA8dGl0bGU+bW9yZTwvdGl0bGU+CiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9InJnYigzNCwgMzQsIDM0KSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSI3IiBjeT0iMiIgcj0iMiIvPgogICAgPGNpcmNsZSBjeD0iMTIiIGN5PSIyIiByPSIyIi8+CiAgPC9nPgo8L3N2Zz4K"
-                      alt="more"
-                    />
-                    <div>More</div>
-                  </button>
-                </div>
+                )}
+                <button className="button3">
+                  <img
+                    src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
+                    alt="share"
+                  />
+                  <div>Share</div>
+                </button>
+                <button className="button4">
+                  <img
+                    src="https://a-v2.sndcdn.com/assets/images/message-a0c65ef1.svg"
+                    alt="message"
+                  />
+                </button>
+                <button className="button5">
+                  <img
+                    src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjE0cHgiIGhlaWdodD0iNHB4IiB2aWV3Qm94PSIwIDAgMTQgNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICA8dGl0bGU+bW9yZTwvdGl0bGU+CiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9InJnYigzNCwgMzQsIDM0KSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSI3IiBjeT0iMiIgcj0iMiIvPgogICAgPGNpcmNsZSBjeD0iMTIiIGN5PSIyIiByPSIyIi8+CiAgPC9nPgo8L3N2Zz4K"
+                    alt="more"
+                  />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="artist-body">
+            <div className={"recent"}>
+              <text>My Track</text>
+              {tracks &&
+                tracks.map((item: any) => (
+                  <TrackBox
+                    item={item}
+                    artistName={user.display_name}
+                    myId={myId}
+                    user={user}
+                  />
+                ))}
+              <div ref={ref} className="inView">
+                text
               </div>
             </div>
-          </div>
 
-          <Grid className={"artist-info"} columns={3} divided>
-            <Grid.Row>
-              <Grid.Column className="artist-info-text">
-                <div>Followers</div>
-                <text>213K</text>
-              </Grid.Column>
-              <Grid.Column className="artist-info-text">
-                <div>Following</div>
-                <text>5</text>
-              </Grid.Column>
-              <Grid.Column className="artist-info-text">
-                <div>Tracks</div>
-                <text>2</text>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
+            <Grid className={"artist-info"} columns={3} divided>
+              <Grid.Row>
+                <Grid.Column className="artist-info-text">
+                  <div>Followers</div>
+                  <text>{user.follower_count}</text>
+                </Grid.Column>
+                <Grid.Column className="artist-info-text">
+                  <div>Following</div>
+                  <text>{user.following_count}</text>
+                </Grid.Column>
+                <Grid.Column className="artist-info-text">
+                  <div>Tracks</div>
+                  <text>{user.track_count}</text>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default ArtistPage;

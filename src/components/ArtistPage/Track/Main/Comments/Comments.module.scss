@@ -1,5 +1,7 @@
 .container {
-  margin-top: 25px;
+  &.bottomBorder {
+    border-bottom: 1px solid lightgray;
+  }
   header {
     color: #999999;
     font-size: 14px;
@@ -19,26 +21,21 @@
   margin: 0;
   li {
     display: grid;
-    grid-template-columns: 50px 520px 90px;
+    grid-template-columns: 40px 520px 90px;
+    justify-content: space-around;
     padding: 15px 0;
     .userImage {
       cursor: pointer;
-      display: flex;
+      display: grid;
       align-items: center;
-      div {
-        --red: 0;
-        --green: 0;
-        --blue: 0;
-        --red2: 0;
-        --green2: 0;
-        --blue2: 0;
-        --bg-color: rgba(var(--red), var(--green), var(--blue), 1);
-        --bg-color2: rgba(var(--red2), var(--green2), var(--blue2), 1);
+      border-radius: 50%;
+      border: 1px solid lightgray;
+      box-sizing: border-box;
+      max-height: 40px;
+      overflow: hidden;
+      img {
         height: 40px;
         width: 40px;
-        border-radius: 50%;
-        background: linear-gradient(120deg, var(--bg-color), var(--bg-color2));
-        box-sizing: border-box;
       }
     }
     .mainComment {
@@ -54,7 +51,6 @@
         color: #cccccc;
       }
       .comment {
-        margin-top: 8px;
         color: black;
       }
     }
@@ -63,6 +59,24 @@
       color: #999999;
       text-align: right;
       position: relative;
+      .deleteButton {
+        visibility: hidden;
+        height: 22px;
+        width: 22px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 70px;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+      }
       .replyButton {
         visibility: hidden;
         font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
@@ -82,14 +96,14 @@
         padding: 2px 9px 2px 8px;
       }
     }
-    &:hover .replyButton {
+    &:hover .replyButton,
+    &:hover .deleteButton {
       visibility: visible;
     }
   }
   .replyContainer {
     width: 649px;
     height: 52px;
-    padding: 10px 10px 10px 0;
     box-sizing: border-box;
     margin: 0 0 0 20px;
     display: none;
@@ -100,10 +114,10 @@
       display: flex;
       background-color: #f2f2f2;
       padding: 5px;
-      .userImage {
+      .replyUserImage {
         height: 20px;
         width: 20px;
-        border: 1px solid black;
+        border: 1px solid #e5e5e5;
         box-sizing: border-box;
       }
       .replyInput {
@@ -129,6 +143,93 @@
     }
     &.shown {
       display: block;
+    }
+  }
+}
+.replyCommentContainer {
+  margin: 0;
+  margin-left: 20px;
+  box-sizing: border-box;
+  list-style-type: none;
+  li {
+    display: grid;
+    grid-template-columns: 40px 490px 90px;
+    justify-content: space-around;
+    padding: 15px 0;
+    .userImage {
+      cursor: pointer;
+      display: grid;
+      align-items: center;
+      border-radius: 50%;
+      border: 1px solid lightgray;
+      box-sizing: border-box;
+      max-height: 40px;
+      img {
+        height: 40px;
+        width: 40px;
+      }
+    }
+    .mainComment {
+      color: #999999;
+      font-size: 12px;
+      .hoverClick {
+        cursor: pointer;
+        &:hover {
+          color: black;
+        }
+      }
+      .at {
+        color: #cccccc;
+      }
+      .comment {
+        color: black;
+      }
+    }
+    .timePassed {
+      font-size: 12px;
+      color: #999999;
+      text-align: right;
+      position: relative;
+      .deleteButton {
+        visibility: hidden;
+        height: 22px;
+        width: 22px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 70px;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+      }
+      .replyButton {
+        visibility: hidden;
+        font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+          "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+        height: 22px;
+        width: 67px;
+        box-sizing: border-box;
+        position: absolute;
+        right: 0;
+        top: 20px;
+        margin: 0;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #333333;
+        padding: 2px 9px 2px 8px;
+      }
+    }
+    &:hover .replyButton,
+    &:hover .deleteButton {
+      visibility: visible;
     }
   }
 }

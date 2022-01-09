@@ -1,40 +1,37 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./TrackHeader.module.scss";
-import { ITrack } from "../TrackPage";
-import { useColor } from "color-thief-react";
-import HeaderButton from "./PlayPauseButton";
+import { IArtist, ITrack } from "../TrackPage";
+import HeaderButton from "./HeaderButton";
 import TrackInfo from "./TrackInfo";
-import AlbumImage from "./AlbumImage";
 import TrackTag from "./TrackTag";
 import { useTrackContext } from "../../../../context/TrackContext";
+import { MdOutlineCancel } from "react-icons/md";
+import AlbumImage from "./AlbumImage";
+import throttle from "lodash/throttle";
+// import axios from "axios";
+// import { useParams } from "react-router-dom";
 // import WaveSurfer from "wavesurfer.js";
 
 const TrackHeader = ({
   openModal,
   track,
+  artist,
+  noTrack,
 }: {
   openModal: () => void;
   track: ITrack;
+  artist: IArtist;
+  noTrack: boolean;
 }) => {
-  //   const [isPlaying, setIsPlaying] = useState(false); // 트랙이 재생중인지
+  // const [isPlaying, setIsPlaying] = useState(false); // 트랙이 재생중인지
   const [headerTrackDuration, setHeaderTrackDuration] = useState<
     number | undefined
   >(undefined); // 트랙 길이
+  const [trackLoading, setTrackLoading] = useState(true);
+  const [isSameTrack, setIsSameTrack] = useState<boolean | undefined>(
+    undefined
+  );
   const trackHeader = useRef<HTMLDivElement>(null); // 헤더 전체 div(재생과는 무관)
-  const { data } = useColor(track.image, "rgbArray", {
-    // 트랙 이미지에 따라 헤더 색을 자동으로 생성
-    crossOrigin: "anonymous",
-    quality: 10,
-  });
-  useEffect(() => {
-    const { current } = trackHeader;
-    if (current !== null && data !== undefined) {
-      const [red, green, blue] = data;
-      current.style.setProperty("--red", `${red}`);
-      current.style.setProperty("--green", `${green}`);
-      current.style.setProperty("--blue", `${blue}`);
-    }
-  }, [trackHeader, data]);
 
   const {
     trackDuration,
@@ -45,14 +42,24 @@ const TrackHeader = ({
     audioPlayer,
     audioSrc,
     setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
   } = useTrackContext();
-  const isSameTrack = audioSrc === track.audio;
+  const headerTrackSrc = track.audio.split("?")[0];
+  const barTrackSrc = audioSrc.split("?")[0];
+  useEffect(() => {
+    if (barTrackSrc === headerTrackSrc) {
+      setIsSameTrack(true);
+    } else {
+      setIsSameTrack(false);
+    }
+  }, [track]);
 
   useEffect(() => {
-    if (isSameTrack) {
+    if (barTrackSrc === headerTrackSrc) {
       setHeaderTrackDuration(trackDuration);
     }
-  }, [isSameTrack, trackDuration]);
+  }, [track, isSameTrack, trackDuration]);
 
   //   const audioPlayer = useRef<HTMLAudioElement>(new Audio()); // 오디오 태그 접근
   const progressBar = useRef<any>(null); // 재생 바 태그 접근(input)
@@ -71,10 +78,12 @@ const TrackHeader = ({
     setPlayingTime(audioPlayer.current.currentTime);
     changePlayerCurrentTime();
   };
+  //   const throttleChangeRange = () => throttle(changeRange, 300);
 
+  const buttonDisabled = noTrack || trackLoading;
   const togglePlayPause = () => {
     // 재생/일시정지 버튼 누를 때
-    if (audioSrc === track.audio) {
+    if (barTrackSrc === headerTrackSrc) {
       const prevValue = trackIsPlaying;
       setTrackIsPlaying(!prevValue);
       if (!prevValue) {
@@ -88,11 +97,16 @@ const TrackHeader = ({
       }
     } else {
       setAudioSrc(track.audio);
+      setTrackIsPlaying(true);
+      setTrackBarArtist(artist);
+      setTrackBarTrack(track);
+      setIsSameTrack(true);
       audioPlayer.current.src = track.audio;
-      audioPlayer.current.load();
       setTimeout(() => {
         audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
       }, 1);
+      animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
 
@@ -105,83 +119,113 @@ const TrackHeader = ({
     }
   };
 
-  const changePlayerCurrentTime = () => {
-    if (progressBar.current && audioPlayer.current && isSameTrack) {
-      progressBar.current.value = audioPlayer.current.currentTime;
-      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
-      progressBar.current.style.setProperty(
-        "--seek-before-width",
-        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
-      );
-      setPlayingTime(audioPlayer.current.currentTime);
-    } else {
-      setPlayingTime(0);
-      progressBar.current.value = 0;
-      progressBar.current.style.setProperty("--seek-before-width", `0%`);
-    }
-  };
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      if (progressBar.current && audioPlayer.current && isSameTrack) {
+        progressBar.current.value = audioPlayer.current.currentTime;
+        // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+        progressBar.current.style.setProperty(
+          "--seek-before-width",
+          `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+        );
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else if (progressBar.current) {
+        setPlayingTime(0);
+        progressBar.current.value = 0;
+        progressBar.current.style.setProperty("--seek-before-width", `0%`);
+      }
+    }, 30000),
+    [playingTime]
+  );
+  changePlayerCurrentTime();
 
-  useEffect(() => {
-    changePlayerCurrentTime();
-  }, [playingTime]);
+  //   const onPlayerClick = () => {
+  //     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
+  //     if (!isSameTrack) {
+  //       setAudioSrc(track.audio);
+  //       setIsSameTrack(true);
+  //       audioPlayer.current.src = track.audio;
+  //       audioPlayer.current.load();
+  //     }
+  //     setTrackIsPlaying(true);
+  //     audioPlayer.current.currentTime = progressBar.current.value;
+  //     setPlayingTime(audioPlayer.current.currentTime);
+  //     setTimeout(() => {
+  //       audioPlayer.current.play();
+  //     }, 1);
+  //     animationRef.current = requestAnimationFrame(whilePlaying);
+  //   };
 
-  const onPlayerClick = () => {
-    // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-    if (!isSameTrack) {
-      setAudioSrc(track.audio);
-      audioPlayer.current.src = track.audio;
-      audioPlayer.current.load();
-    }
-    setTrackIsPlaying(true);
-    setPlayingTime(progressBar.current.value);
-    setTimeout(() => {
-      audioPlayer.current.play();
-    }, 1);
-    animationRef.current = requestAnimationFrame(whilePlaying);
-  };
+  const headerPlayer = useRef<HTMLAudioElement>(null);
+  const onLoadedMetadata = useCallback(() => {
+    setHeaderTrackDuration(headerPlayer.current?.duration);
+    setTrackLoading(false);
+  }, [audioSrc]);
 
   return (
     <div ref={trackHeader} className={styles.trackHeader}>
       <div className={styles.trackInfo}>
         <HeaderButton
-          isPlaying={trackIsPlaying}
           togglePlayPause={togglePlayPause}
           isSameTrack={isSameTrack}
+          buttonDisabled={buttonDisabled}
         />
-        <TrackInfo track={track} />
+        <TrackInfo track={track} artist={artist} />
       </div>
-      <div className={styles.playingTrack}>
-        <div className={styles.trackPlayer}>
-          <div className={styles.time}>
-            <div className={styles.currentTime}>
-              {audioSrc === track.audio && calculateTime(playingTime)}
+      {noTrack === true ? (
+        <div className={styles.noTrackFound}>
+          <MdOutlineCancel />
+          This track was not found. Maybe it has been removed
+        </div>
+      ) : (
+        <div className={styles.playingTrack}>
+          <div className={styles.trackPlayer}>
+            <div className={styles.time}>
+              <div className={styles.currentTime}>
+                {isSameTrack && calculateTime(playingTime)}
+              </div>
+              <div className={styles.duration}>
+                {typeof headerTrackDuration === "number" &&
+                  !isNaN(headerTrackDuration) &&
+                  calculateTime(headerTrackDuration)}
+              </div>
             </div>
-            <div className={styles.duration}>
-              {typeof headerTrackDuration === "number" &&
-                !isNaN(headerTrackDuration) &&
-                calculateTime(headerTrackDuration)}
+            <div className={styles.barContainer}>
+              <audio
+                ref={headerPlayer}
+                src={track.audio}
+                preload="metadata"
+                onLoadedMetadata={onLoadedMetadata}
+              />
+              <input
+                ref={progressBar}
+                type="range"
+                className={styles.progressBar}
+                defaultValue="0"
+                onChange={audioSrc === track.audio ? changeRange : () => null}
+                step="0.3"
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                }}
+                max={
+                  audioSrc === track.audio && headerTrackDuration
+                    ? trackDuration
+                    : headerTrackDuration
+                }
+              />
             </div>
-          </div>
-          <div className={styles.barContainer}>
-            <input
-              ref={progressBar}
-              type="range"
-              className={styles.progressBar}
-              defaultValue="0"
-              onChange={audioSrc === track.audio ? changeRange : () => null}
-              step="0.3"
-              onClick={onPlayerClick}
-              max={
-                audioSrc === track.audio
-                  ? trackDuration
-                  : headerTrackDuration && headerTrackDuration
-              }
-            />
           </div>
         </div>
-      </div>
-      <TrackTag track={track} />
-      <AlbumImage openModal={openModal} track={track} />
+      )}
+
+      {noTrack || <TrackTag track={track} />}
+      {noTrack || (
+        <AlbumImage
+          openModal={openModal}
+          track={track}
+          trackHeader={trackHeader}
+        />
+      )}
     </div>
   );
 

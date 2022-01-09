@@ -1,68 +1,34 @@
-import { useEffect, useState } from "react";
+import { BiHeartSquare } from "react-icons/bi";
 import LikeItems from "./LikeItems";
+import styles from "./LikeList.module.scss";
 
-const LikeList = () => {
-  const [likedTrackList, setLikedTrackList] = useState([
-    {
-      title: "Stay",
-      img: "https://image.bugsm.co.kr/album/images/500/6221/622131.jpg",
-      id: 1,
-      artist: "The Kid LAROI",
-      count: 3,
-      like: 421,
-      comment: 3,
-      repost: 52,
-    },
-    {
-      title: "리무진 (Feat. MINO)",
-      img: "https://image.bugsm.co.kr/album/images/1000/204336/20433609.jpg",
-      id: 2,
-      artist: "BE'O",
-      count: 3,
-      like: 123,
-      comment: 12,
-      repost: 32,
-    },
-    {
-      title: "strawberry moon",
-      img: "https://image.bugsm.co.kr/album/images/1000/40662/4066238.jpg",
-      id: 3,
-      artist: "IU",
-      count: 532,
-      like: 123,
-      comment: 43,
-      repost: 123,
-    },
-    {
-      title: "Stay",
-      img: "https://image.bugsm.co.kr/album/images/500/6221/622131.jpg",
-      id: 4,
-      artist: "The Kid LAROI",
-      count: 321,
-      like: 123,
-      comment: 3,
-      repost: 412,
-    },
-  ]);
-  useEffect(() => {
-    //setMostTrackList안쓰면 오류나서 일시적으로 해놓은 코드
-    if (likedTrackList[0].id >= 1000) {
-      setLikedTrackList([...likedTrackList]);
-    }
-  }, []);
+const LikeList = ({ likeList }: { likeList: any }) => {
   return (
     <>
-      {likedTrackList.map((item) => (
-        <LikeItems
-          title={item.title}
-          img={item.img}
-          artist={item.artist}
-          count={item.count}
-          like={item.like}
-          comment={item.comment}
-          repost={item.repost}
-        />
-      ))}
+      {likeList.length === 0 ? (
+        <div className={styles.noLikeWrapper}>
+          <BiHeartSquare className={styles.noLike} />
+          <div>You have no likes yet</div>
+        </div>
+      ) : (
+        likeList
+          .slice(-3)
+          .map((item: any) => (
+            <LikeItems
+              userPermal={item.artist.permalink}
+              trackPermal={item.permalink}
+              title={item.title}
+              img={item.image}
+              artist={item.artist.display_name}
+              count={item.count}
+              like={item.like_count}
+              comment={item.comment_count}
+              repost={item.repost_count}
+              key={item.id}
+              trackId={item.id}
+            />
+          ))
+      )}
     </>
   );
 };

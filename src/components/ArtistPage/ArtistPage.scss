@@ -8,20 +8,60 @@
   width: 1240px;
   background-color: white;
   margin-top: 46px;
-  height: calc(100vh - 46px);
+  padding-bottom: 70px;
+  height: 100%;
+  min-height: 100vh;
 }
 
 .profile-header {
   width: 1240px;
   height: 260px;
-  background-image: url(https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg);
   display: flex;
   flex-direction: row;
-  img {
+
+  .header-img {
+    position: absolute;
+    width: 1240px;
+    height: 260px;
+  }
+
+  .profile-img {
     width: 200px;
     height: 200px;
     border-radius: 200px;
     margin: 30px;
+    z-index: 10;
+  }
+
+  .upload-header-image {
+    margin-left: 670px;
+    margin-top: 30px;
+    z-index: 10;
+
+    button {
+      width: 175px;
+      height: 26px;
+      border: 1px solid #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        width: 20px;
+        height: 20px;
+        border-radius: 0px;
+        margin: 0px;
+      }
+
+      div {
+        font-size: 14px;
+        margin-left: 5px;
+      }
+    }
+
+    input {
+      display: none;
+    }
   }
 }
 
@@ -29,6 +69,7 @@
   display: flex;
   flex-direction: column;
   margin-top: 30px;
+  z-index: 10;
 }
 
 .displayname {
@@ -122,6 +163,16 @@
     width: 31px;
   }
 
+  .button6 {
+    width: 65px;
+  }
+
+  .button7 {
+    width: 100px;
+    background-color: white;
+    color: #ff5500;
+  }
+
   div {
     font-size: 14px;
     line-height: 26px;
@@ -143,6 +194,10 @@
   border-right: 1px solid #ccc;
   margin-right: 50px;
 
+  .inView {
+    color: white;
+  }
+
   text {
     font-size: 24px;
     color: #333;
@@ -157,103 +212,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-}
-
-.recent-track {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: row;
-
-  img {
-    width: 160px;
-    height: 160px;
-  }
-}
-
-.track-right {
-  display: flex;
-  flex-direction: column;
-  margin-left: 10px;
-}
-
-.track-info {
-  display: flex;
-  flex-direction: row;
-}
-
-.track-info-name {
-  display: flex;
-  flex-direction: column;
-  margin-left: 5px;
-}
-
-.artistname {
-  font-size: 12px;
-  color: #333;
-}
-
-.trackname {
-  font-size: 15px;
-  color: #000;
-  margin-top: -3px;
-}
-
-.player {
-  width: 644px;
-  height: 60px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
-.comment {
-  width: 644px;
-  height: 32px;
-  background-color: #f2f2f2;
-  border: 1px solid #e5e5e5;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-
-  img {
-    width: 20px;
-    height: 20px;
-  }
-
-  input {
-    width: 612px;
-    height: 20px;
-    font-size: 12px;
-    border: 1px solid #ccc;
-    border-radius: 0;
-  }
-}
-
-.track-buttons {
-  display: flex;
-  flex-direction: row;
-  margin-top: 10px;
-
-  button {
-    width: 65px;
-    height: 22px;
-    background-color: white;
-    border: 1px solid #ccc;
-    font-size: 11px;
-    border-radius: 3px;
-    margin-right: 10px;
-  }
-
-  img {
-    width: 20px;
-    height: 20px;
-    color: #333;
-    margin-right: 3px;
-  }
-
-  div {
-    line-height: 22px;
   }
 }
 

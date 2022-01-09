@@ -17,11 +17,21 @@ import { MdVolumeUp, MdPlaylistPlay } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useTrackContext } from "../../../../context/TrackContext";
+import { useAuthContext } from "../../../../context/AuthContext";
+import axios from "axios";
+import { IFollowings } from "../Main/ListenArtistInfo";
+import { ILikeTrack } from "../Main/ListenEngagement";
+// import throttle from "lodash/throttle";
+
 // import axios from "axios";
 
 const TrackBar = () => {
-  const [likeTrack, setLikeTrack] = useState(false);
-  const [followArtist, setFollowArtist] = useState(false);
+  const [likeTrack, setLikeTrack] = useState<boolean | undefined>(undefined);
+  const [followArtist, setFollowArtist] = useState<boolean | undefined>(
+    undefined
+  );
+  const [likeLoading, setLikeLoading] = useState(true);
+  const [followLoading, setFollowLoading] = useState(true);
 
   const {
     trackDuration,
@@ -30,12 +40,15 @@ const TrackBar = () => {
     playingTime,
     setPlayingTime,
     audioPlayer,
-    setAudioSrc,
+    audioSrc,
     isMuted,
     setIsMuted,
     loop,
     setLoop,
+    trackBarArtist,
+    trackBarTrack,
   } = useTrackContext();
+  const { userSecret } = useAuthContext();
 
   const history = useHistory();
 
@@ -56,8 +69,10 @@ const TrackBar = () => {
     setPlayingTime(audioPlayer.current.currentTime);
     changePlayerCurrentTime();
   };
+  //   const throttleChangeRange = () => throttle(changeRange, 300);
 
   const togglePlayPause = () => {
+    if (audioSrc.length === 0) return;
     // 재생/일시정지 버튼 누를 때
     const prevValue = trackIsPlaying;
     setTrackIsPlaying(!prevValue);
@@ -86,6 +101,14 @@ const TrackBar = () => {
     }
   };
 
+  useEffect(() => {
+    if (trackIsPlaying) {
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    } else {
+      cancelAnimationFrame(barAnimationRef.current);
+    }
+  }, [trackIsPlaying]);
+
   const changePlayerCurrentTime = () => {
     if (progressBar.current && audioPlayer.current) {
       progressBar.current.value = audioPlayer.current.currentTime;
@@ -113,198 +136,328 @@ const TrackBar = () => {
   const toggleLoop = () => setLoop(!loop);
   const toggleMuteUnmute = () => setIsMuted(!isMuted);
 
-  const clickArtist = () => history.push(`/username`);
-  const clickTrack = () => history.push(`/username/trackname`);
+  const clickArtist = () => {
+    if (
+      window.location.href.split("soundwaffle.com")[1] ===
+      `/${trackBarArtist.permalink}`
+    ) {
+      return;
+    }
+    history.push(`/${trackBarArtist.permalink}`);
+  };
+  const clickTrack = () => {
+    if (
+      window.location.href.split("soundwaffle.com")[1] ===
+      `/${trackBarArtist.permalink}/${trackBarTrack.permalink}`
+    ) {
+      return;
+    }
+    history.push(`/${trackBarArtist.permalink}/${trackBarTrack.permalink}`);
+  };
+
+  const isLikeTrack = async () => {
+    if (userSecret.id !== 0 && trackBarTrack.id !== 0) {
+      const config: any = {
+        method: "get",
+        url: `/users/${userSecret.id}/likes/tracks`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        // like 트랙 목록 받아오기
+        const likeTracks = await axios(config);
+        if (likeTracks.data.results.length === 0) {
+          setLikeLoading(false);
+          setLikeTrack(false);
+        } else {
+          const trackExist = likeTracks.data.results.find(
+            (likeTrack: ILikeTrack) => likeTrack.id === trackBarTrack.id
+          );
+          if (trackExist) {
+            setLikeTrack(true);
+          } else {
+            setLikeTrack(false);
+          }
+          setLikeLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const isFollowing = async () => {
+    if (trackBarArtist.id !== 0 && userSecret.id !== 0) {
+      const followConfig: any = {
+        method: "get",
+        url: `/users/${trackBarArtist.id}/followers`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const { data } = await axios(followConfig);
+        if (data.results.length === 0) {
+          setFollowLoading(false);
+          setFollowArtist(false);
+        } else {
+          const trackExist = data.results.find(
+            (follower: IFollowings) => follower.id === userSecret.id
+          );
+          console.log(trackExist, "esatt");
+          if (trackExist) {
+            setFollowArtist(true);
+          } else {
+            setFollowArtist(false);
+          }
+          setFollowLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+  useEffect(() => {
+    isLikeTrack();
+    isFollowing();
+  }, [trackBarTrack]);
 
   const onLikeTrack = async () => {
-    // try {
-    //   const response = await axios.post(
-    //     `https://api.soundwaffle.com/likes/tracks/track_id`
-    //   );
-    //   console.log(response);
-    //   setLike(true)
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    setLikeTrack(true);
+    const config: any = {
+      method: "post",
+      url: `/likes/tracks/${trackBarTrack.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        setLikeTrack(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const unlikeTrack = async () => {
-    // try {
-    //   const response = await axios.delete(
-    //     `https://api.soundwaffle.com/likes/tracks/track_id`
-    //   );
-    //   console.log(response);
-    //   setLike(false);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    setLikeTrack(false);
+    const config: any = {
+      method: "delete",
+      url: `/likes/tracks/${trackBarTrack.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        setLikeTrack(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onFollowArtist = async () => {
-    // try {
-    //   const response = await axios.post(
-    //     `https://api.soundwaffle.com/resolve?url=https://soundwaffle.com/user/xdlcfiw69486/follow&client_id=eok6x7k4bef2`,
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxMSwidXNlcm5hbWUiOiJhbmRobDIwNEBzb3VuZHdhZmZsZS5jb20iLCJleHAiOjE2Mzk4NTIzNDYsImVtYWlsIjoiYW5kaGwyMDRAc291bmR3YWZmbGUuY29tIiwib3JpZ19pYXQiOjE2Mzk4NDUxNDZ9.t__NMUozOtcOiZfpDRmCQNTo_1A91gOi3MVlFRayRYM`,
-    //       },
-    //     }
-    //   );
-    //   console.log(response);
-    //   setFollowArtist(true);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    setFollowArtist(true);
+    const config: any = {
+      method: "post",
+      url: `/users/me/followings/${trackBarArtist.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        setFollowArtist(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const unfollowArtist = async () => {
-    //   try {
-    //       const response = await axios.delete(`https://api.soundwaffle.com/users/{user_id}/follow`)
-    //       console.log(response)
-    //       setFollowArtist(false)
-    //   } catch(error) {
-    //       console.log(error)
-    //   }
-    setFollowArtist(false);
+    const config: any = {
+      method: "delete",
+      url: `/users/me/followings/${trackBarArtist.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const response = await axios(config);
+      if (response) {
+        setFollowArtist(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const nextTrack = () => {
-    setPlayingTime(0);
-    setTrackIsPlaying(true);
-    setAudioSrc(
-      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-    );
-    audioPlayer.current.src =
-      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+  console.log();
 
-    audioPlayer.current.load();
-    setTimeout(() => {
-      audioPlayer.current.play();
-      barAnimationRef.current = requestAnimationFrame(whilePlaying);
-    }, 1);
-  };
+  //   const nextTrack = () => {
+  //     setPlayingTime(0);
+  //     setTrackIsPlaying(true);
+  //     setAudioSrc(
+  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+  //     );
+  //     audioPlayer.current.src =
+  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
 
-  const prevTrack = () => {
-    setPlayingTime(0);
-    setTrackIsPlaying(true);
-    setAudioSrc(
-      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-    );
-    audioPlayer.current.src =
-      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+  //     audioPlayer.current.load();
+  //     setTimeout(() => {
+  //       audioPlayer.current.play();
+  //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
+  //     }, 1);
+  //   };
 
-    audioPlayer.current.load();
-    setTimeout(() => {
-      audioPlayer.current.play();
-      barAnimationRef.current = requestAnimationFrame(whilePlaying);
-    }, 1);
-  };
+  //   const prevTrack = () => {
+  //     setPlayingTime(0);
+  //     setTrackIsPlaying(true);
+  //     setAudioSrc(
+  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+  //     );
+  //     audioPlayer.current.src =
+  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+  //     audioPlayer.current.load();
+  //     setTimeout(() => {
+  //       audioPlayer.current.play();
+  //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
+  //     }, 1);
+  //   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.main}>
-        <button className={styles.previousTrack} onClick={prevTrack}>
-          <IoPlaySkipBackSharp />
-        </button>
-        {trackIsPlaying ? (
-          <button className={styles.playButton} onClick={togglePlayPause}>
-            <IoPauseSharp />
-          </button>
-        ) : (
-          <button className={styles.playButton} onClick={togglePlayPause}>
-            <IoPlaySharp />
-          </button>
-        )}
-        <button className={styles.nextTrack} onClick={nextTrack}>
-          <IoPlaySkipForwardSharp />
-        </button>
-        <button className={styles.shuffle}>
-          <IoShuffleSharp />
-        </button>
-        <button
-          className={`${styles.loop} ${loop && styles.loopTrack}`}
-          onClick={toggleLoop}
-        >
-          <BiRepeat />
-        </button>
-        <div className={styles.trackContainer}>
-          <div className={styles.currentTime}>{calculateTime(playingTime)}</div>
-          <div className={styles.track}>
-            <input
-              ref={progressBar}
-              type="range"
-              className={styles.progressBar}
-              onChange={changeRange}
-              step="0.3"
-              defaultValue="0"
-              onClick={onPlayerClick}
-              max={trackDuration}
-            />
-          </div>
-          <div className={styles.duration}>
-            {!isNaN(trackDuration) ? calculateTime(trackDuration) : "0:00"}
+    <>
+      {!!audioSrc.length && (
+        <div className={styles.container}>
+          <div className={styles.main}>
+            <button
+              className={styles.previousTrack}
+              // onClick={prevTrack}
+            >
+              <IoPlaySkipBackSharp />
+            </button>
+            {trackIsPlaying ? (
+              <button className={styles.playButton} onClick={togglePlayPause}>
+                <IoPauseSharp />
+              </button>
+            ) : (
+              <button className={styles.playButton} onClick={togglePlayPause}>
+                <IoPlaySharp />
+              </button>
+            )}
+            <button
+              className={styles.nextTrack}
+              // onClick={nextTrack}
+            >
+              <IoPlaySkipForwardSharp />
+            </button>
+            <button className={styles.shuffle}>
+              <IoShuffleSharp />
+            </button>
+            <button
+              className={`${styles.loop} ${loop && styles.loopTrack}`}
+              onClick={toggleLoop}
+            >
+              <BiRepeat />
+            </button>
+            <div className={styles.trackContainer}>
+              <div className={styles.currentTime}>
+                {calculateTime(playingTime)}
+              </div>
+              <div className={styles.track}>
+                <input
+                  ref={progressBar}
+                  type="range"
+                  className={styles.progressBar}
+                  onChange={changeRange}
+                  step="0.3"
+                  defaultValue="0"
+                  onClick={onPlayerClick}
+                  max={trackDuration}
+                />
+              </div>
+              <div className={styles.duration}>
+                {!isNaN(trackDuration) ? calculateTime(trackDuration) : "0:00"}
+              </div>
+            </div>
+            {isMuted ? (
+              <button className={styles.volume} onClick={toggleMuteUnmute}>
+                <RiVolumeMuteFill />
+              </button>
+            ) : (
+              <button className={styles.volume} onClick={toggleMuteUnmute}>
+                <MdVolumeUp />
+              </button>
+            )}
+            <div className={styles.trackInfo}>
+              <img
+                src={trackBarTrack.image || "/default.track_image.svg"}
+                alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
+              />
+              <div className={styles.artistTrackName}>
+                <div className={styles.artistName} onClick={clickArtist}>
+                  {trackBarArtist.display_name}
+                </div>
+                <div className={styles.trackName} onClick={clickTrack}>
+                  <span>{trackBarTrack.title}</span>
+                </div>
+              </div>
+              {trackBarArtist.id === userSecret.id || (
+                <>
+                  {likeTrack === true && (
+                    <button
+                      className={`${styles.unlikeTrack} ${styles.listenEngagement}`}
+                      onClick={unlikeTrack}
+                      disabled={likeLoading || likeTrack}
+                    >
+                      <BsFillSuitHeartFill />
+                    </button>
+                  )}
+                  {likeTrack === false && (
+                    <button
+                      className={`${styles.likeTrack} ${styles.listenEngagement}`}
+                      onClick={onLikeTrack}
+                      disabled={likeLoading || !likeTrack}
+                    >
+                      <BsFillSuitHeartFill />
+                    </button>
+                  )}
+                  {followArtist === true && (
+                    <button
+                      className={`${styles.unfollowArtist} ${styles.listenEngagement}`}
+                      onClick={unfollowArtist}
+                      disabled={followLoading || followArtist}
+                    >
+                      <RiUserUnfollowFill />
+                    </button>
+                  )}
+                  {followArtist === false && (
+                    <button
+                      className={`${styles.followAritst} ${styles.listenEngagement}`}
+                      onClick={onFollowArtist}
+                      disabled={followLoading || !followArtist}
+                    >
+                      <RiUserFollowFill />
+                    </button>
+                  )}
+                </>
+              )}
+              <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
+                <MdPlaylistPlay />
+              </button>
+            </div>
           </div>
         </div>
-        {isMuted ? (
-          <button className={styles.volume} onClick={toggleMuteUnmute}>
-            <RiVolumeMuteFill />
-          </button>
-        ) : (
-          <button className={styles.volume} onClick={toggleMuteUnmute}>
-            <MdVolumeUp />
-          </button>
-        )}
-        <div className={styles.trackInfo}>
-          <img
-            src="https://images.unsplash.com/photo-1507808973436-a4ed7b5e87c9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHwyfDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60"
-            alt={`누구의 어떤 노래`}
-          />
-          <div className={styles.artistTrackName}>
-            <div className={styles.artistName} onClick={clickArtist}>
-              Artist
-            </div>
-            <div className={styles.trackName} onClick={clickTrack}>
-              <span>Track Name</span>
-            </div>
-          </div>
-          {likeTrack ? (
-            <button
-              className={`${styles.unlikeTrack} ${styles.listenEngagement}`}
-              onClick={unlikeTrack}
-            >
-              <BsFillSuitHeartFill />
-            </button>
-          ) : (
-            <button
-              className={`${styles.likeTrack} ${styles.listenEngagement}`}
-              onClick={onLikeTrack}
-            >
-              <BsFillSuitHeartFill />
-            </button>
-          )}
-          {followArtist ? (
-            <button
-              className={`${styles.unfollowArtist} ${styles.listenEngagement}`}
-              onClick={unfollowArtist}
-            >
-              <RiUserUnfollowFill />
-            </button>
-          ) : (
-            <button
-              className={`${styles.followAritst} ${styles.listenEngagement}`}
-              onClick={onFollowArtist}
-            >
-              <RiUserFollowFill />
-            </button>
-          )}
-
-          <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
-            <MdPlaylistPlay />
-          </button>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
