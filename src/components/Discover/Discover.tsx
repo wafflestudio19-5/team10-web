@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useAuthContext } from "../../context/AuthContext";
 import styles from "./Discover.module.scss";
 import LikeList from "./LikeList/LikeList";
@@ -26,25 +27,42 @@ const Discover = () => {
     },
   ]);
   const [likeListId, setLikeListId] = useState([-1]);
+  const [likeCount, setLikeCount] = useState(0);
   const [mostTrackList, setMostTrackList] = useState([
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999999,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999998,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999997,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999996,
     },
   ]);
@@ -52,31 +70,55 @@ const Discover = () => {
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999999,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999998,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999997,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999996,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999995,
     },
     {
       title: "",
       image: "",
+      permalink: "",
+      artist: {
+        permalink: "",
+      },
       id: 999994,
     },
   ]);
@@ -84,15 +126,24 @@ const Discover = () => {
     const checkValid = async () => {
       const jwtToken = localStorage.getItem("jwt_token");
       const permal = localStorage.getItem("permalink");
-      await setUserSecret({ ...userSecret, jwt: jwtToken, permalink: permal });
+      const ID = localStorage.getItem("id");
+      await setUserSecret({
+        ...userSecret,
+        jwt: jwtToken,
+        permalink: permal,
+        id: ID,
+      });
     };
     const fetchMostNewList = () => {
-      axios.get("/tracks").then((r: any) => {
-        const mostList = r.data.results.slice(0, 4);
-        const newList = r.data.results.slice(-6);
-        setMostTrackList(mostList);
-        setNewTrackList(newList);
-      });
+      axios
+        .get("/tracks")
+        .then((r: any) => {
+          const mostList = r.data.results.slice(0, 4);
+          const newList = r.data.results.slice(-6);
+          setMostTrackList(mostList);
+          setNewTrackList(newList);
+        })
+        .catch(() => toast.error("트랙 정보 불러오기를 실패하였습니다"));
     };
     checkValid();
     fetchMostNewList();
@@ -108,17 +159,13 @@ const Discover = () => {
       const fetchUserId = async () => {
         try {
           await axios
-            .get(
-              `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${userSecret.permalink}`
-            )
-            .then((r) => {
-              const userId = r.data.id;
-              axios.get(`/users/${userId}/likes/tracks`).then((res) => {
-                setLikeList(res.data.results);
-              });
+            .get(`/users/${userSecret.id}/likes/tracks`)
+            .then((res) => {
+              setLikeCount(res.data.count);
+              setLikeList(res.data.results);
             });
-        } catch (error) {
-          console.log(error);
+        } catch {
+          toast.error("like list 불러오기를 실패하였습니다");
         }
       };
       fetchUserId();
@@ -150,7 +197,11 @@ const Discover = () => {
               <h2>More of what you like</h2>
               <div>Suggestions based on what you've liked or played</div>
             </div>
-            <MostList mostTrackList={mostTrackList} likeListId={likeListId} />
+            <MostList
+              mostTrackList={mostTrackList}
+              likeListId={likeListId}
+              setLikeList={setLikeList}
+            />
             {/* 아티스트 프로필이 있어야 가능 */}
           </div>
           <div className={styles.new}>
@@ -174,6 +225,7 @@ const Discover = () => {
                 listScroll={listScroll}
                 newTrackList={newTrackList}
                 likeListId={likeListId}
+                setLikeList={setLikeList}
               />
               {/* 아티스트 프로필이 있어야 가능 */}
             </div>
@@ -182,10 +234,10 @@ const Discover = () => {
         <div className={styles.fluid}>
           <div className={styles.likes}>
             <div className={styles.header}>
-              🤍 {likeListId.length} likes
+              🤍 {likeCount} likes
               <button>View all</button>
             </div>
-            <LikeList likeList={likeList} />
+            <LikeList likeList={likeList} setLikeList={setLikeList} />
           </div>
           <div className={styles.following}>
             <div className={styles.header}>

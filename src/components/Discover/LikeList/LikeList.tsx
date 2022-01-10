@@ -2,7 +2,13 @@ import { BiHeartSquare } from "react-icons/bi";
 import LikeItems from "./LikeItems";
 import styles from "./LikeList.module.scss";
 
-const LikeList = ({ likeList }: { likeList: any }) => {
+const LikeList = ({
+  likeList,
+  setLikeList,
+}: {
+  likeList: any;
+  setLikeList: any;
+}) => {
   return (
     <>
       {likeList.length === 0 ? (
@@ -12,7 +18,7 @@ const LikeList = ({ likeList }: { likeList: any }) => {
         </div>
       ) : (
         likeList
-          .slice(-3)
+          .slice(0, 3)
           .map((item: any) => (
             <LikeItems
               userPermal={item.artist.permalink}
@@ -26,6 +32,7 @@ const LikeList = ({ likeList }: { likeList: any }) => {
               repost={item.repost_count}
               key={item.id}
               trackId={item.id}
+              setLikeList={setLikeList}
             />
           ))
       )}

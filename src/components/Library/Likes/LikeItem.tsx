@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { AiFillHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { FaUserCheck, FaUserPlus } from "react-icons/fa";
@@ -17,6 +18,7 @@ const LikeItem = ({
   trackPermal,
   artistPermal,
   followList,
+  setLikeList,
 }: {
   title: string;
   img: string;
@@ -26,6 +28,7 @@ const LikeItem = ({
   trackPermal: string;
   artistPermal: string;
   followList: any;
+  setLikeList: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -36,7 +39,7 @@ const LikeItem = ({
   };
   const [play, setPlay] = useState(false);
   const [heart, setHeart] = useState(true);
-  const [follow, setFollow] = useState(false);
+  const [follow, setFollow] = useState<boolean | string>(false);
   const { userSecret } = useAuthContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
@@ -59,6 +62,12 @@ const LikeItem = ({
       });
       setHeart(!heart);
     }
+    await axios
+      .get(`/users/${userSecret.id}/likes/tracks`)
+      .then((res) => {
+        setLikeList(res.data.results);
+      })
+      .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };
   const handleFollow = async (e: any) => {
     e.stopPropagation();
@@ -83,7 +92,11 @@ const LikeItem = ({
   };
   useEffect(() => {
     if (followList.length !== 0) {
-      followList.includes(artistId) ? setFollow(!follow) : null;
+      followList.includes(userSecret.id)
+        ? setFollow("no")
+        : followList.includes(artistId)
+        ? setFollow(!follow)
+        : null;
     }
   }, [followList]);
   return (
@@ -151,7 +164,7 @@ const LikeItem = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              {follow ? (
+              {follow === "no" ? null : follow ? (
                 <FaUserCheck className={styles.follow} onClick={handleFollow} />
               ) : (
                 <FaUserPlus
@@ -170,7 +183,7 @@ const LikeItem = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              {follow ? (
+              {follow === "no" ? null : follow ? (
                 <FaUserCheck className={styles.follow} onClick={handleFollow} />
               ) : (
                 <FaUserPlus

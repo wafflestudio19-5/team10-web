@@ -7,17 +7,24 @@ import { AiFillHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const MostItems = ({
   title,
   img,
   trackId,
   likeListId,
+  trackPermalink,
+  artistPermalink,
+  setLikeList,
 }: {
   title: string;
   img: string;
   trackId: number | string;
   likeListId: any;
+  trackPermalink: string;
+  artistPermalink: string;
+  setLikeList: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -51,19 +58,23 @@ const MostItems = ({
       });
       setHeart(!heart);
     }
+    await axios
+      .get(`/users/${userSecret.id}/likes/tracks`)
+      .then((res) => {
+        setLikeList(res.data.results);
+      })
+      .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
   };
   useEffect(() => {
     if (trackId <= 999990 && likeListId[0] !== -1) {
-      axios.get(`/tracks/${trackId}`).then((r) => {
-        const permalink = {
-          artistPermal: r.data.artist.permalink,
-          trackPermal: r.data.permalink,
-        };
-        setPermalink(permalink);
-      });
+      const permalink = {
+        artistPermal: artistPermalink,
+        trackPermal: trackPermalink,
+      };
+      setPermalink(permalink);
       setHeart(likeListId.includes(trackId));
     }
   }, [trackId, likeListId]);

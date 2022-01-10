@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { AiFillAppstore } from "react-icons/ai";
 import { BiHeartSquare } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
@@ -51,7 +52,7 @@ const Likes = () => {
     },
   ]);
   const [followList, setFollowList] = useState([]);
-  const { userSecret } = useAuthContext();
+  const { userSecret, setUserSecret } = useAuthContext();
   const filter = (e: any) => {
     setFilterInput(e.target.value);
     const newList = likeList.filter((item) =>
@@ -60,29 +61,40 @@ const Likes = () => {
     setFilteredLike(newList);
   };
   useEffect(() => {
+    const checkValid = async () => {
+      const jwtToken = localStorage.getItem("jwt_token");
+      const permal = localStorage.getItem("permalink");
+      const ID = localStorage.getItem("id");
+      await setUserSecret({
+        ...userSecret,
+        jwt: jwtToken,
+        permalink: permal,
+        id: ID,
+      });
+    };
+    checkValid();
+  }, []);
+  useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
         try {
-          await axios
-            .get(
-              `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${userSecret.permalink}`
-            )
-            .then((r) => {
-              const userId = r.data.id;
-              axios.get(`/users/${userId}/likes/tracks`).then((res) => {
-                setLikeList(res.data.results);
-                setFilteredLike(res.data.results);
-              });
-              axios.get(`/users/${userId}/followings`).then((res) => {
-                const fetchFollowList = res.data.results.map(
-                  (item: any) => item.id
-                );
-                console.log(fetchFollowList);
-                setFollowList(fetchFollowList);
-              });
-            });
-        } catch (error) {
-          console.log(error);
+          await axios({
+            method: "get",
+            url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
+          }).then((res) => {
+            console.log(res);
+            setLikeList(res.data.results);
+            setFilteredLike(res.data.results);
+          });
+          axios.get(`/users/${userSecret.id}/followings`).then((res) => {
+            const fetchFollowList = res.data.results.map(
+              (item: any) => item.id
+            );
+            console.log(fetchFollowList);
+            setFollowList(fetchFollowList);
+          });
+        } catch {
+          toast.error("유저 정보 불러오기에 실패하였습니다");
         }
       };
       fetchUserId();
@@ -173,6 +185,7 @@ const Likes = () => {
                   trackPermal={item.permalink}
                   artistPermal={item.artist.permalink}
                   followList={followList}
+                  setLikeList={setLikeList}
                 />
               ))
             )}

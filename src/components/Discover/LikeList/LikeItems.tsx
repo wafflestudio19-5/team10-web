@@ -8,6 +8,8 @@ import { FaCommentAlt } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 
 const LikeItems = ({
   userPermal,
@@ -20,6 +22,7 @@ const LikeItems = ({
   comment,
   repost,
   trackId,
+  setLikeList,
 }: {
   userPermal: string;
   trackPermal: string;
@@ -31,6 +34,7 @@ const LikeItems = ({
   comment: number;
   repost: number;
   trackId: number;
+  setLikeList: any;
 }) => {
   const [play, setPlay] = useState(false);
   const [heart, setHeart] = useState(true);
@@ -62,6 +66,12 @@ const LikeItems = ({
       });
       setHeart(!heart);
     }
+    await axios
+      .get(`/users/${userSecret.id}/likes/tracks`)
+      .then((res) => {
+        setLikeList(res.data.results);
+      })
+      .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };
   return (
     <div className={styles.itemWrapper}>
@@ -69,8 +79,8 @@ const LikeItems = ({
         {img === null ? (
           <svg
             className={styles.track}
-            width="220"
-            height="220"
+            width="45"
+            height="45"
             viewBox="0 0 220 220"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

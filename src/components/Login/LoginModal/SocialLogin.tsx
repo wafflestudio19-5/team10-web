@@ -38,6 +38,7 @@ const SocialLogin = ({
       .then(async (res) => {
         localStorage.setItem("permalink", res.data.permalink);
         localStorage.setItem("jwt_token", res.data.token);
+        localStorage.setItem("id", res.data.id);
         history.push("/discover");
       })
       .catch(() => {

@@ -4,9 +4,11 @@ import styles from "./MostList.module.scss";
 const MostList = ({
   mostTrackList,
   likeListId,
+  setLikeList,
 }: {
   mostTrackList: any;
   likeListId: any;
+  setLikeList: any;
 }) => {
   return (
     <div className={styles.mostList}>
@@ -17,6 +19,9 @@ const MostList = ({
           key={item.id}
           trackId={item.id}
           likeListId={likeListId}
+          trackPermalink={item.permalink}
+          artistPermalink={item.artist.permalink}
+          setLikeList={setLikeList}
         />
       ))}
     </div>

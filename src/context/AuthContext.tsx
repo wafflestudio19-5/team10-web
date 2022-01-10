@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 interface IUserSecret {
   jwt: string | undefined | null;
   permalink: string | undefined | null;
-  id: number;
+  id: number | null | string;
 }
 
 interface IAuthContext {
