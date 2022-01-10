@@ -4,6 +4,7 @@ import styles from "./CommentsInput.module.scss";
 import axios from "axios";
 import { ITrack, IUserMe } from "../../TrackPage";
 import { useAuthContext } from "../../../../../context/AuthContext";
+import { throttle } from "lodash";
 
 const CommentsInput = ({
   fetchComments,
@@ -22,20 +23,26 @@ const CommentsInput = ({
   };
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const config: any = {
-      method: "post",
-      url: `/tracks/${track.id}/comments`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: { content: commentInput },
-    };
-    try {
-      const response = await axios(config);
-      console.log(response);
-    } catch (error) {
-      console.log(console.error());
+    if (commentInput.trim().length === 0) {
+      return;
     }
+    const submitInput = throttle(async () => {
+      const config: any = {
+        method: "post",
+        url: `/tracks/${track.id}/comments`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: { content: commentInput },
+      };
+      try {
+        const response = await axios(config);
+        console.log(response);
+      } catch (error) {
+        console.log(console.error());
+      }
+    }, 1000);
+    submitInput();
     setInput("");
     fetchComments();
   };

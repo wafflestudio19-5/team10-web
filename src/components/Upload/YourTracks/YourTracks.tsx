@@ -71,7 +71,7 @@ const YourTracks = () => {
         setUsername(response.data.display_name);
         const tracksConfig: any = {
           method: "get",
-          url: `/users/${userSecret.id}/tracks?page=${1}&page_size=${10}`,
+          url: `/users/${userSecret.id}/tracks?page=${1}`,
           headers: {
             Authorization: `JWT ${userSecret.jwt}`,
           },
@@ -83,6 +83,7 @@ const YourTracks = () => {
           setYourTracks(data.results);
           setCurrentTracks(data.results);
           setLoading(false);
+          console.log(data);
           if (data.next) {
             // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
             nextPage.current += 1;
