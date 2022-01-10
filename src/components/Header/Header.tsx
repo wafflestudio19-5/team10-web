@@ -11,7 +11,7 @@ function Header() {
   const [me, setMe] = useState<any>();
 
   useEffect(() => {
-    cookies.get("is_logged_in") === null ? history.push("/") : null;
+    cookies.get("is_logged_in") === undefined && history.push("/");
     const jwt = localStorage.getItem("jwt_token");
     const getMe = async () => {
       const config: any = {
