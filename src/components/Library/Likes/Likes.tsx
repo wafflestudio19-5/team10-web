@@ -52,6 +52,7 @@ const Likes = () => {
     },
   ]);
   const [followList, setFollowList] = useState([]);
+  const [nextPage, setNextPage] = useState<string | null>(null);
   const { userSecret, setUserSecret } = useAuthContext();
   const filter = (e: any) => {
     setFilterInput(e.target.value);
@@ -60,6 +61,34 @@ const Likes = () => {
     );
     setFilteredLike(newList);
   };
+  const _ = require("lodash");
+  const fetchFollowList = _.throttle(() => {
+    const asyncFetchFollwList = async () => {
+      await axios.get(`/users/${userSecret.id}/followings`).then((res) => {
+        if (res.data.next !== null) {
+          let fetchFollowList = res.data.results.map((item: any) => item.id);
+          const nextUrl = res.data.next.split("users")[1];
+          const recurse = (url: string) => {
+            axios.get(`users${url}`).then((r) => {
+              if (r.data.next !== null) {
+                fetchFollowList = [...fetchFollowList, ...r.data.results];
+                const nextUrl = r.data.next.split("users")[1];
+                recurse(nextUrl);
+              } else {
+                fetchFollowList = [...fetchFollowList, ...r.data.results];
+                setFollowList(fetchFollowList);
+              }
+            });
+          };
+          recurse(nextUrl);
+        } else {
+          let fetchFollowList = res.data.results.map((item: any) => item.id);
+          setFollowList(fetchFollowList);
+        }
+      });
+    };
+    asyncFetchFollwList();
+  }, 200);
   useEffect(() => {
     const checkValid = async () => {
       const jwtToken = localStorage.getItem("jwt_token");
@@ -82,17 +111,13 @@ const Likes = () => {
             method: "get",
             url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
           }).then((res) => {
-            console.log(res);
             setLikeList(res.data.results);
             setFilteredLike(res.data.results);
+            res.data.next === null
+              ? null
+              : setNextPage(`users${res.data.next.split("users")[1]}`);
           });
-          axios.get(`/users/${userSecret.id}/followings`).then((res) => {
-            const fetchFollowList = res.data.results.map(
-              (item: any) => item.id
-            );
-            console.log(fetchFollowList);
-            setFollowList(fetchFollowList);
-          });
+          fetchFollowList();
         } catch {
           toast.error("유저 정보 불러오기에 실패하였습니다");
         }
@@ -100,6 +125,37 @@ const Likes = () => {
       fetchUserId();
     }
   }, [userSecret]);
+  const addLikeList = () => {
+    if (nextPage !== null && likeList.length === filteredLike.length) {
+      axios({
+        method: "get",
+        url: nextPage,
+      })
+        .then((res) => {
+          setLikeList([...likeList, ...res.data.results]);
+          setFilteredLike([...likeList, ...res.data.results]);
+          res.data.next === null
+            ? setNextPage(null)
+            : setNextPage(`users${res.data.next.split("users")[1]}`);
+        })
+        .catch(() => toast.error("like list 불러오기에 실패하였습니다"));
+    }
+  };
+  const fetchLikeList = _.throttle(() => {
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = document.documentElement.scrollTop;
+    const clientHeight = document.documentElement.clientHeight;
+    if (scrollTop + clientHeight >= scrollHeight) {
+      // 페이지 끝에 도달하면 추가 데이터를 받아온다
+      addLikeList();
+    }
+  }, 500);
+  useEffect(() => {
+    window.addEventListener("scroll", fetchLikeList);
+    return () => {
+      window.removeEventListener("scroll", fetchLikeList);
+    };
+  });
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.wrapper}>
@@ -185,7 +241,9 @@ const Likes = () => {
                   trackPermal={item.permalink}
                   artistPermal={item.artist.permalink}
                   followList={followList}
+                  fetchFollowList={fetchFollowList}
                   setLikeList={setLikeList}
+                  setFilteredLike={setFilteredLike}
                 />
               ))
             )}

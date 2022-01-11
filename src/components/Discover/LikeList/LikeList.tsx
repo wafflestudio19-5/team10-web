@@ -5,9 +5,11 @@ import styles from "./LikeList.module.scss";
 const LikeList = ({
   likeList,
   setLikeList,
+  setLikeCount,
 }: {
   likeList: any;
   setLikeList: any;
+  setLikeCount: any;
 }) => {
   return (
     <>
@@ -33,6 +35,7 @@ const LikeList = ({
               key={item.id}
               trackId={item.id}
               setLikeList={setLikeList}
+              setLikeCount={setLikeCount}
             />
           ))
       )}

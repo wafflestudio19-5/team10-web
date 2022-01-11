@@ -163,6 +163,7 @@ const Discover = () => {
             .then((res) => {
               setLikeCount(res.data.count);
               setLikeList(res.data.results);
+              console.log(res.data);
             });
         } catch {
           toast.error("like list 불러오기를 실패하였습니다");
@@ -201,6 +202,7 @@ const Discover = () => {
               mostTrackList={mostTrackList}
               likeListId={likeListId}
               setLikeList={setLikeList}
+              setLikeCount={setLikeCount}
             />
             {/* 아티스트 프로필이 있어야 가능 */}
           </div>
@@ -226,6 +228,7 @@ const Discover = () => {
                 newTrackList={newTrackList}
                 likeListId={likeListId}
                 setLikeList={setLikeList}
+                setLikeCount={setLikeCount}
               />
               {/* 아티스트 프로필이 있어야 가능 */}
             </div>
@@ -237,7 +240,11 @@ const Discover = () => {
               🤍 {likeCount} likes
               <button>View all</button>
             </div>
-            <LikeList likeList={likeList} setLikeList={setLikeList} />
+            <LikeList
+              likeList={likeList}
+              setLikeList={setLikeList}
+              setLikeCount={setLikeCount}
+            />
           </div>
           <div className={styles.following}>
             <div className={styles.header}>

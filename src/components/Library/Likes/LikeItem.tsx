@@ -18,7 +18,9 @@ const LikeItem = ({
   trackPermal,
   artistPermal,
   followList,
+  fetchFollowList,
   setLikeList,
+  setFilteredLike,
 }: {
   title: string;
   img: string;
@@ -28,7 +30,9 @@ const LikeItem = ({
   trackPermal: string;
   artistPermal: string;
   followList: any;
+  fetchFollowList: any;
   setLikeList: any;
+  setFilteredLike: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -52,22 +56,24 @@ const LikeItem = ({
         method: "post",
         url: `/likes/tracks/${trackId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast("like에 실패하였습니다"));
       setHeart(!heart);
     } else {
       await axios({
         method: "delete",
         url: `/likes/tracks/${trackId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast("like에 실패하였습니다"));
       setHeart(!heart);
     }
-    await axios
-      .get(`/users/${userSecret.id}/likes/tracks`)
-      .then((res) => {
-        setLikeList(res.data.results);
-      })
-      .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
+    }).then((res) => {
+      console.log(res);
+      setLikeList(res.data.results);
+      setFilteredLike(res.data.results);
+    });
   };
   const handleFollow = async (e: any) => {
     e.stopPropagation();
@@ -76,23 +82,24 @@ const LikeItem = ({
         method: "post",
         url: `/users/me/followings/${artistId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast.error("팔로우에 실패하였습니다"));
       setFollow(!follow);
     } else {
       await axios({
         method: "delete",
         url: `/users/me/followings/${artistId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast.error("팔로우에 실패하였습니다"));
       setFollow(!follow);
     }
+    fetchFollowList();
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
   };
   useEffect(() => {
     if (followList.length !== 0) {
-      followList.includes(userSecret.id)
+      artistId === userSecret.id
         ? setFollow("no")
         : followList.includes(artistId)
         ? setFollow(!follow)

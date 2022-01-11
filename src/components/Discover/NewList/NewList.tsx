@@ -6,11 +6,13 @@ const NewList = ({
   newTrackList,
   likeListId,
   setLikeList,
+  setLikeCount,
 }: {
   listScroll: any;
   newTrackList: any;
   likeListId: any;
   setLikeList: any;
+  setLikeCount: any;
 }) => {
   return (
     <div className={styles.newList} ref={listScroll}>
@@ -24,6 +26,7 @@ const NewList = ({
           trackPermalink={item.permalink}
           artistPermalink={item.artist.permalink}
           setLikeList={setLikeList}
+          setLikeCount={setLikeCount}
         />
       ))}
     </div>

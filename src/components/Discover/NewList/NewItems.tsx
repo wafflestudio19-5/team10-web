@@ -17,6 +17,7 @@ const NewItems = ({
   trackPermalink,
   artistPermalink,
   setLikeList,
+  setLikeCount,
 }: {
   title: string;
   img: string;
@@ -25,6 +26,7 @@ const NewItems = ({
   trackPermalink: string;
   artistPermalink: string;
   setLikeList: any;
+  setLikeCount: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -62,6 +64,7 @@ const NewItems = ({
       .get(`/users/${userSecret.id}/likes/tracks`)
       .then((res) => {
         setLikeList(res.data.results);
+        setLikeCount(res.data.count);
       })
       .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };

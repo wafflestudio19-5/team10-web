@@ -23,6 +23,7 @@ const LikeItems = ({
   repost,
   trackId,
   setLikeList,
+  setLikeCount,
 }: {
   userPermal: string;
   trackPermal: string;
@@ -35,6 +36,7 @@ const LikeItems = ({
   repost: number;
   trackId: number;
   setLikeList: any;
+  setLikeCount: any;
 }) => {
   const [play, setPlay] = useState(false);
   const [heart, setHeart] = useState(true);
@@ -70,6 +72,7 @@ const LikeItems = ({
       .get(`/users/${userSecret.id}/likes/tracks`)
       .then((res) => {
         setLikeList(res.data.results);
+        setLikeCount(res.data.count);
       })
       .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };

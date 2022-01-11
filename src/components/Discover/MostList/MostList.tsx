@@ -5,10 +5,12 @@ const MostList = ({
   mostTrackList,
   likeListId,
   setLikeList,
+  setLikeCount,
 }: {
   mostTrackList: any;
   likeListId: any;
   setLikeList: any;
+  setLikeCount: any;
 }) => {
   return (
     <div className={styles.mostList}>
@@ -22,6 +24,7 @@ const MostList = ({
           trackPermalink={item.permalink}
           artistPermalink={item.artist.permalink}
           setLikeList={setLikeList}
+          setLikeCount={setLikeCount}
         />
       ))}
     </div>
