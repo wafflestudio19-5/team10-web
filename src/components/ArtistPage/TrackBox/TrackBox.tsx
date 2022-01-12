@@ -127,6 +127,7 @@ function TrackBox({ item, artistName, myId, user }: any) {
           }
         )
         .then(() => {
+          toast("댓글 작성 완료");
           setComment("");
         })
         .catch(() => {
@@ -246,7 +247,7 @@ function TrackBox({ item, artistName, myId, user }: any) {
             <img src={user.image_profile} alt="me" />
           )}
           <input
-            placeholder={"Write a comment"}
+            placeholder={"Write a comment and Press Enter"}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onKeyPress={postComment}
