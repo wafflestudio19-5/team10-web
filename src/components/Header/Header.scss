@@ -52,13 +52,14 @@
 }
 
 .search {
-  width: 526.58px;
+  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-right: 10px;
 
   input {
-    width: 506.58px;
+    flex-grow: 1;
     height: 28px;
   }
 }
@@ -79,17 +80,15 @@
 }
 
 .header_user {
-  width: 202.34px;
+  width: fit-content;
   display: flex;
   flex-direction: row;
 }
 
 .dropdown {
-  width: 110.34px;
   height: 46px;
 
   button {
-    width: 110.34px;
     height: 46px;
     background-color: #333;
     border: none;

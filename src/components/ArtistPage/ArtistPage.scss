@@ -34,8 +34,7 @@
   }
 
   .upload-header-image {
-    margin-left: 670px;
-    margin-top: 30px;
+    margin-top: 31px;
     z-index: 10;
 
     button {
@@ -234,4 +233,11 @@
   text {
     font-size: 20px;
   }
+}
+
+.name-button {
+  width: 950px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }

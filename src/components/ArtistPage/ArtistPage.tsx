@@ -255,31 +255,33 @@ function ArtistPage() {
                 alt={"profileImg"}
               />
             )}
-            <div className={"name"}>
-              <div className={"displayname"}>{user.display_name}</div>
-              {user.first_name + user.last_name !== "" && (
-                <div className={"username"}>
-                  {user.first_name + user.last_name}
+            <div className="name-button">
+              <div className={"name"}>
+                <div className={"displayname"}>{user.display_name}</div>
+                {user.first_name + user.last_name !== "" && (
+                  <div className={"username"}>
+                    {user.first_name + user.last_name}
+                  </div>
+                )}
+              </div>
+              {isMe === true && (
+                <div className="upload-header-image">
+                  <button onClick={clickImageInput}>
+                    <img
+                      src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
+                      alt="img"
+                    />
+                    <div>Upload header image</div>
+                  </button>
+                  <input
+                    type="file"
+                    id="file-input3"
+                    accept=".png"
+                    onChange={changeHeader}
+                  />
                 </div>
               )}
             </div>
-            {isMe === true && (
-              <div className="upload-header-image">
-                <button onClick={clickImageInput}>
-                  <img
-                    src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
-                    alt="img"
-                  />
-                  <div>Upload header image</div>
-                </button>
-                <input
-                  type="file"
-                  id="file-input3"
-                  accept=".png"
-                  onChange={changeHeader}
-                />
-              </div>
-            )}
           </div>
 
           <div className={"menu-bar"}>
