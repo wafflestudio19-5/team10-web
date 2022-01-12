@@ -137,6 +137,8 @@ function TrackBox({ item, artistName, myId, user }: any) {
   };
 
   useEffect(() => {
+    player.current.audio.current.pause();
+
     const getIsLiking = () => {
       axios.get(`/users/${myId}/likes/tracks`).then((res) => {
         const pages = Array.from(

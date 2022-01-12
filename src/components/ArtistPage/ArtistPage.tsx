@@ -28,6 +28,8 @@ function ArtistPage() {
   const [trackPage, setTrackPage] = useState<any>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
+  const [musicPlay, setMusicPlay] = useState<boolean>();
+
   const clickImageInput = (event: any) => {
     event.preventDefault();
     let fileInput = document.getElementById("file-input3");
@@ -377,6 +379,8 @@ function ArtistPage() {
                     artistName={user.display_name}
                     myId={myId}
                     user={user}
+                    musicPlay={musicPlay}
+                    setMusicPlay={setMusicPlay}
                   />
                 ))}
               <div ref={ref} className="inView">
