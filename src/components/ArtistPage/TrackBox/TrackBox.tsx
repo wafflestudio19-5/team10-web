@@ -290,7 +290,7 @@ function TrackBox({ item, artistName, myId, user }: any) {
               <div>{item.repost_count}</div>
             </button>
           )}
-          <button>
+          {/* <button>
             <img
               src="https://a-v2.sndcdn.com/assets/images/share-e2febe1d.svg"
               alt="share"
@@ -303,7 +303,7 @@ function TrackBox({ item, artistName, myId, user }: any) {
               alt="more"
             />
             <div>More</div>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
