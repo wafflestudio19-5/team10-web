@@ -57,7 +57,6 @@ function EditModal({ user, modal, setModal, getUser }: any) {
       try {
         await axios(config);
         toast("프로필 업데이트 성공");
-        console.log(imgFile);
         setModal(false);
         getUser(user.id);
       } catch (error) {

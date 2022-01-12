@@ -42,7 +42,7 @@ function UploadModal({ selectedFile, setModal }: any) {
 
   const handleUpload = (e: any) => {
     e.preventDefault();
-    if (imageFile) {
+    if (imageFile && token) {
       axios
         .post(
           "https://api.soundwaffle.com/tracks",

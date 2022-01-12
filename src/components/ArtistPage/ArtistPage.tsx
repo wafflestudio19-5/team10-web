@@ -71,7 +71,6 @@ function ArtistPage() {
       }
     };
     changeHeaderImg();
-    getUser(pageId);
   };
 
   const getUser = (id: any) => {
@@ -286,11 +285,11 @@ function ArtistPage() {
           <div className={"menu-bar"}>
             <div className={"menu-left"}>
               <a href={`/${permalink}`}>All</a>
-              <a href={`/${permalink}/popular-tracks`}>Popular tracks</a>
-              <a href={`/${permalink}/tracks`}>Tracks</a>
-              <a href={`/${permalink}/albums`}>Albums</a>
-              <a href={`/${permalink}/sets`}>Playlists</a>
-              <a href={`/${permalink}/reposts`}>Reposts</a>
+              <a>Popular tracks</a>
+              <a>Tracks</a>
+              <a>Albums</a>
+              <a>Playlists</a>
+              <a>Reposts</a>
             </div>
             {isMe === true && (
               <div className="menu-right">
