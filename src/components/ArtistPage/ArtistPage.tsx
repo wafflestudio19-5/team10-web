@@ -28,7 +28,7 @@ function ArtistPage() {
   const [trackPage, setTrackPage] = useState<any>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
-  const [musicPlay, setMusicPlay] = useState<boolean>();
+  const [currentPlay, setCurrentPlay] = useState<any>(null);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -379,8 +379,8 @@ function ArtistPage() {
                     artistName={user.display_name}
                     myId={myId}
                     user={user}
-                    musicPlay={musicPlay}
-                    setMusicPlay={setMusicPlay}
+                    currentPlay={currentPlay}
+                    setCurrentPlay={setCurrentPlay}
                   />
                 ))}
               <div ref={ref} className="inView">

@@ -7,7 +7,14 @@ import { useHistory } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./TrackBox.scss";
 
-function TrackBox({ item, artistName, myId, user }: any) {
+function TrackBox({
+  item,
+  artistName,
+  myId,
+  user,
+  currentPlay,
+  setCurrentPlay,
+}: any) {
   const { userSecret } = useAuthContext();
   const history = useHistory();
 
@@ -19,11 +26,17 @@ function TrackBox({ item, artistName, myId, user }: any) {
   const [isPlaying, setIsPlaying] = useState<boolean>();
 
   const playMusic = () => {
+    if (currentPlay !== null) {
+      const current = document.getElementsByClassName(`player${currentPlay}`);
+      current[0].getElementsByTagName("audio")[0].pause();
+    }
     setIsPlaying(true);
     player.current.audio.current.play();
+    setCurrentPlay(item.id);
   };
 
   const pauseMusic = () => {
+    setCurrentPlay(null);
     setIsPlaying(false);
     player.current.audio.current.pause();
   };
@@ -240,7 +253,12 @@ function TrackBox({ item, artistName, myId, user }: any) {
             <div className={"trackname"}>{item.title}</div>
           </div>
         </div>
-        <AudioPlayer className="player" src={item.audio} ref={player} />
+        <AudioPlayer
+          className={`player${item.id}`}
+          src={item.audio}
+          key={item.id}
+          ref={player}
+        />
         <div className={"comment"}>
           {user.image_profile === null && (
             <img src="img/user_img.png" alt="me" />
