@@ -34,7 +34,7 @@ function Header() {
     localStorage.removeItem("jwt_token");
     localStorage.removeItem("permalink");
     localStorage.removeItem("id");
-    cookies.remove("is_logged_in");
+    cookies.remove("is_logged_in", { path: "/" });
     history.push("/logout");
   };
 

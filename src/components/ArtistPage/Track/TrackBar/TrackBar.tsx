@@ -25,6 +25,20 @@ import { ILikeTrack } from "../Main/ListenEngagement";
 
 // import axios from "axios";
 
+export interface ITrackBarTrack {
+  id: number;
+  title: string;
+  permalink: string;
+  audio: string;
+  image: string | null;
+  like_count: number;
+  repost_count: number;
+  comment_count: number;
+  genre: string | null;
+  count: number;
+  is_private: boolean;
+}
+
 const TrackBar = () => {
   const [likeTrack, setLikeTrack] = useState<boolean | undefined>(undefined);
   const [followArtist, setFollowArtist] = useState<boolean | undefined>(

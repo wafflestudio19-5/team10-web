@@ -6,7 +6,7 @@ import { BiRepost, BiPencil } from "react-icons/bi";
 import { FiLink2 } from "react-icons/fi";
 import { FaPlay } from "react-icons/fa";
 import { IArtist, ITrack, IUserMe } from "../TrackPage";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../../context/AuthContext";
@@ -17,7 +17,7 @@ export interface ILikeTrack {
 
 const ListenEngagement = ({
   track,
-  artist,
+  //   artist,
   userMe,
   fetchTrack,
   isMyTrack,
@@ -39,7 +39,7 @@ const ListenEngagement = ({
   const [likeLoading, setLikeLoading] = useState(true);
   const [repostLoading, setRepostLoading] = useState(true);
 
-  const history = useHistory();
+  //   const history = useHistory();
   const { userSecret } = useAuthContext();
 
   useEffect(() => {
@@ -203,10 +203,10 @@ const ListenEngagement = ({
     setEditModal(true);
   };
 
-  const trackLikes = () =>
-    history.push(`/${artist.permalink}/${track.permalink}/likes`);
-  const trackReposts = () =>
-    history.push(`/${artist.permalink}/${track.permalink}/reposts`);
+  //   const trackLikes = () =>
+  //     history.push(`/${artist.permalink}/${track.permalink}/likes`);
+  //   const trackReposts = () =>
+  //     history.push(`/${artist.permalink}/${track.permalink}/reposts`);
 
   return (
     <div className={styles.main}>
@@ -269,14 +269,20 @@ const ListenEngagement = ({
         </div>
         <div className={styles.likeStats}>
           <BsSuitHeartFill />
-          <span className={styles.pointer} onClick={trackLikes}>
+          <span
+            className={styles.pointer}
+            //    onClick={trackLikes}
+          >
             {track.like_count}
           </span>
         </div>
         {isMyTrack === false && (
           <div className={styles.repostStats}>
             <BiRepost />
-            <span className={styles.pointer} onClick={trackReposts}>
+            <span
+              className={styles.pointer}
+              // onClick={trackReposts}
+            >
               {track.repost_count}
             </span>
           </div>

@@ -35,8 +35,9 @@ interface IYourTracks {
   like_count: number;
   repost_count: number;
   comment_count: number;
-  genre: number | null;
+  genre: string | null;
   count: number;
+  is_private: boolean;
 }
 
 const YourTracks = () => {
@@ -169,8 +170,6 @@ const YourTracks = () => {
     }
   };
 
-  console.log(nextPage, yourTracks);
-
   return (
     <div className={styles.yourTracksPage}>
       {modal && editTrack && (
@@ -250,9 +249,9 @@ const YourTracks = () => {
                     setModal={setModal}
                     setEditTrack={setEditTrack}
                     fetchYourTracks={fetchYourTracks}
-                    yourTracks={currentTracks}
-                    finalPage={finalPage.current}
-                    currentPage={currentPage}
+                    // yourTracks={currentTracks}
+                    // finalPage={finalPage.current}
+                    // currentPage={currentPage}
                   />
                 );
               })}
@@ -284,22 +283,23 @@ const Track = ({
   setModal,
   setEditTrack,
   fetchYourTracks,
-  yourTracks,
-  finalPage,
-  currentPage,
-}: {
+}: //   yourTracks,
+//   finalPage,
+//   currentPage,
+{
   track: IYourTracks;
   checkedItemHandler: (id: number, isChecked: boolean) => void;
   username: string;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
   fetchYourTracks: () => void;
-  yourTracks: IYourTracks[];
-  finalPage: number;
-  currentPage: number;
+  //   yourTracks: IYourTracks[];
+  //   finalPage: number;
+  //   currentPage: number;
 }) => {
   const [checked, setChecked] = useState(false);
-  const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
+  //   const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
+  //   const [fetchLoading, setFetchLoading] = useState(true)
   //   const [duration, setDuration] = useState(0);
   const [play, setPlay] = useState(false);
   const player = useRef<HTMLAudioElement>(null);
@@ -319,44 +319,44 @@ const Track = ({
     setChecked(!checked);
     checkedItemHandler(track.id, event.target.checked);
   };
-  useEffect(() => {
-    const fetchTrack = async () => {
-      if (userSecret.jwt && currentPage > finalPage) {
-        const config: any = {
-          method: "get",
-          url: `/tracks/${track.id}`,
-          headers: {
-            Authorization: `JWT ${userSecret.jwt}`,
-          },
-          data: {},
-        };
-        try {
-          const { data } = await axios(config);
-          const tagList = data.tags.map((value: ITag) => value.name);
-          setFetchedTrack({
-            id: data.id,
-            title: data.title,
-            permalink: data.permalink,
-            audio: data.audio,
-            comment_count: data.comment_count,
-            count: data.count,
-            created_at: data.created_at,
-            description: data.description,
-            genre: data.genre,
-            image: data.image,
-            like_count: data.like_count,
-            repost_count: data.repost_count,
-            tags: tagList,
-            is_private: data.is_private,
-            audio_length: 0,
-          });
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-    fetchTrack();
-  }, [userSecret, yourTracks]);
+  //   useEffect(() => {
+  //     const fetchTrack = async () => {
+  //       if (userSecret.jwt && currentPage > finalPage) {
+  //         const config: any = {
+  //           method: "get",
+  //           url: `/tracks/${track.id}`,
+  //           headers: {
+  //             Authorization: `JWT ${userSecret.jwt}`,
+  //           },
+  //           data: {},
+  //         };
+  //         try {
+  //           const { data } = await axios(config);
+  //           const tagList = data.tags.map((value: ITag) => value.name);
+  //           setFetchedTrack({
+  //             id: data.id,
+  //             title: data.title,
+  //             permalink: data.permalink,
+  //             audio: data.audio,
+  //             comment_count: data.comment_count,
+  //             count: data.count,
+  //             created_at: data.created_at,
+  //             description: data.description,
+  //             genre: data.genre,
+  //             image: data.image,
+  //             like_count: data.like_count,
+  //             repost_count: data.repost_count,
+  //             tags: tagList,
+  //             is_private: data.is_private,
+  //             audio_length: 0,
+  //           });
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       }
+  //     };
+  //     fetchTrack();
+  //   }, [userSecret, yourTracks]);
   const headerTrackSrc = track.audio.split("?")[0];
   const barTrackSrc = audioSrc.split("?")[0];
   useEffect(() => {
@@ -382,14 +382,15 @@ const Track = ({
   //   };
 
   const togglePlayButton = () => {
-    if (fetchedTrack) {
+    if (track) {
+      console.log("play");
       if (!play) {
         if (headerTrackSrc !== barTrackSrc) {
           setPlayingTime(0);
           audioPlayer.current.src = track.audio;
           setAudioSrc(track.audio);
           audioPlayer.current.load();
-          setTrackBarTrack(fetchedTrack);
+          setTrackBarTrack(track);
         }
         setPlay(true);
         setTrackIsPlaying(true);
@@ -408,11 +409,41 @@ const Track = ({
   const clickTitle = () =>
     history.push(`/${userSecret.permalink}/${track.permalink}`);
 
-  const onEditTrack: React.MouseEventHandler = (event) => {
+  const onEditTrack: React.MouseEventHandler = async (event) => {
     event.stopPropagation();
-    if (fetchedTrack) {
+    if (track) {
       setModal(true);
-      setEditTrack(fetchedTrack);
+      const config: any = {
+        method: "get",
+        url: `/tracks/${track.id}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const { data } = await axios(config);
+        const tagList = data.tags.map((value: ITag) => value.name);
+        setEditTrack({
+          id: data.id,
+          title: data.title,
+          permalink: data.permalink,
+          audio: data.audio,
+          comment_count: data.comment_count,
+          count: data.count,
+          created_at: data.created_at,
+          description: data.description,
+          genre: data.genre,
+          image: data.image,
+          like_count: data.like_count,
+          repost_count: data.repost_count,
+          tags: tagList,
+          is_private: data.is_private,
+          audio_length: 0,
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   const deleteTrack = async (event: React.MouseEvent, id: number) => {
@@ -457,7 +488,7 @@ const Track = ({
     <li key={track.id} onClick={() => setChecked(!checked)}>
       <audio
         ref={player}
-        src={fetchedTrack?.audio}
+        src={track?.audio}
         preload="metadata"
         // onLoadedMetadata={onLoadedMetadata}
       />

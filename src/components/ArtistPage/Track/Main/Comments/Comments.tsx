@@ -28,6 +28,7 @@ const Comments = ({
   commentCount: number;
   isFinalComment: boolean;
 }) => {
+  console.log(comments);
   const sortedComments = comments.reduce((sorted: any, comment: IComment) => {
     if (!sorted[comment.group]) {
       sorted[comment.group] = [];
@@ -45,11 +46,11 @@ const Comments = ({
       </header>
       <ul className={styles.commentsList}>
         {comments.length !== 0
-          ? sortedComments.reverse().map((comments: IComment[]) => {
+          ? sortedComments.reverse().map((comment: IComment[]) => {
               return (
                 <CommentItem
-                  comments={comments}
-                  key={comments[0].group}
+                  comments={comment}
+                  key={comment[0].group}
                   track={track}
                   fetchComments={fetchComments}
                   userMe={userMe}
@@ -144,6 +145,7 @@ const CommentItem = ({
             try {
               const response = await axios(config);
               if (response) {
+                console.log("deleted");
                 fetchComments();
               }
             } catch (error) {
