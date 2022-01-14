@@ -312,6 +312,7 @@ const Track = ({
     setTrackBarTrack,
     audioPlayer,
     setPlayingTime,
+    setTrackBarArtist,
   } = useTrackContext();
   const history = useHistory();
 
@@ -382,14 +383,18 @@ const Track = ({
   //   };
 
   const togglePlayButton = () => {
-    if (track) {
-      console.log("play");
+    if (track && userSecret.permalink) {
       if (!play) {
         if (headerTrackSrc !== barTrackSrc) {
           setPlayingTime(0);
           audioPlayer.current.src = track.audio;
           setAudioSrc(track.audio);
           audioPlayer.current.load();
+          setTrackBarArtist({
+            display_name: username,
+            id: userSecret.id,
+            permalink: userSecret.permalink,
+          });
           setTrackBarTrack(track);
         }
         setPlay(true);

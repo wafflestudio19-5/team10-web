@@ -98,7 +98,11 @@ const TrackHeader = ({
     } else {
       setAudioSrc(track.audio);
       setTrackIsPlaying(true);
-      setTrackBarArtist(artist);
+      setTrackBarArtist({
+        display_name: artist.display_name,
+        id: artist.id,
+        permalink: artist.permalink,
+      });
       setTrackBarTrack({
         id: track.id,
         title: track.title,

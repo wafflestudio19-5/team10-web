@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useRef, useState } from "react";
-import { ITrackBarTrack } from "../components/ArtistPage/Track/TrackBar/TrackBar";
-import { IArtist } from "../components/ArtistPage/Track/TrackPage";
+import {
+  ITrackBarArtist,
+  ITrackBarTrack,
+} from "../components/ArtistPage/Track/TrackBar/TrackBar";
+// import { IArtist } from "../components/ArtistPage/Track/TrackPage";
 
 // 토큰 타입 지정
 interface ITrackContext {
@@ -17,8 +20,8 @@ interface ITrackContext {
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
   loop: boolean;
   setLoop: React.Dispatch<React.SetStateAction<boolean>>;
-  trackBarArtist: IArtist;
-  setTrackBarArtist: React.Dispatch<React.SetStateAction<IArtist>>;
+  trackBarArtist: ITrackBarArtist;
+  setTrackBarArtist: React.Dispatch<React.SetStateAction<ITrackBarArtist>>;
   trackBarTrack: ITrackBarTrack;
   setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrackBarTrack>>;
 }
@@ -39,8 +42,8 @@ const TrackContext = createContext<ITrackContext>({
   setLoop: () => Boolean,
   trackBarArtist: {
     display_name: "",
-    country: "",
-    city: "",
+    // country: "",
+    // city: "",
     id: 0,
     permalink: "",
   },
@@ -72,10 +75,8 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
   const [audioSrc, setAudioSrc] = useState<ITrackContext["audioSrc"]>("");
   const [isMuted, setIsMuted] = useState(false);
   const [loop, setLoop] = useState(false);
-  const [trackBarArtist, setTrackBarArtist] = useState<IArtist>({
+  const [trackBarArtist, setTrackBarArtist] = useState<ITrackBarArtist>({
     display_name: "",
-    country: "",
-    city: "",
     id: 0,
     permalink: "",
   });
