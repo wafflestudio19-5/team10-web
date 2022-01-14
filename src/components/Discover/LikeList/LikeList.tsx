@@ -6,10 +6,14 @@ const LikeList = ({
   likeList,
   setLikeList,
   setLikeCount,
+  togglePlayPause,
+  playMusic,
 }: {
   likeList: any;
   setLikeList: any;
   setLikeCount: any;
+  togglePlayPause: any;
+  playMusic: any;
 }) => {
   return (
     <>
@@ -36,6 +40,9 @@ const LikeList = ({
               trackId={item.id}
               setLikeList={setLikeList}
               setLikeCount={setLikeCount}
+              togglePlayPause={togglePlayPause}
+              track={item}
+              playMusic={playMusic}
             />
           ))
       )}

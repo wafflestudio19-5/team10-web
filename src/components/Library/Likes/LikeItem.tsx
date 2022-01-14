@@ -7,6 +7,7 @@ import { FaUserCheck, FaUserPlus } from "react-icons/fa";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
 import { Link, useHistory } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useTrackContext } from "../../../context/TrackContext";
 import styles from "./LikeItem.module.scss";
 
 const LikeItem = ({
@@ -21,6 +22,9 @@ const LikeItem = ({
   fetchFollowList,
   setLikeList,
   setFilteredLike,
+  togglePlayPause,
+  track,
+  playMusic,
 }: {
   title: string;
   img: string;
@@ -33,6 +37,9 @@ const LikeItem = ({
   fetchFollowList: any;
   setLikeList: any;
   setFilteredLike: any;
+  togglePlayPause: any;
+  track: any;
+  playMusic: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -45,10 +52,24 @@ const LikeItem = ({
   const [heart, setHeart] = useState(true);
   const [follow, setFollow] = useState<boolean | string>(false);
   const { userSecret } = useAuthContext();
+  const { trackIsPlaying, trackBarTrack } = useTrackContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
-    setPlay(!play);
+    togglePlayPause(track, track.artist);
+    trackBarTrack.id === trackId ? setPlay(!trackIsPlaying) : setPlay(true);
   };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? null : setPlay(false);
+  }, [trackBarTrack]);
+  const moveWeb = async () => {
+    setPlay(true);
+  };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? moveWeb().then(() => playMusic()) : null;
+  }, []);
+  useEffect(() => {
+    trackBarTrack.id === trackId ? setPlay(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
   const handleHeart = async (e: any) => {
     e.stopPropagation();
     if (heart === false) {

@@ -1,12 +1,14 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { AiFillAppstore } from "react-icons/ai";
 import { BiHeartSquare } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
 import { useHistory } from "react-router";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useTrackContext } from "../../../context/TrackContext";
 import LikeItem from "./LikeItem";
+import throttle from "lodash/throttle";
 import styles from "./Likes.module.scss";
 
 const Likes = () => {
@@ -21,6 +23,8 @@ const Likes = () => {
         permalink: "",
         display_name: "",
         id: -1,
+        city: "",
+        country: "",
       },
       permailink: "",
       title: "",
@@ -31,6 +35,12 @@ const Likes = () => {
       audio: "",
       image: "",
       id: -1,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
   ]);
   const [filteredLike, setFilteredLike] = useState([
@@ -39,6 +49,8 @@ const Likes = () => {
         permalink: "",
         display_name: "",
         id: -1,
+        city: "",
+        country: "",
       },
       permailink: "",
       title: "",
@@ -49,6 +61,12 @@ const Likes = () => {
       audio: "",
       image: "",
       id: -1,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
   ]);
   const [followList, setFollowList] = useState([]);
@@ -66,24 +84,24 @@ const Likes = () => {
     const asyncFetchFollwList = async () => {
       await axios.get(`/users/${userSecret.id}/followings`).then((res) => {
         if (res.data.next !== null) {
-          let fetchFollowList = res.data.results.map((item: any) => item.id);
+          let fetchedFollowList = res.data.results.map((item: any) => item.id);
           const nextUrl = res.data.next.split("users")[1];
           const recurse = (url: string) => {
             axios.get(`users${url}`).then((r) => {
               if (r.data.next !== null) {
-                fetchFollowList = [...fetchFollowList, ...r.data.results];
+                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
                 const nextUrl = r.data.next.split("users")[1];
                 recurse(nextUrl);
               } else {
-                fetchFollowList = [...fetchFollowList, ...r.data.results];
-                setFollowList(fetchFollowList);
+                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
+                setFollowList(fetchedFollowList);
               }
             });
           };
           recurse(nextUrl);
         } else {
-          let fetchFollowList = res.data.results.map((item: any) => item.id);
-          setFollowList(fetchFollowList);
+          let fetchedFollowList = res.data.results.map((item: any) => item.id);
+          setFollowList(fetchedFollowList);
         }
       });
     };
@@ -91,15 +109,17 @@ const Likes = () => {
   }, 200);
   useEffect(() => {
     const checkValid = async () => {
-      const jwtToken = localStorage.getItem("jwt_token");
-      const permal = localStorage.getItem("permalink");
-      const ID = localStorage.getItem("id");
-      await setUserSecret({
-        ...userSecret,
-        jwt: jwtToken,
-        permalink: permal,
-        id: ID,
-      });
+      if (userSecret.permalink === undefined) {
+        const jwtToken = localStorage.getItem("jwt_token");
+        const permal = localStorage.getItem("permalink");
+        const ID = localStorage.getItem("id");
+        await setUserSecret({
+          ...userSecret,
+          jwt: jwtToken,
+          permalink: permal,
+          id: ID,
+        });
+      }
     };
     checkValid();
   }, []);
@@ -156,6 +176,67 @@ const Likes = () => {
       window.removeEventListener("scroll", fetchLikeList);
     };
   });
+  const {
+    setTrackIsPlaying,
+    playingTime,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    trackIsPlaying,
+    trackBarTrack,
+  } = useTrackContext();
+  const animationRef = useRef(0); // 재생 애니메이션
+  const playMusic = () => {
+    if (trackIsPlaying) {
+      audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    } else {
+      audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+  const togglePlayPause = (track: any, artist: any) => {
+    // 재생/일시정지 버튼 누를 때
+    if (trackBarTrack.id === track.id) {
+      const prevValue = trackIsPlaying;
+      setTrackIsPlaying(!prevValue);
+      if (!prevValue) {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+        animationRef.current = requestAnimationFrame(whilePlaying);
+      } else {
+        audioPlayer.current.pause();
+        setPlayingTime(audioPlayer.current.currentTime);
+        cancelAnimationFrame(animationRef.current);
+      }
+    } else {
+      setAudioSrc(track.audio);
+      setTrackIsPlaying(true);
+      setTrackBarArtist(artist);
+      setTrackBarTrack(track);
+      audioPlayer.current.src = track.audio;
+      setTimeout(() => {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }, 1);
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    }
+  };
+  const whilePlaying = () => {
+    changePlayerCurrentTime();
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      setPlayingTime(audioPlayer.current.currentTime);
+    }, 30000),
+    [playingTime]
+  );
+  changePlayerCurrentTime();
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.wrapper}>
@@ -244,6 +325,9 @@ const Likes = () => {
                   fetchFollowList={fetchFollowList}
                   setLikeList={setLikeList}
                   setFilteredLike={setFilteredLike}
+                  togglePlayPause={togglePlayPause}
+                  track={item}
+                  playMusic={playMusic}
                 />
               ))
             )}

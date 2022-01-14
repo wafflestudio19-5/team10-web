@@ -1,6 +1,6 @@
 import styles from "./LikeItem.module.scss";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsFillPlayFill, BsThreeDots } from "react-icons/bs";
 import { BiRepost } from "react-icons/bi";
 import { AiFillHeart } from "react-icons/ai";
@@ -9,6 +9,7 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
 import toast from "react-hot-toast";
+import { useTrackContext } from "../../../context/TrackContext";
 // import toast from "react-hot-toast";
 
 const LikeItems = ({
@@ -24,6 +25,9 @@ const LikeItems = ({
   trackId,
   setLikeList,
   setLikeCount,
+  togglePlayPause,
+  track,
+  playMusic,
 }: {
   userPermal: string;
   trackPermal: string;
@@ -37,14 +41,32 @@ const LikeItems = ({
   trackId: number;
   setLikeList: any;
   setLikeCount: any;
+  togglePlayPause: any;
+  track: any;
+  playMusic: any;
 }) => {
   const [play, setPlay] = useState(false);
   const [heart, setHeart] = useState(true);
   const history = useHistory();
   const { userSecret } = useAuthContext();
-  const handlePlay = () => {
-    setPlay(!play);
+  const { trackIsPlaying, trackBarTrack } = useTrackContext();
+  const handlePlay = (e: any) => {
+    e.stopPropagation();
+    togglePlayPause(track, track.artist);
+    trackBarTrack.id === trackId ? setPlay(!trackIsPlaying) : setPlay(true);
   };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? null : setPlay(false);
+  }, [trackBarTrack]);
+  const moveWeb = async () => {
+    setPlay(true);
+  };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? moveWeb().then(() => playMusic()) : null;
+  }, []);
+  useEffect(() => {
+    trackBarTrack.id === trackId ? setPlay(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
   const goArtistPage = () => {
     history.push(`/${userPermal}`);
   };

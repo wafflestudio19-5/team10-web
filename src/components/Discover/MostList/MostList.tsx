@@ -6,11 +6,15 @@ const MostList = ({
   likeListId,
   setLikeList,
   setLikeCount,
+  togglePlayPause,
+  playMusic,
 }: {
   mostTrackList: any;
   likeListId: any;
   setLikeList: any;
   setLikeCount: any;
+  togglePlayPause: any;
+  playMusic: any;
 }) => {
   return (
     <div className={styles.mostList}>
@@ -25,6 +29,9 @@ const MostList = ({
           artistPermalink={item.artist.permalink}
           setLikeList={setLikeList}
           setLikeCount={setLikeCount}
+          togglePlayPause={togglePlayPause}
+          track={item}
+          playMusic={playMusic}
         />
       ))}
     </div>

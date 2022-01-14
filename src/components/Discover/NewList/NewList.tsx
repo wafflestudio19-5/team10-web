@@ -7,12 +7,16 @@ const NewList = ({
   likeListId,
   setLikeList,
   setLikeCount,
+  togglePlayPause,
+  playMusic,
 }: {
   listScroll: any;
   newTrackList: any;
   likeListId: any;
   setLikeList: any;
   setLikeCount: any;
+  togglePlayPause: any;
+  playMusic: any;
 }) => {
   return (
     <div className={styles.newList} ref={listScroll}>
@@ -27,6 +31,9 @@ const NewList = ({
           artistPermalink={item.artist.permalink}
           setLikeList={setLikeList}
           setLikeCount={setLikeCount}
+          togglePlayPause={togglePlayPause}
+          track={item}
+          playMusic={playMusic}
         />
       ))}
     </div>

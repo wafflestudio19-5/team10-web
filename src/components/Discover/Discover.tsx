@@ -1,11 +1,13 @@
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../context/AuthContext";
+import { useTrackContext } from "../../context/TrackContext";
 import styles from "./Discover.module.scss";
 import LikeList from "./LikeList/LikeList";
 import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
+import throttle from "lodash/throttle";
 
 const Discover = () => {
   const { userSecret, setUserSecret } = useAuthContext();
@@ -14,6 +16,9 @@ const Discover = () => {
       artist: {
         permalink: "",
         display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
       permailink: "",
       title: "",
@@ -24,104 +29,321 @@ const Discover = () => {
       audio: "",
       image: "",
       id: -1,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
   ]);
   const [likeListId, setLikeListId] = useState([-1]);
   const [likeCount, setLikeCount] = useState(0);
   const [mostTrackList, setMostTrackList] = useState([
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999999,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999998,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999997,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999996,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
   ]);
   const [newTrackList, setNewTrackList] = useState([
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999999,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999998,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999997,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999996,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999995,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
     {
-      title: "",
-      image: "",
-      permalink: "",
       artist: {
         permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
       },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
       id: 999994,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
   ]);
+  const {
+    setTrackIsPlaying,
+    playingTime,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    trackIsPlaying,
+    trackBarTrack,
+  } = useTrackContext();
+  const animationRef = useRef(0); // 재생 애니메이션
+  const playMusic = () => {
+    if (trackIsPlaying) {
+      audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    } else {
+      audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+  const togglePlayPause = (track: any, artist: any) => {
+    // 재생/일시정지 버튼 누를 때
+    if (trackBarTrack.id === track.id) {
+      const prevValue = trackIsPlaying;
+      setTrackIsPlaying(!prevValue);
+      if (!prevValue) {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+        animationRef.current = requestAnimationFrame(whilePlaying);
+      } else {
+        audioPlayer.current.pause();
+        setPlayingTime(audioPlayer.current.currentTime);
+        cancelAnimationFrame(animationRef.current);
+      }
+    } else {
+      setAudioSrc(track.audio);
+      setTrackIsPlaying(true);
+      setTrackBarArtist(artist);
+      setTrackBarTrack(track);
+      audioPlayer.current.src = track.audio;
+      setTimeout(() => {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }, 1);
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    }
+  };
+  const whilePlaying = () => {
+    changePlayerCurrentTime();
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      setPlayingTime(audioPlayer.current.currentTime);
+    }, 30000),
+    [playingTime]
+  );
+  changePlayerCurrentTime();
   useEffect(() => {
     const checkValid = async () => {
       const jwtToken = localStorage.getItem("jwt_token");
@@ -203,6 +425,8 @@ const Discover = () => {
               likeListId={likeListId}
               setLikeList={setLikeList}
               setLikeCount={setLikeCount}
+              togglePlayPause={togglePlayPause}
+              playMusic={playMusic}
             />
             {/* 아티스트 프로필이 있어야 가능 */}
           </div>
@@ -229,6 +453,8 @@ const Discover = () => {
                 likeListId={likeListId}
                 setLikeList={setLikeList}
                 setLikeCount={setLikeCount}
+                togglePlayPause={togglePlayPause}
+                playMusic={playMusic}
               />
               {/* 아티스트 프로필이 있어야 가능 */}
             </div>
@@ -244,6 +470,8 @@ const Discover = () => {
               likeList={likeList}
               setLikeList={setLikeList}
               setLikeCount={setLikeCount}
+              togglePlayPause={togglePlayPause}
+              playMusic={playMusic}
             />
           </div>
           <div className={styles.following}>

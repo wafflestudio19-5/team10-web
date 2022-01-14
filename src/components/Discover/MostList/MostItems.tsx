@@ -8,6 +8,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useTrackContext } from "../../../context/TrackContext";
 
 const MostItems = ({
   title,
@@ -18,6 +19,9 @@ const MostItems = ({
   artistPermalink,
   setLikeList,
   setLikeCount,
+  togglePlayPause,
+  track,
+  playMusic,
 }: {
   title: string;
   img: string;
@@ -27,6 +31,9 @@ const MostItems = ({
   artistPermalink: string;
   setLikeList: any;
   setLikeCount: any;
+  togglePlayPause: any;
+  track: any;
+  playMusic: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -39,10 +46,24 @@ const MostItems = ({
     trackPermal: "",
   });
   const { userSecret } = useAuthContext();
+  const { trackIsPlaying, trackBarTrack } = useTrackContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
-    setPlay(!play);
+    togglePlayPause(track, track.artist);
+    trackBarTrack.id === trackId ? setPlay(!trackIsPlaying) : setPlay(true);
   };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? null : setPlay(false);
+  }, [trackBarTrack]);
+  const moveWeb = async () => {
+    setPlay(true);
+  };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? moveWeb().then(() => playMusic()) : null;
+  }, []);
+  useEffect(() => {
+    trackBarTrack.id === trackId ? setPlay(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
   const handleHeart = async (e: any) => {
     e.stopPropagation();
     if (heart === false) {
