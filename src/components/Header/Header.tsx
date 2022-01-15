@@ -29,7 +29,8 @@ function Header() {
       }
     };
     getMe();
-  }, [me]);
+  }, []);
+
   const onSignOut = () => {
     localStorage.removeItem("jwt_token");
     localStorage.removeItem("permalink");
