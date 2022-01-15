@@ -29,8 +29,10 @@ function TrackBox({
 
   const playMusic = () => {
     if (currentPlay !== null) {
-      const current = document.getElementsByClassName(`player${currentPlay}`);
-      current[0].getElementsByTagName("audio")[0].pause();
+      // const current = document.getElementsByClassName(`player${currentPlay}`);
+      // current[0].getElementsByTagName("audio")[0].pause();
+      let current = document.getElementById(`button${currentPlay}`);
+      current?.click();
     }
     setIsPlaying(true);
     player.current.audio.current.play();
@@ -55,11 +57,6 @@ function TrackBox({
       await axios(config);
       setIsLiking(true);
       setLikes(likes + 1);
-      // if (trackPage === null) {
-      //   getTracks(pageId, 1);
-      // } else {
-      //   getTracks(pageId, trackPage - 1);
-      // }
     } catch (error) {
       toast("트랙 좋아요 실패");
     }
@@ -77,11 +74,6 @@ function TrackBox({
       await axios(config);
       setIsLiking(false);
       setLikes(likes - 1);
-      // if (trackPage === null) {
-      //   getTracks(pageId, 1);
-      // } else {
-      //   getTracks(pageId, trackPage - 1);
-      // }
     } catch (error) {
       toast("트랙 좋아요 취소 실패");
     }
@@ -99,11 +91,6 @@ function TrackBox({
       await axios(config);
       setReposted(true);
       setReposts(reposts + 1);
-      // if (trackPage === null) {
-      //   getTracks(pageId, 1);
-      // } else {
-      //   getTracks(pageId, trackPage - 1);
-      // }
     } catch (error) {
       toast("트랙 리포스트 실패");
     }
@@ -121,11 +108,6 @@ function TrackBox({
       await axios(config);
       setReposted(false);
       setReposts(reposts - 1);
-      // if (trackPage === null) {
-      //   getTracks(pageId, 1);
-      // } else {
-      //   getTracks(pageId, trackPage - 1);
-      // }
     } catch (error) {
       toast("트랙 리포스트 취소 실패");
     }
@@ -237,7 +219,7 @@ function TrackBox({
             </button>
           )}
           {isPlaying && (
-            <button onClick={pauseMusic}>
+            <button onClick={pauseMusic} id={`button${item.id}`}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="25"

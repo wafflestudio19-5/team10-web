@@ -385,9 +385,6 @@ function ArtistPage() {
                     user={user}
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}
-                    // getTracks={getTracks}
-                    // pageId={pageId}
-                    // trackPage={trackPage}
                   />
                 ))}
               <div ref={ref} className="inView">
