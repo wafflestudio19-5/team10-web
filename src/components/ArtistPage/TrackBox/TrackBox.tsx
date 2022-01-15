@@ -18,8 +18,8 @@ function TrackBox({
   const { userSecret } = useAuthContext();
   const history = useHistory();
 
-  const [isLiking, setIsLiking] = useState<boolean>();
-  const [reposted, setReposted] = useState<boolean>();
+  const [isLiking, setIsLiking] = useState<boolean>(false);
+  const [reposted, setReposted] = useState<boolean>(false);
   const [comment, setComment] = useState<string>();
   const [likes, setLikes] = useState<number>(item.like_count);
   const [reposts, setReposts] = useState<number>(item.repost_count);
@@ -166,13 +166,11 @@ function TrackBox({
         );
         pages.map((page) => {
           axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
-            const filter = res.data.results.filter(
+            const filter1 = res.data.results.filter(
               (track: any) => track.id === item.id
             );
-            if (filter.length !== 0) {
+            if (filter1.length !== 0) {
               setIsLiking(true);
-            } else {
-              setIsLiking(false);
             }
           });
         });
@@ -187,13 +185,11 @@ function TrackBox({
         );
         pages.map((page) => {
           axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
-            const filter = res.data.results.filter(
+            const filter2 = res.data.results.filter(
               (track: any) => track.id === item.id
             );
-            if (filter.length !== 0) {
+            if (filter2.length !== 0) {
               setReposted(true);
-            } else {
-              setReposted(false);
             }
           });
         });
