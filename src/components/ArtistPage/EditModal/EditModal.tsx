@@ -105,6 +105,19 @@ function EditModal({ user, modal, setModal, getUser, setUser }: any) {
     }
   };
 
+  const cancelChange = () => {
+    setModal(false);
+    setDisplayName(user.display_name);
+    setFirstName(user.first_name);
+    setLastName(user.last_name);
+    setCity(user.city);
+    setCountry(user.country);
+    setBio(user.bio);
+    setProfileImg(user.image_profile);
+    setImgFile(undefined);
+    setImgChanged(false);
+  };
+
   return (
     <div className={modal ? "modal open" : "modal"}>
       {modal ? (
@@ -200,7 +213,7 @@ function EditModal({ user, modal, setModal, getUser, setUser }: any) {
           </div>
 
           <div className="edit-modal-button">
-            <button className="cancel-button" onClick={() => setModal(false)}>
+            <button className="cancel-button" onClick={cancelChange}>
               Cancel
             </button>
             <button className="save-button" onClick={changeProfile}>
