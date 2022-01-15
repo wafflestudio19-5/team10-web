@@ -38,6 +38,7 @@ function ArtistPage() {
 
   const changeHeader = (event: any) => {
     const changeHeaderImg = async () => {
+      const header = event.target.files[0].name;
       const config: any = {
         method: "patch",
         url: `/users/me`,
@@ -45,7 +46,9 @@ function ArtistPage() {
           Authorization: `JWT ${userSecret.jwt}`,
         },
         data: {
-          image_header_filename: event.target.files[0].name,
+          image_header_extension: header.substr(
+            -header.length + header.indexOf(`.`) + 1
+          ),
         },
       };
       try {
@@ -316,6 +319,7 @@ function ArtistPage() {
                   modal={modal}
                   setModal={setModal}
                   getUser={getUser}
+                  setUser={setUser}
                 />
               </div>
             )}

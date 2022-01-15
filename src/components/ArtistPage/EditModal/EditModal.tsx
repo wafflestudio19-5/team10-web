@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./EditModal.scss";
 
-function EditModal({ user, modal, setModal, getUser }: any) {
+function EditModal({ user, modal, setModal, getUser, setUser }: any) {
   const { userSecret } = useAuthContext();
 
   const [displayName, setDisplayName] = useState<string>(user.display_name);
@@ -71,7 +71,9 @@ function EditModal({ user, modal, setModal, getUser }: any) {
           Authorization: `JWT ${userSecret.jwt}`,
         },
         data: {
-          image_profile_filename: imgFile.name,
+          image_profile_extension: imgFile.name.substr(
+            -imgFile.name.length + imgFile.name.indexOf(`.`) + 1
+          ),
         },
       };
       try {
@@ -83,6 +85,13 @@ function EditModal({ user, modal, setModal, getUser }: any) {
         };
         axios
           .put(res.data.image_profile_presigned_url, imgFile, img_options)
+          .then(() => {
+            const reader = new FileReader();
+            reader.readAsDataURL(imgFile);
+            reader.onload = () => {
+              setUser({ ...user, image_profile: reader.result });
+            };
+          })
           .catch(() => {
             toast("이미지파일 업로드 실패");
           });
