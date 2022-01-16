@@ -339,7 +339,9 @@ const Discover = () => {
   };
   const changePlayerCurrentTime = useCallback(
     throttle(() => {
-      setPlayingTime(audioPlayer.current.currentTime);
+      audioPlayer.current !== null
+        ? setPlayingTime(audioPlayer.current.currentTime)
+        : null;
     }, 30000),
     [playingTime]
   );

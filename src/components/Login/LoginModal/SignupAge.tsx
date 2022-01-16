@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
+import Cookies from "universal-cookie";
+import { useAuthContext } from "../../../context/AuthContext";
 
 const SignupAge = ({
   age,
@@ -18,9 +20,11 @@ const SignupAge = ({
   displayName: string;
   inputs: any;
 }) => {
+  const { setUserSecret } = useAuthContext();
   const history = useHistory();
   const input = useRef<HTMLInputElement>(null);
   const input2 = useRef<HTMLInputElement>(null);
+  const cookies = new Cookies();
   useEffect(() => {
     input.current?.focus();
   }, []);
@@ -38,9 +42,18 @@ const SignupAge = ({
           gender: gender,
         })
         .then(async (res) => {
-          localStorage.setItem("permalink", res.data.permalink);
+          localStorage.setItem("permalink", res.data.permalink); // 민석님이 제안하신대로 로컬스토리지에 저장하도록 했습니다!
           localStorage.setItem("jwt_token", res.data.token);
           localStorage.setItem("id", res.data.id);
+          cookies.set("is_logged_in", true, {
+            path: "/",
+            expires: new Date(Date.now() + 1000 * 3600 * 12),
+          });
+          setUserSecret({
+            id: res.data.id,
+            permalink: res.data.permalink,
+            jwt: res.data.token,
+          });
           history.push("/discover");
         })
         .catch(() => {
