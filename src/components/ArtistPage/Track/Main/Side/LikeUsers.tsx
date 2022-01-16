@@ -40,18 +40,19 @@ const LikeUsers = ({
           const clickUser = () => history.push(`/${liker.permalink}`);
           console.log(liker);
           return (
-            <div key={index}>
+            <>
               <img
                 className={styles.image}
                 src={liker.image_profile || "/default_user_image.png"}
                 style={{ zIndex: index }}
                 onClick={clickUser}
+                key={index}
                 data-tip={
                   userSecret.id === liker.id ? "You" : liker.display_name
                 }
               />
               <ReactTooltip place="bottom" effect="solid" />
-            </div>
+            </>
           );
         })}
       </div>

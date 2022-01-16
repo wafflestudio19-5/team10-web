@@ -44,7 +44,7 @@ const CommentsInput = ({
     }, 1000);
     submitInput();
     setInput("");
-    fetchComments();
+    setTimeout(() => fetchComments(), 100);
   };
 
   return (

@@ -145,10 +145,13 @@ const TrackBar = () => {
   }, [playingTime]);
 
   const onPlayerClick = () => {
+    audioPlayer.current.pause();
     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-    setTrackIsPlaying(true);
     setPlayingTime(progressBar.current.value);
-    audioPlayer.current.play();
+    setTrackIsPlaying(true);
+    setTimeout(() => {
+      audioPlayer.current.play();
+    }, 10);
     barAnimationRef.current = requestAnimationFrame(whilePlaying);
   };
 

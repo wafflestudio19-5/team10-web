@@ -158,22 +158,27 @@ const TrackHeader = ({
     changePlayerCurrentTime();
   }, [playingTime, audioSrc]);
 
-  //   const onPlayerClick = () => {
-  //     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-  //     if (!isSameTrack) {
-  //       setAudioSrc(track.audio);
-  //       setIsSameTrack(true);
-  //       audioPlayer.current.src = track.audio;
-  //       audioPlayer.current.load();
-  //     }
-  //     setTrackIsPlaying(true);
-  //     audioPlayer.current.currentTime = progressBar.current.value;
-  //     setPlayingTime(audioPlayer.current.currentTime);
-  //     setTimeout(() => {
-  //       audioPlayer.current.play();
-  //     }, 1);
-  //     animationRef.current = requestAnimationFrame(whilePlaying);
-  //   };
+  const onPlayerClick = () => {
+    audioPlayer.current.pause();
+    // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
+    if (!isSameTrack) {
+      setAudioSrc(track.audio);
+      setIsSameTrack(true);
+      audioPlayer.current.src = track.audio;
+      audioPlayer.current.load();
+      //   audioPlayer.current.play();
+    }
+    // console.log("onclick");
+    audioPlayer.current.currentTime = progressBar.current.value;
+    setPlayingTime(progressBar.current.value);
+    // console.log(progressBar.current.value);
+    setTrackIsPlaying(true);
+    // audioPlayer.current.play();
+    setTimeout(() => {
+      audioPlayer.current.play();
+    }, 10);
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
 
   const headerPlayer = useRef<HTMLAudioElement>(null);
   const onLoadedMetadata = useCallback(() => {
@@ -222,10 +227,12 @@ const TrackHeader = ({
                 className={styles.progressBar}
                 defaultValue="0"
                 onChange={audioSrc === track.audio ? changeRange : () => null}
+                // onMouseDown={onPlayerClick}
+                onInput={onPlayerClick}
                 step="0.3"
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                }}
+                // onMouseDown={(event) => {
+                //   event.preventDefault();
+                // }}
                 max={
                   audioSrc === track.audio && headerTrackDuration
                     ? trackDuration

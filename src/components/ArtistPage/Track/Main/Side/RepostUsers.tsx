@@ -39,18 +39,19 @@ const RepostUsers = ({
         {trackReposters.map((reposter, index) => {
           const clickUser = () => history.push(`/${reposter.permalink}`);
           return (
-            <div key={index}>
+            <>
               <img
                 className={styles.image}
                 src={reposter.image_profile || "/default_user_image.png"}
                 style={{ zIndex: index }}
                 onClick={clickUser}
+                key={index}
                 data-tip={
                   userSecret.id === reposter.id ? "You" : reposter.display_name
                 }
               />
               <ReactTooltip place="bottom" effect="solid" />
-            </div>
+            </>
           );
         })}
       </div>
