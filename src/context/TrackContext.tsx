@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useRef, useState } from "react";
-import { IArtist, ITrack } from "../components/ArtistPage/Track/TrackPage";
+import {
+  ITrackBarArtist,
+  ITrackBarTrack,
+} from "../components/ArtistPage/Track/TrackBar/TrackBar";
+// import { IArtist } from "../components/ArtistPage/Track/TrackPage";
 
 // 토큰 타입 지정
 interface ITrackContext {
@@ -16,10 +20,10 @@ interface ITrackContext {
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
   loop: boolean;
   setLoop: React.Dispatch<React.SetStateAction<boolean>>;
-  trackBarArtist: IArtist;
-  setTrackBarArtist: React.Dispatch<React.SetStateAction<IArtist>>;
-  trackBarTrack: ITrack;
-  setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrack>>;
+  trackBarArtist: ITrackBarArtist;
+  setTrackBarArtist: React.Dispatch<React.SetStateAction<ITrackBarArtist>>;
+  trackBarTrack: ITrackBarTrack;
+  setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrackBarTrack>>;
 }
 
 const TrackContext = createContext<ITrackContext>({
@@ -38,8 +42,8 @@ const TrackContext = createContext<ITrackContext>({
   setLoop: () => Boolean,
   trackBarArtist: {
     display_name: "",
-    country: "",
-    city: "",
+    // country: "",
+    // city: "",
     id: 0,
     permalink: "",
   },
@@ -49,17 +53,13 @@ const TrackContext = createContext<ITrackContext>({
     title: "",
     permalink: "",
     audio: "",
-    comment_count: 0,
-    count: 0,
-    created_at: "",
-    description: "",
-    genre: null,
     image: "",
     like_count: 0,
     repost_count: 0,
-    tags: [],
+    comment_count: 0,
+    genre: "",
+    count: 0,
     is_private: false,
-    audio_length: 0,
   },
   setTrackBarTrack: () => {},
 });
@@ -75,29 +75,23 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
   const [audioSrc, setAudioSrc] = useState<ITrackContext["audioSrc"]>("");
   const [isMuted, setIsMuted] = useState(false);
   const [loop, setLoop] = useState(false);
-  const [trackBarArtist, setTrackBarArtist] = useState<IArtist>({
+  const [trackBarArtist, setTrackBarArtist] = useState<ITrackBarArtist>({
     display_name: "",
-    country: "",
-    city: "",
     id: 0,
     permalink: "",
   });
-  const [trackBarTrack, setTrackBarTrack] = useState<ITrack>({
+  const [trackBarTrack, setTrackBarTrack] = useState<ITrackBarTrack>({
     id: 0,
     title: "",
     permalink: "",
     audio: "",
     comment_count: 0,
     count: 0,
-    created_at: "",
-    description: "",
     genre: null,
     image: "",
     like_count: 0,
     repost_count: 0,
-    tags: [],
     is_private: false,
-    audio_length: 0,
   });
 
   return (

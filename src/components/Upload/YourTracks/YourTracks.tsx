@@ -4,7 +4,7 @@ import { MdPlaylistAdd } from "react-icons/md";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 import { AiOutlineDown } from "react-icons/ai";
 import { BsSoundwave } from "react-icons/bs";
-// import { BsFillFileLock2Fill } from "react-icons/bs";
+import { BsFillFileLock2Fill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import { FcComments } from "react-icons/fc";
 import { BsSuitHeartFill, BsTrashFill } from "react-icons/bs";
@@ -16,17 +16,18 @@ import { useEffect, useState } from "react";
 import UploadHeader from "../UploadHeader/UploadHeader";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
-// import ReactTooltip from "react-tooltip";
+import ReactTooltip from "react-tooltip";
 import { ITag, ITrack } from "../../ArtistPage/Track/TrackPage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTrackContext } from "../../../context/TrackContext";
 import EditModal from "./EditModal";
+import ArtworkModal from "./ArtworkModal";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 dayjs.extend(relativeTime);
 
-interface IYourTracks {
+export interface IYourTracks {
   id: number;
   title: string;
   permalink: string;
@@ -35,14 +36,15 @@ interface IYourTracks {
   like_count: number;
   repost_count: number;
   comment_count: number;
-  genre: number | null;
+  genre: string | null;
   count: number;
+  is_private: boolean;
 }
 
 const YourTracks = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [yourTracks, setYourTracks] = useState<IYourTracks[]>([]);
-  const [checkedItems, setCheckedItems] = useState(new Set());
+  const [checkedItems, setCheckedItems] = useState<number[]>([]);
   const [username, setUsername] = useState("");
   const [modal, setModal] = useState(false);
   const [editTrack, setEditTrack] = useState<ITrack>();
@@ -52,53 +54,11 @@ const YourTracks = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageRendered, setPageRendered] = useState(1);
   const [currentTracks, setCurrentTracks] = useState<IYourTracks[]>([]);
+  const [artworkModal, setArtworkModal] = useState(false);
   const nextPage = useRef(1);
   const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
 
-  const fetchYourTracks = async () => {
-    if (userSecret.jwt) {
-      const config: any = {
-        method: "get",
-        url: `/users/me`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const response = await axios(config);
-        setUsername(response.data.display_name);
-        const tracksConfig: any = {
-          method: "get",
-          url: `/users/${userSecret.id}/tracks?page=${1}&page_size=${10}`,
-          headers: {
-            Authorization: `JWT ${userSecret.jwt}`,
-          },
-          data: {},
-        };
-        try {
-          const { data } = await axios(tracksConfig);
-          setTrackCount(data.count);
-          setYourTracks(data.results);
-          setCurrentTracks(data.results);
-          setLoading(false);
-          if (data.next) {
-            // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
-            nextPage.current += 1;
-          } else {
-            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
-            finalPage.current = nextPage.current;
-            setIsFinalPage(true);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
   const fetchNextTracks = async () => {
     if (pageRendered > currentPage && trackCount) {
       const nextPage = currentPage + 1;
@@ -149,7 +109,94 @@ const YourTracks = () => {
     );
     setCurrentPage(previousPage);
   };
+  const fetchYourTracksAgain = async () => {
+    if (userSecret.jwt) {
+      const config: any = {
+        method: "get",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const response = await axios(config);
+        setUsername(response.data.display_name);
+        const tracksConfig: any = {
+          method: "get",
+          url: `/users/${userSecret.id}/tracks?page=${currentPage}`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          const { data } = await axios(tracksConfig);
+          setTrackCount(data.count);
+          setCurrentTracks(data.results);
+          setLoading(false);
+          console.log(data);
+          if (data.next) {
+            // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
+            nextPage.current += 1;
+          } else {
+            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
+            finalPage.current = currentPage;
+            setIsFinalPage(true);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   useEffect(() => {
+    const fetchYourTracks = async () => {
+      if (userSecret.jwt) {
+        const config: any = {
+          method: "get",
+          url: `/users/me`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          const response = await axios(config);
+          setUsername(response.data.display_name);
+          const tracksConfig: any = {
+            method: "get",
+            url: `/users/${userSecret.id}/tracks?page=${1}`,
+            headers: {
+              Authorization: `JWT ${userSecret.jwt}`,
+            },
+            data: {},
+          };
+          try {
+            const { data } = await axios(tracksConfig);
+            setTrackCount(data.count);
+            setYourTracks(data.results);
+            setCurrentTracks(data.results);
+            setLoading(false);
+            console.log(data);
+            if (data.next) {
+              // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
+              nextPage.current += 1;
+            } else {
+              // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
+              finalPage.current = nextPage.current;
+              setIsFinalPage(true);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
     fetchYourTracks();
   }, [userSecret.jwt]);
 
@@ -160,15 +207,14 @@ const YourTracks = () => {
 
   const checkedItemHandler = (id: number, isChecked: boolean) => {
     if (isChecked) {
-      checkedItems.add(id);
-      setCheckedItems(checkedItems);
-    } else if (!isChecked && checkedItems.has(id)) {
-      checkedItems.delete(id);
-      setCheckedItems(checkedItems);
+      setCheckedItems(checkedItems.concat(id));
+    } else if (!isChecked && checkedItems.includes(id)) {
+      setCheckedItems(checkedItems.filter((element) => element !== id));
     }
   };
 
-  console.log(nextPage, yourTracks);
+  const openArtworkModal = () => setArtworkModal(true);
+  const closeArtworkModal = () => setArtworkModal(false);
 
   return (
     <div className={styles.yourTracksPage}>
@@ -176,9 +222,14 @@ const YourTracks = () => {
         <EditModal
           setModal={setModal}
           track={editTrack}
-          fetchYourTracks={fetchYourTracks}
+          fetchYourTracks={fetchYourTracksAgain}
         />
       )}
+      <ArtworkModal
+        modal={artworkModal}
+        closeModal={closeArtworkModal}
+        track={currentTracks[0]}
+      />
       <div className={styles.wrapper}>
         <div className={styles.main}>
           <div className={styles.uploadHeader}>
@@ -193,17 +244,22 @@ const YourTracks = () => {
                 <input type="checkbox" />
               </div>
               <div className={styles.dropdownContainer}>
-                <button className={styles.editTracks} onClick={editToggle}>
+                <button
+                  className={styles.editTracks}
+                  onClick={editToggle}
+                  disabled={checkedItems.length === 0}
+                >
                   <BiPencil />
                   <span>Edit tracks</span>
                   <AiOutlineDown />
                 </button>
                 {isEditOpen && (
-                  <div></div>
-                  //   <ul>
-                  //     <li>Privacy and tags</li>
-                  //     <li>Artwork</li>
-                  //   </ul>
+                  <div>
+                    <ul>
+                      <li>Privacy and tags</li>
+                      <li onClick={openArtworkModal}>Artwork</li>
+                    </ul>
+                  </div>
                 )}
               </div>
               <button className={styles.addToPlaylist}>
@@ -248,10 +304,11 @@ const YourTracks = () => {
                     username={username}
                     setModal={setModal}
                     setEditTrack={setEditTrack}
-                    fetchYourTracks={fetchYourTracks}
-                    yourTracks={currentTracks}
-                    finalPage={finalPage.current}
-                    currentPage={currentPage}
+                    fetchYourTracks={fetchYourTracksAgain}
+                    checkedItems={checkedItems}
+                    // yourTracks={currentTracks}
+                    // finalPage={finalPage.current}
+                    // currentPage={currentPage}
                   />
                 );
               })}
@@ -282,23 +339,28 @@ const Track = ({
   username,
   setModal,
   setEditTrack,
+  checkedItems,
   fetchYourTracks,
-  yourTracks,
-  finalPage,
-  currentPage,
-}: {
+}: //
+//
+//   yourTracks,
+//   finalPage,
+//   currentPage,
+{
   track: IYourTracks;
   checkedItemHandler: (id: number, isChecked: boolean) => void;
   username: string;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
   fetchYourTracks: () => void;
-  yourTracks: IYourTracks[];
-  finalPage: number;
-  currentPage: number;
+  checkedItems: any;
+  //   yourTracks: IYourTracks[];
+  //   finalPage: number;
+  //   currentPage: number;
 }) => {
   const [checked, setChecked] = useState(false);
-  const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
+  //   const [fetchedTrack, setFetchedTrack] = useState<ITrack>();
+  //   const [fetchLoading, setFetchLoading] = useState(true)
   //   const [duration, setDuration] = useState(0);
   const [play, setPlay] = useState(false);
   const player = useRef<HTMLAudioElement>(null);
@@ -311,53 +373,58 @@ const Track = ({
     setTrackBarTrack,
     audioPlayer,
     setPlayingTime,
+    setTrackBarArtist,
   } = useTrackContext();
   const history = useHistory();
 
-  const checkHandler: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+  const checkHandler = () => {
+    const prevValue = checked;
     setChecked(!checked);
-    checkedItemHandler(track.id, event.target.checked);
+    checkedItemHandler(track.id, !prevValue);
+    console.log(checkedItems);
   };
-  useEffect(() => {
-    const fetchTrack = async () => {
-      if (userSecret.jwt && currentPage > finalPage) {
-        const config: any = {
-          method: "get",
-          url: `/tracks/${track.id}`,
-          headers: {
-            Authorization: `JWT ${userSecret.jwt}`,
-          },
-          data: {},
-        };
-        try {
-          const { data } = await axios(config);
-          const tagList = data.tags.map((value: ITag) => value.name);
-          setFetchedTrack({
-            id: data.id,
-            title: data.title,
-            permalink: data.permalink,
-            audio: data.audio,
-            comment_count: data.comment_count,
-            count: data.count,
-            created_at: data.created_at,
-            description: data.description,
-            genre: data.genre,
-            image: data.image,
-            like_count: data.like_count,
-            repost_count: data.repost_count,
-            tags: tagList,
-            is_private: data.is_private,
-            audio_length: 0,
-          });
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-    fetchTrack();
-  }, [userSecret, yourTracks]);
+
+  //   useEffect(() => {
+  //     const fetchTrack = async () => {
+  //       if (userSecret.jwt && currentPage > finalPage) {
+  //         const config: any = {
+  //           method: "get",
+  //           url: `/tracks/${track.id}`,
+  //           headers: {
+  //             Authorization: `JWT ${userSecret.jwt}`,
+  //           },
+  //           data: {},
+  //         };
+  //         try {
+  //           const { data } = await axios(config);
+  //           const tagList = data.tags.map((value: ITag) => value.name);
+  //           setFetchedTrack({
+  //             id: data.id,
+  //             title: data.title,
+  //             permalink: data.permalink,
+  //             audio: data.audio,
+  //             comment_count: data.comment_count,
+  //             count: data.count,
+  //             created_at: data.created_at,
+  //             description: data.description,
+  //             genre: data.genre,
+  //             image: data.image,
+  //             like_count: data.like_count,
+  //             repost_count: data.repost_count,
+  //             tags: tagList,
+  //             is_private: data.is_private,
+  //             audio_length: 0,
+  //           });
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //       }
+  //     };
+  //     fetchTrack();
+  //   }, [userSecret, yourTracks]);
   const headerTrackSrc = track.audio.split("?")[0];
   const barTrackSrc = audioSrc.split("?")[0];
+
   useEffect(() => {
     if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
       setPlay(true);
@@ -381,14 +448,19 @@ const Track = ({
   //   };
 
   const togglePlayButton = () => {
-    if (fetchedTrack) {
+    if (track && userSecret.permalink) {
       if (!play) {
         if (headerTrackSrc !== barTrackSrc) {
           setPlayingTime(0);
           audioPlayer.current.src = track.audio;
           setAudioSrc(track.audio);
           audioPlayer.current.load();
-          setTrackBarTrack(fetchedTrack);
+          setTrackBarArtist({
+            display_name: username,
+            id: userSecret.id,
+            permalink: userSecret.permalink,
+          });
+          setTrackBarTrack(track);
         }
         setPlay(true);
         setTrackIsPlaying(true);
@@ -407,11 +479,41 @@ const Track = ({
   const clickTitle = () =>
     history.push(`/${userSecret.permalink}/${track.permalink}`);
 
-  const onEditTrack: React.MouseEventHandler = (event) => {
+  const onEditTrack: React.MouseEventHandler = async (event) => {
     event.stopPropagation();
-    if (fetchedTrack) {
+    if (track) {
       setModal(true);
-      setEditTrack(fetchedTrack);
+      const config: any = {
+        method: "get",
+        url: `/tracks/${track.id}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const { data } = await axios(config);
+        const tagList = data.tags.map((value: ITag) => value.name);
+        setEditTrack({
+          id: data.id,
+          title: data.title,
+          permalink: data.permalink,
+          audio: data.audio,
+          comment_count: data.comment_count,
+          count: data.count,
+          created_at: data.created_at,
+          description: data.description,
+          genre: data.genre,
+          image: data.image,
+          like_count: data.like_count,
+          repost_count: data.repost_count,
+          tags: tagList,
+          is_private: data.is_private,
+          audio_length: 0,
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   const deleteTrack = async (event: React.MouseEvent, id: number) => {
@@ -453,10 +555,10 @@ const Track = ({
   const onClickName = () => history.push(`/${userSecret.permalink}`);
 
   return (
-    <li key={track.id} onClick={() => setChecked(!checked)}>
+    <li key={track.id} onClick={checkHandler}>
       <audio
         ref={player}
-        src={fetchedTrack?.audio}
+        src={track?.audio}
         preload="metadata"
         // onLoadedMetadata={onLoadedMetadata}
       />
@@ -464,7 +566,7 @@ const Track = ({
         type="checkbox"
         className={styles.trackCheckBox}
         checked={checked}
-        onChange={(event) => checkHandler(event)}
+        onChange={checkHandler}
       />
       <div
         className={styles.playContainer}
@@ -524,8 +626,8 @@ const Track = ({
               </button>
             </div>
           </div>
-          {/* <div className={styles.extra}>
-            {fetchedTrack?.is_private && (
+          <div className={styles.extra}>
+            {track?.is_private && (
               <div className={styles.private}>
                 <span data-tip="This track is private.">
                   <BsFillFileLock2Fill />
@@ -533,7 +635,7 @@ const Track = ({
                 <ReactTooltip />
               </div>
             )}
-          </div> */}
+          </div>
           {/* <div className={styles.duration}>
             <span>{duration !== 0 && calculateTime(duration)}</span>
           </div>

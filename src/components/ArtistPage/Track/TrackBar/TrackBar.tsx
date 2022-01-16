@@ -7,31 +7,50 @@ import {
   IoShuffleSharp,
 } from "react-icons/io5";
 import { BiRepeat } from "react-icons/bi";
-import { BsFillSuitHeartFill } from "react-icons/bs";
+// import { BsFillSuitHeartFill } from "react-icons/bs";
 import {
-  RiUserFollowFill,
-  RiUserUnfollowFill,
+  //   RiUserFollowFill,
+  //   RiUserUnfollowFill,
   RiVolumeMuteFill,
 } from "react-icons/ri";
 import { MdVolumeUp, MdPlaylistPlay } from "react-icons/md";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { useTrackContext } from "../../../../context/TrackContext";
-import { useAuthContext } from "../../../../context/AuthContext";
-import axios from "axios";
-import { IFollowings } from "../Main/ListenArtistInfo";
-import { ILikeTrack } from "../Main/ListenEngagement";
+// import { useAuthContext } from "../../../../context/AuthContext";
+// import axios from "axios";
+// import { IFollowings } from "../Main/ListenArtistInfo";
+// import { ILikeTrack } from "../Main/ListenEngagement";
 // import throttle from "lodash/throttle";
 
 // import axios from "axios";
 
+export interface ITrackBarTrack {
+  id: number;
+  title: string;
+  permalink: string;
+  audio: string;
+  image: string | null;
+  like_count: number;
+  repost_count: number;
+  comment_count: number;
+  genre: string | null;
+  count: number;
+  is_private: boolean;
+}
+export interface ITrackBarArtist {
+  display_name: string;
+  id: number;
+  permalink: string;
+}
+
 const TrackBar = () => {
-  const [likeTrack, setLikeTrack] = useState<boolean | undefined>(undefined);
-  const [followArtist, setFollowArtist] = useState<boolean | undefined>(
-    undefined
-  );
-  const [likeLoading, setLikeLoading] = useState(true);
-  const [followLoading, setFollowLoading] = useState(true);
+  //   const [likeTrack, setLikeTrack] = useState<boolean | undefined>(undefined);
+  //   const [followArtist, setFollowArtist] = useState<boolean | undefined>(
+  //     undefined
+  //   );
+  //   const [likeLoading, setLikeLoading] = useState(true);
+  //   const [followLoading, setFollowLoading] = useState(true);
 
   const {
     trackDuration,
@@ -48,7 +67,7 @@ const TrackBar = () => {
     trackBarArtist,
     trackBarTrack,
   } = useTrackContext();
-  const { userSecret } = useAuthContext();
+  //   const { userSecret } = useAuthContext();
 
   const history = useHistory();
 
@@ -126,10 +145,13 @@ const TrackBar = () => {
   }, [playingTime]);
 
   const onPlayerClick = () => {
+    audioPlayer.current.pause();
     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-    setTrackIsPlaying(true);
     setPlayingTime(progressBar.current.value);
-    audioPlayer.current.play();
+    setTrackIsPlaying(true);
+    setTimeout(() => {
+      audioPlayer.current.play();
+    }, 10);
     barAnimationRef.current = requestAnimationFrame(whilePlaying);
   };
 
@@ -155,151 +177,151 @@ const TrackBar = () => {
     history.push(`/${trackBarArtist.permalink}/${trackBarTrack.permalink}`);
   };
 
-  const isLikeTrack = async () => {
-    if (userSecret.id !== 0 && trackBarTrack.id !== 0) {
-      const config: any = {
-        method: "get",
-        url: `/users/${userSecret.id}/likes/tracks`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        // like 트랙 목록 받아오기
-        const likeTracks = await axios(config);
-        if (likeTracks.data.results.length === 0) {
-          setLikeLoading(false);
-          setLikeTrack(false);
-        } else {
-          const trackExist = likeTracks.data.results.find(
-            (likeTrack: ILikeTrack) => likeTrack.id === trackBarTrack.id
-          );
-          if (trackExist) {
-            setLikeTrack(true);
-          } else {
-            setLikeTrack(false);
-          }
-          setLikeLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
+  //   const isLikeTrack = async () => {
+  //     if (userSecret.id !== 0 && trackBarTrack.id !== 0) {
+  //       const config: any = {
+  //         method: "get",
+  //         url: `/users/${userSecret.id}/likes/tracks`,
+  //         headers: {
+  //           Authorization: `JWT ${userSecret.jwt}`,
+  //         },
+  //         data: {},
+  //       };
+  //       try {
+  //         // like 트랙 목록 받아오기
+  //         const likeTracks = await axios(config);
+  //         if (likeTracks.data.results.length === 0) {
+  //           setLikeLoading(false);
+  //           setLikeTrack(false);
+  //         } else {
+  //           const trackExist = likeTracks.data.results.find(
+  //             (likeTrack: ILikeTrack) => likeTrack.id === trackBarTrack.id
+  //           );
+  //           if (trackExist) {
+  //             setLikeTrack(true);
+  //           } else {
+  //             setLikeTrack(false);
+  //           }
+  //           setLikeLoading(false);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   };
 
-  const isFollowing = async () => {
-    if (trackBarArtist.id !== 0 && userSecret.id !== 0) {
-      const followConfig: any = {
-        method: "get",
-        url: `/users/${trackBarArtist.id}/followers`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const { data } = await axios(followConfig);
-        if (data.results.length === 0) {
-          setFollowLoading(false);
-          setFollowArtist(false);
-        } else {
-          const trackExist = data.results.find(
-            (follower: IFollowings) => follower.id === userSecret.id
-          );
-          console.log(trackExist, "esatt");
-          if (trackExist) {
-            setFollowArtist(true);
-          } else {
-            setFollowArtist(false);
-          }
-          setFollowLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-  useEffect(() => {
-    isLikeTrack();
-    isFollowing();
-  }, [trackBarTrack]);
+  //   const isFollowing = async () => {
+  //     if (trackBarArtist.id !== 0 && userSecret.id !== 0) {
+  //       const followConfig: any = {
+  //         method: "get",
+  //         url: `/users/${trackBarArtist.id}/followers`,
+  //         headers: {
+  //           Authorization: `JWT ${userSecret.jwt}`,
+  //         },
+  //         data: {},
+  //       };
+  //       try {
+  //         const { data } = await axios(followConfig);
+  //         if (data.results.length === 0) {
+  //           setFollowLoading(false);
+  //           setFollowArtist(false);
+  //         } else {
+  //           const trackExist = data.results.find(
+  //             (follower: IFollowings) => follower.id === userSecret.id
+  //           );
+  //           console.log(trackExist, "esatt");
+  //           if (trackExist) {
+  //             setFollowArtist(true);
+  //           } else {
+  //             setFollowArtist(false);
+  //           }
+  //           setFollowLoading(false);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   };
+  //   useEffect(() => {
+  //     isLikeTrack();
+  //     isFollowing();
+  //   }, [trackBarTrack]);
 
-  const onLikeTrack = async () => {
-    const config: any = {
-      method: "post",
-      url: `/likes/tracks/${trackBarTrack.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setLikeTrack(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const unlikeTrack = async () => {
-    const config: any = {
-      method: "delete",
-      url: `/likes/tracks/${trackBarTrack.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setLikeTrack(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //   const onLikeTrack = async () => {
+  //     const config: any = {
+  //       method: "post",
+  //       url: `/likes/tracks/${trackBarTrack.id}`,
+  //       headers: {
+  //         Authorization: `JWT ${userSecret.jwt}`,
+  //       },
+  //       data: {},
+  //     };
+  //     try {
+  //       const response = await axios(config);
+  //       if (response) {
+  //         setLikeTrack(true);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   const unlikeTrack = async () => {
+  //     const config: any = {
+  //       method: "delete",
+  //       url: `/likes/tracks/${trackBarTrack.id}`,
+  //       headers: {
+  //         Authorization: `JWT ${userSecret.jwt}`,
+  //       },
+  //       data: {},
+  //     };
+  //     try {
+  //       const response = await axios(config);
+  //       if (response) {
+  //         setLikeTrack(false);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-  const onFollowArtist = async () => {
-    const config: any = {
-      method: "post",
-      url: `/users/me/followings/${trackBarArtist.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const unfollowArtist = async () => {
-    const config: any = {
-      method: "delete",
-      url: `/users/me/followings/${trackBarArtist.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //   const onFollowArtist = async () => {
+  //     const config: any = {
+  //       method: "post",
+  //       url: `/users/me/followings/${trackBarArtist.id}`,
+  //       headers: {
+  //         Authorization: `JWT ${userSecret.jwt}`,
+  //       },
+  //       data: {},
+  //     };
+  //     try {
+  //       const response = await axios(config);
+  //       if (response) {
+  //         setFollowArtist(true);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   const unfollowArtist = async () => {
+  //     const config: any = {
+  //       method: "delete",
+  //       url: `/users/me/followings/${trackBarArtist.id}`,
+  //       headers: {
+  //         Authorization: `JWT ${userSecret.jwt}`,
+  //       },
+  //       data: {},
+  //     };
+  //     try {
+  //       const response = await axios(config);
+  //       if (response) {
+  //         setFollowArtist(false);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-  console.log();
+  //   console.log();
 
   //   const nextTrack = () => {
   //     setPlayingTime(0);
@@ -410,7 +432,7 @@ const TrackBar = () => {
                   <span>{trackBarTrack.title}</span>
                 </div>
               </div>
-              {trackBarArtist.id === userSecret.id || (
+              {/* {trackBarArtist.id === userSecret.id || (
                 <>
                   {likeTrack === true && (
                     <button
@@ -449,7 +471,7 @@ const TrackBar = () => {
                     </button>
                   )}
                 </>
-              )}
+              )} */}
               <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
                 <MdPlaylistPlay />
               </button>

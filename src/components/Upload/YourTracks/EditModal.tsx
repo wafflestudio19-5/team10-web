@@ -167,9 +167,11 @@ const EditModal = ({
     }
   };
 
+  const closeModal = () => setModal(false);
+
   return (
-    <div className={styles.modalWrapper} onClick={() => setModal(false)}>
-      <div className={styles.closeButton} onClick={() => setModal(false)}>
+    <div className={styles.modalWrapper} onClick={closeModal}>
+      <div className={styles.closeButton} onClick={closeModal}>
         <GrClose />
       </div>
       <div

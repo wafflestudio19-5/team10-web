@@ -98,14 +98,31 @@ const TrackHeader = ({
     } else {
       setAudioSrc(track.audio);
       setTrackIsPlaying(true);
-      setTrackBarArtist(artist);
-      setTrackBarTrack(track);
+      setTrackBarArtist({
+        display_name: artist.display_name,
+        id: artist.id,
+        permalink: artist.permalink,
+      });
+      setTrackBarTrack({
+        id: track.id,
+        title: track.title,
+        permalink: track.permalink,
+        audio: track.audio,
+        image: track.image,
+        like_count: track.like_count,
+        repost_count: track.repost_count,
+        comment_count: track.comment_count,
+        genre: track.genre,
+        count: track.count,
+        is_private: track.is_private,
+      });
       setIsSameTrack(true);
       audioPlayer.current.src = track.audio;
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
       }, 1);
+      //   changePlayerCurrentTime();
       animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
@@ -137,24 +154,31 @@ const TrackHeader = ({
     }, 30000),
     [playingTime]
   );
-  changePlayerCurrentTime();
+  useEffect(() => {
+    changePlayerCurrentTime();
+  }, [playingTime, audioSrc]);
 
-  //   const onPlayerClick = () => {
-  //     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-  //     if (!isSameTrack) {
-  //       setAudioSrc(track.audio);
-  //       setIsSameTrack(true);
-  //       audioPlayer.current.src = track.audio;
-  //       audioPlayer.current.load();
-  //     }
-  //     setTrackIsPlaying(true);
-  //     audioPlayer.current.currentTime = progressBar.current.value;
-  //     setPlayingTime(audioPlayer.current.currentTime);
-  //     setTimeout(() => {
-  //       audioPlayer.current.play();
-  //     }, 1);
-  //     animationRef.current = requestAnimationFrame(whilePlaying);
-  //   };
+  const onPlayerClick = () => {
+    audioPlayer.current.pause();
+    // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
+    if (!isSameTrack) {
+      setAudioSrc(track.audio);
+      setIsSameTrack(true);
+      audioPlayer.current.src = track.audio;
+      audioPlayer.current.load();
+      //   audioPlayer.current.play();
+    }
+    // console.log("onclick");
+    audioPlayer.current.currentTime = progressBar.current.value;
+    setPlayingTime(progressBar.current.value);
+    // console.log(progressBar.current.value);
+    setTrackIsPlaying(true);
+    // audioPlayer.current.play();
+    setTimeout(() => {
+      audioPlayer.current.play();
+    }, 10);
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
 
   const headerPlayer = useRef<HTMLAudioElement>(null);
   const onLoadedMetadata = useCallback(() => {
@@ -203,10 +227,12 @@ const TrackHeader = ({
                 className={styles.progressBar}
                 defaultValue="0"
                 onChange={audioSrc === track.audio ? changeRange : () => null}
+                // onMouseDown={onPlayerClick}
+                onInput={onPlayerClick}
                 step="0.3"
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                }}
+                // onMouseDown={(event) => {
+                //   event.preventDefault();
+                // }}
                 max={
                   audioSrc === track.audio && headerTrackDuration
                     ? trackDuration
