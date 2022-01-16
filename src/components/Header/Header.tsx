@@ -30,6 +30,7 @@ function Header() {
     };
     getMe();
   }, []);
+
   const onSignOut = () => {
     localStorage.removeItem("jwt_token");
     localStorage.removeItem("permalink");
@@ -47,7 +48,7 @@ function Header() {
 
         <div className={"header_menu"}>
           <span onClick={() => history.push("/discover")}>Home</span>
-          <span onClick={() => history.push("/you/stream")}>Stream</span>
+          <span>Stream</span>
           <span onClick={() => history.push("/you/library")}>Library</span>
         </div>
 
@@ -118,11 +119,8 @@ function Header() {
             </ul>
           </div>
 
-          <a
-            onClick={() => history.push("/notifications")}
-            className={"notifications"}
-          />
-          <a onClick={() => history.push("/messages")} className={"messages"} />
+          <a className={"notifications"} />
+          <a className={"messages"} />
         </div>
 
         <div className={"header_more"}>
@@ -141,12 +139,10 @@ function Header() {
             </button>
             <ul className="dropdown-menu">
               <li>
-                <a className="dropdown-item" href="#">
-                  About us
-                </a>
+                <a className="dropdown-item">About us</a>
               </li>
               <li>
-                <a className="dropdown-item" href="#" onClick={onSignOut}>
+                <a className="dropdown-item" onClick={onSignOut}>
                   Sign out
                 </a>
               </li>

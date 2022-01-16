@@ -8,7 +8,6 @@ function UploadModal({ selectedFile, setModal }: any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
-  const token = userSecret.jwt;
   const trackPermalink = selectedFile.name.substr(
     0,
     selectedFile.name.indexOf(".")
@@ -42,6 +41,7 @@ function UploadModal({ selectedFile, setModal }: any) {
 
   const handleUpload = (e: any) => {
     e.preventDefault();
+    const myToken = localStorage.getItem("jwt_token");
     if (imageFile) {
       axios
         .post(
@@ -56,7 +56,7 @@ function UploadModal({ selectedFile, setModal }: any) {
           },
           {
             headers: {
-              Authorization: `JWT ${token}`,
+              Authorization: `JWT ${myToken}`,
             },
           }
         )
@@ -112,7 +112,7 @@ function UploadModal({ selectedFile, setModal }: any) {
           },
           {
             headers: {
-              Authorization: `JWT ${token}`,
+              Authorization: `JWT ${myToken}`,
             },
           }
         )
@@ -223,7 +223,7 @@ function UploadModal({ selectedFile, setModal }: any) {
                 id="flexRadioDefault2"
                 onChange={() => setIsPrivate(false)}
               />
-              <label className="form-check-label">Public (defualt)</label>
+              <label className="form-check-label">Public (default)</label>
             </div>
             <div className="form-check">
               <input
@@ -240,7 +240,9 @@ function UploadModal({ selectedFile, setModal }: any) {
       </div>
 
       <div className="upload-modal-button">
-        <button className="cancel-button">Cancel</button>
+        <button className="cancel-button" onClick={() => setModal(false)}>
+          Cancel
+        </button>
         <button className="save-button" onClick={handleUpload}>
           Save
         </button>

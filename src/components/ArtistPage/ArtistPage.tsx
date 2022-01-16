@@ -28,6 +28,8 @@ function ArtistPage() {
   const [trackPage, setTrackPage] = useState<any>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
+  const [currentPlay, setCurrentPlay] = useState<any>(null);
+
   const clickImageInput = (event: any) => {
     event.preventDefault();
     let fileInput = document.getElementById("file-input3");
@@ -36,6 +38,7 @@ function ArtistPage() {
 
   const changeHeader = (event: any) => {
     const changeHeaderImg = async () => {
+      const header = event.target.files[0].name;
       const config: any = {
         method: "patch",
         url: `/users/me`,
@@ -43,7 +46,9 @@ function ArtistPage() {
           Authorization: `JWT ${userSecret.jwt}`,
         },
         data: {
-          image_header_filename: event.target.files[0].name,
+          image_header_extension: header.substr(
+            -header.length + header.indexOf(`.`) + 1
+          ),
         },
       };
       try {
@@ -71,7 +76,6 @@ function ArtistPage() {
       }
     };
     changeHeaderImg();
-    getUser(pageId);
   };
 
   const getUser = (id: any) => {
@@ -256,41 +260,43 @@ function ArtistPage() {
                 alt={"profileImg"}
               />
             )}
-            <div className={"name"}>
-              <div className={"displayname"}>{user.display_name}</div>
-              {user.first_name + user.last_name !== "" && (
-                <div className={"username"}>
-                  {user.first_name + user.last_name}
+            <div className="name-button">
+              <div className={"name"}>
+                <div className={"displayname"}>{user.display_name}</div>
+                {user.first_name + user.last_name !== "" && (
+                  <div className={"username"}>
+                    {user.first_name + user.last_name}
+                  </div>
+                )}
+              </div>
+              {isMe === true && (
+                <div className="upload-header-image">
+                  <button onClick={clickImageInput}>
+                    <img
+                      src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
+                      alt="img"
+                    />
+                    <div>Upload header image</div>
+                  </button>
+                  <input
+                    type="file"
+                    id="file-input3"
+                    accept=".png"
+                    onChange={changeHeader}
+                  />
                 </div>
               )}
             </div>
-            {isMe === true && (
-              <div className="upload-header-image">
-                <button onClick={clickImageInput}>
-                  <img
-                    src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg"
-                    alt="img"
-                  />
-                  <div>Upload header image</div>
-                </button>
-                <input
-                  type="file"
-                  id="file-input3"
-                  accept=".png"
-                  onChange={changeHeader}
-                />
-              </div>
-            )}
           </div>
 
           <div className={"menu-bar"}>
             <div className={"menu-left"}>
               <a href={`/${permalink}`}>All</a>
-              <a href={`/${permalink}/popular-tracks`}>Popular tracks</a>
-              <a href={`/${permalink}/tracks`}>Tracks</a>
-              <a href={`/${permalink}/albums`}>Albums</a>
-              <a href={`/${permalink}/sets`}>Playlists</a>
-              <a href={`/${permalink}/reposts`}>Reposts</a>
+              <a>Popular tracks</a>
+              <a>Tracks</a>
+              <a>Albums</a>
+              <a>Playlists</a>
+              <a>Reposts</a>
             </div>
             {isMe === true && (
               <div className="menu-right">
@@ -313,6 +319,7 @@ function ArtistPage() {
                   modal={modal}
                   setModal={setModal}
                   getUser={getUser}
+                  setUser={setUser}
                 />
               </div>
             )}
@@ -376,6 +383,8 @@ function ArtistPage() {
                     artistName={user.display_name}
                     myId={myId}
                     user={user}
+                    currentPlay={currentPlay}
+                    setCurrentPlay={setCurrentPlay}
                   />
                 ))}
               <div ref={ref} className="inView">
