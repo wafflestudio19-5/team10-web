@@ -38,8 +38,8 @@ const ListenArtistInfo = ({
   const history = useHistory();
   const { permalink, display_name } = artist;
   const clickUsername = () => history.push(`/${permalink}`);
-  const clickFollowers = () => history.push(`/${permalink}/followers`);
-  const clickTracks = () => history.push(`/${permalink}/tracks`);
+  //   const clickFollowers = () => history.push(`/${permalink}/followers`);
+  //   const clickTracks = () => history.push(`/${permalink}/tracks`);
 
   const fetchArtist = async () => {
     if (artist.id !== 0) {
@@ -150,11 +150,15 @@ const ListenArtistInfo = ({
         {display_name}
       </div>
       <ul className={styles.userInfo}>
-        <li onClick={clickFollowers}>
+        <li
+        // onClick={clickFollowers}
+        >
           <BsPeopleFill />
           <span>{artistInfo.followers}</span>
         </li>
-        <li onClick={clickTracks}>
+        <li
+        // onClick={clickTracks}
+        >
           <IoStatsChart />
           <span>{artistInfo.tracks}</span>
         </li>

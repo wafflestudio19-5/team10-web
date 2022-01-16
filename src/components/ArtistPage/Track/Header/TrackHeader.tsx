@@ -122,6 +122,7 @@ const TrackHeader = ({
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
       }, 1);
+      //   changePlayerCurrentTime();
       animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
@@ -153,7 +154,9 @@ const TrackHeader = ({
     }, 30000),
     [playingTime]
   );
-  changePlayerCurrentTime();
+  useEffect(() => {
+    changePlayerCurrentTime();
+  }, [playingTime, audioSrc]);
 
   //   const onPlayerClick = () => {
   //     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함

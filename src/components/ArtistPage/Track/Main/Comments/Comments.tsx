@@ -155,7 +155,6 @@ const CommentItem = ({
         },
       ],
     });
-    return;
   };
 
   return (

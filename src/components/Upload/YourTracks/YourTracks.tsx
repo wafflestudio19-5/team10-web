@@ -4,7 +4,7 @@ import { MdPlaylistAdd } from "react-icons/md";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 import { AiOutlineDown } from "react-icons/ai";
 import { BsSoundwave } from "react-icons/bs";
-// import { BsFillFileLock2Fill } from "react-icons/bs";
+import { BsFillFileLock2Fill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import { FcComments } from "react-icons/fc";
 import { BsSuitHeartFill, BsTrashFill } from "react-icons/bs";
@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import UploadHeader from "../UploadHeader/UploadHeader";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
-// import ReactTooltip from "react-tooltip";
+import ReactTooltip from "react-tooltip";
 import { ITag, ITrack } from "../../ArtistPage/Track/TrackPage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -57,50 +57,6 @@ const YourTracks = () => {
   const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
 
-  const fetchYourTracks = async () => {
-    if (userSecret.jwt) {
-      const config: any = {
-        method: "get",
-        url: `/users/me`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const response = await axios(config);
-        setUsername(response.data.display_name);
-        const tracksConfig: any = {
-          method: "get",
-          url: `/users/${userSecret.id}/tracks?page=${1}`,
-          headers: {
-            Authorization: `JWT ${userSecret.jwt}`,
-          },
-          data: {},
-        };
-        try {
-          const { data } = await axios(tracksConfig);
-          setTrackCount(data.count);
-          setYourTracks(data.results);
-          setCurrentTracks(data.results);
-          setLoading(false);
-          console.log(data);
-          if (data.next) {
-            // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
-            nextPage.current += 1;
-          } else {
-            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
-            finalPage.current = nextPage.current;
-            setIsFinalPage(true);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
   const fetchNextTracks = async () => {
     if (pageRendered > currentPage && trackCount) {
       const nextPage = currentPage + 1;
@@ -151,7 +107,94 @@ const YourTracks = () => {
     );
     setCurrentPage(previousPage);
   };
+  const fetchYourTracksAgain = async () => {
+    if (userSecret.jwt) {
+      const config: any = {
+        method: "get",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const response = await axios(config);
+        setUsername(response.data.display_name);
+        const tracksConfig: any = {
+          method: "get",
+          url: `/users/${userSecret.id}/tracks?page=${currentPage}`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          const { data } = await axios(tracksConfig);
+          setTrackCount(data.count);
+          setCurrentTracks(data.results);
+          setLoading(false);
+          console.log(data);
+          if (data.next) {
+            // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
+            nextPage.current += 1;
+          } else {
+            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
+            finalPage.current = currentPage;
+            setIsFinalPage(true);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   useEffect(() => {
+    const fetchYourTracks = async () => {
+      if (userSecret.jwt) {
+        const config: any = {
+          method: "get",
+          url: `/users/me`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          const response = await axios(config);
+          setUsername(response.data.display_name);
+          const tracksConfig: any = {
+            method: "get",
+            url: `/users/${userSecret.id}/tracks?page=${1}`,
+            headers: {
+              Authorization: `JWT ${userSecret.jwt}`,
+            },
+            data: {},
+          };
+          try {
+            const { data } = await axios(tracksConfig);
+            setTrackCount(data.count);
+            setYourTracks(data.results);
+            setCurrentTracks(data.results);
+            setLoading(false);
+            console.log(data);
+            if (data.next) {
+              // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
+              nextPage.current += 1;
+            } else {
+              // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
+              finalPage.current = nextPage.current;
+              setIsFinalPage(true);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
     fetchYourTracks();
   }, [userSecret.jwt]);
 
@@ -176,7 +219,7 @@ const YourTracks = () => {
         <EditModal
           setModal={setModal}
           track={editTrack}
-          fetchYourTracks={fetchYourTracks}
+          fetchYourTracks={fetchYourTracksAgain}
         />
       )}
       <div className={styles.wrapper}>
@@ -248,7 +291,7 @@ const YourTracks = () => {
                     username={username}
                     setModal={setModal}
                     setEditTrack={setEditTrack}
-                    fetchYourTracks={fetchYourTracks}
+                    fetchYourTracks={fetchYourTracksAgain}
                     // yourTracks={currentTracks}
                     // finalPage={finalPage.current}
                     // currentPage={currentPage}
@@ -561,8 +604,8 @@ const Track = ({
               </button>
             </div>
           </div>
-          {/* <div className={styles.extra}>
-            {fetchedTrack?.is_private && (
+          <div className={styles.extra}>
+            {track?.is_private && (
               <div className={styles.private}>
                 <span data-tip="This track is private.">
                   <BsFillFileLock2Fill />
@@ -570,7 +613,7 @@ const Track = ({
                 <ReactTooltip />
               </div>
             )}
-          </div> */}
+          </div>
           {/* <div className={styles.duration}>
             <span>{duration !== 0 && calculateTime(duration)}</span>
           </div>
