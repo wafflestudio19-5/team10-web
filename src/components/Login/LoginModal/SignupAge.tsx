@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
 
 const SignupAge = ({
@@ -25,22 +26,27 @@ const SignupAge = ({
   }, []);
   const [lastPage, setLastSign] = useState(false);
   const onClick = async () => {
-    await axios
-      .post(`https://api.soundwaffle.com/signup`, {
-        display_name: displayName,
-        email: inputs.email,
-        password: inputs.password,
-        age: parseInt(age),
-        gender: gender,
-      })
-      .then(async (res) => {
-        localStorage.setItem("permalink", res.data.permalink);
-        localStorage.setItem("jwt_token", res.data.token);
-        history.push("/discover");
-      })
-      .catch(() => {
-        console.log("회원가입 실패");
-      });
+    if (displayName === "") {
+      toast.error("display name은 비워둘 수 없습니다");
+    } else {
+      await axios
+        .post(`https://api.soundwaffle.com/signup`, {
+          display_name: displayName,
+          email: inputs.email,
+          password: inputs.password,
+          age: parseInt(age),
+          gender: gender,
+        })
+        .then(async (res) => {
+          localStorage.setItem("permalink", res.data.permalink);
+          localStorage.setItem("jwt_token", res.data.token);
+          localStorage.setItem("id", res.data.id);
+          history.push("/discover");
+        })
+        .catch(() => {
+          console.log("회원가입 실패");
+        });
+    }
   };
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -62,9 +68,13 @@ const SignupAge = ({
           </select>
           <button
             onClick={() => {
-              setNextSign(null);
-              setLastSign(!lastPage);
-              input2.current?.focus();
+              if (parseInt(age) <= 0) {
+                toast.error("나이는 1살 이상이어야 합니다");
+              } else {
+                setNextSign(null);
+                setLastSign(!lastPage);
+                input2.current?.focus();
+              }
             }}
           >
             Continue

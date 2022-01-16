@@ -1,11 +1,14 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { AiFillAppstore } from "react-icons/ai";
 import { BiHeartSquare } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
 import { useHistory } from "react-router";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useTrackContext } from "../../../context/TrackContext";
 import LikeItem from "./LikeItem";
+import throttle from "lodash/throttle";
 import styles from "./Likes.module.scss";
 
 const Likes = () => {
@@ -20,6 +23,8 @@ const Likes = () => {
         permalink: "",
         display_name: "",
         id: -1,
+        city: "",
+        country: "",
       },
       permailink: "",
       title: "",
@@ -30,6 +35,12 @@ const Likes = () => {
       audio: "",
       image: "",
       id: -1,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
   ]);
   const [filteredLike, setFilteredLike] = useState([
@@ -38,6 +49,8 @@ const Likes = () => {
         permalink: "",
         display_name: "",
         id: -1,
+        city: "",
+        country: "",
       },
       permailink: "",
       title: "",
@@ -48,10 +61,17 @@ const Likes = () => {
       audio: "",
       image: "",
       id: -1,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
     },
   ]);
   const [followList, setFollowList] = useState([]);
-  const { userSecret } = useAuthContext();
+  const [nextPage, setNextPage] = useState<string | null>(null);
+  const { userSecret, setUserSecret } = useAuthContext();
   const filter = (e: any) => {
     setFilterInput(e.target.value);
     const newList = likeList.filter((item) =>
@@ -59,35 +79,164 @@ const Likes = () => {
     );
     setFilteredLike(newList);
   };
+  const _ = require("lodash");
+  const fetchFollowList = _.throttle(() => {
+    const asyncFetchFollwList = async () => {
+      await axios.get(`/users/${userSecret.id}/followings`).then((res) => {
+        if (res.data.next !== null) {
+          let fetchedFollowList = res.data.results.map((item: any) => item.id);
+          const nextUrl = res.data.next.split("users")[1];
+          const recurse = (url: string) => {
+            axios.get(`users${url}`).then((r) => {
+              if (r.data.next !== null) {
+                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
+                const nextUrl = r.data.next.split("users")[1];
+                recurse(nextUrl);
+              } else {
+                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
+                setFollowList(fetchedFollowList);
+              }
+            });
+          };
+          recurse(nextUrl);
+        } else {
+          let fetchedFollowList = res.data.results.map((item: any) => item.id);
+          setFollowList(fetchedFollowList);
+        }
+      });
+    };
+    asyncFetchFollwList();
+  }, 200);
+  useEffect(() => {
+    const checkValid = async () => {
+      if (userSecret.permalink === undefined) {
+        const jwtToken = localStorage.getItem("jwt_token");
+        const permal = localStorage.getItem("permalink");
+        const ID = localStorage.getItem("id");
+        await setUserSecret({
+          ...userSecret,
+          jwt: jwtToken,
+          permalink: permal,
+          id: ID,
+        });
+      }
+    };
+    checkValid();
+  }, []);
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
         try {
-          await axios
-            .get(
-              `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${userSecret.permalink}`
-            )
-            .then((r) => {
-              const userId = r.data.id;
-              axios.get(`/users/${userId}/likes/tracks`).then((res) => {
-                setLikeList(res.data.results);
-                setFilteredLike(res.data.results);
-              });
-              axios.get(`/users/${userId}/followings`).then((res) => {
-                const fetchFollowList = res.data.results.map(
-                  (item: any) => item.id
-                );
-                console.log(fetchFollowList);
-                setFollowList(fetchFollowList);
-              });
-            });
-        } catch (error) {
-          console.log(error);
+          await axios({
+            method: "get",
+            url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
+          }).then((res) => {
+            setLikeList(res.data.results);
+            setFilteredLike(res.data.results);
+            res.data.next === null
+              ? null
+              : setNextPage(`users${res.data.next.split("users")[1]}`);
+          });
+          fetchFollowList();
+        } catch {
+          toast.error("유저 정보 불러오기에 실패하였습니다");
         }
       };
       fetchUserId();
     }
   }, [userSecret]);
+  const addLikeList = () => {
+    if (nextPage !== null && likeList.length === filteredLike.length) {
+      axios({
+        method: "get",
+        url: nextPage,
+      })
+        .then((res) => {
+          setLikeList([...likeList, ...res.data.results]);
+          setFilteredLike([...likeList, ...res.data.results]);
+          res.data.next === null
+            ? setNextPage(null)
+            : setNextPage(`users${res.data.next.split("users")[1]}`);
+        })
+        .catch(() => toast.error("like list 불러오기에 실패하였습니다"));
+    }
+  };
+  const fetchLikeList = _.throttle(() => {
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = document.documentElement.scrollTop;
+    const clientHeight = document.documentElement.clientHeight;
+    if (scrollTop + clientHeight >= scrollHeight) {
+      // 페이지 끝에 도달하면 추가 데이터를 받아온다
+      addLikeList();
+    }
+  }, 500);
+  useEffect(() => {
+    window.addEventListener("scroll", fetchLikeList);
+    return () => {
+      window.removeEventListener("scroll", fetchLikeList);
+    };
+  });
+  const {
+    setTrackIsPlaying,
+    playingTime,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    trackIsPlaying,
+    trackBarTrack,
+  } = useTrackContext();
+  const animationRef = useRef(0); // 재생 애니메이션
+  const playMusic = () => {
+    if (trackIsPlaying) {
+      audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    } else {
+      audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
+      cancelAnimationFrame(animationRef.current);
+    }
+  };
+  const togglePlayPause = (track: any, artist: any) => {
+    // 재생/일시정지 버튼 누를 때
+    if (trackBarTrack.id === track.id) {
+      const prevValue = trackIsPlaying;
+      setTrackIsPlaying(!prevValue);
+      if (!prevValue) {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+        animationRef.current = requestAnimationFrame(whilePlaying);
+      } else {
+        audioPlayer.current.pause();
+        setPlayingTime(audioPlayer.current.currentTime);
+        cancelAnimationFrame(animationRef.current);
+      }
+    } else {
+      setAudioSrc(track.audio);
+      setTrackIsPlaying(true);
+      setTrackBarArtist(artist);
+      setTrackBarTrack(track);
+      audioPlayer.current.src = track.audio;
+      setTimeout(() => {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }, 1);
+      animationRef.current = requestAnimationFrame(whilePlaying);
+    }
+  };
+  const whilePlaying = () => {
+    changePlayerCurrentTime();
+    animationRef.current = requestAnimationFrame(whilePlaying);
+  };
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      setPlayingTime(audioPlayer.current.currentTime);
+    }, 30000),
+    [playingTime]
+  );
+  changePlayerCurrentTime();
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.wrapper}>
@@ -173,6 +322,12 @@ const Likes = () => {
                   trackPermal={item.permalink}
                   artistPermal={item.artist.permalink}
                   followList={followList}
+                  fetchFollowList={fetchFollowList}
+                  setLikeList={setLikeList}
+                  setFilteredLike={setFilteredLike}
+                  togglePlayPause={togglePlayPause}
+                  track={item}
+                  playMusic={playMusic}
                 />
               ))
             )}
