@@ -450,7 +450,10 @@ const Track = ({
   const togglePlayButton = () => {
     if (track && userSecret.permalink) {
       if (!play) {
-        if (headerTrackSrc !== barTrackSrc) {
+        if (
+          headerTrackSrc !== barTrackSrc &&
+          typeof userSecret.id === "number"
+        ) {
           setPlayingTime(0);
           audioPlayer.current.src = track.audio;
           setAudioSrc(track.audio);
