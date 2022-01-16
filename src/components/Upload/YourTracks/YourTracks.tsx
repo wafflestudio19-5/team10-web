@@ -22,11 +22,12 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useTrackContext } from "../../../context/TrackContext";
 import EditModal from "./EditModal";
+import ArtworkModal from "./ArtworkModal";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 dayjs.extend(relativeTime);
 
-interface IYourTracks {
+export interface IYourTracks {
   id: number;
   title: string;
   permalink: string;
@@ -43,7 +44,7 @@ interface IYourTracks {
 const YourTracks = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [yourTracks, setYourTracks] = useState<IYourTracks[]>([]);
-  const [checkedItems, setCheckedItems] = useState(new Set());
+  const [checkedItems, setCheckedItems] = useState<number[]>([]);
   const [username, setUsername] = useState("");
   const [modal, setModal] = useState(false);
   const [editTrack, setEditTrack] = useState<ITrack>();
@@ -53,6 +54,7 @@ const YourTracks = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageRendered, setPageRendered] = useState(1);
   const [currentTracks, setCurrentTracks] = useState<IYourTracks[]>([]);
+  const [artworkModal, setArtworkModal] = useState(false);
   const nextPage = useRef(1);
   const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
@@ -205,13 +207,14 @@ const YourTracks = () => {
 
   const checkedItemHandler = (id: number, isChecked: boolean) => {
     if (isChecked) {
-      checkedItems.add(id);
-      setCheckedItems(checkedItems);
-    } else if (!isChecked && checkedItems.has(id)) {
-      checkedItems.delete(id);
-      setCheckedItems(checkedItems);
+      setCheckedItems(checkedItems.concat(id));
+    } else if (!isChecked && checkedItems.includes(id)) {
+      setCheckedItems(checkedItems.filter((element) => element !== id));
     }
   };
+
+  const openArtworkModal = () => setArtworkModal(true);
+  const closeArtworkModal = () => setArtworkModal(false);
 
   return (
     <div className={styles.yourTracksPage}>
@@ -222,6 +225,11 @@ const YourTracks = () => {
           fetchYourTracks={fetchYourTracksAgain}
         />
       )}
+      <ArtworkModal
+        modal={artworkModal}
+        closeModal={closeArtworkModal}
+        track={currentTracks[0]}
+      />
       <div className={styles.wrapper}>
         <div className={styles.main}>
           <div className={styles.uploadHeader}>
@@ -236,17 +244,22 @@ const YourTracks = () => {
                 <input type="checkbox" />
               </div>
               <div className={styles.dropdownContainer}>
-                <button className={styles.editTracks} onClick={editToggle}>
+                <button
+                  className={styles.editTracks}
+                  onClick={editToggle}
+                  disabled={checkedItems.length === 0}
+                >
                   <BiPencil />
                   <span>Edit tracks</span>
                   <AiOutlineDown />
                 </button>
                 {isEditOpen && (
-                  <div></div>
-                  //   <ul>
-                  //     <li>Privacy and tags</li>
-                  //     <li>Artwork</li>
-                  //   </ul>
+                  <div>
+                    <ul>
+                      <li>Privacy and tags</li>
+                      <li onClick={openArtworkModal}>Artwork</li>
+                    </ul>
+                  </div>
                 )}
               </div>
               <button className={styles.addToPlaylist}>
@@ -292,6 +305,7 @@ const YourTracks = () => {
                     setModal={setModal}
                     setEditTrack={setEditTrack}
                     fetchYourTracks={fetchYourTracksAgain}
+                    checkedItems={checkedItems}
                     // yourTracks={currentTracks}
                     // finalPage={finalPage.current}
                     // currentPage={currentPage}
@@ -325,8 +339,11 @@ const Track = ({
   username,
   setModal,
   setEditTrack,
+  checkedItems,
   fetchYourTracks,
-}: //   yourTracks,
+}: //
+//
+//   yourTracks,
 //   finalPage,
 //   currentPage,
 {
@@ -336,6 +353,7 @@ const Track = ({
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
   fetchYourTracks: () => void;
+  checkedItems: any;
   //   yourTracks: IYourTracks[];
   //   finalPage: number;
   //   currentPage: number;
@@ -359,10 +377,13 @@ const Track = ({
   } = useTrackContext();
   const history = useHistory();
 
-  const checkHandler: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+  const checkHandler = () => {
+    const prevValue = checked;
     setChecked(!checked);
-    checkedItemHandler(track.id, event.target.checked);
+    checkedItemHandler(track.id, !prevValue);
+    console.log(checkedItems);
   };
+
   //   useEffect(() => {
   //     const fetchTrack = async () => {
   //       if (userSecret.jwt && currentPage > finalPage) {
@@ -403,6 +424,7 @@ const Track = ({
   //   }, [userSecret, yourTracks]);
   const headerTrackSrc = track.audio.split("?")[0];
   const barTrackSrc = audioSrc.split("?")[0];
+
   useEffect(() => {
     if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
       setPlay(true);
@@ -533,7 +555,7 @@ const Track = ({
   const onClickName = () => history.push(`/${userSecret.permalink}`);
 
   return (
-    <li key={track.id} onClick={() => setChecked(!checked)}>
+    <li key={track.id} onClick={checkHandler}>
       <audio
         ref={player}
         src={track?.audio}
@@ -544,7 +566,7 @@ const Track = ({
         type="checkbox"
         className={styles.trackCheckBox}
         checked={checked}
-        onChange={(event) => checkHandler(event)}
+        onChange={checkHandler}
       />
       <div
         className={styles.playContainer}
