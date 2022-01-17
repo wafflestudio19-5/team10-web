@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../context/AuthContext";
 import { useTrackContext } from "../../context/TrackContext";
@@ -7,7 +7,6 @@ import styles from "./Discover.module.scss";
 import LikeList from "./LikeList/LikeList";
 import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
-import throttle from "lodash/throttle";
 
 const Discover = () => {
   const { userSecret, setUserSecret } = useAuthContext();
@@ -285,7 +284,6 @@ const Discover = () => {
   ]);
   const {
     setTrackIsPlaying,
-    playingTime,
     setPlayingTime,
     audioPlayer,
     setAudioSrc,
@@ -294,16 +292,13 @@ const Discover = () => {
     trackIsPlaying,
     trackBarTrack,
   } = useTrackContext();
-  const animationRef = useRef(0); // 재생 애니메이션
   const playMusic = () => {
     if (trackIsPlaying) {
       audioPlayer.current.play();
       setPlayingTime(audioPlayer.current.currentTime);
-      animationRef.current = requestAnimationFrame(whilePlaying);
     } else {
       audioPlayer.current.pause();
       setPlayingTime(audioPlayer.current.currentTime);
-      cancelAnimationFrame(animationRef.current);
     }
   };
   const togglePlayPause = (track: any, artist: any) => {
@@ -314,11 +309,9 @@ const Discover = () => {
       if (!prevValue) {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
-        animationRef.current = requestAnimationFrame(whilePlaying);
       } else {
         audioPlayer.current.pause();
         setPlayingTime(audioPlayer.current.currentTime);
-        cancelAnimationFrame(animationRef.current);
       }
     } else {
       setAudioSrc(track.audio);
@@ -330,20 +323,8 @@ const Discover = () => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
       }, 1);
-      animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
-  const whilePlaying = () => {
-    changePlayerCurrentTime();
-    animationRef.current = requestAnimationFrame(whilePlaying);
-  };
-  const changePlayerCurrentTime = useCallback(
-    throttle(() => {
-      setPlayingTime(audioPlayer.current.currentTime);
-    }, 30000),
-    [playingTime]
-  );
-  changePlayerCurrentTime();
   useEffect(() => {
     const checkValid = async () => {
       const jwtToken = localStorage.getItem("jwt_token");
