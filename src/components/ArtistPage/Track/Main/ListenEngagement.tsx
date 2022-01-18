@@ -5,6 +5,7 @@ import { BiRepost, BiPencil } from "react-icons/bi";
 // import { ImShare } from "react-icons/im";
 import { FiLink2 } from "react-icons/fi";
 import { FaPlay } from "react-icons/fa";
+import { MdPlaylistAdd } from "react-icons/md";
 import { IArtist, ITrack, IUserMe } from "../TrackPage";
 // import { useHistory } from "react-router-dom";
 import axios from "axios";
@@ -24,6 +25,7 @@ const ListenEngagement = ({
   setEditModal,
   fetchReposters,
   fetchLikers,
+  openPlaylistModal,
 }: {
   track: ITrack;
   artist: IArtist;
@@ -33,6 +35,7 @@ const ListenEngagement = ({
   setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
   fetchReposters: () => void;
   fetchLikers: () => void;
+  openPlaylistModal: () => void;
 }) => {
   const [like, setLike] = useState(false);
   const [repost, setRepost] = useState(false);
@@ -251,10 +254,10 @@ const ListenEngagement = ({
           <FiLink2 />
           <span>Copy Link</span>
         </button>
-        {/* <button className={styles.more}>
-          <FiMoreHorizontal />
-          <span>More</span>
-        </button> */}
+        <button className={styles.more} onClick={openPlaylistModal}>
+          <MdPlaylistAdd />
+          <span>Add to Playlist</span>
+        </button>
         {isMyTrack === true && (
           <button className={styles.edit} onClick={editTrack}>
             <BiPencil />
@@ -276,17 +279,15 @@ const ListenEngagement = ({
             {track.like_count}
           </span>
         </div>
-        {isMyTrack === false && (
-          <div className={styles.repostStats}>
-            <BiRepost />
-            <span
-              className={styles.pointer}
-              // onClick={trackReposts}
-            >
-              {track.repost_count}
-            </span>
-          </div>
-        )}
+        <div className={styles.repostStats}>
+          <BiRepost />
+          <span
+            className={styles.pointer}
+            // onClick={trackReposts}
+          >
+            {track.repost_count}
+          </span>
+        </div>
       </div>
     </div>
   );
