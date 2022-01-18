@@ -123,8 +123,8 @@ const LikeItem = ({
       artistId === userSecret.id
         ? setFollow("no")
         : followList.includes(artistId)
-        ? setFollow(!follow)
-        : null;
+        ? setFollow(true)
+        : setFollow(false);
     }
   }, [followList]);
   return (

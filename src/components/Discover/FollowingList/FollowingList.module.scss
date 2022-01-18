@@ -1,0 +1,27 @@
+.itemsWrapper {
+  flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.noItemsWrapper {
+  .noFollowerWrapper {
+    width: 200px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    .noFollower {
+      width: 120px;
+      height: 120px;
+      color: #999999;
+    }
+    .text {
+      color: #999999;
+      font-size: 14px;
+    }
+  }
+}

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@greatsumini/react-facebook-login": "^3.0.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -16,6 +17,7 @@
     "color-thief-react": "^2.1.0",
     "colorthief": "^2.3.2",
     "dayjs": "^1.10.7",
+    "instagram-login-react": "^2.0.0",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-audio-player": "^0.17.0",
