@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiFillAppstore } from "react-icons/ai";
 import { BiHeartSquare } from "react-icons/bi";
-import { FaList } from "react-icons/fa";
 import { useHistory } from "react-router";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useTrackContext } from "../../../context/TrackContext";
@@ -242,23 +241,12 @@ const Likes = () => {
           >
             Albums
           </div>
-          <div
-            className={styles.others}
-            onClick={() => goToSomewhere("/you/stations")}
-          >
-            Stations
-          </div>
+
           <div
             className={styles.others}
             onClick={() => goToSomewhere("/you/following")}
           >
             Following
-          </div>
-          <div
-            className={styles.others}
-            onClick={() => goToSomewhere("/you/history")}
-          >
-            History
           </div>
         </div>
         <div className={styles.recent_played}>
@@ -269,7 +257,6 @@ const Likes = () => {
             <div className={styles.filterWrapper}>
               <div>View</div>
               <AiFillAppstore className={styles.squareIcon} />
-              <FaList className={styles.listIcon} />
               <input
                 type="text"
                 className={styles.filter}
@@ -310,6 +297,7 @@ const Likes = () => {
                   togglePlayPause={togglePlayPause}
                   track={item}
                   playMusic={playMusic}
+                  setNextPage={setNextPage}
                 />
               ))
             )}

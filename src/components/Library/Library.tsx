@@ -29,23 +29,12 @@ const Library = () => {
           >
             Albums
           </div>
-          <div
-            className={styles.others}
-            onClick={() => goToSomewhere("/you/stations")}
-          >
-            Stations
-          </div>
+
           <div
             className={styles.others}
             onClick={() => goToSomewhere("/you/following")}
           >
             Following
-          </div>
-          <div
-            className={styles.others}
-            onClick={() => goToSomewhere("/you/history")}
-          >
-            History
           </div>
         </div>
         <div className={styles.recent_played}>

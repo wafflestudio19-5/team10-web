@@ -25,6 +25,7 @@ const LikeItem = ({
   togglePlayPause,
   track,
   playMusic,
+  setNextPage,
 }: {
   title: string;
   img: string;
@@ -40,6 +41,7 @@ const LikeItem = ({
   togglePlayPause: any;
   track: any;
   playMusic: any;
+  setNextPage: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -91,9 +93,11 @@ const LikeItem = ({
       method: "get",
       url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
     }).then((res) => {
-      console.log(res);
       setLikeList(res.data.results);
       setFilteredLike(res.data.results);
+      res.data.next === null
+        ? null
+        : setNextPage(`users${res.data.next.split("users")[1]}`);
     });
   };
   const handleFollow = async (e: any) => {
