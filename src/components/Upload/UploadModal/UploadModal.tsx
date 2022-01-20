@@ -4,7 +4,16 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
-function UploadModal({ selectedFile, setModal }: any) {
+function UploadModal({
+  num,
+  selectedFile,
+  setModal,
+  selectedNum,
+  cancelCount,
+  setCancelCount,
+  numArray,
+  setNumArray,
+}: any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
@@ -37,6 +46,14 @@ function UploadModal({ selectedFile, setModal }: any) {
 
   const changeTrackPermalink = (event: any) => {
     setTPermalink(event.target.value);
+  };
+
+  const cancelModal = () => {
+    setCancelCount(cancelCount + 1);
+    setNumArray(numArray.filter((item: any) => item !== num));
+    if (cancelCount + 1 === selectedNum) {
+      setModal(false);
+    }
   };
 
   const handleUpload = (e: any) => {
@@ -240,7 +257,7 @@ function UploadModal({ selectedFile, setModal }: any) {
       </div>
 
       <div className="upload-modal-button">
-        <button className="cancel-button" onClick={() => setModal(false)}>
+        <button className="cancel-button" onClick={cancelModal}>
           Cancel
         </button>
         <button className="save-button" onClick={handleUpload}>

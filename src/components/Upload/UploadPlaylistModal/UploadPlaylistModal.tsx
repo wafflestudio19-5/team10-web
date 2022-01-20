@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
-import "./UploadPlaylistModal.scss";
 
 function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
   const { userSecret } = useAuthContext();

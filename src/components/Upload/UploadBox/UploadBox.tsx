@@ -6,6 +6,7 @@ function UploadBox({
   setModal,
   setSelectedNum,
   setPlaylistModal,
+  setNumArray,
 }: any) {
   const [isPlaylist, setIsPlaylist] = useState<boolean>(false);
 
@@ -14,6 +15,9 @@ function UploadBox({
       setModal(true);
       setSelectedNum(event.target.files.length);
       setSelectedFile(event.target.files);
+      setNumArray(
+        Array.from({ length: event.target.files.length }, (_, i) => i)
+      );
     } else {
       setPlaylistModal(true);
       setSelectedNum(event.target.files.length);
