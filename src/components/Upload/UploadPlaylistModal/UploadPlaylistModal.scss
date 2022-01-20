@@ -1,0 +1,205 @@
+.upload-modal {
+    width: 800px;
+    height: 700px;
+    border: 1px solid #f2f2f2;
+    margin: auto;
+    margin-top: 150px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px -5px;
+
+    .upload-modal-header {
+        width: 748px;
+        height: 40px;
+        display: flex;
+        flex-direction: row;
+        margin: 20px 26px;
+        border-bottom: 1px solid #f2f2f2;
+
+        .upload-basic-info {
+            color: #FF5500;
+            border-bottom: 2px solid #FF5500;
+        }
+
+        div {
+            font-size: 24px;
+            margin-right: 20px;
+
+            &:hover {
+                border-bottom: 2px solid #333;
+            }
+        }
+    }
+
+    .upload-modal-body{
+        display: flex;
+
+        .upload-image {
+            margin-left: 26px;
+
+            .upload-track-img {
+                width: 260px;
+                height: 260px;
+                position: relative;
+            }
+
+            button {
+                position: relative;
+                top: -50px;
+                left: 65px;
+                width: 140px;
+                height: 26px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #f2f2f2;
+
+                div{
+                    margin-left: 10px;
+                }
+            }
+
+            input {
+                display: none;
+            }
+        }
+
+        .upload-info {
+            width: 470px;
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px;
+
+            .upload-info-title {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+
+                text {
+                    font-size: 12px;
+                    margin-bottom: 7px;
+                }
+
+                input {
+                    width: 470px;
+                    height: 26px;
+                    font-size: 14px;
+                    margin-bottom: 10px;
+                }
+            }
+
+            .upload-info-permalink {
+                display: flex;
+                align-items: center;
+                width: 470px;
+                height: 26px;
+
+                div {
+                    line-height: 26px;
+                    margin-right: 5px;
+                }
+
+                input {
+                    height: 26px;
+                    margin-top: 10px;
+                }
+            }
+
+            .upload-info-genre {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+
+                text {
+                    font-size: 12px;
+                    margin-bottom: 7px;
+                }
+
+                select {
+                    width: 230px;
+                    height: 26px;
+                    font-size: 14px;
+                }
+            }
+
+            .upload-info-tag {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+
+                text {
+                    font-size: 12px;
+                    margin-bottom: 7px;
+                }
+
+                input {
+                    width: 470px;
+                    height: 26px;
+                    font-size: 14px;
+                }
+            }
+
+            .upload-info-description {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 20px;
+
+                text {
+                    font-size: 12px;
+                    margin-bottom: 7px;
+                }
+
+                input {
+                    width: 470px;
+                    height: 130px;
+                    font-size: 14px;
+                }
+            }
+
+            .upload-info-privacy {
+                font-size: 14px;
+
+                text {
+                    font-size: 12px;
+                }
+
+                div {
+                    margin-top: 7px;
+                }
+            }
+        }
+    }
+
+    .upload-modal-button {
+        width: 800px;
+        border-top: 1px solid #f2f2f2;
+        font-size: 14px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        margin-top: 30px;
+
+        button {
+            margin-top: 30px;
+        }
+
+        .cancel-button {
+            width: 55px;
+            height: 26px;
+            line-height: 26px;
+            background-color: white;
+            color: #333;
+            border: none;
+        }
+
+        .save-button {
+            width: 55px;
+            height: 26px;
+            line-height: 26px;
+            background-color: #FF5500;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            margin-left: 10px;
+            margin-right: 25px;
+        }
+    }
+}
