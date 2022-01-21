@@ -263,14 +263,14 @@ const TrackMain = ({
         {/* <RelatedTracks />
         <InPlaylists /> */}
         <LikeUsers
-          track={track}
-          artist={artist}
+          //   track={track}
+          //   artist={artist}
           trackLikers={trackLikers}
           likersCount={likersCount}
         />
         <RepostUsers
-          track={track}
-          artist={artist}
+          //   track={track}
+          //   artist={artist}
           trackReposters={trackReposters}
           repostersCount={repostersCount}
         />

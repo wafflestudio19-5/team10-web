@@ -37,6 +37,27 @@
   height: 100px;
   width: 820px;
   box-sizing: border-box;
+  .trackCount {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: grid;
+    grid-row: 2;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    .countNumber {
+      font-size: 30px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .tracks {
+      font-size: 15px;
+    }
+  }
   .barContainer {
     width: 100%;
   }

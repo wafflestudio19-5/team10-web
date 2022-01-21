@@ -2,8 +2,8 @@
 .setWrapper {
   width: 100vw;
   background-color: #f2f2f2;
-  min-height: calc(100vh + 70px);
-  padding-bottom: 45px;
+  min-height: calc(100vh + 49px);
+  //   padding-bottom: 45px;
 }
 .set {
   margin: 0 auto;
@@ -12,4 +12,5 @@
   box-sizing: border-box;
   font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans,
     Garuda, Verdana, Tahoma, sans-serif;
+  //   padding-bottom: 45px;
 }

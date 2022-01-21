@@ -2,19 +2,19 @@ import React from "react";
 import styles from "./SideUsers.module.scss";
 import { BsSuitHeartFill } from "react-icons/bs";
 import { useHistory } from "react-router";
-import { IArtist, ITrack } from "../../TrackPage";
+// import { IArtist, ITrack } from "../../TrackPage";
 import ReactTooltip from "react-tooltip";
 import { ITrackReposter } from "../TrackMain";
 import { useAuthContext } from "../../../../../context/AuthContext";
 
 const LikeUsers = ({
-  track,
-  artist,
+  //   track,
+  //   artist,
   trackLikers,
   likersCount,
 }: {
-  track: ITrack;
-  artist: IArtist;
+  //   track: ITrack;
+  //   artist: IArtist;
   trackLikers: ITrackReposter[];
   likersCount: number;
 }) => {
@@ -25,9 +25,9 @@ const LikeUsers = ({
     <div className={styles.container}>
       <div
         className={styles.title}
-        onClick={() =>
-          history.push(`${artist.permalink}/${track.permalink}/likes`)
-        }
+        // onClick={() =>
+        //   history.push(`${artist.permalink}/${track.permalink}/likes`)
+        // }
       >
         <div>
           <BsSuitHeartFill />

@@ -2,19 +2,19 @@ import React from "react";
 import styles from "./SideUsers.module.scss";
 import { BiRepost } from "react-icons/bi";
 import { useHistory } from "react-router";
-import { IArtist, ITrack } from "../../TrackPage";
+// import { IArtist, ITrack } from "../../TrackPage";
 import ReactTooltip from "react-tooltip";
 import { ITrackReposter } from "../TrackMain";
 import { useAuthContext } from "../../../../../context/AuthContext";
 
 const RepostUsers = ({
-  track,
-  artist,
+  //   track,
+  //   artist,
   repostersCount,
   trackReposters,
 }: {
-  track: ITrack;
-  artist: IArtist;
+  //   track: ITrack;
+  //   artist: IArtist;
   repostersCount: number;
   trackReposters: ITrackReposter[];
 }) => {
@@ -25,9 +25,9 @@ const RepostUsers = ({
     <div className={styles.container} style={{ marginBottom: "30px" }}>
       <div
         className={styles.title}
-        onClick={() =>
-          history.push(`${artist.permalink}/${track.permalink}/reposts`)
-        }
+        // onClick={() =>
+        //   history.push(`${artist.permalink}/${track.permalink}/reposts`)
+        // }
       >
         <div>
           <BiRepost />

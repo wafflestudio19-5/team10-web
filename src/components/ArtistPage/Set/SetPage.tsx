@@ -4,6 +4,8 @@ import axios from "axios";
 import styles from "./SetPage.module.scss";
 import SetHeader from "./Header/SetHeader";
 import SetModal from "./Modal/SetModal";
+import SetMain from "./Main/SetMain";
+import { useAuthContext } from "../../../context/AuthContext";
 
 interface ISetParams {
   username: string;
@@ -89,28 +91,35 @@ const SetPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const { username, playlist } = useParams<ISetParams>();
-  useEffect(() => {
-    const fetchSet = async () => {
-      try {
-        const response = await axios.get(
-          `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`
-        );
-        const data = response.data;
-        setSet(data);
+  const { userSecret } = useAuthContext();
+  const fetchSet = async () => {
+    try {
+      const response = await axios.get(
+        `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`
+      );
+      const data = response.data;
+      setSet(data);
+      setIsLoading(false);
+    } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.status === 404
+      ) {
+        setNoSet(true);
         setIsLoading(false);
-      } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404
-        ) {
-          setNoSet(true);
-          setIsLoading(false);
-        }
       }
-    };
+    }
+  };
+  useEffect(() => {
     fetchSet();
   }, []);
+
+  useEffect(() => {
+    if (set.creator.id !== userSecret.id && set.is_private === true) {
+      setNoSet(true);
+    }
+  }, [userSecret.id, set.is_private, isLoading]);
 
   const openModal = () => setModal(true);
   const closeModal = () => setModal(false);
@@ -136,17 +145,7 @@ const SetPage = () => {
         <div className={styles.set}>
           <SetModal modal={modal} closeModal={closeModal} playlist={set} />
           <SetHeader openModal={openModal} playlist={set} noSet={noSet} />
-          {/* {noTrack || (
-        <TrackMain
-          track={track}
-          artist={artist}
-          userMe={userMe}
-          fetchTrack={fetchTrack}
-          isMyTrack={isMyTrack}
-          setEditModal={setEditModal}
-          openPlaylistModal={openPlaylistModal}
-        />
-      )} */}
+          {noSet || <SetMain playlist={set} fetchSet={fetchSet} />}
         </div>
       )}
     </div>

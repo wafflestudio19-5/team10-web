@@ -1,0 +1,31 @@
+.trackMain {
+  position: relative;
+  top: 46px;
+  display: grid;
+  grid-template-columns: 880px 360px;
+  width: 1240px;
+  box-sizing: border-box;
+  background-color: white;
+  padding: 0 30px 110px 30px;
+  // padding-bottom: 45px;
+}
+.header {
+  display: grid;
+  grid-row: 2;
+  position: relative;
+}
+.infoComments {
+  position: relative;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 150px 670px;
+}
+.leftSide {
+  margin-top: 20px;
+  border-right: 1px solid rgb(231, 231, 231);
+  width: 850px;
+}
+.trackList {
+  list-style-type: none;
+  padding: 0;
+}

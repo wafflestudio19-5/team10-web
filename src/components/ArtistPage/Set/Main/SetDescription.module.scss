@@ -1,0 +1,29 @@
+.main {
+  max-height: 150px;
+  overflow-y: scroll;
+  //   border: 1px dotted gray;
+  position: relative;
+  //   button {
+  //     display: block;
+  //     background-color: white;
+  //     border: none;
+  //     padding: 0;
+  //     position: absolute;
+  //     bottom: 0;
+  //     font-size: 12px;
+  //     cursor: pointer;
+  //   }
+  .private {
+    span svg {
+      width: 22px;
+      height: 22px;
+      path {
+        fill: #ff5500;
+      }
+    }
+  }
+  margin-bottom: 25px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

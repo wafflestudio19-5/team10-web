@@ -87,7 +87,7 @@ const TrackPage = () => {
     } else if (username !== userSecret.permalink && track.is_private) {
       setNoTrack(true);
     }
-  });
+  }, [userSecret.permalink, track.is_private, isLoading]);
 
   const fetchTrack = async () => {
     const encoded = encodeURI(

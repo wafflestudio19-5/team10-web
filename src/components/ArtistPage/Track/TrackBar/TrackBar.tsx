@@ -368,6 +368,10 @@ const TrackBar = () => {
     }, 1);
   };
 
+  if (audioPlayer.current.ended) {
+    nextTrack();
+  }
+
   return (
     <>
       {!!audioSrc.length && (
