@@ -1,0 +1,27 @@
+.titleInfo {
+  position: absolute;
+  top: 30px;
+  right: 390px;
+  width: 100px;
+  height: 67px;
+  display: grid;
+  align-content: space-between;
+  font-size: 16px;
+  text-align: right;
+  color: white;
+  .releasedDate {
+    height: 22px;
+  }
+  .tag {
+    height: 24px;
+    padding: auto 5px;
+    white-space: pre;
+    background-color: #999999;
+    border-radius: 10px;
+    display: inline-block;
+    line-height: 24px;
+    &:hover {
+      background-color: #666666;
+    }
+  }
+}

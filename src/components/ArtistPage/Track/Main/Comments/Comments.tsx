@@ -12,6 +12,7 @@ import { ITrack, IUserMe } from "../../TrackPage";
 import { useAuthContext } from "../../../../../context/AuthContext";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { throttle } from "lodash";
 
 const Comments = ({
   comments,
@@ -86,24 +87,30 @@ const CommentItem = ({
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const config: any = {
-      method: "post",
-      url: `/tracks/${track.id}/comments`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {
-        content: commentInput,
-        group: comments[0].group,
-      },
-    };
-    try {
-      const response = await axios(config);
-      console.log(response);
-      fetchComments();
-    } catch (error) {
-      console.log(console.error());
+    if (commentInput.trim().length === 0) {
+      return;
     }
+    const submitInput = throttle(async () => {
+      const config: any = {
+        method: "post",
+        url: `/tracks/${track.id}/comments`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {
+          content: commentInput,
+          group: comments[0].group,
+        },
+      };
+      try {
+        const response = await axios(config);
+        console.log(response);
+        fetchComments();
+      } catch (error) {
+        console.log(console.error());
+      }
+    }, 1000);
+    submitInput();
     setInput("");
     setShowReply(false);
     fetchComments();

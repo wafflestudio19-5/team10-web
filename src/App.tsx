@@ -20,6 +20,7 @@ import YourTracks from "./components/Upload/YourTracks/YourTracks";
 import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
 import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
 import axios from "axios";
+import SetPage from "./components/ArtistPage/Set/SetPage";
 
 function App() {
   const location = useLocation();
@@ -45,6 +46,7 @@ function App() {
           <Route exact path="/you/tracks" component={YourTracks} />
           <Route exact path="/:permalink" component={ArtistPage} />
           <Route exact path="/:username/:trackname" component={TrackPage} />
+          <Route exact path="/:username/sets/:playlist" component={SetPage} />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
         {location.pathname !== "/" && <AudioTag />}
