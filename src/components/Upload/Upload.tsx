@@ -27,7 +27,6 @@ function Upload() {
         {playlistModal && (
           <UploadPlaylistModal
             selectedFiles={selectedFiles}
-            setSelectedFiles={setSelectedFiles}
             setPlaylistModal={setPlaylistModal}
           />
         )}

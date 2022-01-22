@@ -50,18 +50,13 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
     setListPermalink(event.target.value);
   };
 
-  // const changeTrack = (e: any, item: any) => {
-  //   setNewFiles([...newFiles, { id: item, title: e.target.value }]);
-  //   console.log(newFiles);
-  // };
-
   const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
     // 이미지 파일 기능 추가해야됨
     console.log(imageFile);
-    console.log(selectedFiles);
-    console.log(newFiles);
     const myToken = localStorage.getItem("jwt_token");
+
+    // set 만들기
     axios
       .post(
         "https://api.soundwaffle.com/sets",
@@ -78,8 +73,72 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           },
         }
       )
-      .then(() => {
-        console.log("성공");
+      .then((res1) => {
+        // 개별 track 만들기
+        const tracks = Array.from(
+          { length: selectedFiles.length },
+          (_, i) => i
+        );
+        tracks.map((item: number) => {
+          axios
+            .post(
+              "https://api.soundwaffle.com/tracks",
+              {
+                title: newFiles[item].name,
+                permalink: newFiles[item].name,
+                is_private: isPrivate,
+                audio_extension: selectedFiles[item].name.substr(
+                  -selectedFiles[item].name.length +
+                    selectedFiles[item].name.indexOf(`.`) +
+                    1
+                ),
+              },
+              {
+                headers: {
+                  Authorization: `JWT ${myToken}`,
+                },
+              }
+            )
+            .then((res2) => {
+              const music_options = {
+                headers: {
+                  "Content-Type": selectedFiles[item].type,
+                },
+              };
+              // S3에 음악파일 업로드
+              axios
+                .put(
+                  res2.data.audio_presigned_url,
+                  selectedFiles[item],
+                  music_options
+                )
+                .then(() => {
+                  // set에 트랙 추가하기
+                  axios
+                    .post(
+                      `https://api.soundwaffle.com/sets/${res1.data.id}/tracks`,
+                      {
+                        track_id: res2.data.id,
+                      },
+                      {
+                        headers: {
+                          Authorization: `JWT ${myToken}`,
+                        },
+                      }
+                    )
+                    .catch(() => {
+                      toast("set에 추가 실패");
+                    });
+                })
+                .catch(() => {
+                  toast("음악파일 업로드 실패");
+                });
+            })
+            .catch(() => {
+              toast("업로드 실패");
+              toast("트랙 url이 중복되었는지 확인해주세요");
+            });
+        });
       })
       .catch(() => {
         toast("set 만들기 실패");
@@ -202,6 +261,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         <PlaylistTrack
           item={item}
           selectedFiles={selectedFiles}
+          newFiles={newFiles}
           setNewFiles={setNewFiles}
         />
       ))}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./PlaylistTrack.scss";
 
-function PlaylistTrack({ item, selectedFiles, setNewFiles }: any) {
+function PlaylistTrack({ item, selectedFiles, newFiles, setNewFiles }: any) {
   const trackTitle = selectedFiles[item].name.substr(
     0,
     selectedFiles[item].name.indexOf(".")
@@ -10,7 +10,7 @@ function PlaylistTrack({ item, selectedFiles, setNewFiles }: any) {
 
   const changeTitle = (e: any) => {
     setTitle(e.target.value);
-    const newState = [...selectedFiles];
+    const newState = [...newFiles];
     newState[item] = {
       ...newState[item],
       name: e.target.value,
