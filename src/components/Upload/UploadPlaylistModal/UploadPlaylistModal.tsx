@@ -259,6 +259,10 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
         </div>
       </div>
 
+      <div className="upload-playlist-track">
+        <input />
+      </div>
+
       <div className="upload-modal-button">
         <button
           className="cancel-button"

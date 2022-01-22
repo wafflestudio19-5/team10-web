@@ -23,6 +23,19 @@
     }
 }
 
+.upload-playlist-track {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #f2f2f2;
+
+    input {
+        margin-top: 30px;
+        width: 680px;
+        height: 26px;
+    }
+}
+
 .playlist-upload-modal {
     width: 800px;
     height: fit-content;
@@ -181,6 +194,7 @@
 
             .upload-info-privacy {
                 font-size: 14px;
+                margin-bottom: 30px;
 
                 text {
                     font-size: 12px;
