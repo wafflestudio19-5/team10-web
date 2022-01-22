@@ -9,7 +9,6 @@ function Upload() {
   const [modal, setModal] = useState(false);
   const [playlistModal, setPlaylistModal] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<any>();
-  const [selectedNum, setSelectedNum] = useState<number>(0);
 
   return (
     <div className={"uploadpage-wrapper"}>
@@ -20,7 +19,6 @@ function Upload() {
             setModal={setModal}
             setPlaylistModal={setPlaylistModal}
             setSelectedFiles={setSelectedFiles}
-            setSelectedNum={setSelectedNum}
           />
         )}
         {modal && (
@@ -28,9 +26,9 @@ function Upload() {
         )}
         {playlistModal && (
           <UploadPlaylistModal
-            selectedFile={selectedFiles[0]}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
             setPlaylistModal={setPlaylistModal}
-            selectedNum={selectedNum}
           />
         )}
       </div>

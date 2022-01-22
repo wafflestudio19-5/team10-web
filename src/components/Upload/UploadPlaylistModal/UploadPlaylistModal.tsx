@@ -6,21 +6,23 @@ import "./UploadPlaylistModal.scss";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
+function UploadPlaylistModal({
+  selectedFiles,
+  setSelectedFiles,
+  setPlaylistModal,
+}: any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
-  const trackPermalink = selectedFile.name.substr(
-    0,
-    selectedFile.name.indexOf(".")
-  );
+  const trackNum = Array.from({ length: selectedFiles.length }, (_, i) => i);
 
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
+  const [playlistType, setPlaylistType] = useState<string>("Playlist");
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
-  const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
+  const [listPermalink, setListPermalink] = useState<string>("");
   const [date, setDate] = useState(new Date());
 
   const clickImageInput = (event: any) => {
@@ -38,116 +40,54 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
     setImageFile(event.target.files[0]);
   };
 
-  const changeTrackPermalink = (event: any) => {
-    setTPermalink(event.target.value);
+  const changeTitle = (e: any) => {
+    setTitle(e.target.value);
+    if (listPermalink === "") {
+      setListPermalink(title);
+    }
   };
 
-  const handleUpload = (e: any) => {
+  const changeListPermalink = (event: any) => {
+    setListPermalink(event.target.value);
+  };
+
+  const changeTrack = (e: any, item: any) => {
+    const newSelectedFiles = [...selectedFiles];
+    newSelectedFiles[item] = {
+      ...newSelectedFiles[item],
+      name: e.target.value,
+    };
+    setSelectedFiles(newSelectedFiles);
+  };
+
+  const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
+    // 이미지 파일 기능 추가해야됨
+    console.log(imageFile);
+    console.log(selectedFiles);
     const myToken = localStorage.getItem("jwt_token");
-    if (imageFile) {
-      axios
-        .post(
-          "https://api.soundwaffle.com/tracks",
-          {
-            title: title,
-            permalink: tPermalink,
-            description: description,
-            is_private: isPrivate,
-            audio_filename: selectedFile.name,
-            image_filename: imageFile.name,
+    axios
+      .post(
+        "https://api.soundwaffle.com/sets",
+        {
+          title: title,
+          permalink: listPermalink,
+          type: playlistType,
+          description: description,
+          is_private: isPrivate,
+        },
+        {
+          headers: {
+            Authorization: `JWT ${myToken}`,
           },
-          {
-            headers: {
-              Authorization: `JWT ${myToken}`,
-            },
-          }
-        )
-        .then((res) => {
-          const music_options = {
-            headers: {
-              "Content-Type": selectedFile.type,
-            },
-          };
-
-          axios
-            .put(res.data.audio_presigned_url, selectedFile, music_options)
-            .then(() => {
-              toast("음악파일 업로드 완료");
-            })
-            .catch(() => {
-              toast("음악파일 업로드 실패");
-            });
-
-          const img_options = {
-            headers: {
-              "Content-Type": imageFile.type,
-            },
-          };
-
-          axios
-            .put(res.data.image_presigned_url, imageFile, img_options)
-            .then(() => {
-              toast("이미지파일 업로드 완료");
-            })
-            .catch(() => {
-              toast("이미지파일 업로드 실패");
-            });
-
-          setPlaylistModal(false);
-        })
-        .catch(() => {
-          toast("업로드 실패");
-          if (title === null) {
-            toast("제목은 필수입니다.");
-          }
-        });
-    } else {
-      axios
-        .post(
-          "https://api.soundwaffle.com/tracks",
-          {
-            title: title,
-            permalink: tPermalink,
-            description: description,
-            is_private: isPrivate,
-            audio_filename: selectedFile.name,
-          },
-          {
-            headers: {
-              Authorization: `JWT ${myToken}`,
-            },
-          }
-        )
-        .then((res) => {
-          const music_options = {
-            headers: {
-              "Content-Type": selectedFile.type,
-            },
-          };
-
-          axios
-            .put(res.data.audio_presigned_url, selectedFile, music_options)
-            .then(() => {
-              toast("음악파일 업로드 완료");
-            })
-            .catch(() => {
-              toast("음악파일 업로드 실패");
-            });
-
-          setPlaylistModal(false);
-        })
-        .catch(() => {
-          toast("업로드 실패");
-          toast("트랙 url이 중복되었는지 확인해주세요");
-          if (title === null) {
-            toast("제목은 필수입니다.");
-          }
-          if (/[ㄱ-ㅎ|가-힣]/.test(tPermalink)) {
-            toast("트랙 url은 영어 / 영어+숫자만 가능합니다");
-          }
-        });
-    }
+        }
+      )
+      .then(() => {
+        console.log("성공");
+      })
+      .catch(() => {
+        toast("set 만들기 실패");
+      });
   };
 
   return (
@@ -189,13 +129,13 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
         <div className="upload-info">
           <div className="upload-info-title">
             <text>Title *</text>
-            <input
-              placeholder="Name your track"
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <input placeholder="Name your playlist" onChange={changeTitle} />
             <div className="upload-info-permalink">
               <div>{`soundcloud.com/${permalink}/sets/`}</div>
-              <input value={tPermalink} onChange={changeTrackPermalink} />
+              <input
+                placeholder="title (default)"
+                onChange={changeListPermalink}
+              />
             </div>
           </div>
           <div className="upload-info-genre">
@@ -208,9 +148,12 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
           <div className="upload-type-date">
             <div className="upload-info-genre">
               <text>Playlist type</text>
-              <select>
-                <option value="Playlist">None</option>
-                <option value="Album">Custom</option>
+              <select
+                defaultValue={"Playlist"}
+                onChange={(e: any) => setPlaylistType(e.target.value)}
+              >
+                <option value="Playlist">Playlist</option>
+                <option value="Album">Album</option>
               </select>
             </div>
             <div className="upload-info-date">
@@ -259,9 +202,17 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
         </div>
       </div>
 
-      <div className="upload-playlist-track">
-        <input />
-      </div>
+      {trackNum.map((item: number) => (
+        <div className="upload-playlist-track">
+          <input
+            value={selectedFiles[item].name.substr(
+              0,
+              selectedFiles[item].name.indexOf(".")
+            )}
+            onChange={(e) => changeTrack(e, item)}
+          />
+        </div>
+      ))}
 
       <div className="upload-modal-button">
         <button
@@ -270,7 +221,7 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
         >
           Cancel
         </button>
-        <button className="save-button" onClick={handleUpload}>
+        <button className="save-button" onClick={handlePlaylistUpload}>
           Save
         </button>
       </div>

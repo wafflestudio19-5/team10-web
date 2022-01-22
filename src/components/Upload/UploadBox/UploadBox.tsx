@@ -1,12 +1,7 @@
 import { useState } from "react";
 import "./UploadBox.scss";
 
-function UploadBox({
-  setSelectedFiles,
-  setModal,
-  setSelectedNum,
-  setPlaylistModal,
-}: any) {
+function UploadBox({ setSelectedFiles, setModal, setPlaylistModal }: any) {
   const [isPlaylist, setIsPlaylist] = useState<boolean>(false);
 
   const handleFileInput = async (event: any) => {
@@ -19,7 +14,6 @@ function UploadBox({
       // );
     } else {
       setPlaylistModal(true);
-      setSelectedNum(event.target.files.length);
       setSelectedFiles(event.target.files);
     }
   };
