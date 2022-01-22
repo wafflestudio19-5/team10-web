@@ -12,6 +12,7 @@ import { ITrack, IUserMe } from "../../TrackPage";
 import { useAuthContext } from "../../../../../context/AuthContext";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { throttle } from "lodash";
 
 const Comments = ({
   comments,
@@ -86,32 +87,38 @@ const CommentItem = ({
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const config: any = {
-      method: "post",
-      url: `/tracks/${track.id}/comments`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {
-        content: commentInput,
-        group: comments[0].group,
-      },
-    };
-    try {
-      const response = await axios(config);
-      console.log(response);
-      fetchComments();
-    } catch (error) {
-      console.log(console.error());
+    if (commentInput.trim().length === 0) {
+      return;
     }
+    const submitInput = throttle(async () => {
+      const config: any = {
+        method: "post",
+        url: `/tracks/${track.id}/comments`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {
+          content: commentInput,
+          group: comments[0].group,
+        },
+      };
+      try {
+        const response = await axios(config);
+        console.log(response);
+        fetchComments();
+      } catch (error) {
+        console.log(console.error());
+      }
+    }, 1000);
+    submitInput();
     setInput("");
     setShowReply(false);
     fetchComments();
   };
 
   const history = useHistory();
-  const clickUsername = (id: number) => {
-    return history.push(`/${comments[id].writer.permalink}`);
+  const clickUsername = (permalink: string) => {
+    return history.push(`/${permalink}`);
   };
 
   //   const commentedTime = (comment: IComment) => {
@@ -162,7 +169,7 @@ const CommentItem = ({
       <li key={comments[0].id}>
         <div
           className={styles.userImage}
-          onClick={() => clickUsername(comments[0].writer.id)}
+          onClick={() => clickUsername(comments[0].writer.permalink)}
         >
           <img
             src={comments[0].writer.image_profile || "/default_user_image.png"}
@@ -173,7 +180,7 @@ const CommentItem = ({
           <div className={styles.commentInfo}>
             <span
               className={styles.hoverClick}
-              onClick={() => clickUsername(comments[0].writer.id)}
+              onClick={() => clickUsername(comments[0].writer.permalink)}
             >
               {comments[0].writer.id === userSecret.id
                 ? "You"
@@ -209,7 +216,7 @@ const CommentItem = ({
               <li key={child.id}>
                 <div
                   className={styles.userImage}
-                  onClick={() => clickUsername(child.writer.id)}
+                  onClick={() => clickUsername(child.writer.permalink)}
                 >
                   <img
                     src={
@@ -222,7 +229,7 @@ const CommentItem = ({
                   <div className={styles.commentInfo}>
                     <span
                       className={styles.hoverClick}
-                      onClick={() => clickUsername(child.writer.id)}
+                      onClick={() => clickUsername(child.writer.permalink)}
                     >
                       {child.writer.id === userSecret.id
                         ? "You"

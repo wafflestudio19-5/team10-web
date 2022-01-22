@@ -1,18 +1,15 @@
-import React from "react";
-import styles from "./TrackModal.module.scss";
+import { IPlaylist } from "../SetPage";
+import styles from "./SetModal.module.scss";
 import { GrClose } from "react-icons/gr";
-import { IArtist, ITrack } from "../TrackPage";
 
-const TrackModal = ({
+const SetModal = ({
   modal,
   closeModal,
-  track,
-  artist,
+  playlist,
 }: {
   modal: boolean;
   closeModal: () => void;
-  track: ITrack;
-  artist: IArtist;
+  playlist: IPlaylist;
 }) => {
   return (
     <div
@@ -27,13 +24,13 @@ const TrackModal = ({
       {modal && (
         <section onClick={(event) => event.stopPropagation()}>
           <main>
-            <div className={styles.trackInfo}>
-              {track.title} - {artist.display_name}
+            <div className={styles.playlistInfo}>
+              {playlist.title} - {playlist.creator.display_name}
             </div>
-            <div className={styles.trackImage}>
+            <div className={styles.playlistImage}>
               <img
-                src={track.image || "/default.track_image.svg"}
-                alt={`${track.title}의 트랙 이미지`}
+                src={playlist.image || "/default_track_image.svg"}
+                alt={`${playlist.title}의 이미지`}
               />
               <div />
             </div>
@@ -43,5 +40,4 @@ const TrackModal = ({
     </div>
   );
 };
-
-export default TrackModal;
+export default SetModal;

@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
 import EditModal from "../../Upload/YourTracks/EditModal";
+import PlaylistModal from "./Modal/PlaylistModal";
 
 export interface ITrack {
   id: number;
@@ -76,6 +77,7 @@ const TrackPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMyTrack, setIsMyTrack] = useState<boolean | undefined>(false);
   const [editModal, setEditModal] = useState(false);
+  const [playlistModal, setPlaylistModal] = useState(false);
 
   const { userSecret } = useAuthContext();
   const { username, trackname } = useParams<IParams>();
@@ -85,12 +87,15 @@ const TrackPage = () => {
     } else if (username !== userSecret.permalink && track.is_private) {
       setNoTrack(true);
     }
-  });
+  }, [userSecret.permalink, track.is_private, isLoading]);
 
   const fetchTrack = async () => {
+    const encoded = encodeURI(
+      `https://www.soundwaffle.com/${username}/${trackname}`
+    );
     try {
       const response = await axios.get(
-        `https://api.soundwaffle.com/resolve?url=https%3A%2F%2Fwww.soundwaffle.com%2F${username}%2F${trackname}`
+        `https://api.soundwaffle.com/resolve?url=${encoded}`
       );
       const data = response.data;
       const artist = response.data.artist;
@@ -159,6 +164,8 @@ const TrackPage = () => {
 
   const openModal = () => setModal(true);
   const closeModal = () => setModal(false);
+  const openPlaylistModal = () => setPlaylistModal(true);
+  const closePlaylistModal = () => setPlaylistModal(false);
 
   return (
     <div className={styles.trackWrapper}>
@@ -167,6 +174,14 @@ const TrackPage = () => {
           setModal={setEditModal}
           track={track}
           fetchYourTracks={fetchTrack}
+        />
+      )}
+      {playlistModal === true && (
+        <PlaylistModal
+          modal={playlistModal}
+          closeModal={closePlaylistModal}
+          track={track}
+          artist={artist}
         />
       )}
       {isLoading || (
@@ -191,6 +206,7 @@ const TrackPage = () => {
               fetchTrack={fetchTrack}
               isMyTrack={isMyTrack}
               setEditModal={setEditModal}
+              openPlaylistModal={openPlaylistModal}
             />
           )}
         </div>
