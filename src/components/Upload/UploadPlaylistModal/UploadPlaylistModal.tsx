@@ -16,7 +16,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [title, setTitle] = useState<string>("");
-  const [playlistType, setPlaylistType] = useState<string>("Playlist");
+  const [playlistType, setPlaylistType] = useState<string>("playlist");
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [listPermalink, setListPermalink] = useState<string>("");
@@ -42,7 +42,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const changeTitle = (e: any) => {
     setTitle(e.target.value);
     if (listPermalink === "") {
-      setListPermalink(title);
+      setListPermalink(e.target.value);
     }
   };
 
@@ -59,6 +59,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
     e.preventDefault();
     // 이미지 파일 기능 추가해야됨
     console.log(imageFile);
+    console.log(selectedFiles);
     console.log(newFiles);
     const myToken = localStorage.getItem("jwt_token");
     axios
@@ -144,11 +145,11 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
             <div className="upload-info-genre">
               <text>Playlist type</text>
               <select
-                defaultValue={"Playlist"}
+                value="playlist"
                 onChange={(e: any) => setPlaylistType(e.target.value)}
               >
-                <option value="Playlist">Playlist</option>
-                <option value="Album">Album</option>
+                <option value="playlist">playlist</option>
+                <option value="album">album</option>
               </select>
             </div>
             <div className="upload-info-date">
