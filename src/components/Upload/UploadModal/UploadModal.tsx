@@ -69,8 +69,12 @@ function UploadModal({
             permalink: tPermalink,
             description: description,
             is_private: isPrivate,
-            audio_filename: selectedFile.name,
-            image_filename: imageFile.name,
+            audio_extension: selectedFile.name.substr(
+              -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
+            ),
+            image_extension: imageFile.name.substr(
+              -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+            ),
           },
           {
             headers: {
@@ -126,7 +130,9 @@ function UploadModal({
             permalink: tPermalink,
             description: description,
             is_private: isPrivate,
-            audio_filename: selectedFile.name,
+            audio_extension: selectedFile.name.substr(
+              -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
+            ),
           },
           {
             headers: {
