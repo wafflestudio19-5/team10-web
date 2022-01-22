@@ -5,12 +5,9 @@ import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadPlaylistModal.scss";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import PlaylistTrack from "./PlaylistTrack/PlaylistTrack";
 
-function UploadPlaylistModal({
-  selectedFiles,
-  setSelectedFiles,
-  setPlaylistModal,
-}: any) {
+function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
@@ -24,6 +21,8 @@ function UploadPlaylistModal({
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [listPermalink, setListPermalink] = useState<string>("");
   const [date, setDate] = useState(new Date());
+
+  const [newFiles, setNewFiles] = useState<any>(selectedFiles);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -51,20 +50,16 @@ function UploadPlaylistModal({
     setListPermalink(event.target.value);
   };
 
-  const changeTrack = (e: any, item: any) => {
-    const newSelectedFiles = [...selectedFiles];
-    newSelectedFiles[item] = {
-      ...newSelectedFiles[item],
-      name: e.target.value,
-    };
-    setSelectedFiles(newSelectedFiles);
-  };
+  // const changeTrack = (e: any, item: any) => {
+  //   setNewFiles([...newFiles, { id: item, title: e.target.value }]);
+  //   console.log(newFiles);
+  // };
 
   const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
     // 이미지 파일 기능 추가해야됨
     console.log(imageFile);
-    console.log(selectedFiles);
+    console.log(newFiles);
     const myToken = localStorage.getItem("jwt_token");
     axios
       .post(
@@ -203,15 +198,11 @@ function UploadPlaylistModal({
       </div>
 
       {trackNum.map((item: number) => (
-        <div className="upload-playlist-track">
-          <input
-            value={selectedFiles[item].name.substr(
-              0,
-              selectedFiles[item].name.indexOf(".")
-            )}
-            onChange={(e) => changeTrack(e, item)}
-          />
-        </div>
+        <PlaylistTrack
+          item={item}
+          selectedFiles={selectedFiles}
+          setNewFiles={setNewFiles}
+        />
       ))}
 
       <div className="upload-modal-button">
