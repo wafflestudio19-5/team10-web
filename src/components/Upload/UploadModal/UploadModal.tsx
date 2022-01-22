@@ -50,9 +50,10 @@ function UploadModal({
 
   const cancelModal = () => {
     setCancelCount(cancelCount + 1);
-    setNumArray(numArray.filter((item: any) => item !== num));
     if (cancelCount + 1 === selectedNum) {
       setModal(false);
+    } else {
+      setNumArray(numArray.filter((item: any) => item !== num));
     }
   };
 

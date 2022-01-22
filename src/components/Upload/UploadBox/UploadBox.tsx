@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./UploadBox.scss";
 
 function UploadBox({
-  setSelectedFile,
+  setSelectedFiles,
   setModal,
   setSelectedNum,
   setPlaylistModal,
@@ -14,14 +14,14 @@ function UploadBox({
     if (!isPlaylist) {
       setModal(true);
       setSelectedNum(event.target.files.length);
-      setSelectedFile(event.target.files);
+      setSelectedFiles(event.target.files);
       setNumArray(
         Array.from({ length: event.target.files.length }, (_, i) => i)
       );
     } else {
       setPlaylistModal(true);
       setSelectedNum(event.target.files.length);
-      setSelectedFile(event.target.files);
+      setSelectedFiles(event.target.files);
     }
   };
 

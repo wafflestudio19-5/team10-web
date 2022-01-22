@@ -8,7 +8,7 @@ import UploadPlaylistModal from "./UploadPlaylistModal/UploadPlaylistModal";
 function Upload() {
   const [modal, setModal] = useState(false);
   const [playlistModal, setPlaylistModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<any>();
+  const [selectedFiles, setSelectedFiles] = useState<any>();
   const [selectedNum, setSelectedNum] = useState<number>(0);
   const [cancelCount, setCancelCount] = useState<number>(0);
   const [numArray, setNumArray] = useState<any>();
@@ -21,7 +21,7 @@ function Upload() {
           <UploadBox
             setModal={setModal}
             setPlaylistModal={setPlaylistModal}
-            setSelectedFile={setSelectedFile}
+            setSelectedFiles={setSelectedFiles}
             setSelectedNum={setSelectedNum}
             setNumArray={setNumArray}
           />
@@ -30,7 +30,7 @@ function Upload() {
           numArray.map((item: number) => (
             <UploadModal
               num={item}
-              selectedFile={selectedFile[item]}
+              selectedFile={selectedFiles[item]}
               setModal={setModal}
               selectedNum={selectedNum}
               cancelCount={cancelCount}
@@ -41,7 +41,7 @@ function Upload() {
           ))}
         {playlistModal && (
           <UploadPlaylistModal
-            selectedFile={selectedFile}
+            selectedFile={selectedFiles}
             setPlaylistModal={setPlaylistModal}
             selectedNum={selectedNum}
           />
