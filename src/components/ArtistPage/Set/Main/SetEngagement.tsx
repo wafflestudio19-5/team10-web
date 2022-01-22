@@ -1,4 +1,4 @@
-// import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "./SetEngagement.module.scss";
 import { BsSuitHeartFill } from "react-icons/bs";
 import { BiRepost, BiPencil } from "react-icons/bi";
@@ -11,6 +11,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { IPlaylist } from "../SetPage";
+import { MdDelete } from "react-icons/md";
+import { useHistory } from "react-router";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 export interface ILikeTrack {
   id: number;
@@ -22,16 +26,18 @@ const SetEngagement = ({
   fetchSet,
   fetchLikers,
   fetchReposters,
+  setEditModal,
 }: {
   playlist: IPlaylist;
   isMySet: undefined | boolean;
   fetchSet: () => void;
   fetchLikers: () => void;
   fetchReposters: () => void;
+  setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   //     const [like, setLike] = useState(false);
   //   const [repost, setRepost] = useState(false);
-  //   const history = useHistory();
+  const history = useHistory();
   const { userSecret } = useAuthContext();
 
   const likeSet = async () => {
@@ -141,6 +147,41 @@ const SetEngagement = ({
   //     history.push(`/${artist.permalink}/${track.permalink}/likes`);
   //   const trackReposts = () =>
   //     history.push(`/${artist.permalink}/${track.permalink}/reposts`);
+  const removeSet = async () => {
+    confirmAlert({
+      message: "Do you really want to remove this playlist?",
+      buttons: [
+        {
+          label: "Cancel",
+          onClick: () => {
+            return null;
+          },
+        },
+        {
+          label: "Yes",
+          onClick: async () => {
+            const config: any = {
+              method: "delete",
+              url: `/sets/${playlist.id}`,
+              headers: {
+                Authorization: `JWT ${userSecret.jwt}`,
+              },
+              data: {},
+            };
+            try {
+              await axios(config);
+              toast.success("플레이리스트를 삭제했습니다");
+              history.push(`/${userSecret.permalink}/sets`);
+            } catch (error) {
+              console.log(error);
+              toast.error("플레이리스트를 삭제하는 데 실패했습니다");
+            }
+          },
+        },
+      ],
+    });
+  };
+  const openEditModal = () => setEditModal(true);
 
   return (
     <div className={styles.main}>
@@ -182,12 +223,15 @@ const SetEngagement = ({
           <span>Add to Playlist</span>
         </button> */}
         {isMySet === true && (
-          <button
-            className={styles.edit}
-            //    onClick={editTrack}
-          >
+          <button className={styles.edit} onClick={openEditModal}>
             <BiPencil />
             <span>Edit</span>
+          </button>
+        )}
+        {isMySet === true && (
+          <button className={styles.remove} onClick={removeSet}>
+            <MdDelete />
+            <span>Delete playlist</span>
           </button>
         )}
       </div>

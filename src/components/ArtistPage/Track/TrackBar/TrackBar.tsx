@@ -17,6 +17,7 @@ import { MdVolumeUp, MdPlaylistPlay } from "react-icons/md";
 import { useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { useTrackContext } from "../../../../context/TrackContext";
+import toast from "react-hot-toast";
 // import { useAuthContext } from "../../../../context/AuthContext";
 // import axios from "axios";
 // import { IFollowings } from "../Main/ListenArtistInfo";
@@ -328,13 +329,15 @@ const TrackBar = () => {
 
   const nextTrack = () => {
     if (trackBarPlaylist.length === 0) {
-      return;
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
     }
     const current = trackBarPlaylist.findIndex(
       (track) => track.id === trackBarTrack.id
     );
     if (current === trackBarPlaylist.length - 1) {
-      return;
+      return toast.error("다음 트랙이 없습니다");
     }
     setPlayingTime(0);
     setTrackIsPlaying(true);
@@ -349,18 +352,20 @@ const TrackBar = () => {
 
   const prevTrack = () => {
     if (trackBarPlaylist.length === 0) {
-      return;
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
     }
     const current = trackBarPlaylist.findIndex(
       (track) => track.id === trackBarTrack.id
     );
     if (current === 0) {
-      return;
+      return toast.error("이전 트랙이 없습니다");
     }
     setPlayingTime(0);
     setTrackIsPlaying(true);
     setTrackBarTrack(trackBarPlaylist[current - 1]);
-    audioPlayer.current.src = trackBarPlaylist[current + 1].audio;
+    audioPlayer.current.src = trackBarPlaylist[current - 1].audio;
     audioPlayer.current.load();
     setTimeout(() => {
       audioPlayer.current.play();
@@ -368,7 +373,7 @@ const TrackBar = () => {
     }, 1);
   };
 
-  if (audioPlayer.current.ended) {
+  if (audioPlayer.current?.ended) {
     nextTrack();
   }
 

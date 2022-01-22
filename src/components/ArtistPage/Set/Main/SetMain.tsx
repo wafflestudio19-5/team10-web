@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { ITrackReposter } from "../../Track/Main/TrackMain";
@@ -14,9 +15,13 @@ import TrackList from "./TrackList";
 const SetMain = ({
   playlist,
   fetchSet,
+  setEditModal,
+  playing,
 }: {
   playlist: IPlaylist;
   fetchSet: () => void;
+  setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
+  playing: string;
 }) => {
   const [isMySet, setIsMySet] = useState<undefined | boolean>(undefined);
   const [setLikers, setSetLikers] = useState<ITrackReposter[]>([]);
@@ -80,6 +85,7 @@ const SetMain = ({
             fetchSet={fetchSet}
             fetchLikers={fetchLikers}
             fetchReposters={fetchReposters}
+            setEditModal={setEditModal}
           />
         </div>
         <div className={styles.infoComments}>
@@ -91,7 +97,14 @@ const SetMain = ({
             {playlist.description && <SetDescription playlist={playlist} />}
             <ul className={styles.trackList}>
               {playlist.tracks.map((track) => {
-                return <TrackList track={track} playlist={playlist} />;
+                return (
+                  <TrackList
+                    track={track}
+                    playlist={playlist}
+                    key={track.id}
+                    playing={playing}
+                  />
+                );
               })}
             </ul>
           </div>

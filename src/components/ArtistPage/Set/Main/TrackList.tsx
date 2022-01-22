@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
+import { useHistory } from "react-router";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { useTrackContext } from "../../../../context/TrackContext";
 import { IPlaylist, ISetTrack } from "../SetPage";
@@ -9,9 +10,11 @@ import styles from "./TrackList.module.scss";
 const TrackList = ({
   track,
   playlist,
+  playing,
 }: {
   track: ISetTrack;
   playlist: IPlaylist;
+  playing: string;
 }) => {
   const [play, setPlay] = useState(false);
   const { userSecret } = useAuthContext();
@@ -22,8 +25,12 @@ const TrackList = ({
     audioPlayer,
     setAudioSrc,
     setTrackBarTrack,
+    // setTrackBarArtist,
     setTrackIsPlaying,
+    setTrackBarPlaylist,
+    // trackBarPlaylist,
   } = useTrackContext();
+  const history = useHistory();
   const headerTrackSrc = track.audio.split("?")[0];
   const barTrackSrc = audioSrc.split("?")[0];
 
@@ -57,6 +64,9 @@ const TrackList = ({
         setTimeout(() => {
           audioPlayer.current.play();
         }, 1);
+        if (playing === "before") {
+          setTrackBarPlaylist(playlist.tracks);
+        }
       } else {
         audioPlayer.current.pause();
         setPlay(false);
@@ -64,8 +74,9 @@ const TrackList = ({
       }
     }
   };
-
   const index = playlist.tracks.findIndex((element) => element.id === track.id);
+  const clickArtist = () => history.push(`/${track.artist}`);
+  const clickTrack = () => history.push(`/${track.artist}/${track.permalink}`);
   return (
     <li className={styles.main} key={track.id}>
       <div className={styles.image}>
@@ -76,9 +87,13 @@ const TrackList = ({
       </div>
       <div className={styles.index}>{index + 1}</div>
       <div className={styles.content}>
-        <span className={styles.artistName}>{track.artist} -</span>
+        <span className={styles.artistName} onClick={clickArtist}>
+          {track.artist} -
+        </span>
         &nbsp;
-        <span className={styles.trackTitle}>{track.title}</span>
+        <span className={styles.trackTitle} onClick={clickTrack}>
+          {track.title}
+        </span>
       </div>
       <div className={styles.count}>
         <span>

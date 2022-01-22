@@ -1,26 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useAuthContext } from "../../../context/AuthContext";
 // import axios from "axios";
 // import toast from "react-hot-toast";
-import styles from "./EditModal.module.scss";
-import { ITrack } from "../../ArtistPage/Track/TrackPage";
+import styles from "./SetEditModal.module.scss";
 import axios from "axios";
 import { GrClose } from "react-icons/gr";
 import toast from "react-hot-toast";
+import { useAuthContext } from "../../../../context/AuthContext";
+import { IPlaylist } from "../SetPage";
 
 interface ITrackPermalink {
   permalink: string;
   id: number;
 }
 
-const EditModal = ({
+const SetEditModal = ({
   setModal,
-  track,
-  fetchYourTracks,
+  playlist,
+  fetchSet,
 }: {
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
-  track: ITrack;
-  fetchYourTracks: () => void;
+  playlist: IPlaylist;
+  fetchSet: () => void;
 }) => {
   const { userSecret } = useAuthContext();
 
@@ -36,14 +36,14 @@ const EditModal = ({
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setTitle(track.title);
-    setTPermalink(track.permalink);
-    setDescription(track.description);
-    setIsPrivate(track.is_private);
+    setTitle(playlist.title);
+    setTPermalink(playlist.permalink);
+    setDescription(playlist.description);
+    setIsPrivate(playlist.is_private);
     // setTags(track.tags);
-    setImageUrl(track.image);
-    setTagInput(track.tags.join(", "));
-  }, [track]);
+    setImageUrl(playlist.image);
+    setTagInput(playlist.tags.join(", "));
+  }, [playlist]);
 
   const openFileSelector = (event: any) => {
     event.preventDefault();
@@ -74,7 +74,7 @@ const EditModal = ({
       permalinkList &&
       permalinkList.find(
         (link: ITrackPermalink) =>
-          link.permalink === tPermalink && link.id !== track.id
+          link.permalink === tPermalink && link.id !== playlist.id
       )
     ) {
       toast.error(`동일한 링크의 다른 트랙이 존재합니다(${tPermalink})`);
@@ -116,14 +116,6 @@ const EditModal = ({
   };
 
   const onSaveChanges = async () => {
-    // if (
-    //   !title ||
-    //   !tPermalink ||
-    //   permalinkList.find((link) => link.permalink === tPermalink) !== undefined
-    // ) {
-    //   toast.error("제목과 링크를 확인해 주세요");
-    //   return;
-    // }
     if (!/^[0-9a-z_-]+$/g.test(tPermalink)) {
       return toast.error(
         `링크에는 숫자, 알파벳 소문자, -, _ 만 사용해 주세요.`
@@ -133,7 +125,7 @@ const EditModal = ({
     if (imageFile) {
       config = {
         method: "patch",
-        url: `/tracks/${track.id}`,
+        url: `/sets/${playlist.id}`,
         headers: {
           Authorization: `JWT ${userSecret.jwt}`,
         },
@@ -151,7 +143,7 @@ const EditModal = ({
       try {
         const { data } = await axios(config);
         if (data) {
-          fetchYourTracks();
+          fetchSet();
           setModal(false);
           try {
             const response = await axios.put(
@@ -181,7 +173,7 @@ const EditModal = ({
     } else {
       config = {
         method: "patch",
-        url: `/tracks/${track.id}`,
+        url: `/sets/${playlist.id}`,
         headers: {
           Authorization: `JWT ${userSecret.jwt}`,
         },
@@ -198,7 +190,7 @@ const EditModal = ({
       try {
         const response = await axios(config);
         if (response) {
-          fetchYourTracks();
+          fetchSet();
           setModal(false);
         }
       } catch (error) {
@@ -243,9 +235,7 @@ const EditModal = ({
       >
         <div className={styles["upload-modal-header"]}>
           <div className={styles["upload-basic-info"]}>Basic info</div>
-          {/* <div>Metadata</div>
-        <div>Permissions</div>
-        <div>Advanced</div> */}
+          <div>Tracks</div>
         </div>
         <div className={styles["upload-modal-body"]}>
           <div className={styles["upload-image"]}>
@@ -259,8 +249,8 @@ const EditModal = ({
             {imageUrl && (
               <img
                 className={styles["upload-track-img"]}
-                src={imageUrl || track.image || "/default.track_image.svg"}
-                alt={`${track.title}의 이미지`}
+                src={imageUrl || playlist.image || "/default.track_image.svg"}
+                alt={`${playlist.title}의 이미지`}
               />
             )}
             <button onClick={openFileSelector}>
@@ -349,4 +339,4 @@ const EditModal = ({
   );
 };
 
-export default EditModal;
+export default SetEditModal;
