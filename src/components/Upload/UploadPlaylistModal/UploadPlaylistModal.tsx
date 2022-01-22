@@ -2,6 +2,9 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
+import "./UploadPlaylistModal.scss";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
   const { userSecret } = useAuthContext();
@@ -18,6 +21,7 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
+  const [date, setDate] = useState(new Date());
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -147,7 +151,7 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
   };
 
   return (
-    <div className="upload-modal">
+    <div className="playlist-upload-modal">
       <div className="upload-modal-header">
         <div className="upload-basic-info">Basic info</div>
         <div>Metadata</div>
@@ -190,7 +194,7 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
               onChange={(e) => setTitle(e.target.value)}
             />
             <div className="upload-info-permalink">
-              <div>{`soundcloud.com/${permalink}/`}</div>
+              <div>{`soundcloud.com/${permalink}/sets/`}</div>
               <input value={tPermalink} onChange={changeTrackPermalink} />
             </div>
           </div>
@@ -200,6 +204,23 @@ function UploadPlaylistModal({ selectedFile, setPlaylistModal }: any) {
               <option value="None">None</option>
               <option value="Custom">Custom</option>
             </select>
+          </div>
+          <div className="upload-type-date">
+            <div className="upload-info-genre">
+              <text>Playlist type</text>
+              <select>
+                <option value="Playlist">None</option>
+                <option value="Album">Custom</option>
+              </select>
+            </div>
+            <div className="upload-info-date">
+              <text>Release date</text>
+              <DatePicker
+                className="datepicker"
+                selected={date}
+                onChange={(e: any) => setDate(e)}
+              />
+            </div>
           </div>
           <div className="upload-info-tag">
             <text>Additional tags</text>
