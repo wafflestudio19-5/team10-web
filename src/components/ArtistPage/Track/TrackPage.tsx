@@ -127,9 +127,12 @@ const TrackPage = () => {
       setIsLoading(false);
     } catch (error) {
       if (
-        axios.isAxiosError(error) &&
-        error.response &&
-        error.response.status === 404
+        (axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 404) ||
+        (axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 400)
       ) {
         setNoTrack(true);
         setIsLoading(false);

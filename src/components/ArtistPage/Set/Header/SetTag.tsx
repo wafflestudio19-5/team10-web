@@ -6,7 +6,6 @@ dayjs.extend(relativeTime);
 
 const SetTag = ({ playlist }: { playlist: IPlaylist }) => {
   const releasedDate = dayjs(playlist.created_at).fromNow();
-  console.log(playlist.tags);
   return (
     <div className={styles.titleInfo}>
       <div className={styles.releasedDate}>{releasedDate}</div>

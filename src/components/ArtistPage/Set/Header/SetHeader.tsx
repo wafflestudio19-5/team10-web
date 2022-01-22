@@ -1,5 +1,11 @@
 import { throttle } from "lodash";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  //   useState,
+} from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { useTrackContext } from "../../../../context/TrackContext";
 import { IPlaylist } from "../SetPage";
@@ -13,12 +19,16 @@ const SetHeader = ({
   openModal,
   playlist,
   noSet,
+  playing,
+  setPlaying,
 }: {
   openModal: () => void;
   playlist: IPlaylist;
   noSet: boolean;
+  playing: string;
+  setPlaying: React.Dispatch<SetStateAction<string>>;
 }) => {
-  const [playing, setPlaying] = useState("before");
+  //   const [playing, setPlaying] = useState("before");
   //   const [headerTrackDuration, setHeaderTrackDuration] = useState<
   //     number | undefined
   //   >(undefined); // 트랙 길이
@@ -223,7 +233,6 @@ const SetHeader = ({
             openModal={openModal}
             playlist={playlist}
             setHeader={setHeader}
-            playing={playing}
           />
         )}
       </div>

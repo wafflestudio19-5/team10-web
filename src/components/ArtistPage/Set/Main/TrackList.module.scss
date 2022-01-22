@@ -65,12 +65,19 @@
       font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans,
         Garuda, Verdana, Tahoma, sans-serif;
       font-size: 14px;
+      &:hover {
+        color: #333;
+        cursor: pointer;
+      }
     }
     .trackTitle {
       color: #333;
       line-height: 44px;
       font-family: Interstate, Lucida Grande, Lucida Sans Unicode, Lucida Sans,
         Garuda, Verdana, Tahoma, sans-serif;
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
   .count {
