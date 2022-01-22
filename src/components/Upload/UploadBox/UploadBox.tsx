@@ -6,18 +6,17 @@ function UploadBox({
   setModal,
   setSelectedNum,
   setPlaylistModal,
-  setNumArray,
 }: any) {
   const [isPlaylist, setIsPlaylist] = useState<boolean>(false);
 
   const handleFileInput = async (event: any) => {
     if (!isPlaylist) {
       setModal(true);
-      setSelectedNum(event.target.files.length);
-      setSelectedFiles(event.target.files);
-      setNumArray(
-        Array.from({ length: event.target.files.length }, (_, i) => i)
-      );
+      // setSelectedNum(event.target.files.length);
+      setSelectedFiles(event.target.files[0]);
+      // setNumArray(
+      //   Array.from({ length: event.target.files.length }, (_, i) => i)
+      // );
     } else {
       setPlaylistModal(true);
       setSelectedNum(event.target.files.length);
@@ -38,14 +37,25 @@ function UploadBox({
           Drag and drop your tracks & albums here
         </div>
         <button onClick={clickFileInput}>or choose files to upload</button>
-        <input
-          type="file"
-          id="file-input"
-          className="file-input"
-          accept=".mp3, .wav"
-          multiple
-          onChange={handleFileInput}
-        />
+        {isPlaylist && (
+          <input
+            type="file"
+            id="file-input"
+            className="file-input"
+            accept=".mp3, .wav"
+            multiple
+            onChange={handleFileInput}
+          />
+        )}
+        {!isPlaylist && (
+          <input
+            type="file"
+            id="file-input"
+            className="file-input"
+            accept=".mp3, .wav"
+            onChange={handleFileInput}
+          />
+        )}
         <div className="upload-playlist">
           <div className="form-check">
             <input
@@ -56,7 +66,7 @@ function UploadBox({
               onChange={() => setIsPlaylist(!isPlaylist)}
             />
             <label className="form-check-label">
-              Make a playlist when multiple files are selected
+              Make a playlist with multiple files
             </label>
           </div>
         </div>

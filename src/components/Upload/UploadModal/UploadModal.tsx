@@ -5,15 +5,15 @@ import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
 function UploadModal({
-  num,
+  // num,
   selectedFile,
   setModal,
-  selectedNum,
-  cancelCount,
-  setCancelCount,
-  numArray,
-  setNumArray,
-}: any) {
+}: // selectedNum,
+// cancelCount,
+// setCancelCount,
+// numArray,
+// setNumArray,
+any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
@@ -49,12 +49,13 @@ function UploadModal({
   };
 
   const cancelModal = () => {
-    setCancelCount(cancelCount + 1);
-    if (cancelCount + 1 === selectedNum) {
-      setModal(false);
-    } else {
-      setNumArray(numArray.filter((item: any) => item !== num));
-    }
+    // setCancelCount(cancelCount + 1);
+    // if (cancelCount + 1 === selectedNum) {
+    //   setModal(false);
+    // } else {
+    //   setNumArray(numArray.filter((item: any) => item !== num));
+    // }
+    setModal(false);
   };
 
   const handleUpload = (e: any) => {
