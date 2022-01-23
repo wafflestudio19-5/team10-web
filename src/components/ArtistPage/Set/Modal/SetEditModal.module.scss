@@ -30,23 +30,89 @@
     margin: 20px 26px;
     border-bottom: 1px solid #f2f2f2;
 
-    .upload-basic-info {
-      color: #ff5500;
-      border-bottom: 2px solid #ff5500;
-    }
-
     div {
       font-size: 24px;
       margin-right: 20px;
+      cursor: pointer;
 
       &:hover {
         border-bottom: 2px solid #333;
+      }
+    }
+    .upload-basic-info {
+      color: #ff5500;
+      border-bottom: 2px solid #ff5500;
+      &:hover {
+        border: none;
+        border-bottom: 2px solid #ff5500;
       }
     }
   }
 
   .upload-modal-body {
     display: flex;
+    .trackContainer {
+      list-style-type: none;
+      padding: 0;
+      width: 800px;
+      overflow-y: scroll;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+      li {
+        list-style: none;
+        height: 44px;
+        width: 100%;
+        display: flex;
+        .imageContainer {
+          display: flex;
+          align-items: center;
+          img {
+            height: 30px;
+            width: 30px;
+          }
+          margin-left: 15px;
+          margin-right: 10px;
+        }
+        .content {
+          width: 720px;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          .artistName {
+            color: #999;
+            line-height: 44px;
+            font-family: Interstate, Lucida Grande, Lucida Sans Unicode,
+              Lucida Sans, Garuda, Verdana, Tahoma, sans-serif;
+            font-size: 14px;
+            &:hover {
+              color: #333;
+              cursor: pointer;
+            }
+          }
+          .trackTitle {
+            color: #333;
+            line-height: 44px;
+            font-family: Interstate, Lucida Grande, Lucida Sans Unicode,
+              Lucida Sans, Garuda, Verdana, Tahoma, sans-serif;
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+        .deleteButton {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          svg {
+            color: lightgray;
+          }
+        }
+      }
+    }
 
     .upload-image {
       margin-left: 26px;
@@ -192,7 +258,9 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
-    margin-top: 30px;
+    // margin-top: 30px;
+    position: absolute;
+    bottom: 20px;
 
     button {
       margin-top: 30px;
@@ -205,6 +273,7 @@
       background-color: white;
       color: #333;
       border: none;
+      margin-right: 10px;
     }
 
     .save-button {
@@ -215,7 +284,6 @@
       color: white;
       border: none;
       border-radius: 3px;
-      margin-left: 10px;
       margin-right: 25px;
     }
   }

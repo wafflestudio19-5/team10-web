@@ -117,7 +117,7 @@ const SetEngagement = ({
   const unrepostSet = async () => {
     const config: any = {
       method: "delete",
-      url: `/reposts/tracks/${playlist.id}`,
+      url: `/reposts/sets/${playlist.id}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
@@ -135,9 +135,7 @@ const SetEngagement = ({
   };
   const copyLink = async () => {
     await navigator.clipboard.writeText(location.href);
-    toast.success("Link has been copied to the clipboard!", {
-      position: "top-right",
-    });
+    toast.success("Link has been copied to the clipboard!");
   };
   //   const editTrack = () => {
   //     setEditModal(true);

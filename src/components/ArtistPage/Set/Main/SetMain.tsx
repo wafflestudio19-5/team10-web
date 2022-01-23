@@ -103,6 +103,7 @@ const SetMain = ({
                     playlist={playlist}
                     key={track.id}
                     playing={playing}
+                    fetchSet={fetchSet}
                   />
                 );
               })}

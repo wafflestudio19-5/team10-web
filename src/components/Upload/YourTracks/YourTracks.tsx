@@ -25,6 +25,7 @@ import EditModal from "./EditModal";
 import ArtworkModal from "./ArtworkModal";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import PrivacyModal from "./PrivacyModal";
 dayjs.extend(relativeTime);
 
 export interface IYourTracks {
@@ -44,7 +45,7 @@ export interface IYourTracks {
 const YourTracks = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [yourTracks, setYourTracks] = useState<IYourTracks[]>([]);
-  const [checkedItems, setCheckedItems] = useState<number[]>([]);
+  const [checkedId, setCheckedId] = useState<number[]>([]);
   const [username, setUsername] = useState("");
   const [modal, setModal] = useState(false);
   const [editTrack, setEditTrack] = useState<ITrack>();
@@ -55,6 +56,8 @@ const YourTracks = () => {
   const [pageRendered, setPageRendered] = useState(1);
   const [currentTracks, setCurrentTracks] = useState<IYourTracks[]>([]);
   const [artworkModal, setArtworkModal] = useState(false);
+  const [privacyModal, setPrivacyModal] = useState(false);
+  const [isAllChecked, setIsAllChecked] = useState(false);
   const nextPage = useRef(1);
   const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
@@ -207,14 +210,30 @@ const YourTracks = () => {
 
   const checkedItemHandler = (id: number, isChecked: boolean) => {
     if (isChecked) {
-      setCheckedItems(checkedItems.concat(id));
-    } else if (!isChecked && checkedItems.includes(id)) {
-      setCheckedItems(checkedItems.filter((element) => element !== id));
+      setCheckedId(checkedId.concat(id));
+    } else if (!isChecked && checkedId.includes(id)) {
+      setCheckedId(checkedId.filter((element) => element !== id));
     }
   };
 
   const openArtworkModal = () => setArtworkModal(true);
   const closeArtworkModal = () => setArtworkModal(false);
+  const openPrivacyModal = () => setPrivacyModal(true);
+  const closePrivacyModal = () => setPrivacyModal(false);
+
+  const checkedItems = checkedId
+    .map((id) => currentTracks.find((track) => track.id === id))
+    .filter((item) => item !== undefined);
+
+  const clickAll = () => {
+    if (checkedId.length < currentTracks.length) {
+      setCheckedId(currentTracks.map((track) => track.id));
+      setIsAllChecked(true);
+    } else {
+      setCheckedId([]);
+      setIsAllChecked(false);
+    }
+  };
 
   return (
     <div className={styles.yourTracksPage}>
@@ -228,7 +247,19 @@ const YourTracks = () => {
       <ArtworkModal
         modal={artworkModal}
         closeModal={closeArtworkModal}
-        track={currentTracks[0]}
+        track={
+          currentTracks.find((track) => track.id === checkedId[0]) ||
+          currentTracks[0]
+        }
+        fetchYourTracks={fetchYourTracksAgain}
+        checkedItems={checkedId}
+      />
+      <PrivacyModal
+        modal={privacyModal}
+        closeModal={closePrivacyModal}
+        fetchYourTracks={fetchYourTracksAgain}
+        checkedItems={checkedItems}
+        editToggle={editToggle}
       />
       <div className={styles.wrapper}>
         <div className={styles.main}>
@@ -241,13 +272,17 @@ const YourTracks = () => {
             </div>
             <div className={styles.editButtons}>
               <div className={styles.checkboxContainer}>
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={currentTracks.length === checkedId.length}
+                  onClick={clickAll}
+                />
               </div>
               <div className={styles.dropdownContainer}>
                 <button
                   className={styles.editTracks}
                   onClick={editToggle}
-                  disabled={checkedItems.length === 0}
+                  disabled={checkedId.length === 0}
                 >
                   <BiPencil />
                   <span>Edit tracks</span>
@@ -256,8 +291,15 @@ const YourTracks = () => {
                 {isEditOpen && (
                   <div>
                     <ul>
-                      <li>Privacy and tags</li>
-                      <li onClick={openArtworkModal}>Artwork</li>
+                      <li
+                        className={styles.privacyTags}
+                        onClick={openPrivacyModal}
+                      >
+                        Privacy and tags
+                      </li>
+                      <li onClick={openArtworkModal} className={styles.artwork}>
+                        Artwork
+                      </li>
                     </ul>
                   </div>
                 )}
@@ -305,7 +347,9 @@ const YourTracks = () => {
                     setModal={setModal}
                     setEditTrack={setEditTrack}
                     fetchYourTracks={fetchYourTracksAgain}
-                    checkedItems={checkedItems}
+                    checkedItems={checkedId}
+                    isAllChecked={isAllChecked}
+                    // setIsAllChecked={setIsAllChecked}
                     // yourTracks={currentTracks}
                     // finalPage={finalPage.current}
                     // currentPage={currentPage}
@@ -341,7 +385,9 @@ const Track = ({
   setEditTrack,
   checkedItems,
   fetchYourTracks,
-}: //
+  isAllChecked,
+}: //   setIsAllChecked,
+//
 //
 //   yourTracks,
 //   finalPage,
@@ -354,6 +400,8 @@ const Track = ({
   setEditTrack: React.Dispatch<React.SetStateAction<ITrack | undefined>>;
   fetchYourTracks: () => void;
   checkedItems: any;
+  isAllChecked: boolean;
+  //   setIsAllChecked: React.Dispatch<React.SetStateAction<boolean>>;
   //   yourTracks: IYourTracks[];
   //   finalPage: number;
   //   currentPage: number;
@@ -376,6 +424,11 @@ const Track = ({
     setTrackBarArtist,
   } = useTrackContext();
   const history = useHistory();
+
+  useEffect(() => {
+    setChecked(isAllChecked);
+  }, [isAllChecked]);
+  console.log(track.title, checked);
 
   const checkHandler = () => {
     const prevValue = checked;
@@ -568,7 +621,9 @@ const Track = ({
       <input
         type="checkbox"
         className={styles.trackCheckBox}
-        checked={checked}
+        checked={
+          checked || !!checkedItems.find((item: number) => item === track.id)
+        }
         onChange={checkHandler}
       />
       <div

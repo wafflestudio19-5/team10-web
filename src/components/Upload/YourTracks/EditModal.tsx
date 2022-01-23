@@ -143,9 +143,7 @@ const EditModal = ({
           description: description,
           is_private: isPrivate,
           image_extension: imageFile.name.split(".").at(-1),
-          ...(tagInput && {
-            tags_input: tagInput.replace(/,/g, "").split(" "),
-          }),
+          tags_input: tagInput.replace(/,/g, "").split(" "),
         },
       };
       try {
@@ -190,9 +188,7 @@ const EditModal = ({
           permalink: tPermalink,
           description: description,
           is_private: isPrivate,
-          ...(tagInput && {
-            tags_input: tagInput.replace(/,/g, "").split(" "),
-          }),
+          tags_input: tagInput.replace(/,/g, "").split(" "),
         },
       };
       try {

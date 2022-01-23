@@ -10,10 +10,14 @@ const ArtworkModal = ({
   modal,
   closeModal,
   track,
+  fetchYourTracks,
+  checkedItems,
 }: {
   modal: boolean;
   closeModal: () => void;
   track: IYourTracks;
+  fetchYourTracks: () => void;
+  checkedItems: number[];
 }) => {
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
@@ -47,30 +51,44 @@ const ArtworkModal = ({
 
   const onSaveChanges = async () => {
     if (imageFile) {
-      const config: any = {
-        method: "patch",
-        url: `/tracks/${track.id}`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {
-          image_filename: imageFile.name,
-        },
-      };
-      try {
-        const response = await axios(config);
-        if (response) {
-          closeModal();
+      for (let i = 0; i < checkedItems.length; i++) {
+        const config: any = {
+          method: "patch",
+          url: `/tracks/${checkedItems[i]}`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {
+            image_extension: imageFile.name.split(".").at(-1),
+          },
+        };
+        try {
+          const { data } = await axios(config);
+          if (data) {
+            try {
+              await axios.put(data.image_presigned_url, imageFile, {
+                headers: {
+                  "Content-Type": imageFile.type,
+                },
+              });
+              toast.success("이미지 업로드에 성공했습니다");
+              fetchYourTracks();
+              closeModal();
+            } catch (error) {
+              toast.error("이미지 업로드에 실패했습니다");
+              console.log(error);
+            }
+          }
+        } catch (error) {
+          if (
+            axios.isAxiosError(error) &&
+            error.response &&
+            error.response.status === 400
+          ) {
+            toast.error("잘못된 요청입니다.");
+          }
+          console.log(error);
         }
-      } catch (error) {
-        if (
-          axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 400
-        ) {
-          toast.error("잘못된 요청입니다.");
-        }
-        console.log(error);
       }
     }
   };
@@ -103,22 +121,25 @@ const ArtworkModal = ({
                   alt={`${track.title}의 이미지`}
                 />
               )}
-              <button onClick={openFileSelector}>
-                <div>Upload new image</div>
-              </button>
-              <button onClick={closeModal}>
-                <div>Cancel</div>
-              </button>
-              <button onClick={onSaveChanges}>
-                <div>Save</div>
-              </button>
-              <input
-                type="file"
-                accept="impge/png"
-                onChange={handleImageInput}
-                ref={imageRef}
-              />
-              <div />
+              <div className={styles.buttons}>
+                <button
+                  onClick={openFileSelector}
+                  className={styles.uploadButton}
+                >
+                  <div>Upload new image</div>
+                </button>
+                <input type="file" onChange={handleImageInput} ref={imageRef} />
+                <button onClick={closeModal} className={styles.cancelButton}>
+                  <div>Cancel</div>
+                </button>
+                <button
+                  onClick={onSaveChanges}
+                  className={styles.saveButton}
+                  disabled={!imageFile}
+                >
+                  <div>Save</div>
+                </button>
+              </div>
             </div>
           </main>
         </section>
