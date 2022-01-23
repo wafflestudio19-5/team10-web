@@ -112,7 +112,7 @@ const SocialLogin = ({
           )}
         />
         <FacebookLogin
-          appId="960144394606529" //현재 테스트 appId, 배포 할때 바꿔야 함
+          appId="465809628243999" //현재 테스트 appId, 배포 할때 바꿔야 함 //바꿈
           onFail={() => {
             toast.error("소셜 로그인에 실패하였습니다");
           }}

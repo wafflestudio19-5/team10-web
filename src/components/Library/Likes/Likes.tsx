@@ -121,20 +121,23 @@ const Likes = () => {
     };
     checkValid();
   }, []);
+  const fetchLikesList = async () => {
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
+    }).then((res) => {
+      setLikeList(res.data.results);
+      setFilteredLike(res.data.results);
+      res.data.next === null
+        ? null
+        : setNextPage(`users${res.data.next.split("users")[1]}`);
+    });
+  };
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
         try {
-          await axios({
-            method: "get",
-            url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
-          }).then((res) => {
-            setLikeList(res.data.results);
-            setFilteredLike(res.data.results);
-            res.data.next === null
-              ? null
-              : setNextPage(`users${res.data.next.split("users")[1]}`);
-          });
+          fetchLikesList();
           fetchFollowList();
         } catch {
           toast.error("유저 정보 불러오기에 실패하였습니다");
@@ -292,12 +295,10 @@ const Likes = () => {
                   artistPermal={item.artist.permalink}
                   followList={followList}
                   fetchFollowList={fetchFollowList}
-                  setLikeList={setLikeList}
-                  setFilteredLike={setFilteredLike}
                   togglePlayPause={togglePlayPause}
                   track={item}
                   playMusic={playMusic}
-                  setNextPage={setNextPage}
+                  fetchLikesList={fetchLikesList}
                 />
               ))
             )}
