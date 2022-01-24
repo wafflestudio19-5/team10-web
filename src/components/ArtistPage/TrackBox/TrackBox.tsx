@@ -186,6 +186,7 @@ function TrackBox({
     <div className={"recent-track"}>
       {item.image !== null && (
         <img
+          className="track-Img"
           src={item.image}
           alt={"trackImg"}
           onClick={() =>
@@ -195,6 +196,7 @@ function TrackBox({
       )}
       {item.image === null && (
         <img
+          className="track-Img"
           src={"img/default.track_image.svg"}
           alt={"trackImg"}
           onClick={() =>

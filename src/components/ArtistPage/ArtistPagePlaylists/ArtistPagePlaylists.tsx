@@ -21,8 +21,8 @@ function ArtistPagePlaylists() {
   const [header, setHeader] = useState<any>();
   // const [ref, inView] = useInView();
 
-  // const [tracks, setTracks] = useState<any>();
-  // const [trackPage, setTrackPage] = useState<any>(null);
+  const [playlists, setPlaylists] = useState<any>();
+  // const [playlistPage, setPlaylistPage] = useState<any>(null);
 
   // const [currentPlay, setCurrentPlay] = useState<any>(null);
 
@@ -44,32 +44,33 @@ function ArtistPagePlaylists() {
       });
   };
 
-  // const getTracks = async (id: any, page: any) => {
-  //   axios
-  //     .get(`/users/${id}/tracks?page=${page}`)
-  //     .then((res) => {
-  //       if (page === 1) {
-  //         setTracks(
-  //           res.data.results.filter((item: any) => item.is_private === false)
-  //         );
-  //       } else {
-  //         setTracks((item: any) => [
-  //           ...item,
-  //           ...res.data.results.filter(
-  //             (item: any) => item.is_private === false
-  //           ),
-  //         ]);
-  //       }
-  //       if (res.data.next === null) {
-  //         setTrackPage(null);
-  //       } else {
-  //         setTrackPage(page + 1);
-  //       }
-  //     })
-  //     .catch(() => {
-  //       toast("트랙 정보 불러오기 실패");
-  //     });
-  // };
+  // 임의로 GET users/userid/sets가 아닌 GET sets 이용
+  const getPlaylists = async (id: any, page: any) => {
+    axios
+      .get(`/sets?page=${page}`)
+      .then((res) => {
+        if (page === 1) {
+          setPlaylists(
+            res.data.results.filter((item: any) => item.is_private === false)
+          );
+        } else {
+          setPlaylists((item: any) => [
+            ...item,
+            ...res.data.results.filter(
+              (item: any) => item.is_private === false
+            ),
+          ]);
+        }
+        // if (res.data.next === null) {
+        //   setPlaylistPage(null);
+        // } else {
+        //   setPlaylistPage(page + 1);
+        // }
+      })
+      .catch(() => {
+        toast("플레이리스트 불러오기 실패");
+      });
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -96,8 +97,8 @@ function ArtistPagePlaylists() {
           // setPageId(res1.data.id);
           // 유저 정보
           getUser(res1.data.id);
-          //트랙 불러오기
-          // getTracks(res1.data.id, 1);
+          // 플레이리스트 불러오기
+          getPlaylists(res1.data.id, 1);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -130,7 +131,10 @@ function ArtistPagePlaylists() {
           <div className="artist-body">
             <div className={"recent"}>
               <text>My Playlists</text>
-              <PlaylistBox />
+              {playlists &&
+                playlists.map((item: any) => (
+                  <PlaylistBox item={item} user={user} />
+                ))}
               {/* <div ref={ref} className="inView">
                 text
               </div> */}
