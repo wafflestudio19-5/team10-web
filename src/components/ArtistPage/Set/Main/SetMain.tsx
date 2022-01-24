@@ -17,25 +17,27 @@ const SetMain = ({
   fetchSet,
   setEditModal,
   playing,
+  isMySet,
 }: {
   playlist: IPlaylist;
   fetchSet: () => void;
   setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
   playing: string;
+  isMySet: boolean | undefined;
 }) => {
-  const [isMySet, setIsMySet] = useState<undefined | boolean>(undefined);
+  //   const [isMySet, setIsMySet] = useState<undefined | boolean>(undefined);
   const [setLikers, setSetLikers] = useState<ITrackReposter[]>([]);
   const [likersCount, setLikersCount] = useState(0);
   const [setReposters, setSetReposters] = useState<ITrackReposter[]>([]);
   const [repostersCount, setRepostersCount] = useState(0);
   const { userSecret } = useAuthContext();
-  useEffect(() => {
-    if (playlist.creator.id === userSecret.id) {
-      setIsMySet(true);
-    } else {
-      setIsMySet(false);
-    }
-  }, [userSecret.id]);
+  //   useEffect(() => {
+  //     if (playlist.creator.id === userSecret.id) {
+  //       setIsMySet(true);
+  //     } else {
+  //       setIsMySet(false);
+  //     }
+  //   }, [userSecret.id]);
   const fetchLikers = async () => {
     const config: any = {
       method: "get",
@@ -89,10 +91,7 @@ const SetMain = ({
           />
         </div>
         <div className={styles.infoComments}>
-          <CreatorInfo
-            playlist={playlist}
-            //   isMySet={isMySet}
-          />
+          <CreatorInfo playlist={playlist} isMySet={isMySet} />
           <div>
             {playlist.description && <SetDescription playlist={playlist} />}
             <ul className={styles.trackList}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "./ListenArtistInfo.module.scss";
 import { BsPeopleFill } from "react-icons/bs";
 import { IoStatsChart } from "react-icons/io5";
@@ -6,7 +6,7 @@ import { RiUserFollowFill, RiUserUnfollowLine } from "react-icons/ri";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
-import { IArtist, IUserMe } from "../TrackPage";
+import { IArtist, ITrack, IUserMe } from "../TrackPage";
 
 // interface IArtistInfo {
 //   image: null | string;
@@ -18,22 +18,26 @@ export interface IFollowings {
 }
 const ListenArtistInfo = ({
   artist,
-  userMe,
+  //   userMe,
   isMyTrack,
-  setArtist,
+  //   setArtist,
+  track,
+  fetchTrack,
 }: {
   artist: IArtist;
   userMe: IUserMe;
   isMyTrack: boolean | undefined;
   setArtist: React.Dispatch<React.SetStateAction<IArtist>>;
+  track: ITrack;
+  fetchTrack: () => void;
 }) => {
   //   const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
   //     image: null,
   //     followers: 0,
   //     tracks: 0,
   //   });
-  const [followArtist, setFollowArtist] = useState(false);
-  const [followLoading, setFollowLoading] = useState(true);
+  //   const [followArtist, setFollowArtist] = useState(false);
+  //   const [followLoading, setFollowLoading] = useState(true);
 
   const { userSecret } = useAuthContext();
 
@@ -43,63 +47,63 @@ const ListenArtistInfo = ({
   //   const clickFollowers = () => history.push(`/${permalink}/followers`);
   //   const clickTracks = () => history.push(`/${permalink}/tracks`);
 
-  const fetchArtist = async () => {
-    if (artist.id !== 0) {
-      const config: any = {
-        method: "get",
-        url: `/users/${artist.id}`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const response = await axios(config);
-        const data = response.data;
-        setArtist({
-          ...artist,
+  //   const fetchArtist = async () => {
+  //     if (artist.id !== 0) {
+  //       const config: any = {
+  //         method: "get",
+  //         url: `/users/${artist.id}`,
+  //         headers: {
+  //           Authorization: `JWT ${userSecret.jwt}`,
+  //         },
+  //         data: {},
+  //       };
+  //       try {
+  //         const response = await axios(config);
+  //         const data = response.data;
+  //         setArtist({
+  //           ...artist,
 
-          follower_count: data.follower_count,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-  const isFollowing = async () => {
-    if (artist.id !== 0 && userMe.id !== 0) {
-      const followConfig: any = {
-        method: "get",
-        url: `/users/${userMe.id}/followings`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const { data } = await axios(followConfig);
-        if (data.results.length === 0) {
-          setFollowLoading(false);
-        } else {
-          const trackExist = data.results.find(
-            (following: IFollowings) => following.id === artist.id
-          );
-          if (trackExist) {
-            setFollowArtist(true);
-          }
-          setFollowLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
+  //           follower_count: data.follower_count,
+  //         });
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   };
+  //   const isFollowing = async () => {
+  //     if (artist.id !== 0 && userMe.id !== 0) {
+  //       const followConfig: any = {
+  //         method: "get",
+  //         url: `/users/${userMe.id}/followings`,
+  //         headers: {
+  //           Authorization: `JWT ${userSecret.jwt}`,
+  //         },
+  //         data: {},
+  //       };
+  //       try {
+  //         const { data } = await axios(followConfig);
+  //         if (data.results.length === 0) {
+  //           setFollowLoading(false);
+  //         } else {
+  //           const trackExist = data.results.find(
+  //             (following: IFollowings) => following.id === artist.id
+  //           );
+  //           if (trackExist) {
+  //             setFollowArtist(true);
+  //           }
+  //           setFollowLoading(false);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   };
+  //   //   useEffect(() => {
+  //   //     fetchArtist();
+  //   //   }, [artist]);
   //   useEffect(() => {
-  //     fetchArtist();
-  //   }, [artist]);
-  useEffect(() => {
-    isFollowing();
-  }, [userMe, userSecret]);
+  //     isFollowing();
+  //   }, [userMe, userSecret]);
 
   const followUser = async () => {
     const config: any = {
@@ -111,11 +115,8 @@ const ListenArtistInfo = ({
       data: {},
     };
     try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(true);
-        fetchArtist();
-      }
+      await axios(config);
+      fetchTrack();
     } catch (error) {
       console.log(error);
     }
@@ -130,11 +131,8 @@ const ListenArtistInfo = ({
       data: {},
     };
     try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(false);
-        fetchArtist();
-      }
+      await axios(config);
+      fetchTrack();
     } catch (error) {
       console.log(error);
     }
@@ -165,17 +163,21 @@ const ListenArtistInfo = ({
           <span>{artist.track_count}</span>
         </li>
       </ul>
-      {isMyTrack === false && followArtist && (
-        <button className={styles.unfollowArtist} onClick={unfollowUser}>
+      {isMyTrack === false && track.is_followed && (
+        <button
+          className={styles.unfollowArtist}
+          onClick={unfollowUser}
+          disabled={track.is_followed === undefined}
+        >
           <RiUserUnfollowLine />
           <span>Following</span>
         </button>
       )}
-      {isMyTrack === false && !followArtist && (
+      {isMyTrack === false && track.is_followed === false && (
         <button
           className={styles.followArtist}
           onClick={followUser}
-          disabled={followLoading}
+          disabled={track.is_followed === undefined}
         >
           <RiUserFollowFill />
           <span>Follow</span>

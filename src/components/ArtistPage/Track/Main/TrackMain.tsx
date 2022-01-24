@@ -243,6 +243,8 @@ const TrackMain = ({
             userMe={userMe}
             isMyTrack={isMyTrack}
             setArtist={setArtist}
+            track={track}
+            fetchTrack={fetchTrack}
           />
           <div>
             {track.description && (

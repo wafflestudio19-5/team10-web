@@ -559,13 +559,16 @@ const Track = ({
           count: data.count,
           created_at: data.created_at,
           description: data.description,
-          genre: data.genre.name,
+          genre: data.genre,
           image: data.image,
           like_count: data.like_count,
           repost_count: data.repost_count,
           tags: tagList,
           is_private: data.is_private,
-          audio_length: 0,
+          // audio_length: 0,
+          is_liked: data.is_liked,
+          is_reposted: data.is_reposted,
+          is_followed: data.is_followed,
         });
       } catch (error) {
         console.log(error);

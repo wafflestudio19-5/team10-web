@@ -92,7 +92,7 @@ const TrackList = ({
       }
     }
   };
-  //   console.log(track.id, liked);
+  console.log(track);
   const index = playlist.tracks.findIndex((element) => element.id === track.id);
   const clickArtist = () => history.push(`/${track.artist}`);
   const clickTrack = () => history.push(`/${track.artist}/${track.permalink}`);
@@ -116,7 +116,7 @@ const TrackList = ({
     await navigator.clipboard.writeText(location.href);
     toast.success("Link has been copied to the clipboard!");
   };
-  console.log(track.is_liked);
+
   return (
     <li className={styles.main} key={track.id}>
       <div className={styles.image}>

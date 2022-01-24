@@ -53,6 +53,9 @@ export interface IPlaylist {
   image: string;
   tracks: ISetTrack[];
   created_at: string;
+  is_followed: boolean | undefined;
+  is_liked: boolean | undefined;
+  is_reposted: boolean | undefined;
 }
 
 const SetPage = () => {
@@ -87,8 +90,12 @@ const SetPage = () => {
     image: "",
     tracks: [],
     created_at: "",
+    is_followed: undefined,
+    is_liked: undefined,
+    is_reposted: undefined,
   });
   const [noSet, setNoSet] = useState(false);
+  const [isMySet, setIsMySet] = useState<undefined | boolean>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -101,7 +108,6 @@ const SetPage = () => {
         `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`
       );
       const data = response.data;
-      console.log(userSecret.jwt);
       try {
         const config: any = {
           method: "get",
@@ -111,9 +117,20 @@ const SetPage = () => {
           },
           data: {},
         };
-        await axios(config);
-        setSet(data);
-        console.log(data);
+        const response = await axios(config);
+        if (response.data.creator.id === userSecret.id) {
+          setIsMySet(true);
+        } else {
+          setIsMySet(false);
+        }
+        if (
+          response.data.creator.id !== userSecret.id &&
+          response.data.is_private
+        ) {
+          setNoSet(true);
+        }
+        setSet(response.data);
+        console.log("page", data);
         setIsLoading(false);
       } catch (error) {
         console.log(error);
@@ -133,7 +150,7 @@ const SetPage = () => {
     }
   };
   useEffect(() => {
-    if (userSecret.jwt) {
+    if (typeof userSecret.jwt === "string") {
       fetchSet();
     }
   }, [userSecret.jwt]);
@@ -180,6 +197,7 @@ const SetPage = () => {
               fetchSet={fetchSet}
               setEditModal={setEditModal}
               playing={playing}
+              isMySet={isMySet}
             />
           )}
         </div>
