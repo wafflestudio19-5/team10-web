@@ -52,16 +52,23 @@ const PlaylistModal = ({
         },
         data: {
           track_id: track.id,
+          track_ids: [{ id: track.id }],
         },
       };
       try {
-        const response = await axios(trackConfig);
-        console.log(response);
+        await axios(trackConfig);
+        // console.log(response);
       } catch (error) {
         console.log(error);
       }
     } catch (error) {
-      console.log(error);
+      if (
+        axios.isAxiosError(error) &&
+        error &&
+        error?.response?.status === 400
+      ) {
+        toast.error("플레이리스트 제목을 변경해 주세요");
+      }
     }
   };
 

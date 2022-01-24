@@ -9,7 +9,7 @@ const TrackTag = ({ track }: { track: ITrack }) => {
   //   const history = useHistory();
   //   const clickTag = () => history.push(`/tags/${track.tags[0]}`);
   const releasedDate = dayjs(track.created_at).fromNow();
-  console.log(track.tags);
+  //   console.log(track.tags);
   return (
     <div className={styles.titleInfo}>
       <div className={styles.releasedDate}>{releasedDate}</div>

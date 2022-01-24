@@ -1,5 +1,10 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { BiRepost } from "react-icons/bi";
+import { BsSuitHeartFill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
+import { FiLink2 } from "react-icons/fi";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
 import { useHistory } from "react-router";
 import { useAuthContext } from "../../../../context/AuthContext";
@@ -11,12 +16,16 @@ const TrackList = ({
   track,
   playlist,
   playing,
+  fetchSet,
 }: {
   track: ISetTrack;
   playlist: IPlaylist;
   playing: string;
+  fetchSet: () => void;
 }) => {
   const [play, setPlay] = useState(false);
+  //   const [liked, setLiked] = useState(false);
+  //   const [reposted, setReposted] = useState(false);
   const { userSecret } = useAuthContext();
   const {
     audioSrc,
@@ -33,6 +42,15 @@ const TrackList = ({
   const history = useHistory();
   const headerTrackSrc = track.audio.split("?")[0];
   const barTrackSrc = audioSrc.split("?")[0];
+
+  //   useEffect(() => {
+  //     if (track.is_liked) {
+  //       setLiked(true);
+  //     }
+  //     if (track.is_reposted) {
+  //       setReposted(true);
+  //     }
+  //   }, [track.is_reposted, track.is_liked]);
 
   useEffect(() => {
     if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
@@ -74,9 +92,30 @@ const TrackList = ({
       }
     }
   };
+  //   console.log(track.id, liked);
   const index = playlist.tracks.findIndex((element) => element.id === track.id);
   const clickArtist = () => history.push(`/${track.artist}`);
   const clickTrack = () => history.push(`/${track.artist}/${track.permalink}`);
+  const likeTrack = async () => {
+    const config: any = {
+      method: track.is_liked ? "delete" : "post",
+      url: `/likes/tracks/${track.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      await axios(config);
+      fetchSet();
+    } catch (error) {
+      toast.error("실패했습니다");
+    }
+  };
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(location.href);
+    toast.success("Link has been copied to the clipboard!");
+  };
   return (
     <li className={styles.main} key={track.id}>
       <div className={styles.image}>
@@ -100,6 +139,20 @@ const TrackList = ({
           <FaPlay />
           &nbsp;{track.count}
         </span>
+      </div>
+      <div className={styles.reaction}>
+        <button
+          className={track.is_liked ? styles.liked : undefined}
+          onClick={likeTrack}
+        >
+          <BsSuitHeartFill />
+        </button>
+        <button className={track.is_reposted ? styles.liked : undefined}>
+          <BiRepost />
+        </button>
+        <button onClick={copyLink}>
+          <FiLink2 />
+        </button>
       </div>
     </li>
   );

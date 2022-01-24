@@ -13,8 +13,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 670px;
-    width: 550px;
+    height: 377px;
+    width: 600px;
     box-sizing: border-box;
     background-color: white;
     padding: 25px;
@@ -39,33 +39,15 @@
 }
 .trackInfo {
   height: 32px;
-  width: 500px;
+  width: 550px;
   font-size: 22px;
   border-bottom: 1px solid lightgray;
-}
-.trackImage {
-  height: 500px;
-  width: 500px;
-  position: relative;
-  top: 18px;
-  img {
-    height: 500px;
-    width: 500px;
-  }
-  input {
-    display: none;
-  }
 }
 .buttons {
   margin-top: 20px;
   border-top: 1px solid lightgray;
   padding: 20px 0;
-  .uploadButton {
-    border: none;
-    background: none;
-    padding: none;
-    margin-right: 250px;
-  }
+  text-align: right;
   .cancelButton {
     width: 55px;
     height: 26px;
@@ -84,4 +66,42 @@
     border-radius: 3px;
     margin-left: 10px;
   }
+}
+.tagInput {
+  width: 550px;
+  height: 145px;
+  box-sizing: border-box;
+  margin: 32px 0 10px 0;
+  .tagLabel {
+    margin-bottom: 8px;
+    font: 12px/1.4 Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda,
+      Verdana, Tahoma, sans-serif;
+    color: #333;
+  }
+  textarea {
+    padding: 2px 7px;
+    width: 550px;
+    height: 120px;
+  }
+}
+.checkboxContainer {
+  display: inline-block;
+  .private,
+  .public,
+  .noModify {
+    display: inline-flex;
+    align-items: center;
+    input {
+      margin-right: 5px;
+    }
+    span {
+      margin-right: 15px;
+    }
+  }
+}
+.privacy {
+  font: 12px/1.4 Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda,
+    Verdana, Tahoma, sans-serif;
+  color: #333;
+  margin: 20px 0 6px 0;
 }

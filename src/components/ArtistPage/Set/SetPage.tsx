@@ -102,6 +102,7 @@ const SetPage = () => {
       );
       const data = response.data;
       setSet(data);
+      console.log(data);
       setIsLoading(false);
     } catch (error) {
       if (

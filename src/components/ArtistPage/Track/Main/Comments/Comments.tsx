@@ -29,7 +29,7 @@ const Comments = ({
   commentCount: number;
   isFinalComment: boolean;
 }) => {
-  console.log(comments);
+  //   console.log(comments);
   const sortedComments = comments.reduce((sorted: any, comment: IComment) => {
     if (!sorted[comment.group]) {
       sorted[comment.group] = [];

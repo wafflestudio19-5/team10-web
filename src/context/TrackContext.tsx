@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useRef, useState } from "react";
 import {
   ITrackBarArtist,
+  ITrackBarPlaylist,
   ITrackBarTrack,
 } from "../components/ArtistPage/Track/TrackBar/TrackBar";
 // import { IArtist } from "../components/ArtistPage/Track/TrackPage";
@@ -23,8 +24,10 @@ interface ITrackContext {
   setTrackBarArtist: React.Dispatch<React.SetStateAction<ITrackBarArtist>>;
   trackBarTrack: ITrackBarTrack;
   setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrackBarTrack>>;
-  trackBarPlaylist: ITrackBarTrack[];
-  setTrackBarPlaylist: React.Dispatch<React.SetStateAction<ITrackBarTrack[]>>;
+  trackBarPlaylist: ITrackBarPlaylist[];
+  setTrackBarPlaylist: React.Dispatch<
+    React.SetStateAction<ITrackBarPlaylist[]>
+  >;
 }
 
 const TrackContext = createContext<ITrackContext>({
@@ -96,7 +99,7 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     // repost_count: 0,
     // is_private: false,
   });
-  const [trackBarPlaylist, setTrackBarPlaylist] = useState<ITrackBarTrack[]>(
+  const [trackBarPlaylist, setTrackBarPlaylist] = useState<ITrackBarPlaylist[]>(
     []
   );
 

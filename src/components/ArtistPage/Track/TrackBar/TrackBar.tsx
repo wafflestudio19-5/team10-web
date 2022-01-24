@@ -14,10 +14,14 @@ import {
   RiVolumeMuteFill,
 } from "react-icons/ri";
 import { MdVolumeUp, MdPlaylistPlay } from "react-icons/md";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useTrackContext } from "../../../../context/TrackContext";
 import toast from "react-hot-toast";
+import { AiOutlineClose } from "react-icons/ai";
+// import { useAuthContext } from "../../../../context/AuthContext";
+import { IoMdPause, IoMdPlay } from "react-icons/io";
+import { shuffle } from "lodash";
 // import { useAuthContext } from "../../../../context/AuthContext";
 // import axios from "axios";
 // import { IFollowings } from "../Main/ListenArtistInfo";
@@ -44,6 +48,14 @@ export interface ITrackBarArtist {
   id: number;
   permalink: string;
 }
+export interface ITrackBarPlaylist {
+  id: number;
+  title: string;
+  permalink: string;
+  audio: string;
+  image: string | null;
+  artist: number;
+}
 
 const TrackBar = () => {
   //   const [likeTrack, setLikeTrack] = useState<boolean | undefined>(undefined);
@@ -52,7 +64,8 @@ const TrackBar = () => {
   //   );
   //   const [likeLoading, setLikeLoading] = useState(true);
   //   const [followLoading, setFollowLoading] = useState(true);
-
+  //   const { userSecret } = useAuthContext();
+  const [nextup, setNextup] = useState(false);
   const {
     trackDuration,
     trackIsPlaying,
@@ -68,7 +81,9 @@ const TrackBar = () => {
     trackBarArtist,
     trackBarTrack,
     setTrackBarTrack,
+    setTrackBarPlaylist,
     // setTrackBarArtist,
+    // setAudioSrc,
     trackBarPlaylist,
   } = useTrackContext();
   //   const { userSecret } = useAuthContext();
@@ -339,11 +354,13 @@ const TrackBar = () => {
     if (current === trackBarPlaylist.length - 1) {
       return toast.error("다음 트랙이 없습니다");
     }
+    audioPlayer.current.pause();
     setPlayingTime(0);
     setTrackIsPlaying(true);
     setTrackBarTrack(trackBarPlaylist[current + 1]);
     audioPlayer.current.src = trackBarPlaylist[current + 1].audio;
     audioPlayer.current.load();
+    audioPlayer.current.pause();
     setTimeout(() => {
       audioPlayer.current.play();
       barAnimationRef.current = requestAnimationFrame(whilePlaying);
@@ -362,20 +379,51 @@ const TrackBar = () => {
     if (current === 0) {
       return toast.error("이전 트랙이 없습니다");
     }
+    audioPlayer.current.pause();
     setPlayingTime(0);
     setTrackIsPlaying(true);
     setTrackBarTrack(trackBarPlaylist[current - 1]);
     audioPlayer.current.src = trackBarPlaylist[current - 1].audio;
     audioPlayer.current.load();
+    audioPlayer.current.pause();
     setTimeout(() => {
       audioPlayer.current.play();
       barAnimationRef.current = requestAnimationFrame(whilePlaying);
     }, 1);
   };
 
-  if (audioPlayer.current?.ended) {
-    nextTrack();
-  }
+  useEffect(() => {
+    if (audioPlayer.current?.ended) {
+      if (
+        audioPlayer.current.src ===
+        trackBarPlaylist[trackBarPlaylist.length - 1].audio
+      ) {
+        setTrackBarTrack(trackBarPlaylist[0]);
+        audioPlayer.current.src = trackBarPlaylist[0].audio;
+        setPlayingTime(0);
+        return;
+      }
+      nextTrack();
+    }
+  }, [playingTime]);
+
+  const shuffleTracks = () => {
+    const currentIndex = trackBarPlaylist.findIndex(
+      (track) => track.id === trackBarTrack.id
+    );
+    if (currentIndex < trackBarPlaylist.length - 2) {
+      const prevTracks = trackBarPlaylist.slice(0, currentIndex + 1);
+      const nextTracks = trackBarPlaylist.slice(
+        currentIndex + 1,
+        trackBarPlaylist.length
+      );
+      const shuffled = shuffle(nextTracks);
+      const newPlaylist = prevTracks.concat(shuffled);
+      setTrackBarPlaylist(newPlaylist);
+    }
+  };
+
+  const toggleNextup = () => setNextup(!nextup);
 
   return (
     <>
@@ -397,7 +445,7 @@ const TrackBar = () => {
             <button className={styles.nextTrack} onClick={nextTrack}>
               <IoPlaySkipForwardSharp />
             </button>
-            <button className={styles.shuffle}>
+            <button className={styles.shuffle} onClick={shuffleTracks}>
               <IoShuffleSharp />
             </button>
             <button
@@ -437,7 +485,7 @@ const TrackBar = () => {
             )}
             <div className={styles.trackInfo}>
               <img
-                src={trackBarTrack.image || "/default.track_image.svg"}
+                src={trackBarTrack.image || "/default_track_image.svg"}
                 alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
               />
               <div className={styles.artistTrackName}>
@@ -488,14 +536,119 @@ const TrackBar = () => {
                   )}
                 </>
               )} */}
-              <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
+              <button
+                className={`${styles.nextUp} ${styles.listenEngagement}`}
+                onClick={toggleNextup}
+              >
                 <MdPlaylistPlay />
               </button>
             </div>
           </div>
+          {nextup ? (
+            <div className={styles.nextList}>
+              <div className={styles.header}>
+                <div className={styles.panel}>Next up</div>
+                <span onClick={() => setNextup(false)}>
+                  <AiOutlineClose />
+                </span>
+              </div>
+
+              <ul className={styles.trackList}>
+                {trackBarPlaylist.map((track) => {
+                  return (
+                    <TrackBarList
+                      key={track.id}
+                      track={track}
+                      clickArtist={clickArtist}
+                      clickTrack={clickTrack}
+                    />
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
         </div>
       )}
     </>
+  );
+};
+
+const TrackBarList = ({
+  track,
+  clickArtist,
+  clickTrack,
+}: {
+  track: ITrackBarPlaylist;
+  clickArtist: () => void;
+  clickTrack: () => void;
+}) => {
+  const [play, setPlay] = useState(false);
+  const {
+    audioSrc,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarTrack,
+    setTrackIsPlaying,
+    trackIsPlaying,
+    trackBarTrack,
+  } = useTrackContext();
+  const headerTrackSrc = track.audio.split("?")[0];
+  const barTrackSrc = audioSrc.split("?")[0];
+  const togglePlayButton = () => {
+    if (!play) {
+      if (headerTrackSrc !== barTrackSrc) {
+        setPlayingTime(0);
+        audioPlayer.current.src = track.audio;
+        setAudioSrc(track.audio);
+        audioPlayer.current.load();
+        // setTrackBarArtist({
+        //   display_name: username,
+        //   id: track.artist,
+        //   permalink: userSecret.permalink,
+        // });
+        setTrackBarTrack(track);
+      }
+      setPlay(true);
+      setTrackIsPlaying(true);
+      setTimeout(() => {
+        audioPlayer.current.play();
+      }, 1);
+    } else {
+      audioPlayer.current.pause();
+      setPlay(false);
+      setTrackIsPlaying(false);
+    }
+  };
+  useEffect(() => {
+    if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
+      setPlay(true);
+    } else {
+      setPlay(false);
+    }
+  }, [audioSrc, trackIsPlaying]);
+
+  return (
+    <li
+      key={track.id}
+      className={track.id === trackBarTrack.id ? styles.playing : undefined}
+    >
+      <div className={styles.image}>
+        <img src={track.image || "/default_track_image.svg"} />
+        <div className={styles.playButton} onClick={() => togglePlayButton()}>
+          {play ? <IoMdPause /> : <IoMdPlay />}
+        </div>
+      </div>
+      <div className={styles.content}>
+        <span className={styles.artistName} onClick={clickArtist}>
+          {track.artist} -
+        </span>
+        &nbsp;
+        <span className={styles.trackTitle} onClick={clickTrack}>
+          {track.title}
+        </span>
+      </div>
+    </li>
   );
 };
 

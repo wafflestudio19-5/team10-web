@@ -38,7 +38,6 @@ const LikeUsers = ({
       <div className={styles.userImages}>
         {trackLikers.map((liker, index) => {
           const clickUser = () => history.push(`/${liker.permalink}`);
-          console.log(liker);
           return (
             <>
               <img

@@ -33,6 +33,7 @@ const EditModal = ({
   //   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>("");
   const [permalinkList, setPermalinkList] = useState<ITrackPermalink[]>([]);
+  const [genre, setGenre] = useState<string | null>(null);
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -43,6 +44,7 @@ const EditModal = ({
     // setTags(track.tags);
     setImageUrl(track.image);
     setTagInput(track.tags.join(", "));
+    setGenre(track.genre);
   }, [track]);
 
   const openFileSelector = (event: any) => {
@@ -79,6 +81,10 @@ const EditModal = ({
     ) {
       toast.error(`동일한 링크의 다른 트랙이 존재합니다(${tPermalink})`);
     }
+  };
+
+  const changeGenre = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setGenre(event.target.value);
   };
 
   useEffect(() => {
@@ -143,9 +149,8 @@ const EditModal = ({
           description: description,
           is_private: isPrivate,
           image_extension: imageFile.name.split(".").at(-1),
-          ...(tagInput && {
-            tags_input: tagInput.replace(/,/g, "").split(" "),
-          }),
+          tags_input: tagInput.replace(/,/g, "").split(" "),
+          genre_input: genre,
         },
       };
       try {
@@ -190,9 +195,8 @@ const EditModal = ({
           permalink: tPermalink,
           description: description,
           is_private: isPrivate,
-          ...(tagInput && {
-            tags_input: tagInput.replace(/,/g, "").split(" "),
-          }),
+          tags_input: tagInput.replace(/,/g, "").split(" "),
+          genre_input: genre,
         },
       };
       try {
@@ -280,9 +284,44 @@ const EditModal = ({
             </div>
             <div className={styles["upload-info-genre"]}>
               <label>Genre</label>
-              <select>
+              <select
+                onChange={(event) => changeGenre(event)}
+                value={genre || "None"}
+              >
                 <option value="None">None</option>
                 <option value="Custom">Custom</option>
+                <option value="Alternative Rock">Alternative Rock</option>
+                <option value="Ambient">Ambient</option>
+                <option value="Classical">Classical</option>
+                <option value="Country">Country</option>
+                <option value={`Dance & EDM`}>Dance &#38; EDM</option>
+                <option value="Dancehall">Dancehall</option>
+                <option value="Deep House">Deep House</option>
+                <option value="Disco">Disco</option>
+                <option value={"Drum & Bass"}>Drum &#38; Bass</option>
+                <option value="Dubstep">Dubstep</option>
+                <option value="Electronic">Electronic</option>
+                <option value={"Folk & Singer-Songwriter"}>
+                  Folk &#38; Singer-Songwriter
+                </option>
+                <option value="Hip-hop &#38; Rap">Hip-hop &#38; Rap</option>
+                <option value="House">House</option>
+                <option value="Indie">Indie</option>
+                <option value="Jazz &#38; Blues">Jazz &#38; Blues</option>
+                <option value="Latin">Latin</option>
+                <option value="Metal">Metal</option>
+                <option value="Piano">Piano</option>
+                <option value="Pop">Pop</option>
+                <option value="R&#38;B &#38; Soul">R&#38;B &#38; Soul</option>
+                <option value="Reggae">Reggae</option>
+                <option value="Reggaeton">Reggaeton</option>
+                <option value="Rock">Rock</option>
+                <option value="Soundtrack">Soundtrack</option>
+                <option value="Techno">Techno</option>
+                <option value="Trance">Trance</option>
+                <option value="Trap">Trap</option>
+                <option value="Triphop">Triphop</option>
+                <option value="World">World</option>
               </select>
             </div>
             <div className={styles["upload-info-tag"]}>
