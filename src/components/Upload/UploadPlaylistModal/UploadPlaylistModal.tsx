@@ -41,9 +41,6 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
 
   const changeTitle = (e: any) => {
     setTitle(e.target.value);
-    if (listPermalink === "") {
-      setListPermalink(e.target.value);
-    }
   };
 
   const changeListPermalink = (event: any) => {
@@ -62,7 +59,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         "https://api.soundwaffle.com/sets",
         {
           title: title,
-          permalink: listPermalink,
+          permalink: listPermalink ? listPermalink : title,
           type: playlistType,
           description: description,
           is_private: isPrivate,
@@ -85,7 +82,24 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
               "https://api.soundwaffle.com/tracks",
               {
                 title: newFiles[item].name,
-                permalink: newFiles[item].name,
+                permalink:
+                  newFiles[item].name.indexOf(".") === -1 && listPermalink
+                    ? listPermalink + "_" + newFiles[item].name
+                    : newFiles[item].name.indexOf(".") === -1 && !listPermalink
+                    ? title + "_" + newFiles[item].name
+                    : newFiles[item].name.indexOf(".") !== -1 && listPermalink
+                    ? listPermalink +
+                      "_" +
+                      newFiles[item].name.substr(
+                        0,
+                        newFiles[item].name.indexOf(".")
+                      )
+                    : title +
+                      "_" +
+                      newFiles[item].name.substr(
+                        0,
+                        newFiles[item].name.indexOf(".")
+                      ),
                 is_private: isPrivate,
                 audio_extension: selectedFiles[item].name.substr(
                   -selectedFiles[item].name.length +
@@ -126,6 +140,10 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                         },
                       }
                     )
+                    .then(() => {
+                      toast("플레이리스트 업로드 성공");
+                      setPlaylistModal(false);
+                    })
                     .catch(() => {
                       toast("set에 추가 실패");
                     });
