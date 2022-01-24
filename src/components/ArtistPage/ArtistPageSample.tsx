@@ -1,4 +1,4 @@
-import "./ArtistPage.scss";
+import "./ArtistPageHeader.scss";
 import { Grid } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -8,8 +8,11 @@ import toast from "react-hot-toast";
 import TrackBox from "./TrackBox/TrackBox";
 import { useAuthContext } from "../../context/AuthContext";
 import { useInView } from "react-intersection-observer";
+import { useHistory } from "react-router";
 
 function ArtistPage() {
+  const history = useHistory();
+
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const { userSecret } = useAuthContext();
@@ -291,7 +294,7 @@ function ArtistPage() {
 
           <div className={"menu-bar"}>
             <div className={"menu-left"}>
-              <a href={`/${permalink}`}>All</a>
+              <a onClick={() => history.push(`/${permalink}`)}>All</a>
               <a>Popular tracks</a>
               <a>Tracks</a>
               <a>Albums</a>

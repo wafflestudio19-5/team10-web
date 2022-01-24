@@ -23,6 +23,7 @@
     "react-audio-player": "^0.17.0",
     "react-color-extractor": "^1.1.2",
     "react-confirm-alert": "^2.7.0",
+    "react-datepicker": "^4.6.0",
     "react-dayjs": "^0.3.2",
     "react-dom": "^17.0.2",
     "react-google-login": "^5.2.2",
@@ -71,6 +72,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-datepicker": "^4.3.4",
     "@types/react-router": "^5.1.17",
     "@types/wavesurfer.js": "^5.2.2",
     "babel-eslint": "^10.1.0",

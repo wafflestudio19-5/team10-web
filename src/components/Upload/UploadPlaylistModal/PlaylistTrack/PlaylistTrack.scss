@@ -1,0 +1,13 @@
+.upload-playlist-track {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #f2f2f2;
+
+    input {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        width: 680px;
+        height: 26px;
+    }
+}

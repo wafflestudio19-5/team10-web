@@ -2,7 +2,6 @@ import Login from "./components/Login/Login";
 import TrackPage from "./components/ArtistPage/Track/TrackPage";
 import Header from "./components/Header/Header";
 import Discover from "./components/Discover/Discover";
-import ArtistPage from "./components/ArtistPage/ArtistPage";
 import Logout from "./components/Logout/Logout";
 import { Switch, Route, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
@@ -19,6 +18,8 @@ import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
 import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
 import axios from "axios";
 import SetPage from "./components/ArtistPage/Set/SetPage";
+import ArtistPageTracks from "./components/ArtistPage/ArtistPageTracks/ArtistPageTracks";
+import ArtistPagePlaylists from "./components/ArtistPage/ArtistPagePlaylists/ArtistPagePlaylists";
 
 function App() {
   const location = useLocation();
@@ -40,7 +41,13 @@ function App() {
           <Route exact path="/you/following" component={Following} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
-          <Route exact path="/:permalink" component={ArtistPage} />
+          <Route exact path="/:permalink" component={ArtistPageTracks} />
+          <Route exact path="/:permalink/tracks" component={ArtistPageTracks} />
+          <Route
+            exact
+            path="/:permalink/sets"
+            component={ArtistPagePlaylists}
+          />
           <Route exact path="/:username/:trackname" component={TrackPage} />
           <Route exact path="/:username/sets/:playlist" component={SetPage} />
         </Switch>
