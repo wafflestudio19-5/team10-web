@@ -1,8 +1,36 @@
+import { useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import "./PlaylistBox.scss";
 
-function PlaylistBox({ item }: any) {
+function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
+  const player = useRef<any>();
+  const [isPlaying, setIsPlaying] = useState<boolean>();
+  const [trackIndex, setTrackIndex] = useState<number>(0);
+
+  const playMusic = () => {
+    if (currentPlay !== null) {
+      let current = document.getElementById(`button${currentPlay}`);
+      current?.click();
+    }
+    setIsPlaying(true);
+    player.current.audio.current.play();
+    setCurrentPlay(item.id);
+  };
+
+  const pauseMusic = () => {
+    setCurrentPlay(null);
+    setIsPlaying(false);
+    player.current.audio.current.pause();
+  };
+
+  const playNextTrack = () => {
+    if (item.tracks.length === trackIndex + 1) {
+      setTrackIndex(0);
+    } else {
+      setTrackIndex(trackIndex + 1);
+    }
+  };
   return (
     <div className={"recent-track"}>
       <img
@@ -12,24 +40,50 @@ function PlaylistBox({ item }: any) {
       />
       <div className={"track-right"}>
         <div className={"track-info"}>
-          <button className="play-button">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              fill="white"
-              className="bi bi-pause-fill"
-              viewBox="0 0 16 16"
+          {!isPlaying && (
+            <button onClick={playMusic} className="play-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="25"
+                height="25"
+                fill="white"
+                className="bi bi-caret-right-fill"
+                viewBox="0 0 16 16"
+              >
+                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+              </svg>
+            </button>
+          )}
+          {isPlaying && (
+            <button
+              onClick={pauseMusic}
+              id={`button${item.id}`}
+              className="play-button"
             >
-              <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="25"
+                height="25"
+                fill="white"
+                className="bi bi-pause-fill"
+                viewBox="0 0 16 16"
+              >
+                <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
+              </svg>
+            </button>
+          )}
           <div className={"track-info-name"}>
             <div className={"artistname"}>{item.creator.display_name}</div>
             <div className={"trackname"}>{item.title}</div>
           </div>
         </div>
-        <AudioPlayer />
+        <AudioPlayer
+          ref={player}
+          className={`player${item.tracks.id}`}
+          key={item.tracks.id}
+          src={item.tracks[trackIndex].audio}
+          onEnded={playNextTrack}
+        />
         {item.tracks !== null &&
           Array.from({ length: item.tracks.length }, (_, i) => i).map(
             (num: any) => (

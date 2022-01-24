@@ -24,7 +24,7 @@ function ArtistPagePlaylists() {
   const [playlists, setPlaylists] = useState<any>();
   // const [playlistPage, setPlaylistPage] = useState<any>(null);
 
-  // const [currentPlay, setCurrentPlay] = useState<any>(null);
+  const [currentPlay, setCurrentPlay] = useState<any>(null);
 
   const getUser = (id: any) => {
     axios
@@ -135,7 +135,12 @@ function ArtistPagePlaylists() {
               <text>My Playlists</text>
               {playlists &&
                 playlists.map((item: any) => (
-                  <PlaylistBox item={item} user={user} />
+                  <PlaylistBox
+                    item={item}
+                    user={user}
+                    currentPlay={currentPlay}
+                    setCurrentPlay={setCurrentPlay}
+                  />
                 ))}
               {/* <div ref={ref} className="inView">
                 text
