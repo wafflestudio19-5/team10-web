@@ -101,9 +101,23 @@ const SetPage = () => {
         `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`
       );
       const data = response.data;
-      setSet(data);
-      console.log(data);
-      setIsLoading(false);
+      console.log(userSecret.jwt);
+      try {
+        const config: any = {
+          method: "get",
+          url: `/sets/${data.id}`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        await axios(config);
+        setSet(data);
+        console.log(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       if (
         (axios.isAxiosError(error) &&
@@ -119,8 +133,10 @@ const SetPage = () => {
     }
   };
   useEffect(() => {
-    fetchSet();
-  }, []);
+    if (userSecret.jwt) {
+      fetchSet();
+    }
+  }, [userSecret.jwt]);
 
   useEffect(() => {
     if (set.creator.id !== userSecret.id && set.is_private === true) {

@@ -116,6 +116,7 @@ const TrackList = ({
     await navigator.clipboard.writeText(location.href);
     toast.success("Link has been copied to the clipboard!");
   };
+  console.log(track.is_liked);
   return (
     <li className={styles.main} key={track.id}>
       <div className={styles.image}>
