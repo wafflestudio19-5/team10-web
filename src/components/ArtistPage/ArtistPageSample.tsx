@@ -1,4 +1,4 @@
-import "./ArtistPage.scss";
+import "./ArtistPageHeader.scss";
 import { Grid } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
