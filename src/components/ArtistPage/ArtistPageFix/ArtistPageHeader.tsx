@@ -90,6 +90,34 @@ function ArtistPageHeader() {
       });
   };
 
+  const getFollowers = (id: any, myPermalink: any) => {
+    // 팔로워 불러오기
+    axios
+      .get(`users/${id}/followers`)
+      .then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/followers?page=${page}`).then((res) => {
+            const filter = res.data.results.filter(
+              (item: any) => item.permalink == myPermalink
+            );
+            if (filter.length === 0) {
+              setIsFollowing(false);
+            } else {
+              setIsFollowing(true);
+            }
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast("팔로워 불러오기 실패");
+      });
+  };
+
   const followUser = async () => {
     const config: any = {
       method: "post",
@@ -151,6 +179,8 @@ function ArtistPageHeader() {
           setPageId(res1.data.id);
           // 유저 정보
           getUser(res1.data.id);
+          //팔로워 불러오기
+          getFollowers(res1.data.id, myPermalink);
         })
         .catch(() => {
           toast("정보 불러오기 실패");

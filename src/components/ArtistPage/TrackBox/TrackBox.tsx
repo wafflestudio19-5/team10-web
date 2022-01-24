@@ -205,7 +205,7 @@ function TrackBox({
       <div className={"track-right"}>
         <div className={"track-info"}>
           {!isPlaying && (
-            <button onClick={playMusic}>
+            <button onClick={playMusic} className="play-button">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="25"
@@ -219,7 +219,11 @@ function TrackBox({
             </button>
           )}
           {isPlaying && (
-            <button onClick={pauseMusic} id={`button${item.id}`}>
+            <button
+              onClick={pauseMusic}
+              id={`button${item.id}`}
+              className="play-button"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="25"
