@@ -298,9 +298,7 @@ function ArtistPage() {
               <a>Popular tracks</a>
               <a>Tracks</a>
               <a>Albums</a>
-              <a onClick={() => history.push(`/${permalink}/tracks`)}>
-                Playlists
-              </a>
+              <a>Playlists</a>
               <a>Reposts</a>
             </div>
             {isMe === true && (
