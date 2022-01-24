@@ -19,7 +19,7 @@ import YourTracks from "./components/Upload/YourTracks/YourTracks";
 import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
 import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
 import axios from "axios";
-import ArtistPageHeader from "./components/ArtistPage/ArtistPageHeader";
+import ArtistPageTracks from "./components/ArtistPage/ArtistPageTracks/ArtistPageTracks";
 
 function App() {
   const location = useLocation();
@@ -43,7 +43,7 @@ function App() {
           <Route exact path="/you/history" component={History} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
-          <Route exact path="/:permalink" component={ArtistPageHeader} />
+          <Route exact path="/:permalink" component={ArtistPageTracks} />
           <Route exact path="/:username/:trackname" component={TrackPage} />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
