@@ -65,6 +65,7 @@ const TrackBar = () => {
   //   const [likeLoading, setLikeLoading] = useState(true);
   //   const [followLoading, setFollowLoading] = useState(true);
   //   const { userSecret } = useAuthContext();
+  const [nextup, setNextup] = useState(false);
   const {
     trackDuration,
     trackIsPlaying,
@@ -391,15 +392,20 @@ const TrackBar = () => {
     }, 1);
   };
 
-  if (audioPlayer.current?.ended) {
-    // const current = trackBarPlaylist.findIndex(
-    //   (track) => track.id === trackBarTrack.id
-    // );
-    // if (current === trackBarPlaylist.length - 1) {
-    //   return;
-    // }
-    nextTrack();
-  }
+  useEffect(() => {
+    if (audioPlayer.current?.ended) {
+      if (
+        audioPlayer.current.src ===
+        trackBarPlaylist[trackBarPlaylist.length - 1].audio
+      ) {
+        setTrackBarTrack(trackBarPlaylist[0]);
+        audioPlayer.current.src = trackBarPlaylist[0].audio;
+        setPlayingTime(0);
+        return;
+      }
+      nextTrack();
+    }
+  }, [playingTime]);
 
   const shuffleTracks = () => {
     const currentIndex = trackBarPlaylist.findIndex(
@@ -416,6 +422,8 @@ const TrackBar = () => {
       setTrackBarPlaylist(newPlaylist);
     }
   };
+
+  const toggleNextup = () => setNextup(!nextup);
 
   return (
     <>
@@ -528,29 +536,37 @@ const TrackBar = () => {
                   )}
                 </>
               )} */}
-              <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
+              <button
+                className={`${styles.nextUp} ${styles.listenEngagement}`}
+                onClick={toggleNextup}
+              >
                 <MdPlaylistPlay />
               </button>
             </div>
           </div>
-          <div className={styles.nextList}>
-            <div className={styles.header}>
-              <div className={styles.panel}>Next up</div>
-              <AiOutlineClose />
+          {nextup ? (
+            <div className={styles.nextList}>
+              <div className={styles.header}>
+                <div className={styles.panel}>Next up</div>
+                <span onClick={() => setNextup(false)}>
+                  <AiOutlineClose />
+                </span>
+              </div>
+
+              <ul className={styles.trackList}>
+                {trackBarPlaylist.map((track) => {
+                  return (
+                    <TrackBarList
+                      key={track.id}
+                      track={track}
+                      clickArtist={clickArtist}
+                      clickTrack={clickTrack}
+                    />
+                  );
+                })}
+              </ul>
             </div>
-            <ul className={styles.trackList}>
-              {trackBarPlaylist.map((track) => {
-                return (
-                  <TrackBarList
-                    key={track.id}
-                    track={track}
-                    clickArtist={clickArtist}
-                    clickTrack={clickTrack}
-                  />
-                );
-              })}
-            </ul>
-          </div>
+          ) : null}
         </div>
       )}
     </>

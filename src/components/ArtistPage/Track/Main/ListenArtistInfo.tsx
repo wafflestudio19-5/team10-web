@@ -8,11 +8,11 @@ import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { IArtist, IUserMe } from "../TrackPage";
 
-interface IArtistInfo {
-  image: null | string;
-  followers: number;
-  tracks: number;
-}
+// interface IArtistInfo {
+//   image: null | string;
+//   followers: number;
+//   tracks: number;
+// }
 export interface IFollowings {
   id: number;
 }
@@ -20,16 +20,18 @@ const ListenArtistInfo = ({
   artist,
   userMe,
   isMyTrack,
+  setArtist,
 }: {
   artist: IArtist;
   userMe: IUserMe;
   isMyTrack: boolean | undefined;
+  setArtist: React.Dispatch<React.SetStateAction<IArtist>>;
 }) => {
-  const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
-    image: null,
-    followers: 0,
-    tracks: 0,
-  });
+  //   const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
+  //     image: null,
+  //     followers: 0,
+  //     tracks: 0,
+  //   });
   const [followArtist, setFollowArtist] = useState(false);
   const [followLoading, setFollowLoading] = useState(true);
 
@@ -54,10 +56,10 @@ const ListenArtistInfo = ({
       try {
         const response = await axios(config);
         const data = response.data;
-        setArtistInfo({
-          image: data.image_profile,
-          followers: data.follower_count,
-          tracks: data.track_count,
+        setArtist({
+          ...artist,
+
+          follower_count: data.follower_count,
         });
       } catch (error) {
         console.log(error);
@@ -92,9 +94,9 @@ const ListenArtistInfo = ({
       }
     }
   };
-  useEffect(() => {
-    fetchArtist();
-  }, [artist]);
+  //   useEffect(() => {
+  //     fetchArtist();
+  //   }, [artist]);
   useEffect(() => {
     isFollowing();
   }, [userMe, userSecret]);
@@ -142,7 +144,7 @@ const ListenArtistInfo = ({
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}>
         <img
-          src={artistInfo.image || "/default_user_image.png"}
+          src={artist.image_profile || "/default_user_image.png"}
           alt={`${artist.display_name}의 프로필 사진`}
         />
       </div>
@@ -154,13 +156,13 @@ const ListenArtistInfo = ({
         // onClick={clickFollowers}
         >
           <BsPeopleFill />
-          <span>{artistInfo.followers}</span>
+          <span>{artist.follower_count}</span>
         </li>
         <li
         // onClick={clickTracks}
         >
           <IoStatsChart />
-          <span>{artistInfo.tracks}</span>
+          <span>{artist.track_count}</span>
         </li>
       </ul>
       {isMyTrack === false && followArtist && (

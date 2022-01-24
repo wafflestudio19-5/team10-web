@@ -32,6 +32,9 @@ export interface IArtist {
   display_name: string;
   id: number;
   permalink: string;
+  track_count: number;
+  follower_count: number;
+  image_profile: string | null;
 }
 export interface ITag {
   id: number;
@@ -72,6 +75,9 @@ const TrackPage = () => {
     display_name: "",
     id: 0,
     permalink: "",
+    track_count: 0,
+    follower_count: 0,
+    image_profile: null,
   });
   const [userMe, setUserMe] = useState<IUserMe>({ id: 0, image_profile: "" });
   const [isLoading, setIsLoading] = useState(true);
@@ -123,6 +129,9 @@ const TrackPage = () => {
         display_name: artist.display_name,
         id: artist.id,
         permalink: artist.permalink,
+        track_count: artist.track_count,
+        follower_count: artist.follower_count,
+        image_profile: artist.image_profile,
       });
       setIsLoading(false);
     } catch (error) {
@@ -210,6 +219,7 @@ const TrackPage = () => {
               isMyTrack={isMyTrack}
               setEditModal={setEditModal}
               openPlaylistModal={openPlaylistModal}
+              setArtist={setArtist}
             />
           )}
         </div>

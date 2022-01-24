@@ -559,7 +559,7 @@ const Track = ({
           count: data.count,
           created_at: data.created_at,
           description: data.description,
-          genre: data.genre,
+          genre: data.genre.name,
           image: data.image,
           like_count: data.like_count,
           repost_count: data.repost_count,

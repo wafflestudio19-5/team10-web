@@ -115,19 +115,12 @@ const ListenEngagement = ({
     try {
       const response = await axios(config);
       if (response) {
-        console.log("asdfsadj");
         setLike(true);
         fetchTrack();
         fetchLikers();
       }
     } catch (error) {
-      if (
-        axios.isAxiosError(error) &&
-        error &&
-        error?.response?.status === 401
-      ) {
-        console.log("asdfasd");
-      }
+      console.log(error);
     }
   };
 

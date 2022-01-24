@@ -51,6 +51,7 @@ const TrackMain = ({
   isMyTrack,
   setEditModal,
   openPlaylistModal,
+  setArtist,
 }: {
   track: ITrack;
   artist: IArtist;
@@ -59,6 +60,7 @@ const TrackMain = ({
   isMyTrack: boolean | undefined;
   setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
   openPlaylistModal: () => void;
+  setArtist: React.Dispatch<React.SetStateAction<IArtist>>;
 }) => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
@@ -240,6 +242,7 @@ const TrackMain = ({
             artist={artist}
             userMe={userMe}
             isMyTrack={isMyTrack}
+            setArtist={setArtist}
           />
           <div>
             {track.description && (
