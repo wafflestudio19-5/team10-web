@@ -17,6 +17,7 @@ function ArtistPagePlaylists() {
   const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
+  const [header, setHeader] = useState<any>();
   const [ref, inView] = useInView();
 
   const [tracks, setTracks] = useState<any>();
@@ -29,6 +30,13 @@ function ArtistPagePlaylists() {
       .get(`users/${id}`)
       .then((res) => {
         setUser(res.data);
+        if (res.data.image_header === null) {
+          setHeader(
+            "https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
+          );
+        } else {
+          setHeader(res.data.image_header);
+        }
       })
       .catch(() => {
         toast("유저 정보 불러오기 실패");
@@ -112,10 +120,15 @@ function ArtistPagePlaylists() {
     return (
       <div className="artistpage-wrapper">
         <div className="artistpage">
-          <ArtistPageHeader />
+          <ArtistPageHeader
+            header={header}
+            user={user}
+            setUser={setUser}
+            getUser={getUser}
+          />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Tracks</text>
+              <text>My Playlists</text>
               {tracks &&
                 tracks.map((item: any) => (
                   <TrackBox
@@ -131,7 +144,7 @@ function ArtistPagePlaylists() {
                 text
               </div>
             </div>
-            <ArtistPageRight />
+            <ArtistPageRight user={user} />
           </div>
         </div>
       </div>
