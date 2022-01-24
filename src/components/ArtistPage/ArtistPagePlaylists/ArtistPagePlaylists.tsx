@@ -52,14 +52,20 @@ function ArtistPagePlaylists() {
         if (page === 1) {
           setPlaylists(
             res.data.results.filter(
-              (item: any) => item.is_private === false && item.tracks !== null
+              (item: any) =>
+                item.is_private === false &&
+                item.tracks !== null &&
+                item.type === "playlist"
             )
           );
         } else {
           setPlaylists((item: any) => [
             ...item,
             ...res.data.results.filter(
-              (item: any) => item.is_private === false && item.tracks !== null
+              (item: any) =>
+                item.is_private === false &&
+                item.tracks !== null &&
+                item.type === "playlist"
             ),
           ]);
         }
