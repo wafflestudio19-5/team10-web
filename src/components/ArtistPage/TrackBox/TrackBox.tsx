@@ -138,6 +138,7 @@ function TrackBox({
   };
 
   useEffect(() => {
+    console.log(item.image);
     player.current.audio.current.pause();
 
     const getIsLiking = () => {

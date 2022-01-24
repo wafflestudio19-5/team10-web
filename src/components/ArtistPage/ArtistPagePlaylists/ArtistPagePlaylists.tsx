@@ -6,9 +6,9 @@ import { useParams } from "react-router";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
 import TrackBox from "../TrackBox/TrackBox";
-import "./ArtistPageTracks.scss";
+import "./ArtistPagePlaylists.scss";
 
-function ArtistPageTracks() {
+function ArtistPagePlaylists() {
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const params = useParams<any>();
@@ -17,7 +17,6 @@ function ArtistPageTracks() {
   const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
-  const [header, setHeader] = useState<any>();
   const [ref, inView] = useInView();
 
   const [tracks, setTracks] = useState<any>();
@@ -30,13 +29,6 @@ function ArtistPageTracks() {
       .get(`users/${id}`)
       .then((res) => {
         setUser(res.data);
-        if (res.data.image_header === null) {
-          setHeader(
-            "https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
-          );
-        } else {
-          setHeader(res.data.image_header);
-        }
       })
       .catch(() => {
         toast("유저 정보 불러오기 실패");
@@ -120,12 +112,7 @@ function ArtistPageTracks() {
     return (
       <div className="artistpage-wrapper">
         <div className="artistpage">
-          <ArtistPageHeader
-            header={header}
-            user={user}
-            setUser={setUser}
-            getUser={getUser}
-          />
+          <ArtistPageHeader />
           <div className="artist-body">
             <div className={"recent"}>
               <text>My Tracks</text>
@@ -144,7 +131,7 @@ function ArtistPageTracks() {
                 text
               </div>
             </div>
-            <ArtistPageRight user={user} />
+            <ArtistPageRight />
           </div>
         </div>
       </div>
@@ -152,4 +139,4 @@ function ArtistPageTracks() {
   }
 }
 
-export default ArtistPageTracks;
+export default ArtistPagePlaylists;

@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useHistory } from "react-router";
 
-function ArtistPageHeader() {
+function ArtistPageHeader({ header, user, setUser, getUser }: any) {
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -19,8 +19,6 @@ function ArtistPageHeader() {
   const [pageId, setPageId] = useState<number>();
 
   const [modal, setModal] = useState(false);
-  const [user, setUser] = useState<any>();
-  const [header, setHeader] = useState<any>();
 
   const [isFollowing, setIsFollowing] = useState<boolean>();
 
@@ -70,24 +68,6 @@ function ArtistPageHeader() {
       }
     };
     changeHeaderImg();
-  };
-
-  const getUser = (id: any) => {
-    axios
-      .get(`users/${id}`)
-      .then((res) => {
-        setUser(res.data);
-        if (res.data.image_header === null) {
-          setHeader(
-            "https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
-          );
-        } else {
-          setHeader(res.data.image_header);
-        }
-      })
-      .catch(() => {
-        toast("유저 정보 불러오기 실패");
-      });
   };
 
   const getFollowers = (id: any, myPermalink: any) => {
@@ -177,8 +157,6 @@ function ArtistPageHeader() {
         .get(`resolve?url=${url}`)
         .then((res1) => {
           setPageId(res1.data.id);
-          // 유저 정보
-          getUser(res1.data.id);
           //팔로워 불러오기
           getFollowers(res1.data.id, myPermalink);
         })
@@ -246,7 +224,7 @@ function ArtistPageHeader() {
             <a>Popular tracks</a>
             <a onClick={() => history.push(`/${permalink}/tracks`)}>Tracks</a>
             <a>Albums</a>
-            <a>Playlists</a>
+            <a onClick={() => history.push(`/${permalink}/sets`)}>Playlists</a>
             <a>Reposts</a>
           </div>
           {isMe === true && (
