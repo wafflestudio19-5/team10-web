@@ -40,7 +40,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     <div className={"recent-track"}>
       <img
         className="track-Img"
-        src={"img/default.track_image.svg"}
+        src="/default.track_image.svg"
         alt={"trackImg"}
       />
       <div className={"track-right"}>
@@ -94,7 +94,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
             (num: any) => (
               <div className={"playlist-track"}>
                 {item.tracks[num].image === null && (
-                  <img src={"img/default.track_image.svg"} alt="me" />
+                  <img src="/default.track_image.svg" alt="me" />
                 )}
                 {item.tracks[num].image !== null && (
                   <img src={item.tracks[num].image} alt="me" />
