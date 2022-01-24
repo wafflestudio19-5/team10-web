@@ -51,13 +51,15 @@ function ArtistPagePlaylists() {
       .then((res) => {
         if (page === 1) {
           setPlaylists(
-            res.data.results.filter((item: any) => item.is_private === false)
+            res.data.results.filter(
+              (item: any) => item.is_private === false && item.tracks !== null
+            )
           );
         } else {
           setPlaylists((item: any) => [
             ...item,
             ...res.data.results.filter(
-              (item: any) => item.is_private === false
+              (item: any) => item.is_private === false && item.tracks !== null
             ),
           ]);
         }
