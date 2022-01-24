@@ -31,6 +31,11 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
       setTrackIndex(trackIndex + 1);
     }
   };
+
+  const playThisTrack = (num: any) => {
+    setTrackIndex(num);
+    playMusic();
+  };
   return (
     <div className={"recent-track"}>
       <img
@@ -88,9 +93,16 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           Array.from({ length: item.tracks.length }, (_, i) => i).map(
             (num: any) => (
               <div className={"playlist-track"}>
-                <img alt="me" />
+                {item.tracks[num].image === null && (
+                  <img src={"img/default.track_image.svg"} alt="me" />
+                )}
+                {item.tracks[num].image !== null && (
+                  <img src={item.tracks[num].image} alt="me" />
+                )}
                 <div>{num + 1}</div>
-                <div>{item.tracks[num].title}</div>
+                <div onClick={() => playThisTrack(num)}>
+                  {item.tracks[num].title}
+                </div>
               </div>
             )
           )}
