@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
+import PlaylistBox from "../PlaylistBox/PlaylistBox";
 // import TrackBox from "../TrackBox/TrackBox";
 import "./ArtistPagePlaylists.scss";
 
@@ -129,6 +130,7 @@ function ArtistPagePlaylists() {
           <div className="artist-body">
             <div className={"recent"}>
               <text>My Playlists</text>
+              <PlaylistBox />
               {/* <div ref={ref} className="inView">
                 text
               </div> */}
