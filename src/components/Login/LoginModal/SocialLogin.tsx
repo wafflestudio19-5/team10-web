@@ -28,7 +28,7 @@ const SocialLogin = ({
   const responseGoogle = (response: any) => {
     axios({
       method: "put",
-      url: "/google/callback",
+      url: "/google/callback", // /socialaccount 로 바꿔야함
       data: {
         email: response.profileObj.email,
         family_name:
@@ -64,7 +64,7 @@ const SocialLogin = ({
   const responseFacebook = (response: any) => {
     axios({
       method: "put",
-      url: "/google/callback",
+      url: "/google/callback", // /socialaccount 로 바꿔야함
       data: {
         email: response.email,
         name: response.name,
