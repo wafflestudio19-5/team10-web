@@ -1,16 +1,16 @@
-import "./ArtistPage.scss";
+import "./ArtistPagePlaylists.scss";
 import { Grid } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import EditModal from "./EditModal/EditModal";
+import EditModal from "../EditModal/EditModal";
 import toast from "react-hot-toast";
-import TrackBox from "./TrackBox/TrackBox";
-import { useAuthContext } from "../../context/AuthContext";
+import TrackBox from "../TrackBox/TrackBox";
+import { useAuthContext } from "../../../context/AuthContext";
 import { useInView } from "react-intersection-observer";
 import { useHistory } from "react-router";
 
-function ArtistPage() {
+function ArtistPagePlaylists() {
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -420,4 +420,4 @@ function ArtistPage() {
   }
 }
 
-export default ArtistPage;
+export default ArtistPagePlaylists;
