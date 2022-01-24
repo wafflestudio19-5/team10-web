@@ -44,6 +44,7 @@ function App() {
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
           <Route exact path="/:permalink" component={ArtistPageTracks} />
+          <Route exact path="/:permalink/tracks" component={ArtistPageTracks} />
           <Route exact path="/:username/:trackname" component={TrackPage} />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}

@@ -244,7 +244,7 @@ function ArtistPageHeader() {
           <div className={"menu-left"}>
             <a onClick={() => history.push(`/${permalink}`)}>All</a>
             <a>Popular tracks</a>
-            <a>Tracks</a>
+            <a onClick={() => history.push(`/${permalink}/tracks`)}>Tracks</a>
             <a>Albums</a>
             <a>Playlists</a>
             <a>Reposts</a>
