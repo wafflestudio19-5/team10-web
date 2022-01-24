@@ -1,36 +1,25 @@
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
-import { useHistory } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
-import "./TrackBox.scss";
+import "./PlaylistBox.scss";
 
-function TrackBox({
-  item,
-  artistName,
-  myId,
-  user,
-  currentPlay,
-  setCurrentPlay,
-}: any) {
+function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
   const { userSecret } = useAuthContext();
-  const history = useHistory();
-
-  const [isLiking, setIsLiking] = useState<boolean>(false);
-  const [reposted, setReposted] = useState<boolean>(false);
-  const [comment, setComment] = useState<string>();
-  const [likes, setLikes] = useState<number>(item.like_count);
-  const [reposts, setReposts] = useState<number>(item.repost_count);
 
   const player = useRef<any>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
+  const [trackIndex, setTrackIndex] = useState<number>(0);
+
+  const [isLiking, setIsLiking] = useState<boolean>(false);
+  const [reposted, setReposted] = useState<boolean>(false);
+  const [likes, setLikes] = useState<number>(item.like_count);
+  const [reposts, setReposts] = useState<number>(item.repost_count);
 
   const playMusic = () => {
     if (currentPlay !== null) {
-      // const current = document.getElementsByClassName(`player${currentPlay}`);
-      // current[0].getElementsByTagName("audio")[0].pause();
       let current = document.getElementById(`button${currentPlay}`);
       current?.click();
     }
@@ -45,10 +34,23 @@ function TrackBox({
     player.current.audio.current.pause();
   };
 
-  const likeTrack = async () => {
+  const playNextTrack = () => {
+    if (item.tracks.length === trackIndex + 1) {
+      setTrackIndex(0);
+    } else {
+      setTrackIndex(trackIndex + 1);
+    }
+  };
+
+  const playThisTrack = (num: any) => {
+    setTrackIndex(num);
+    playMusic();
+  };
+
+  const likePlaylist = async () => {
     const config: any = {
       method: "post",
-      url: `/likes/tracks/${item.id}`,
+      url: `/likes/sets/${item.id}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
@@ -58,14 +60,14 @@ function TrackBox({
       setIsLiking(true);
       setLikes(likes + 1);
     } catch (error) {
-      toast("트랙 좋아요 실패");
+      toast("플레이리스트 좋아요 실패");
     }
   };
 
-  const unlikeTrack = async () => {
+  const unlikePlaylist = async () => {
     const config: any = {
       method: "delete",
-      url: `/likes/tracks/${item.id}`,
+      url: `/likes/sets/${item.id}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
@@ -75,14 +77,14 @@ function TrackBox({
       setIsLiking(false);
       setLikes(likes - 1);
     } catch (error) {
-      toast("트랙 좋아요 취소 실패");
+      toast("플레이리스트 좋아요 취소 실패");
     }
   };
 
-  const repostTrack = async () => {
+  const repostPlaylist = async () => {
     const config: any = {
       method: "post",
-      url: `/reposts/tracks/${item.id}`,
+      url: `/reposts/sets/${item.id}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
@@ -92,14 +94,14 @@ function TrackBox({
       setReposted(true);
       setReposts(reposts + 1);
     } catch (error) {
-      toast("트랙 리포스트 실패");
+      toast("플레이리스트 리포스트 실패");
     }
   };
 
-  const unrepostTrack = async () => {
+  const unrepostPlaylist = async () => {
     const config: any = {
       method: "delete",
-      url: `/reposts/tracks/${item.id}`,
+      url: `/reposts/sets/${item.id}`,
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
@@ -109,101 +111,17 @@ function TrackBox({
       setReposted(false);
       setReposts(reposts - 1);
     } catch (error) {
-      toast("트랙 리포스트 취소 실패");
+      toast("플레이리스트 리포스트 취소 실패");
     }
   };
-
-  const postComment = (e: any) => {
-    if (e.key === "Enter") {
-      axios
-        .post(
-          `/tracks/${item.id}/comments`,
-          {
-            content: comment,
-          },
-          {
-            headers: {
-              Authorization: `JWT ${userSecret.jwt}`,
-            },
-          }
-        )
-        .then(() => {
-          toast("댓글 작성 완료");
-          setComment("");
-        })
-        .catch(() => {
-          toast("댓글 작성 실패");
-        });
-    }
-  };
-
-  useEffect(() => {
-    player.current.audio.current.pause();
-
-    const getIsLiking = () => {
-      axios.get(`/users/${myId}/likes/tracks`).then((res) => {
-        const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
-          (_, i) => i + 1
-        );
-        pages.map((page) => {
-          axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
-            const filter1 = res.data.results.filter(
-              (track: any) => track.id === item.id
-            );
-            if (filter1.length !== 0) {
-              setIsLiking(true);
-            }
-          });
-        });
-      });
-    };
-
-    const getReposted = () => {
-      axios.get(`/users/${myId}/reposts/tracks`).then((res) => {
-        const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
-          (_, i) => i + 1
-        );
-        pages.map((page) => {
-          axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
-            const filter2 = res.data.results.filter(
-              (track: any) => track.id === item.id
-            );
-            if (filter2.length !== 0) {
-              setReposted(true);
-            }
-          });
-        });
-      });
-    };
-
-    getIsLiking();
-    getReposted();
-  }, []);
 
   return (
     <div className={"recent-track"}>
-      {item.image !== null && (
-        <img
-          className="track-Img"
-          src={item.image}
-          alt={"trackImg"}
-          onClick={() =>
-            history.push(`/${userSecret.permalink}/${item.permalink}`)
-          }
-        />
-      )}
-      {item.image === null && (
-        <img
-          className="track-Img"
-          src="/default.track_image.svg"
-          alt={"trackImg"}
-          onClick={() =>
-            history.push(`/${userSecret.permalink}/${item.permalink}`)
-          }
-        />
-      )}
+      <img
+        className="track-Img"
+        src="/default.track_image.svg"
+        alt={"trackImg"}
+      />
       <div className={"track-right"}>
         <div className={"track-info"}>
           {!isPlaying && (
@@ -239,33 +157,37 @@ function TrackBox({
             </button>
           )}
           <div className={"track-info-name"}>
-            <div className={"artistname"}>{artistName}</div>
+            <div className={"artistname"}>{item.creator.display_name}</div>
             <div className={"trackname"}>{item.title}</div>
           </div>
         </div>
         <AudioPlayer
-          className={`player${item.id}`}
-          src={item.audio}
-          key={item.id}
           ref={player}
+          className={`player${item.tracks.id}`}
+          key={item.tracks.id}
+          src={item.tracks[trackIndex].audio}
+          onEnded={playNextTrack}
         />
-        <div className={"comment"}>
-          {user.image_profile === null && (
-            <img src="img/user_img.png" alt="me" />
+        {item.tracks !== null &&
+          Array.from({ length: item.tracks.length }, (_, i) => i).map(
+            (num: any) => (
+              <div className={"playlist-track"}>
+                {item.tracks[num].image === null && (
+                  <img src="/default.track_image.svg" alt="me" />
+                )}
+                {item.tracks[num].image !== null && (
+                  <img src={item.tracks[num].image} alt="me" />
+                )}
+                <div>{num + 1}</div>
+                <div onClick={() => playThisTrack(num)}>
+                  {item.tracks[num].title}
+                </div>
+              </div>
+            )
           )}
-          {user.image_profile !== null && (
-            <img src={user.image_profile} alt="me" />
-          )}
-          <input
-            placeholder={"Write a comment and Press Enter"}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            onKeyPress={postComment}
-          />
-        </div>
         <div className={"track-buttons"}>
           {isLiking === false && (
-            <button onClick={likeTrack}>
+            <button onClick={likePlaylist}>
               <img
                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjAuMyAoNzg5MSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+DQogICAgPHRpdGxlPnN0YXRzX2xpa2VzX2dyZXk8L3RpdGxlPg0KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPg0KICAgIDxkZWZzLz4NCiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBza2V0Y2g6dHlwZT0iTVNQYWdlIj4NCiAgICAgICAgPHBhdGggZD0iTTEwLjgwNDk4MTgsMyBDOC43ODQ3MTU3OSwzIDguMDAwNjUyODUsNS4zNDQ4NjQ4NiA4LjAwMDY1Mjg1LDUuMzQ0ODY0ODYgQzguMDAwNjUyODUsNS4zNDQ4NjQ4NiA3LjIxMjk2Mzg3LDMgNS4xOTYwNDQ5NCwzIEMzLjQ5NDMxMzE4LDMgMS43NDgzNzQsNC4wOTU5MjY5NCAyLjAzMDA4OTk2LDYuNTE0MzA1MzIgQzIuMzczNzI3NjUsOS40NjY3Mzc3NSA3Ljc1NDkxOTE3LDEyLjk5Mjg3MzggNy45OTMxMDk1OCwxMy4wMDEwNTU3IEM4LjIzMTI5OTk4LDEzLjAwOTIzNzggMTMuNzMwOTgyOCw5LjI3ODUzNzggMTMuOTgxNDU5LDYuNTAxMjQwNSBDMTQuMTg3ODY0Nyw0LjIwMDk3MDIzIDEyLjUwNjcxMzYsMyAxMC44MDQ5ODE4LDMgWiIgaWQ9IkltcG9ydGVkLUxheWVycyIgZmlsbD0icmdiKDM0LCAzNCwgMzQpIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIi8+DQogICAgPC9nPg0KPC9zdmc+DQo="
                 alt="heart"
@@ -274,7 +196,7 @@ function TrackBox({
             </button>
           )}
           {isLiking === true && (
-            <button className="liked-button" onClick={unlikeTrack}>
+            <button className="liked-button" onClick={unlikePlaylist}>
               <img
                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjAuMyAoNzg5MSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+DQogICAgPHRpdGxlPnN0YXRzX2xpa2VzX2dyZXk8L3RpdGxlPg0KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPg0KICAgIDxkZWZzLz4NCiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBza2V0Y2g6dHlwZT0iTVNQYWdlIj4NCiAgICAgICAgPHBhdGggZD0iTTEwLjgwNDk4MTgsMyBDOC43ODQ3MTU3OSwzIDguMDAwNjUyODUsNS4zNDQ4NjQ4NiA4LjAwMDY1Mjg1LDUuMzQ0ODY0ODYgQzguMDAwNjUyODUsNS4zNDQ4NjQ4NiA3LjIxMjk2Mzg3LDMgNS4xOTYwNDQ5NCwzIEMzLjQ5NDMxMzE4LDMgMS43NDgzNzQsNC4wOTU5MjY5NCAyLjAzMDA4OTk2LDYuNTE0MzA1MzIgQzIuMzczNzI3NjUsOS40NjY3Mzc3NSA3Ljc1NDkxOTE3LDEyLjk5Mjg3MzggNy45OTMxMDk1OCwxMy4wMDEwNTU3IEM4LjIzMTI5OTk4LDEzLjAwOTIzNzggMTMuNzMwOTgyOCw5LjI3ODUzNzggMTMuOTgxNDU5LDYuNTAxMjQwNSBDMTQuMTg3ODY0Nyw0LjIwMDk3MDIzIDEyLjUwNjcxMzYsMyAxMC44MDQ5ODE4LDMgWiIgaWQ9IkltcG9ydGVkLUxheWVycyIgZmlsbD0icmdiKDI1NSwgODUsIDApIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIi8+DQogICAgPC9nPg0KPC9zdmc+DQo="
                 alt="heart"
@@ -283,7 +205,7 @@ function TrackBox({
             </button>
           )}
           {reposted === false && (
-            <button onClick={repostTrack}>
+            <button onClick={repostPlaylist}>
               <img
                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggMy4wLjMgKDc4OTEpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPg0KICA8dGl0bGU+c3RhdHNfcmVwb3N0PC90aXRsZT4NCiAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogIDxkZWZzLz4NCiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+DQogICAgPGcgaWQ9InJlcG9zdC0iIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9InJnYig1MSwgNTEsIDUxKSI+DQogICAgICA8cGF0aCBkPSJNMiw2IEwyLDExLjAwMDM4NSBDMiwxMi4xMDQ3NDE5IDIuOTAxOTUwMzYsMTMgNC4wMDg1MzAyLDEzIEwxMC45OTU3MzQ5LDEzIEwxMC45OTU3MzQ5LDEzIEwxMCwxMyBMMTAsMTMgTDgsMTEgTDQsMTEgTDQsNiBMMy41LDYgTDYsNiBMMywzIEwwLDYgTDIsNiBMMiw2IFogTTYsMyBMNS4wMDQyNjUxLDMgTDExLjk5MTQ2OTgsMyBDMTMuMDk4MDQ5NiwzIDE0LDMuODk1MjU4MTIgMTQsNC45OTk2MTQ5OCBMMTQsMTAgTDEyLDEwIEwxMiw1IEw4LDUgTDYsMyBaIE0xNiwxMCBMMTAsMTAgTDEzLDEzIEwxNiwxMCBaIiBpZD0iUmVjdGFuZ2xlLTQzIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIi8+DQogICAgPC9nPg0KICA8L2c+DQo8L3N2Zz4NCg=="
                 alt="repost"
@@ -292,7 +214,7 @@ function TrackBox({
             </button>
           )}
           {reposted === true && (
-            <button className="reposted-button" onClick={unrepostTrack}>
+            <button className="reposted-button" onClick={unrepostPlaylist}>
               <img
                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggMy4wLjMgKDc4OTEpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPg0KICA8dGl0bGU+c3RhdHNfcmVwb3N0PC90aXRsZT4NCiAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogIDxkZWZzLz4NCiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+DQogICAgPGcgaWQ9InJlcG9zdC0iIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9InJnYigyNTUsIDg1LCAwKSI+DQogICAgICA8cGF0aCBkPSJNMiw2IEwyLDExLjAwMDM4NSBDMiwxMi4xMDQ3NDE5IDIuOTAxOTUwMzYsMTMgNC4wMDg1MzAyLDEzIEwxMC45OTU3MzQ5LDEzIEwxMC45OTU3MzQ5LDEzIEwxMCwxMyBMMTAsMTMgTDgsMTEgTDQsMTEgTDQsNiBMMy41LDYgTDYsNiBMMywzIEwwLDYgTDIsNiBMMiw2IFogTTYsMyBMNS4wMDQyNjUxLDMgTDExLjk5MTQ2OTgsMyBDMTMuMDk4MDQ5NiwzIDE0LDMuODk1MjU4MTIgMTQsNC45OTk2MTQ5OCBMMTQsMTAgTDEyLDEwIEwxMiw1IEw4LDUgTDYsMyBaIE0xNiwxMCBMMTAsMTAgTDEzLDEzIEwxNiwxMCBaIiBpZD0iUmVjdGFuZ2xlLTQzIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIi8+DQogICAgPC9nPg0KICA8L2c+DQo8L3N2Zz4NCg=="
                 alt="repost"
@@ -320,4 +242,4 @@ function TrackBox({
   );
 }
 
-export default TrackBox;
+export default PlaylistBox;
