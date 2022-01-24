@@ -10,15 +10,14 @@ import styles from "./App.module.scss";
 import Likes from "./components/Library/Likes/Likes";
 import Playlists from "./components/Library/Playlists/Playlists";
 import Albums from "./components/Library/Albums/Albums";
-import Stations from "./components/Library/Stations/Stations";
 import Following from "./components/Library/Following/Following";
-import History from "./components/Library/History/History";
 import { AuthProvider } from "./context/AuthContext";
 import Upload from "./components/Upload/Upload";
 import YourTracks from "./components/Upload/YourTracks/YourTracks";
 import TrackBar from "./components/ArtistPage/Track/TrackBar/TrackBar";
 import AudioTag from "./components/ArtistPage/Track/Audio/AudioTag";
 import axios from "axios";
+import SetPage from "./components/ArtistPage/Set/SetPage";
 import ArtistPageTracks from "./components/ArtistPage/ArtistPageTracks/ArtistPageTracks";
 import ArtistPagePlaylists from "./components/ArtistPage/ArtistPagePlaylists/ArtistPagePlaylists";
 
@@ -39,9 +38,7 @@ function App() {
           <Route exact path="/you/likes" component={Likes} />
           <Route exact path="/you/sets" component={Playlists} />
           <Route exact path="/you/albums" component={Albums} />
-          <Route exact path="/you/stations" component={Stations} />
           <Route exact path="/you/following" component={Following} />
-          <Route exact path="/you/history" component={History} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
           <Route exact path="/:permalink" component={ArtistPageTracks} />
@@ -52,6 +49,7 @@ function App() {
             component={ArtistPagePlaylists}
           />
           <Route exact path="/:username/:trackname" component={TrackPage} />
+          <Route exact path="/:username/sets/:playlist" component={SetPage} />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
         {location.pathname !== "/" && <AudioTag />}

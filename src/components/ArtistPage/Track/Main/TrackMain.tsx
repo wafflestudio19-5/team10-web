@@ -50,6 +50,7 @@ const TrackMain = ({
   userMe,
   isMyTrack,
   setEditModal,
+  openPlaylistModal,
 }: {
   track: ITrack;
   artist: IArtist;
@@ -57,6 +58,7 @@ const TrackMain = ({
   fetchTrack: () => void;
   isMyTrack: boolean | undefined;
   setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
+  openPlaylistModal: () => void;
 }) => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
@@ -230,6 +232,7 @@ const TrackMain = ({
             setEditModal={setEditModal}
             fetchLikers={fetchLikers}
             fetchReposters={fetchReposters}
+            openPlaylistModal={openPlaylistModal}
           />
         </div>
         <div className={styles.infoComments}>
@@ -260,14 +263,14 @@ const TrackMain = ({
         {/* <RelatedTracks />
         <InPlaylists /> */}
         <LikeUsers
-          track={track}
-          artist={artist}
+          //   track={track}
+          //   artist={artist}
           trackLikers={trackLikers}
           likersCount={likersCount}
         />
         <RepostUsers
-          track={track}
-          artist={artist}
+          //   track={track}
+          //   artist={artist}
           trackReposters={trackReposters}
           repostersCount={repostersCount}
         />

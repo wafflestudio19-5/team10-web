@@ -5,7 +5,6 @@ import {
 } from "../components/ArtistPage/Track/TrackBar/TrackBar";
 // import { IArtist } from "../components/ArtistPage/Track/TrackPage";
 
-// 토큰 타입 지정
 interface ITrackContext {
   trackDuration: number; // 현재 재생되고 있는 트랙 길이
   setTrackDuration: React.Dispatch<React.SetStateAction<number>>;
@@ -24,6 +23,8 @@ interface ITrackContext {
   setTrackBarArtist: React.Dispatch<React.SetStateAction<ITrackBarArtist>>;
   trackBarTrack: ITrackBarTrack;
   setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrackBarTrack>>;
+  trackBarPlaylist: ITrackBarTrack[];
+  setTrackBarPlaylist: React.Dispatch<React.SetStateAction<ITrackBarTrack[]>>;
 }
 
 const TrackContext = createContext<ITrackContext>({
@@ -54,14 +55,16 @@ const TrackContext = createContext<ITrackContext>({
     permalink: "",
     audio: "",
     image: "",
-    like_count: 0,
-    repost_count: 0,
-    comment_count: 0,
-    genre: "",
-    count: 0,
-    is_private: false,
+    // like_count: 0,
+    // repost_count: 0,
+    // comment_count: 0,
+    // genre: "",
+    // count: 0,
+    // is_private: false,
   },
   setTrackBarTrack: () => {},
+  trackBarPlaylist: [],
+  setTrackBarPlaylist: () => [],
 });
 
 export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
@@ -85,14 +88,17 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     title: "",
     permalink: "",
     audio: "",
-    comment_count: 0,
-    count: 0,
-    genre: null,
+    // comment_count: 0,
+    // count: 0,
+    // genre: null,
     image: "",
-    like_count: 0,
-    repost_count: 0,
-    is_private: false,
+    // like_count: 0,
+    // repost_count: 0,
+    // is_private: false,
   });
+  const [trackBarPlaylist, setTrackBarPlaylist] = useState<ITrackBarTrack[]>(
+    []
+  );
 
   return (
     <TrackContext.Provider
@@ -114,6 +120,8 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
         setTrackBarArtist,
         trackBarTrack,
         setTrackBarTrack,
+        trackBarPlaylist,
+        setTrackBarPlaylist,
       }}
     >
       {children}

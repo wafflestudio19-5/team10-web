@@ -1,0 +1,18 @@
+.albumImage {
+  position: absolute;
+  top: 20px;
+  width: 340px;
+  height: 340px;
+  right: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  .playlistInfo {
+    overflow-x: scroll;
+  }
+  img {
+    width: 340px;
+    height: 340px;
+  }
+}

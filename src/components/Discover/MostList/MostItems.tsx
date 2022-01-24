@@ -91,6 +91,7 @@ const MostItems = ({
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
+    toast.error("아직 구현되지 않은 기능입니다");
   };
   useEffect(() => {
     if (trackId <= 999990 && likeListId[0] !== -1) {

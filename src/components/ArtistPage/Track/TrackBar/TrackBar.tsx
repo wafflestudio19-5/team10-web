@@ -17,6 +17,7 @@ import { MdVolumeUp, MdPlaylistPlay } from "react-icons/md";
 import { useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { useTrackContext } from "../../../../context/TrackContext";
+import toast from "react-hot-toast";
 // import { useAuthContext } from "../../../../context/AuthContext";
 // import axios from "axios";
 // import { IFollowings } from "../Main/ListenArtistInfo";
@@ -31,12 +32,12 @@ export interface ITrackBarTrack {
   permalink: string;
   audio: string;
   image: string | null;
-  like_count: number;
-  repost_count: number;
-  comment_count: number;
-  genre: string | null;
-  count: number;
-  is_private: boolean;
+  //   like_count: number;
+  //   repost_count: number;
+  //   comment_count: number;
+  //   genre: string | null;
+  //   count: number;
+  //   is_private: boolean;
 }
 export interface ITrackBarArtist {
   display_name: string;
@@ -66,6 +67,9 @@ const TrackBar = () => {
     setLoop,
     trackBarArtist,
     trackBarTrack,
+    setTrackBarTrack,
+    // setTrackBarArtist,
+    trackBarPlaylist,
   } = useTrackContext();
   //   const { userSecret } = useAuthContext();
 
@@ -323,47 +327,62 @@ const TrackBar = () => {
 
   //   console.log();
 
-  //   const nextTrack = () => {
-  //     setPlayingTime(0);
-  //     setTrackIsPlaying(true);
-  //     setAudioSrc(
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-  //     );
-  //     audioPlayer.current.src =
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+  const nextTrack = () => {
+    if (trackBarPlaylist.length === 0) {
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
+    }
+    const current = trackBarPlaylist.findIndex(
+      (track) => track.id === trackBarTrack.id
+    );
+    if (current === trackBarPlaylist.length - 1) {
+      return toast.error("다음 트랙이 없습니다");
+    }
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setTrackBarTrack(trackBarPlaylist[current + 1]);
+    audioPlayer.current.src = trackBarPlaylist[current + 1].audio;
+    audioPlayer.current.load();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
+  };
 
-  //     audioPlayer.current.load();
-  //     setTimeout(() => {
-  //       audioPlayer.current.play();
-  //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
-  //     }, 1);
-  //   };
+  const prevTrack = () => {
+    if (trackBarPlaylist.length === 0) {
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
+    }
+    const current = trackBarPlaylist.findIndex(
+      (track) => track.id === trackBarTrack.id
+    );
+    if (current === 0) {
+      return toast.error("이전 트랙이 없습니다");
+    }
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setTrackBarTrack(trackBarPlaylist[current - 1]);
+    audioPlayer.current.src = trackBarPlaylist[current - 1].audio;
+    audioPlayer.current.load();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
+  };
 
-  //   const prevTrack = () => {
-  //     setPlayingTime(0);
-  //     setTrackIsPlaying(true);
-  //     setAudioSrc(
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-  //     );
-  //     audioPlayer.current.src =
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-
-  //     audioPlayer.current.load();
-  //     setTimeout(() => {
-  //       audioPlayer.current.play();
-  //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
-  //     }, 1);
-  //   };
+  if (audioPlayer.current?.ended) {
+    nextTrack();
+  }
 
   return (
     <>
       {!!audioSrc.length && (
         <div className={styles.container}>
           <div className={styles.main}>
-            <button
-              className={styles.previousTrack}
-              // onClick={prevTrack}
-            >
+            <button className={styles.previousTrack} onClick={prevTrack}>
               <IoPlaySkipBackSharp />
             </button>
             {trackIsPlaying ? (
@@ -375,10 +394,7 @@ const TrackBar = () => {
                 <IoPlaySharp />
               </button>
             )}
-            <button
-              className={styles.nextTrack}
-              // onClick={nextTrack}
-            >
+            <button className={styles.nextTrack} onClick={nextTrack}>
               <IoPlaySkipForwardSharp />
             </button>
             <button className={styles.shuffle}>

@@ -109,12 +109,12 @@ const TrackHeader = ({
         permalink: track.permalink,
         audio: track.audio,
         image: track.image,
-        like_count: track.like_count,
-        repost_count: track.repost_count,
-        comment_count: track.comment_count,
-        genre: track.genre,
-        count: track.count,
-        is_private: track.is_private,
+        // like_count: track.like_count,
+        // repost_count: track.repost_count,
+        // comment_count: track.comment_count,
+        // genre: track.genre,
+        // count: track.count,
+        // is_private: track.is_private,
       });
       setIsSameTrack(true);
       audioPlayer.current.src = track.audio;

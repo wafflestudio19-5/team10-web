@@ -35,7 +35,7 @@ const TrackModal = ({
                 src={track.image || "/default.track_image.svg"}
                 alt={`${track.title}의 트랙 이미지`}
               />
-              <div />)
+              <div />
             </div>
           </main>
         </section>

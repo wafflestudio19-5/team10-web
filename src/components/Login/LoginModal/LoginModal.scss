@@ -54,6 +54,28 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
+      flex-direction: column;
+      .socialLogin {
+        background-color: rgb(255, 255, 255);
+        text-align: left;
+        color: rgba(0, 0, 0, 0.54);
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 2px 0px,
+          rgba(0, 0, 0, 0.24) 0px 0px 1px 0px;
+        padding: 0px;
+        border-radius: 2px;
+        border: 1px solid transparent;
+        font-size: 15px;
+        font-weight: 5000px;
+        padding: 0px 0px 0px 18px;
+        height: 50px;
+        margin: 12px 0 12px 0;
+        line-height: 40px;
+        .google,
+        .facebook,
+        .facebook {
+          color: #1e73ed;
+        }
+      }
     }
     .or {
       width: 400px;
