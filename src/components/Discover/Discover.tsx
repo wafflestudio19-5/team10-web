@@ -1,13 +1,14 @@
 import axios from "axios";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useHistory } from "react-router";
 import { useAuthContext } from "../../context/AuthContext";
 import { useTrackContext } from "../../context/TrackContext";
 import styles from "./Discover.module.scss";
+import FollowingList from "./FollowingList/FollowingList";
 import LikeList from "./LikeList/LikeList";
 import MostList from "./MostList/MostList";
 import NewList from "./NewList/NewList";
-import throttle from "lodash/throttle";
 
 const Discover = () => {
   const { userSecret, setUserSecret } = useAuthContext();
@@ -283,9 +284,17 @@ const Discover = () => {
       audio_length: 0,
     },
   ]);
+  const [followingList, setFollowingList] = useState([
+    {
+      id: -1,
+      permalink: "",
+      display_name: "",
+      image_profile: "",
+      follower_count: 0,
+    },
+  ]);
   const {
     setTrackIsPlaying,
-    playingTime,
     setPlayingTime,
     audioPlayer,
     setAudioSrc,
@@ -294,18 +303,18 @@ const Discover = () => {
     trackIsPlaying,
     trackBarTrack,
   } = useTrackContext();
-  const animationRef = useRef(0); // 재생 애니메이션
   const playMusic = () => {
     if (trackIsPlaying) {
       audioPlayer.current.play();
       setPlayingTime(audioPlayer.current.currentTime);
-      animationRef.current = requestAnimationFrame(whilePlaying);
     } else {
       audioPlayer.current.pause();
       setPlayingTime(audioPlayer.current.currentTime);
-      cancelAnimationFrame(animationRef.current);
     }
   };
+  const history = useHistory();
+  const goLikes = () => history.push("/you/likes");
+  const goFollowing = () => history.push("/you/following");
   const togglePlayPause = (track: any, artist: any) => {
     // 재생/일시정지 버튼 누를 때
     if (trackBarTrack.id === track.id) {
@@ -314,11 +323,9 @@ const Discover = () => {
       if (!prevValue) {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
-        animationRef.current = requestAnimationFrame(whilePlaying);
       } else {
         audioPlayer.current.pause();
         setPlayingTime(audioPlayer.current.currentTime);
-        cancelAnimationFrame(animationRef.current);
       }
     } else {
       setAudioSrc(track.audio);
@@ -330,22 +337,8 @@ const Discover = () => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
       }, 1);
-      animationRef.current = requestAnimationFrame(whilePlaying);
     }
   };
-  const whilePlaying = () => {
-    changePlayerCurrentTime();
-    animationRef.current = requestAnimationFrame(whilePlaying);
-  };
-  const changePlayerCurrentTime = useCallback(
-    throttle(() => {
-      audioPlayer.current !== null
-        ? setPlayingTime(audioPlayer.current.currentTime)
-        : null;
-    }, 30000),
-    [playingTime]
-  );
-  changePlayerCurrentTime();
   useEffect(() => {
     const checkValid = async () => {
       const jwtToken = localStorage.getItem("jwt_token");
@@ -373,11 +366,38 @@ const Discover = () => {
     fetchMostNewList();
   }, []);
   useEffect(() => {
-    console.log();
     if (likeList !== [] || likeList[0].id !== -1) {
       setLikeListId(likeList.map((item: any) => item.id));
     }
   }, [likeList]);
+  const _ = require("lodash");
+  const fetchFollowList = _.throttle(() => {
+    const asyncFetchFollwList = async () => {
+      await axios.get(`/users/${userSecret.id}/followings`).then((res) => {
+        if (res.data.next !== null) {
+          let fetchedFollowList = res.data.results;
+          const nextUrl = res.data.next.split("users")[1];
+          const recurse = (url: string) => {
+            axios.get(`users${url}`).then((r) => {
+              if (r.data.next !== null) {
+                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
+                const nextUrl = r.data.next.split("users")[1];
+                recurse(nextUrl);
+              } else {
+                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
+                setFollowingList(fetchedFollowList);
+              }
+            });
+          };
+          recurse(nextUrl);
+        } else {
+          let fetchedFollowList = res.data.results;
+          setFollowingList(fetchedFollowList);
+        }
+      });
+    };
+    asyncFetchFollwList();
+  }, 200);
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
@@ -387,8 +407,8 @@ const Discover = () => {
             .then((res) => {
               setLikeCount(res.data.count);
               setLikeList(res.data.results);
-              console.log(res.data);
             });
+          fetchFollowList();
         } catch {
           toast.error("like list 불러오기를 실패하였습니다");
         }
@@ -430,7 +450,6 @@ const Discover = () => {
               togglePlayPause={togglePlayPause}
               playMusic={playMusic}
             />
-            {/* 아티스트 프로필이 있어야 가능 */}
           </div>
           <div className={styles.new}>
             <h2>New tracks</h2>
@@ -458,7 +477,6 @@ const Discover = () => {
                 togglePlayPause={togglePlayPause}
                 playMusic={playMusic}
               />
-              {/* 아티스트 프로필이 있어야 가능 */}
             </div>
           </div>
         </div>
@@ -466,7 +484,7 @@ const Discover = () => {
           <div className={styles.likes}>
             <div className={styles.header}>
               🤍 {likeCount} likes
-              <button>View all</button>
+              <button onClick={goLikes}>View all</button>
             </div>
             <LikeList
               likeList={likeList}
@@ -479,9 +497,12 @@ const Discover = () => {
           <div className={styles.following}>
             <div className={styles.header}>
               📅 following artists
-              <button>View all</button>
+              <button onClick={goFollowing}>View all</button>
             </div>
-            {/* 이자리에 following artists 리스트 컴포넌트 */}
+            <FollowingList
+              followingList={followingList}
+              fetchFollowList={fetchFollowList}
+            />
           </div>
         </div>
       </div>

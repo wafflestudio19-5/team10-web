@@ -98,6 +98,10 @@ const LikeItems = ({
       })
       .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };
+  const clickDots = (e: any) => {
+    e.stopPropagation();
+    toast.error("아직 구현되지 않은 기능입니다");
+  };
   return (
     <div className={styles.itemWrapper}>
       <div className={styles.imgWrapper}>
@@ -186,7 +190,7 @@ const LikeItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              <BsThreeDots className={styles.details} />
+              <BsThreeDots className={styles.details} onClick={clickDots} />
             </div>
           </>
         ) : (
@@ -199,7 +203,7 @@ const LikeItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              <BsThreeDots className={styles.details} />
+              <BsThreeDots className={styles.details} onClick={clickDots} />
             </div>
           </>
         )}

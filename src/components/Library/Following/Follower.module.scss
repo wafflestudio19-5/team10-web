@@ -1,0 +1,47 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 170px;
+  height: 250px;
+  margin: 16px;
+  .image {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .link {
+    font-size: 16px;
+    text-decoration: none;
+    color: #5f5f5f;
+    font-weight: 300;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .follower_count {
+    font-size: 14px;
+    color: #999999;
+  }
+  .button {
+    opacity: 0;
+    border: #ff3300 1px solid;
+    border-radius: 3px;
+    background-color: white;
+    color: #ff3300;
+    text-align: center;
+    font-size: 14px;
+    .followed {
+      color: #ff3300;
+    }
+  }
+  &:hover {
+    .button {
+      opacity: 1;
+    }
+  }
+}

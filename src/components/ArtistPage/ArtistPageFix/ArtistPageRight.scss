@@ -1,0 +1,20 @@
+.artist-info {
+    width: 300px;
+    height: fit-content;
+  
+    .artist-info-text {
+      color: #999;
+      
+      &:hover {
+        color: #333;
+      }
+    }
+  
+    div {
+      font-size: 12px;
+    }
+  
+    text {
+      font-size: 20px;
+    }
+  }

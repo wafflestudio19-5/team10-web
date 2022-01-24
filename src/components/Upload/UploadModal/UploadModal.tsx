@@ -4,7 +4,16 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadModal.scss";
 
-function UploadModal({ selectedFile, setModal }: any) {
+function UploadModal({
+  // num,
+  selectedFile,
+  setModal,
+}: // selectedNum,
+// cancelCount,
+// setCancelCount,
+// numArray,
+// setNumArray,
+any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
@@ -39,6 +48,16 @@ function UploadModal({ selectedFile, setModal }: any) {
     setTPermalink(event.target.value);
   };
 
+  const cancelModal = () => {
+    // setCancelCount(cancelCount + 1);
+    // if (cancelCount + 1 === selectedNum) {
+    //   setModal(false);
+    // } else {
+    //   setNumArray(numArray.filter((item: any) => item !== num));
+    // }
+    setModal(false);
+  };
+
   const handleUpload = (e: any) => {
     e.preventDefault();
     const myToken = localStorage.getItem("jwt_token");
@@ -51,8 +70,12 @@ function UploadModal({ selectedFile, setModal }: any) {
             permalink: tPermalink,
             description: description,
             is_private: isPrivate,
-            audio_filename: selectedFile.name,
-            image_filename: imageFile.name,
+            audio_extension: selectedFile.name.substr(
+              -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
+            ),
+            image_extension: imageFile.name.substr(
+              -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+            ),
           },
           {
             headers: {
@@ -108,7 +131,9 @@ function UploadModal({ selectedFile, setModal }: any) {
             permalink: tPermalink,
             description: description,
             is_private: isPrivate,
-            audio_filename: selectedFile.name,
+            audio_extension: selectedFile.name.substr(
+              -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
+            ),
           },
           {
             headers: {
@@ -240,7 +265,7 @@ function UploadModal({ selectedFile, setModal }: any) {
       </div>
 
       <div className="upload-modal-button">
-        <button className="cancel-button" onClick={() => setModal(false)}>
+        <button className="cancel-button" onClick={cancelModal}>
           Cancel
         </button>
         <button className="save-button" onClick={handleUpload}>

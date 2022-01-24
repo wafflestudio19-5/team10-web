@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@greatsumini/react-facebook-login": "^3.0.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -16,11 +17,13 @@
     "color-thief-react": "^2.1.0",
     "colorthief": "^2.3.2",
     "dayjs": "^1.10.7",
+    "instagram-login-react": "^2.0.0",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-audio-player": "^0.17.0",
     "react-color-extractor": "^1.1.2",
     "react-confirm-alert": "^2.7.0",
+    "react-datepicker": "^4.6.0",
     "react-dayjs": "^0.3.2",
     "react-dom": "^17.0.2",
     "react-google-login": "^5.2.2",
@@ -69,6 +72,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-datepicker": "^4.3.4",
     "@types/react-router": "^5.1.17",
     "@types/wavesurfer.js": "^5.2.2",
     "babel-eslint": "^10.1.0",
