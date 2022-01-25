@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router";
+import { useTrackContext } from "../../../context/TrackContext";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
 import TrackBox from "../TrackBox/TrackBox";
@@ -139,6 +140,53 @@ function ArtistPageTracks() {
     }
   }, [inView]);
 
+  // 하단바 재생관련
+  const {
+    setTrackIsPlaying,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    trackIsPlaying,
+    trackBarTrack,
+  } = useTrackContext();
+
+  const playMusic = () => {
+    if (trackIsPlaying) {
+      audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
+    } else {
+      audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
+    }
+  };
+
+  const togglePlayPause = (track: any, artist: any) => {
+    // 재생/일시정지 버튼 누를 때
+    if (trackBarTrack.id === track.id) {
+      const prevValue = trackIsPlaying;
+      setTrackIsPlaying(!prevValue);
+      if (!prevValue) {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else {
+        audioPlayer.current.pause();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }
+    } else {
+      setAudioSrc(track.audio);
+      setTrackIsPlaying(true);
+      setTrackBarArtist(artist);
+      setTrackBarTrack(track);
+      audioPlayer.current.src = track.audio;
+      setTimeout(() => {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }, 1);
+    }
+  };
+
   if (isLoading || user === undefined) {
     return <div>Loading...</div>;
   } else {
@@ -166,6 +214,8 @@ function ArtistPageTracks() {
                     myPlaylist={myPlaylist}
                     modalPage={modalPage}
                     getMyPlaylist={getMyPlaylist}
+                    togglePlayPause={togglePlayPause}
+                    playMusicBar={playMusic}
                   />
                 ))}
               <div ref={ref} className="inView">

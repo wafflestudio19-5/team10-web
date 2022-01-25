@@ -5,6 +5,7 @@ import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useTrackContext } from "../../../context/TrackContext";
 import AddToPlaylist from "../AddToPlaylist/AddToPlaylist";
 import "./TrackBox.scss";
 
@@ -18,6 +19,8 @@ function TrackBox({
   myPlaylist,
   modalPage,
   getMyPlaylist,
+  togglePlayPause,
+  playMusicBar,
 }: any) {
   const { userSecret } = useAuthContext();
   const history = useHistory();
@@ -32,24 +35,6 @@ function TrackBox({
   const [isPlaying, setIsPlaying] = useState<boolean>();
 
   const [playlistModal2, setPlaylistModal2] = useState<boolean>(false);
-
-  const playMusic = () => {
-    if (currentPlay !== null) {
-      // const current = document.getElementsByClassName(`player${currentPlay}`);
-      // current[0].getElementsByTagName("audio")[0].pause();
-      let current = document.getElementById(`button${currentPlay}`);
-      current?.click();
-    }
-    setIsPlaying(true);
-    player.current.audio.current.play();
-    setCurrentPlay(item.id);
-  };
-
-  const pauseMusic = () => {
-    setCurrentPlay(null);
-    setIsPlaying(false);
-    player.current.audio.current.pause();
-  };
 
   const likeTrack = async () => {
     const config: any = {
@@ -188,6 +173,57 @@ function TrackBox({
     getReposted();
   }, []);
 
+  // 하단바 재생 관련
+  const [barPlaying, setBarPlaying] = useState(false);
+  const { trackIsPlaying, trackBarTrack } = useTrackContext();
+
+  const handlePlay = (e: any) => {
+    e.stopPropagation();
+    togglePlayPause(item, user);
+    trackBarTrack.id === item.id
+      ? setBarPlaying(!trackIsPlaying)
+      : setBarPlaying(true);
+  };
+
+  const playMusic = (e: any) => {
+    if (barPlaying) {
+      handlePlay(e);
+    }
+    if (currentPlay !== null) {
+      // const current = document.getElementsByClassName(`player${currentPlay}`);
+      // current[0].getElementsByTagName("audio")[0].pause();
+      let current = document.getElementById(`button${currentPlay}`);
+      current?.click();
+    }
+    setIsPlaying(true);
+    player.current.audio.current.play();
+    setCurrentPlay(item.id);
+    handlePlay(e);
+  };
+
+  const pauseMusic = (e: any) => {
+    setCurrentPlay(null);
+    setIsPlaying(false);
+    player.current.audio.current.pause();
+    handlePlay(e);
+  };
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? null : setBarPlaying(false);
+  }, [trackBarTrack]);
+
+  const moveWeb = async () => {
+    setBarPlaying(true);
+  };
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? moveWeb().then(() => playMusicBar()) : null;
+  }, []);
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? setBarPlaying(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
+
   return (
     <div className={"recent-track"}>
       {item.image !== null && (
@@ -213,7 +249,7 @@ function TrackBox({
       <div className={"track-right"}>
         <div className={"track-info"}>
           {!isPlaying && (
-            <button onClick={playMusic} className="play-button">
+            <button onClick={(e) => playMusic(e)} className="play-button">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="25"
@@ -228,7 +264,7 @@ function TrackBox({
           )}
           {isPlaying && (
             <button
-              onClick={pauseMusic}
+              onClick={(e) => pauseMusic(e)}
               id={`button${item.id}`}
               className="play-button"
             >
