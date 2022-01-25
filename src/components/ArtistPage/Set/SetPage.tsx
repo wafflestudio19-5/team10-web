@@ -22,6 +22,8 @@ export interface ISetTrack {
   is_reposted: boolean;
   permalink: string;
   title: string;
+  artist_display_name: string;
+  artist_permalink: string;
 }
 interface ITag {
   id: number;

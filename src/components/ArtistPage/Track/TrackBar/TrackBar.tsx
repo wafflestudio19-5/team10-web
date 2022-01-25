@@ -55,6 +55,8 @@ export interface ITrackBarPlaylist {
   audio: string;
   image: string | null;
   artist: number;
+  artist_display_name: string;
+  artist_permalink: string;
 }
 
 const TrackBar = () => {
