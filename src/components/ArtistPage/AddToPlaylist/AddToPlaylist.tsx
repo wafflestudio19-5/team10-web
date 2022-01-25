@@ -1,6 +1,6 @@
 import "./AddToPlaylist.scss";
 
-function AddToPlaylist({ playlistModal }: any) {
+function AddToPlaylist({ playlistModal, myPlaylist }: any) {
   // const [addOption, setAddOption] = useState<boolean>(true);
 
   return (
@@ -11,6 +11,7 @@ function AddToPlaylist({ playlistModal }: any) {
             <div>Add to playlist</div>
             <div>Create a playlist</div>
           </div>
+          {myPlaylist && myPlaylist.map((item: any) => <div>{item.title}</div>)}
         </section>
       ) : null}
     </div>

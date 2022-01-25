@@ -15,6 +15,7 @@ function TrackBox({
   user,
   currentPlay,
   setCurrentPlay,
+  myPlaylist,
 }: any) {
   const { userSecret } = useAuthContext();
   const history = useHistory();
@@ -316,6 +317,7 @@ function TrackBox({
           <AddToPlaylist
             playlistModal={playlistModal}
             setPlaylistModal={setPlaylistModal}
+            myPlaylist={myPlaylist}
           />
           {/* <button>
             <img

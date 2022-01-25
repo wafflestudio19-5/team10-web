@@ -25,6 +25,8 @@ function ArtistPageTracks() {
 
   const [currentPlay, setCurrentPlay] = useState<any>(null);
 
+  const [myPlaylist, setMyPlaylist] = useState<any>(null);
+
   const getUser = (id: any) => {
     axios
       .get(`users/${id}`)
@@ -70,6 +72,29 @@ function ArtistPageTracks() {
       });
   };
 
+  const getMyPlaylist = async (id: any) => {
+    axios
+      .get(`/users/${id}/sets`)
+      .then((res1) => {
+        const pages = Array.from(
+          { length: Math.floor(res1.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/sets?page=${page}`).then((res2) => {
+            if (myPlaylist === null) {
+              setMyPlaylist(res2.data.results);
+            } else {
+              setMyPlaylist((item: any) => [...item, ...res2.data.results]);
+            }
+          });
+        });
+      })
+      .catch(() => {
+        toast("플레이리스트 불러오기 실패");
+      });
+  };
+
   useEffect(() => {
     setIsLoading(true);
 
@@ -81,6 +106,7 @@ function ArtistPageTracks() {
       .get(`resolve?url=${myResolve}`)
       .then((res) => {
         setMyId(res.data.id);
+        getMyPlaylist(res.data.id);
       })
       .catch(() => {
         toast("유저 아이디 불러오기 실패");
@@ -138,6 +164,7 @@ function ArtistPageTracks() {
                     user={user}
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}
+                    myPlaylist={myPlaylist}
                   />
                 ))}
               <div ref={ref} className="inView">
