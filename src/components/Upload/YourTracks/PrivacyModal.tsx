@@ -44,6 +44,8 @@ const PrivacyModal = ({
       try {
         await axios(config);
         fetchYourTracks();
+        setTags("");
+        setPrivacy(undefined);
         closeModal();
         editToggle();
         toast.success(`${checkedItems[i]?.title}을 업데이트했습니다`);

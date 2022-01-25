@@ -22,6 +22,8 @@ export interface ISetTrack {
   is_reposted: boolean;
   permalink: string;
   title: string;
+  artist_display_name: string;
+  artist_permalink: string;
 }
 interface ITag {
   id: number;
@@ -50,12 +52,13 @@ export interface IPlaylist {
   is_private: boolean;
   like_count: number;
   repost_count: number;
-  image: string;
+  image: string | null;
   tracks: ISetTrack[];
   created_at: string;
   is_followed: boolean | undefined;
   is_liked: boolean | undefined;
   is_reposted: boolean | undefined;
+  track_count: number;
 }
 
 const SetPage = () => {
@@ -87,12 +90,13 @@ const SetPage = () => {
     is_private: false,
     like_count: 0,
     repost_count: 0,
-    image: "",
+    image: null,
     tracks: [],
     created_at: "",
     is_followed: undefined,
     is_liked: undefined,
     is_reposted: undefined,
+    track_count: 0,
   });
   const [noSet, setNoSet] = useState(false);
   const [isMySet, setIsMySet] = useState<undefined | boolean>(undefined);

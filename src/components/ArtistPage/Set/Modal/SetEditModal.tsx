@@ -34,6 +34,7 @@ const SetEditModal = ({
   //   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>("");
   const [permalinkList, setPermalinkList] = useState<ITrackPermalink[]>([]);
+  const [genre, setGenre] = useState<string | null | undefined>(null);
 
   const BASIC = "basic info";
   const TRACKS = "tracks";
@@ -52,7 +53,8 @@ const SetEditModal = ({
     setIsPrivate(playlist.is_private);
     // setTags(track.tags);
     setImageUrl(playlist.image);
-    setTagInput(playlist.tags.join(", "));
+    setTagInput(playlist.tags.map((tag) => tag.name).join(", "));
+    setGenre(playlist.genre?.name);
   }, [playlist]);
 
   const openFileSelector = (event: any) => {
@@ -73,6 +75,10 @@ const SetEditModal = ({
       };
       setImageFile(event.target.files[0]);
     }
+  };
+
+  const changeGenre = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setGenre(event.target.value);
   };
 
   const changeTrackPermalink = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,9 +151,8 @@ const SetEditModal = ({
           description: description,
           is_private: isPrivate,
           image_extension: imageFile.name.split(".").at(-1),
-          ...(tagInput && {
-            tags_input: tagInput.replace(/,/g, "").split(" "),
-          }),
+          tags_input: tagInput.replace(/,/g, "").split(" "),
+          genre_input: genre,
         },
       };
       try {
@@ -187,9 +192,8 @@ const SetEditModal = ({
           permalink: tPermalink,
           description: description,
           is_private: isPrivate,
-          ...(tagInput && {
-            tags_input: tagInput.replace(/,/g, "").split(" "),
-          }),
+          tags_input: tagInput.replace(/,/g, "").split(" "),
+          genre_input: genre,
         },
       };
       try {
@@ -348,10 +352,13 @@ const SetEditModal = ({
                 </div>
                 <div className={styles["upload-info-genre"]}>
                   <label>Genre</label>
-                  <select>
+                  <select
+                    onChange={(event) => changeGenre(event)}
+                    value={genre || "None"}
+                  >
                     <option value="None">None</option>
-                    <option value="Custom">Custom</option>
-                    {/* <option value="Alternative Rock">Alternative Rock</option>
+                    {/* <option value="Custom">Custom</option> */}
+                    <option value="Alternative Rock">Alternative Rock</option>
                     <option value="Ambient">Ambient</option>
                     <option value="Classical">Classical</option>
                     <option value="Country">Country</option>
@@ -384,7 +391,7 @@ const SetEditModal = ({
                     <option value="Trance">Trance</option>
                     <option value="Trap">Trap</option>
                     <option value="Triphop">Triphop</option>
-                    <option value="World">World</option> */}
+                    <option value="World">World</option>
                   </select>
                 </div>
                 <div className={styles["upload-info-tag"]}>

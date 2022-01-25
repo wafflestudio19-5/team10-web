@@ -18,8 +18,10 @@ const SetImage = ({
       <img
         ref={imgRef}
         src={
-          playlist.image ||
-          playlist.tracks[0].image ||
+          playlist?.image ||
+          (playlist?.tracks !== null &&
+            playlist.tracks.length !== 0 &&
+            playlist.tracks[0].image) ||
           "/default_track_image.svg"
         }
         alt={`${playlist.title}의 트랙 이미지`}

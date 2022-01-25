@@ -95,7 +95,7 @@ const SetMain = ({
           <div>
             {playlist.description && <SetDescription playlist={playlist} />}
             <ul className={styles.trackList}>
-              {playlist.tracks.map((track) => {
+              {playlist?.tracks?.map((track) => {
                 return (
                   <TrackList
                     track={track}

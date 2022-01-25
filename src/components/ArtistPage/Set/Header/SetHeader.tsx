@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
+  useState,
   //   useState,
 } from "react";
 import { MdOutlineCancel } from "react-icons/md";
@@ -33,6 +34,7 @@ const SetHeader = ({
   //     number | undefined
   //   >(undefined); // 트랙 길이
   //   const [trackLoading, setTrackLoading] = useState(true);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
   const setHeader = useRef<HTMLDivElement>(null);
   const {
     trackDuration,
@@ -63,8 +65,12 @@ const SetHeader = ({
     setPlayingTime(audioPlayer.current.currentTime);
     changePlayerCurrentTime();
   };
-  //   const buttonDisabled = noSet || setLoading;
-  const buttonDisabled = false;
+  useEffect(() => {
+    if (noSet || playlist?.tracks?.length === 0) {
+      setButtonDisabled(false);
+    }
+  }, [playlist.tracks]);
+  //   const buttonDisabled = false;
   const togglePlayPause = () => {
     if (playing === "before") {
       setPlaying("playing");
@@ -137,7 +143,7 @@ const SetHeader = ({
     changePlayerCurrentTime();
   }, [playingTime, audioSrc]);
   useEffect(() => {
-    if (trackIsPlaying) {
+    if (trackIsPlaying && playing !== "before") {
       setPlaying("playing");
     } else if (playing !== "before" && trackIsPlaying === false) {
       setPlaying("paused");
@@ -183,14 +189,17 @@ const SetHeader = ({
           </div>
         )}
         <div className={styles.playingTrack}>
-          {playing === "before" ? (
+          {playing === "before" && !noSet && (
             <div className={styles.trackCount}>
-              <div className={styles.countNumber}>{playlist.tracks.length}</div>
+              <div className={styles.countNumber}>
+                {playlist.tracks?.length}
+              </div>
               <div className={styles.tracks}>
-                {playlist.tracks.length === 1 ? "TRACK" : "TRACKS"}
+                {playlist.tracks?.length === 1 ? "TRACK" : "TRACKS"}
               </div>
             </div>
-          ) : (
+          )}
+          {playing !== "before" && !noSet && (
             <div className={styles.trackPlayer}>
               <div className={styles.time}>
                 <div className={styles.currentTime}>
@@ -203,12 +212,6 @@ const SetHeader = ({
                 </div>
               </div>
               <div className={styles.barContainer}>
-                {/* <audio
-                ref={headerPlayer}
-                src={trackBarTrack.audio}
-                preload="metadata"
-                onLoadedMetadata={onLoadedMetadata}
-              /> */}
                 <input
                   ref={progressBar}
                   type="range"

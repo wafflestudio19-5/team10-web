@@ -269,7 +269,7 @@ const ListenEngagement = ({
       <div className={styles.stats}>
         <div className={styles.playStats}>
           <FaPlay />
-          <span>{track.count}</span>
+          <span>{track.play_count}</span>
         </div>
         <div className={styles.likeStats}>
           <BsSuitHeartFill />

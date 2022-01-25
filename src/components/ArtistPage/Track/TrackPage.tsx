@@ -15,10 +15,10 @@ export interface ITrack {
   permalink: string;
   audio: string;
   comment_count: number;
-  count: number;
+  play_count: number;
   created_at: string;
   description: string;
-  genre: null | string;
+  genre: null | ITag;
   image: null | string;
   like_count: number;
   repost_count: number;
@@ -61,7 +61,7 @@ const TrackPage = () => {
     permalink: "",
     audio: "",
     comment_count: 0,
-    count: 0,
+    play_count: 0,
     created_at: "",
     description: "",
     genre: null,
@@ -134,7 +134,7 @@ const TrackPage = () => {
             permalink: response.data.permalink,
             audio: response.data.audio,
             comment_count: response.data.comment_count,
-            count: response.data.count,
+            play_count: response.data.play_count,
             created_at: response.data.created_at,
             description: response.data.description,
             genre: response.data.genre,

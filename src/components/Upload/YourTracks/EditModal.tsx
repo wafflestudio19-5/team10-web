@@ -33,7 +33,7 @@ const EditModal = ({
   //   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>("");
   const [permalinkList, setPermalinkList] = useState<ITrackPermalink[]>([]);
-  const [genre, setGenre] = useState<string | null>(null);
+  const [genre, setGenre] = useState<string | null | undefined>(null);
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const EditModal = ({
     // setTags(track.tags);
     setImageUrl(track.image);
     setTagInput(track.tags.join(", "));
-    setGenre(track.genre);
+    setGenre(track.genre?.name);
   }, [track]);
 
   const openFileSelector = (event: any) => {
@@ -289,7 +289,7 @@ const EditModal = ({
                 value={genre || "None"}
               >
                 <option value="None">None</option>
-                <option value="Custom">Custom</option>
+                {/* <option value="Custom">Custom</option> */}
                 <option value="Alternative Rock">Alternative Rock</option>
                 <option value="Ambient">Ambient</option>
                 <option value="Classical">Classical</option>

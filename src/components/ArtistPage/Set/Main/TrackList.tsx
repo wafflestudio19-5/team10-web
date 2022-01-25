@@ -34,7 +34,7 @@ const TrackList = ({
     audioPlayer,
     setAudioSrc,
     setTrackBarTrack,
-    // setTrackBarArtist,
+    setTrackBarArtist,
     setTrackIsPlaying,
     setTrackBarPlaylist,
     // trackBarPlaylist,
@@ -70,11 +70,11 @@ const TrackList = ({
           audioPlayer.current.src = track.audio;
           setAudioSrc(track.audio);
           audioPlayer.current.load();
-          //   setTrackBarArtist({
-          //     display_name: username,
-          //     id: userSecret.id,
-          //     permalink: userSecret.permalink,
-          //   });
+          setTrackBarArtist({
+            display_name: track.artist_display_name,
+            id: track.artist,
+            permalink: track.artist_permalink,
+          });
           setTrackBarTrack(track);
         }
         setPlay(true);
@@ -92,10 +92,11 @@ const TrackList = ({
       }
     }
   };
-  console.log(track);
+  //   console.log(track);
   const index = playlist.tracks.findIndex((element) => element.id === track.id);
-  const clickArtist = () => history.push(`/${track.artist}`);
-  const clickTrack = () => history.push(`/${track.artist}/${track.permalink}`);
+  const clickArtist = () => history.push(`/${track.artist_permalink}`);
+  const clickTrack = () =>
+    history.push(`/${track.artist_permalink}/${track.permalink}`);
   const likeTrack = async () => {
     const config: any = {
       method: track.is_liked ? "delete" : "post",
@@ -128,7 +129,7 @@ const TrackList = ({
       <div className={styles.index}>{index + 1}</div>
       <div className={styles.content}>
         <span className={styles.artistName} onClick={clickArtist}>
-          {track.artist} -
+          {track.artist_display_name} -
         </span>
         &nbsp;
         <span className={styles.trackTitle} onClick={clickTrack}>
