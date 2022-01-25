@@ -47,7 +47,7 @@ function ArtistPagePlaylists() {
   // 임의로 GET users/userid/sets가 아닌 GET sets 이용
   const getPlaylists = async (id: any, page: any) => {
     axios
-      .get(`/sets?page=${page}`)
+      .get(`/users/${id}/sets?page=${page}`)
       .then((res) => {
         if (page === 1) {
           setPlaylists(
