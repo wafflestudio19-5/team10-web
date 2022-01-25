@@ -26,6 +26,7 @@ function ArtistPageTracks() {
   const [currentPlay, setCurrentPlay] = useState<any>(null);
 
   const [myPlaylist, setMyPlaylist] = useState<any>(null);
+  const [modalPage, setModalPage] = useState<any>(null);
 
   const getUser = (id: any) => {
     axios
@@ -72,23 +73,21 @@ function ArtistPageTracks() {
       });
   };
 
-  const getMyPlaylist = async (id: any) => {
+  const getMyPlaylist = async (id: any, page: any) => {
     axios
-      .get(`/users/${id}/sets`)
-      .then((res1) => {
-        const pages = Array.from(
-          { length: Math.floor(res1.data.count / 10) + 1 },
-          (_, i) => i + 1
-        );
-        pages.map((page) => {
-          axios.get(`users/${id}/sets?page=${page}`).then((res2) => {
-            if (page === 1) {
-              setMyPlaylist(res2.data.results);
-            } else {
-              setMyPlaylist((item: any) => [...item, ...res2.data.results]);
-            }
-          });
-        });
+      .get(`/users/${id}/sets?page=${page}`)
+      .then((res) => {
+        if (page === 1) {
+          setMyPlaylist(res.data.results);
+        } else {
+          setMyPlaylist((item: any) => [...item, ...res.data.results]);
+        }
+
+        if (res.data.next === null) {
+          setModalPage(null);
+        } else {
+          setModalPage(page + 1);
+        }
       })
       .catch(() => {
         toast("플레이리스트 불러오기 실패");
@@ -106,7 +105,7 @@ function ArtistPageTracks() {
       .get(`resolve?url=${myResolve}`)
       .then((res) => {
         setMyId(res.data.id);
-        getMyPlaylist(res.data.id);
+        getMyPlaylist(res.data.id, 1);
       })
       .catch(() => {
         toast("유저 아이디 불러오기 실패");
@@ -165,6 +164,8 @@ function ArtistPageTracks() {
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}
                     myPlaylist={myPlaylist}
+                    modalPage={modalPage}
+                    getMyPlaylist={getMyPlaylist}
                   />
                 ))}
               <div ref={ref} className="inView">

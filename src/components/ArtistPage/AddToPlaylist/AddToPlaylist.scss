@@ -1,4 +1,4 @@
-.playlistModal {
+.playlistModal2 {
     background-color: rgb(242, 242, 242, 0.9);
     display: none;
     position: fixed;
@@ -22,17 +22,30 @@
         width: 500px;
         height: 40px;
         display: flex;
-        flex-direction: row;
-        margin: 20px 26px;
+        justify-content: space-between;
+        margin: 20px 25px;
         border-bottom: 1px solid #f2f2f2;
         font-size: 24px;
 
-        div {
-            margin-right: 20px;
+        .playlistModal-header-left {
+            display: flex;
 
-            &:hover {
-                border-bottom: 2px solid #333;
+            div {
+                margin-right: 20px;
+
+                &:hover {
+                    border-bottom: 2px solid #333;
+                }
             }
+        }
+
+        button {
+            height: 26px;
+            line-height: 26px;
+            font-size: 14px;
+            color: white;
+            background-color: #ff5500;
+            border: none;
         }
     }
 

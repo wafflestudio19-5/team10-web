@@ -16,6 +16,8 @@ function TrackBox({
   currentPlay,
   setCurrentPlay,
   myPlaylist,
+  modalPage,
+  getMyPlaylist,
 }: any) {
   const { userSecret } = useAuthContext();
   const history = useHistory();
@@ -29,7 +31,7 @@ function TrackBox({
   const player = useRef<any>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
 
-  const [playlistModal, setPlaylistModal] = useState<boolean>(false);
+  const [playlistModal2, setPlaylistModal2] = useState<boolean>(false);
 
   const playMusic = () => {
     if (currentPlay !== null) {
@@ -306,7 +308,7 @@ function TrackBox({
           )}
           <button
             className="add-to-playlist"
-            onClick={() => setPlaylistModal(true)}
+            onClick={() => setPlaylistModal2(true)}
           >
             <img
               src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjAuMyAoNzg5MSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+DQogICAgPHRpdGxlPkdyb3VwPC90aXRsZT4NCiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4NCiAgICA8ZGVmcy8+DQogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+DQogICAgICAgIDxnIGlkPSJhZGQtdG8tcGxheWxpc3QiIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9InJnYigzNCwgMzQsIDM0KSI+DQogICAgICAgICAgICA8cGF0aCBkPSJNMTIsMyBMMTIsMSBMMTQsMSBMMTQsMyBMMTYsMyBMMTYsNSBMMTQsNSBMMTQsNyBMMTIsNyBMMTIsNSBMMTAsNSBMMTAsMyBMMTIsMyBaIE0wLDMgTDAsNSBMOCw1IEw4LDMgTDAsMyBaIE0wLDcgTDAsOSBMMTAsOSBMMTAsNyBMMCw3IFogTTAsMTEgTDAsMTMgTDEwLDEzIEwxMCwxMSBMMCwxMSBaIiBpZD0iUmVjdGFuZ2xlLTIwIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIi8+DQogICAgICAgIDwvZz4NCiAgICA8L2c+DQo8L3N2Zz4NCg=="
@@ -315,9 +317,13 @@ function TrackBox({
             <div>Add to playlist</div>
           </button>
           <AddToPlaylist
-            playlistModal={playlistModal}
-            setPlaylistModal={setPlaylistModal}
+            playlistModal2={playlistModal2}
+            setPlaylistModal2={setPlaylistModal2}
             myPlaylist={myPlaylist}
+            trackId={item.id}
+            modalPage={modalPage}
+            getMyPlaylist={getMyPlaylist}
+            myId={myId}
           />
           {/* <button>
             <img

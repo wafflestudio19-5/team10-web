@@ -1,15 +1,63 @@
+import axios from "axios";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import { useInView } from "react-intersection-observer";
+import { useAuthContext } from "../../../context/AuthContext";
 import "./AddToPlaylist.scss";
 
-function AddToPlaylist({ playlistModal, myPlaylist }: any) {
+function AddToPlaylist({
+  playlistModal2,
+  setPlaylistModal2,
+  myPlaylist,
+  trackId,
+  modalPage,
+  getMyPlaylist,
+  myId,
+}: any) {
   // const [addOption, setAddOption] = useState<boolean>(true);
+  const { userSecret } = useAuthContext();
+  const [ref, inView] = useInView();
+
+  // 서버 일시오류가 있는 것 같으니 나중에 다시 해보기
+  const addToPlaylist = (id: any) => {
+    axios
+      .post(
+        `https://api.soundwaffle.com/sets/${id}/tracks`,
+        {
+          track_ids: trackId,
+        },
+        {
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+        }
+      )
+      .then(() => {
+        toast("플레이리스트에 추가 완료");
+      })
+      .catch(() => {
+        toast("플레이리스트에 추가 실패");
+      });
+  };
+
+  useEffect(() => {
+    if (modalPage !== null) {
+      if (inView) {
+        getMyPlaylist(myId, modalPage);
+      }
+    }
+  }, [inView]);
 
   return (
-    <div className={playlistModal ? "playlistModal open" : "playlistModal"}>
-      {playlistModal ? (
+    <div className={playlistModal2 ? "playlistModal2 open" : "playlistModal2"}>
+      {playlistModal2 ? (
         <section className={"playlistModal-section"}>
           <div className="playlistModal-header">
-            <div>Add to playlist</div>
-            <div>Create a playlist</div>
+            <div className="playlistModal-header-left">
+              <div>Add to playlist</div>
+              <div>Create a playlist</div>
+            </div>
+            <button onClick={() => setPlaylistModal2(false)}>Close</button>
           </div>
           {myPlaylist &&
             myPlaylist.map((item: any) => (
@@ -40,9 +88,12 @@ function AddToPlaylist({ playlistModal, myPlaylist }: any) {
                     </div>
                   </div>
                 </div>
-                <button>Add to playlist</button>
+                <button onClick={() => addToPlaylist(item.id)}>
+                  Add to playlist
+                </button>
               </div>
             ))}
+          <div ref={ref} className="inView"></div>
         </section>
       ) : null}
     </div>
