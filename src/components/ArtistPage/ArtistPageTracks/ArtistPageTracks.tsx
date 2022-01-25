@@ -82,7 +82,7 @@ function ArtistPageTracks() {
         );
         pages.map((page) => {
           axios.get(`users/${id}/sets?page=${page}`).then((res2) => {
-            if (myPlaylist === null) {
+            if (page === 1) {
               setMyPlaylist(res2.data.results);
             } else {
               setMyPlaylist((item: any) => [...item, ...res2.data.results]);
