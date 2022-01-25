@@ -11,10 +11,12 @@
 
 .playlistModal-section {
     width: 550px;
-    height: 210px;
+    height: fit-content;
+    max-height: 550px;
     margin: auto;
     background-color: white;
     animation: modal-show .3s;
+    overflow-y: auto;
 
     .playlistModal-header {
         width: 500px;
@@ -32,6 +34,51 @@
                 border-bottom: 2px solid #333;
             }
         }
+    }
+
+    .each-playlist {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 500px;
+        margin-left: 25px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #f2f2f2;
+
+        .each-playlist-left {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+
+            .each-playlist-image {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+            }
+
+            .each-playlist-title {
+                font-size: 12px;
+            }
+
+            .each-playlist-count {
+                font-size: 11px;
+                display: flex;
+                align-items: center;
+
+                img {
+                    width: 16px;
+                    height: 12px;
+                }
+            }
+      }
+
+      button {
+        width: 112px;
+        height: 26px;
+        font-size: 14px;
+        line-height: 26px;
+        margin-bottom: 10px;
+      }
     }
 }
 
