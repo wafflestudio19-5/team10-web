@@ -54,7 +54,7 @@ function ArtistPagePlaylists() {
             res.data.results.filter(
               (item: any) =>
                 item.is_private === false &&
-                item.tracks !== null &&
+                item.tracks.length !== 0 &&
                 item.type === "playlist"
             )
           );
@@ -64,7 +64,7 @@ function ArtistPagePlaylists() {
             ...res.data.results.filter(
               (item: any) =>
                 item.is_private === false &&
-                item.tracks !== null &&
+                item.tracks.length !== 0 &&
                 item.type === "playlist"
             ),
           ]);

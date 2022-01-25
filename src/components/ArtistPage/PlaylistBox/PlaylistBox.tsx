@@ -7,6 +7,7 @@ import { useAuthContext } from "../../../context/AuthContext";
 import "./PlaylistBox.scss";
 
 function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
+  console.log(item.tracks);
   const { userSecret } = useAuthContext();
 
   const player = useRef<any>();
@@ -168,7 +169,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           src={item.tracks[trackIndex].audio}
           onEnded={playNextTrack}
         />
-        {item.tracks !== null &&
+        {item.tracks.length !== 0 &&
           Array.from({ length: item.tracks.length }, (_, i) => i).map(
             (num: any) => (
               <div className={"playlist-track"}>
