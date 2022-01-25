@@ -173,7 +173,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
             (num: any) => (
               <div className={"playlist-track"}>
                 {item.tracks[num].image === null && (
-                  <img src="/default.track_image.svg" alt="me" />
+                  <img src="/default_track_image.svg" alt="me" />
                 )}
                 {item.tracks[num].image !== null && (
                   <img src={item.tracks[num].image} alt="me" />

@@ -239,7 +239,7 @@ function TrackBox({
       {item.image === null && (
         <img
           className="track-Img"
-          src="/default.track_image.svg"
+          src="/default_track_image.svg"
           alt={"trackImg"}
           onClick={() =>
             history.push(`/${userSecret.permalink}/${item.permalink}`)
