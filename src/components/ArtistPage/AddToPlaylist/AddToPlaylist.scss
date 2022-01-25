@@ -37,6 +37,11 @@
                     border-bottom: 2px solid #333;
                 }
             }
+
+            .true {
+                color: #ff5500;
+                border-bottom: 2px solid #ff5500;
+            }
         }
 
         button {
@@ -92,6 +97,84 @@
         line-height: 26px;
         margin-bottom: 10px;
       }
+    }
+
+    .create-option {
+        width: 500px;
+        margin-left: 25px;
+        
+        .create-option-title {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .create-option-input {
+            width: 500px;
+            height: 26px;
+            margin-bottom: 20px;
+        }
+
+        .create-option-privacy-save {
+            width: 500px;
+            height: 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .create-option-privacy {
+            display: flex;
+            align-items: center;
+        }
+
+        .privacy-text {
+            font-size: 12px;
+            line-height: 26px;
+            margin-right: 10px;
+        }
+
+        .form-check {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+
+            input {
+                margin-right: 5px;
+            }
+
+            label {
+                margin-right: 5px;
+                line-height: 26px;
+            }
+        }
+
+        button {
+            width: 53px;
+            height: 26px;
+            font-size: 14px;
+            background-color: #ff5500;
+            color: white;
+            line-height: 26px;
+            border: none;
+        }
+
+        .create-option-track {
+            height: 31px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #f2f2f2;
+            margin-bottom: 20px;
+            
+            img {
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .artistName {
+                margin-right: 5px;
+            }
+        }
     }
 }
 

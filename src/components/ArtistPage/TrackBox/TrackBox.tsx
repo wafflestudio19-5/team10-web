@@ -356,10 +356,11 @@ function TrackBox({
             playlistModal2={playlistModal2}
             setPlaylistModal2={setPlaylistModal2}
             myPlaylist={myPlaylist}
-            trackId={item.id}
+            item={item}
             modalPage={modalPage}
             getMyPlaylist={getMyPlaylist}
             myId={myId}
+            artistName={artistName}
           />
           {/* <button>
             <img

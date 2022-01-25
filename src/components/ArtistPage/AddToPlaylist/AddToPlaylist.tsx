@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { useAuthContext } from "../../../context/AuthContext";
@@ -9,14 +9,16 @@ function AddToPlaylist({
   playlistModal2,
   setPlaylistModal2,
   myPlaylist,
-  trackId,
+  item,
   modalPage,
   getMyPlaylist,
   myId,
+  artistName,
 }: any) {
-  // const [addOption, setAddOption] = useState<boolean>(true);
+  const [addOption, setAddOption] = useState<boolean>(true);
   const { userSecret } = useAuthContext();
   const [ref, inView] = useInView();
+  console.log(setAddOption);
 
   // 서버 일시오류가 있는 것 같으니 나중에 다시 해보기 (500에러)
   const addToPlaylist = (id: any) => {
@@ -24,7 +26,7 @@ function AddToPlaylist({
       .post(
         `https://api.soundwaffle.com/sets/${id}/tracks`,
         {
-          track_ids: [{ id: trackId }],
+          track_ids: [{ id: item.id }],
         },
         {
           headers: {
@@ -54,12 +56,20 @@ function AddToPlaylist({
         <section className={"playlistModal-section"}>
           <div className="playlistModal-header">
             <div className="playlistModal-header-left">
-              <div>Add to playlist</div>
-              <div>Create a playlist</div>
+              <div className={addOption ? "addOption true" : "addOption"}>
+                Add to playlist
+              </div>
+              <div
+                className={!addOption ? "addOption true" : "addOption"}
+                onClick={() => setAddOption(false)}
+              >
+                Create a playlist
+              </div>
             </div>
             <button onClick={() => setPlaylistModal2(false)}>Close</button>
           </div>
-          {myPlaylist &&
+          {addOption &&
+            myPlaylist &&
             myPlaylist.map((item: any) => (
               <div className="each-playlist">
                 <div className="each-playlist-left">
@@ -94,6 +104,44 @@ function AddToPlaylist({
               </div>
             ))}
           <div ref={ref} className="inView"></div>
+          {!addOption && (
+            <div className="create-option">
+              <div className="create-option-title">Playlist title *</div>
+              <input className="create-option-input" />
+              <div className="create-option-privacy-save">
+                <div className="create-option-privacy">
+                  <div className="privacy-text">Privacy:</div>
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault2"
+                    />
+                    <label className="form-check-label">Public</label>
+                  </div>
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault1"
+                    />
+                    <label className="form-check-label">Privacy</label>
+                  </div>
+                </div>
+                <button>Save</button>
+              </div>
+              <div className="create-option-track">
+                {item.image && <img src={item.image} alt="img" />}
+                {!item.image && (
+                  <img src="/default_track_image.svg" alt="img" />
+                )}
+                <div className="artistName">{artistName} - </div>
+                <div>{item.title}</div>
+              </div>
+            </div>
+          )}
         </section>
       ) : null}
     </div>
