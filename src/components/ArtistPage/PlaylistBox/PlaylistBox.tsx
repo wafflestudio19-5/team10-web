@@ -7,7 +7,6 @@ import { useAuthContext } from "../../../context/AuthContext";
 import "./PlaylistBox.scss";
 
 function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
-  console.log(item.tracks);
   const { userSecret } = useAuthContext();
 
   const player = useRef<any>();

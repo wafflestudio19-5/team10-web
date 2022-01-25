@@ -1,0 +1,62 @@
+.playlistModal {
+    background-color: rgb(242, 242, 242, 0.9);
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.playlistModal-section {
+    width: 550px;
+    height: 210px;
+    margin: auto;
+    background-color: white;
+    animation: modal-show .3s;
+
+    .playlistModal-header {
+        width: 500px;
+        height: 40px;
+        display: flex;
+        flex-direction: row;
+        margin: 20px 26px;
+        border-bottom: 1px solid #f2f2f2;
+        font-size: 24px;
+
+        div {
+            margin-right: 20px;
+
+            &:hover {
+                border-bottom: 2px solid #333;
+            }
+        }
+    }
+}
+
+.open {
+    display: flex;
+    align-items: center;
+    animation: modal-bg-show .3s;
+}
+
+@keyframes modal-show {
+    from {
+        opacity: 0;
+        margin-top: -50px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0;
+    }
+}
+
+@keyframes modal-bg-show {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
