@@ -25,6 +25,9 @@ function ArtistPageTracks() {
 
   const [currentPlay, setCurrentPlay] = useState<any>(null);
 
+  const [myPlaylist, setMyPlaylist] = useState<any>(null);
+  const [modalPage, setModalPage] = useState<any>(null);
+
   const getUser = (id: any) => {
     axios
       .get(`users/${id}`)
@@ -70,6 +73,27 @@ function ArtistPageTracks() {
       });
   };
 
+  const getMyPlaylist = async (id: any, page: any) => {
+    axios
+      .get(`/users/${id}/sets?page=${page}`)
+      .then((res) => {
+        if (page === 1) {
+          setMyPlaylist(res.data.results);
+        } else {
+          setMyPlaylist((item: any) => [...item, ...res.data.results]);
+        }
+
+        if (res.data.next === null) {
+          setModalPage(null);
+        } else {
+          setModalPage(page + 1);
+        }
+      })
+      .catch(() => {
+        toast("플레이리스트 불러오기 실패");
+      });
+  };
+
   useEffect(() => {
     setIsLoading(true);
 
@@ -81,6 +105,7 @@ function ArtistPageTracks() {
       .get(`resolve?url=${myResolve}`)
       .then((res) => {
         setMyId(res.data.id);
+        getMyPlaylist(res.data.id, 1);
       })
       .catch(() => {
         toast("유저 아이디 불러오기 실패");
@@ -138,6 +163,9 @@ function ArtistPageTracks() {
                     user={user}
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}
+                    myPlaylist={myPlaylist}
+                    modalPage={modalPage}
+                    getMyPlaylist={getMyPlaylist}
                   />
                 ))}
               <div ref={ref} className="inView">

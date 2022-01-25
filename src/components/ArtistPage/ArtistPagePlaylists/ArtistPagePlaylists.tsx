@@ -6,7 +6,6 @@ import { useParams } from "react-router";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
 import PlaylistBox from "../PlaylistBox/PlaylistBox";
-// import TrackBox from "../TrackBox/TrackBox";
 import "./ArtistPagePlaylists.scss";
 
 function ArtistPagePlaylists() {
@@ -44,17 +43,16 @@ function ArtistPagePlaylists() {
       });
   };
 
-  // 임의로 GET users/userid/sets가 아닌 GET sets 이용
   const getPlaylists = async (id: any, page: any) => {
     axios
-      .get(`/sets?page=${page}`)
+      .get(`/users/${id}/sets?page=${page}`)
       .then((res) => {
         if (page === 1) {
           setPlaylists(
             res.data.results.filter(
               (item: any) =>
                 item.is_private === false &&
-                item.tracks !== null &&
+                item.tracks.length !== 0 &&
                 item.type === "playlist"
             )
           );
@@ -64,7 +62,7 @@ function ArtistPagePlaylists() {
             ...res.data.results.filter(
               (item: any) =>
                 item.is_private === false &&
-                item.tracks !== null &&
+                item.tracks.length !== 0 &&
                 item.type === "playlist"
             ),
           ]);
