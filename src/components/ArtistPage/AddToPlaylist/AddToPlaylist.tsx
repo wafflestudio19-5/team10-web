@@ -18,13 +18,13 @@ function AddToPlaylist({
   const { userSecret } = useAuthContext();
   const [ref, inView] = useInView();
 
-  // 서버 일시오류가 있는 것 같으니 나중에 다시 해보기
+  // 서버 일시오류가 있는 것 같으니 나중에 다시 해보기 (500에러)
   const addToPlaylist = (id: any) => {
     axios
       .post(
         `https://api.soundwaffle.com/sets/${id}/tracks`,
         {
-          track_ids: trackId,
+          track_ids: [{ id: trackId }],
         },
         {
           headers: {

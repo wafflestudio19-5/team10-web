@@ -132,7 +132,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                     .post(
                       `https://api.soundwaffle.com/sets/${res1.data.id}/tracks`,
                       {
-                        track_id: res2.data.id,
+                        track_ids: [{ id: res2.data.id }],
                       },
                       {
                         headers: {
