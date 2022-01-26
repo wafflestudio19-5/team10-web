@@ -19,8 +19,6 @@ function TrackBox({
   myPlaylist,
   modalPage,
   getMyPlaylist,
-  togglePlayPause,
-  playMusicBar,
 }: any) {
   const { userSecret } = useAuthContext();
   const history = useHistory();
@@ -174,8 +172,53 @@ function TrackBox({
   }, []);
 
   // 하단바 재생 관련
+  const {
+    setTrackIsPlaying,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    trackIsPlaying,
+    trackBarTrack,
+  } = useTrackContext();
+
+  const playMusicBar = () => {
+    if (trackIsPlaying) {
+      audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
+    } else {
+      audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
+    }
+  };
+
+  const togglePlayPause = (track: any, artist: any) => {
+    // 재생/일시정지 버튼 누를 때
+    if (trackBarTrack.id === track.id) {
+      const prevValue = trackIsPlaying;
+      setTrackIsPlaying(!prevValue);
+      if (!prevValue) {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else {
+        audioPlayer.current.pause();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }
+    } else {
+      setAudioSrc(track.audio);
+      setTrackIsPlaying(true);
+      setTrackBarArtist(artist);
+      setTrackBarTrack(track);
+      audioPlayer.current.src = track.audio;
+      setTimeout(() => {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }, 1);
+    }
+  };
+
   const [barPlaying, setBarPlaying] = useState(false);
-  const { trackIsPlaying, trackBarTrack } = useTrackContext();
 
   const handlePlay = (e: any) => {
     e.stopPropagation();
