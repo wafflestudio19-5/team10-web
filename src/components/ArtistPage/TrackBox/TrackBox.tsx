@@ -19,6 +19,7 @@ function TrackBox({
   myPlaylist,
   modalPage,
   getMyPlaylist,
+  index,
 }: any) {
   const { userSecret } = useAuthContext();
   const history = useHistory();
@@ -31,6 +32,7 @@ function TrackBox({
 
   const player = useRef<any>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
+  // const [current, setCurrent] = useState<any>();
 
   const [playlistModal2, setPlaylistModal2] = useState<boolean>(false);
 
@@ -233,10 +235,10 @@ function TrackBox({
       handlePlay(e);
     }
     if (currentPlay !== null) {
-      // const current = document.getElementsByClassName(`player${currentPlay}`);
-      // current[0].getElementsByTagName("audio")[0].pause();
-      let current = document.getElementById(`button${currentPlay}`);
-      current?.click();
+      let current1 = document.getElementById(`rewind${currentPlay}`);
+      current1?.click();
+      let current2 = document.getElementById(`button${currentPlay}`);
+      current2?.click();
     }
     setIsPlaying(true);
     player.current.audio.current.play();
@@ -249,6 +251,15 @@ function TrackBox({
     setIsPlaying(false);
     player.current.audio.current.pause();
     handlePlay(e);
+  };
+
+  const rewindMusic = (index: any) => {
+    var event = document.createEvent("HTMLEvents");
+    event.initEvent("click", true, true);
+    var button = document.getElementsByClassName(
+      `rhap_button-clear rhap_main-controls-button rhap_rewind-button`
+    )[index];
+    button.dispatchEvent(event);
   };
 
   useEffect(() => {
@@ -335,6 +346,13 @@ function TrackBox({
           ref={player}
           volume={0}
         />
+        <button
+          id={`button${item.id}`}
+          className="rewind"
+          onClick={() => rewindMusic(index)}
+        >
+          rewind
+        </button>
         <div className={"comment"}>
           {user.image_profile === null && (
             <img src="img/user_img.png" alt="me" />

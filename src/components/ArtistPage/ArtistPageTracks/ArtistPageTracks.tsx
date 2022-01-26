@@ -155,8 +155,9 @@ function ArtistPageTracks() {
             <div className={"recent"}>
               <text>My Tracks</text>
               {tracks &&
-                tracks.map((item: any) => (
+                tracks.map((item: any, index: any) => (
                   <TrackBox
+                    index={index}
                     item={item}
                     artistName={user.display_name}
                     myId={myId}
