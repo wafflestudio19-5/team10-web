@@ -20,6 +20,7 @@ import axios from "axios";
 import SetPage from "./components/ArtistPage/Set/SetPage";
 import ArtistPageTracks from "./components/ArtistPage/ArtistPageTracks/ArtistPageTracks";
 import ArtistPagePlaylists from "./components/ArtistPage/ArtistPagePlaylists/ArtistPagePlaylists";
+import ArtistPageReposts from "./components/ArtistPage/ArtistPageReposts/ArtistPageReposts";
 
 function App() {
   const location = useLocation();
@@ -47,6 +48,11 @@ function App() {
             exact
             path="/:permalink/sets"
             component={ArtistPagePlaylists}
+          />
+          <Route
+            exact
+            path="/:permalink/reposts"
+            component={ArtistPageReposts}
           />
           <Route exact path="/:username/:trackname" component={TrackPage} />
           <Route exact path="/:username/sets/:playlist" component={SetPage} />

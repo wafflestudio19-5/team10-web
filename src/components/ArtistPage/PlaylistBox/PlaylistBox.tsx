@@ -119,7 +119,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     <div className={"recent-track"}>
       <img
         className="track-Img"
-        src="/default.track_image.svg"
+        src="/default_track_image.svg"
         alt={"trackImg"}
       />
       <div className={"track-right"}>

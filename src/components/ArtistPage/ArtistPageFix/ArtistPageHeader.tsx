@@ -225,7 +225,7 @@ function ArtistPageHeader({ header, user, setUser, getUser }: any) {
             <a onClick={() => history.push(`/${permalink}/tracks`)}>Tracks</a>
             <a>Albums</a>
             <a onClick={() => history.push(`/${permalink}/sets`)}>Playlists</a>
-            <a>Reposts</a>
+            <a onClick={() => history.push(`/${permalink}/reposts`)}>Reposts</a>
           </div>
           {isMe === true && (
             <div className="menu-right">
