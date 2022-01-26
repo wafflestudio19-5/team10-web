@@ -190,7 +190,7 @@ function ArtistPageReposts() {
           />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Reposts</text>
+              <text>My Reposts (Tracks)</text>
               {repostTracks &&
                 repostTracks.map((item: any) => (
                   <TrackBox
@@ -207,6 +207,8 @@ function ArtistPageReposts() {
                     playMusicBar={playMusic}
                   />
                 ))}
+              <div className="reposts-more">+ More Tracks</div>
+              <text>My Reposts (Sets)</text>
               {repostSets &&
                 repostSets.map((item: any) => (
                   <PlaylistBox
@@ -216,6 +218,7 @@ function ArtistPageReposts() {
                     setCurrentPlay={setCurrentPlay}
                   />
                 ))}
+              <div className="reposts-more">+ More Sets</div>
             </div>
             <ArtistPageRight user={user} />
           </div>
