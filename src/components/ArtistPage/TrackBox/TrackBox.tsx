@@ -290,6 +290,7 @@ function TrackBox({
           src={item.audio}
           key={item.id}
           ref={player}
+          volume={0}
         />
         <div className={"comment"}>
           {user.image_profile === null && (
