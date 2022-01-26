@@ -19,7 +19,6 @@ function TrackBox({
   myPlaylist,
   modalPage,
   getMyPlaylist,
-  index,
 }: any) {
   const { userSecret } = useAuthContext();
   const history = useHistory();
@@ -32,7 +31,7 @@ function TrackBox({
 
   const player = useRef<any>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
-  // const [current, setCurrent] = useState<any>();
+  const [current, setCurrent] = useState<any>(0);
 
   const [playlistModal2, setPlaylistModal2] = useState<boolean>(false);
 
@@ -213,6 +212,7 @@ function TrackBox({
       setTrackBarArtist(artist);
       setTrackBarTrack(track);
       audioPlayer.current.src = track.audio;
+      audioPlayer.current.currentTime = current;
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
@@ -235,10 +235,8 @@ function TrackBox({
       handlePlay(e);
     }
     if (currentPlay !== null) {
-      let current1 = document.getElementById(`rewind${currentPlay}`);
-      current1?.click();
-      let current2 = document.getElementById(`button${currentPlay}`);
-      current2?.click();
+      let current = document.getElementById(`button${currentPlay}`);
+      current?.click();
     }
     setIsPlaying(true);
     player.current.audio.current.play();
@@ -248,18 +246,10 @@ function TrackBox({
 
   const pauseMusic = (e: any) => {
     setCurrentPlay(null);
+    setCurrent(player.current.audio.current.currentTime);
     setIsPlaying(false);
     player.current.audio.current.pause();
     handlePlay(e);
-  };
-
-  const rewindMusic = (index: any) => {
-    var event = document.createEvent("HTMLEvents");
-    event.initEvent("click", true, true);
-    var button = document.getElementsByClassName(
-      `rhap_button-clear rhap_main-controls-button rhap_rewind-button`
-    )[index];
-    button.dispatchEvent(event);
   };
 
   useEffect(() => {
@@ -346,13 +336,6 @@ function TrackBox({
           ref={player}
           volume={0}
         />
-        <button
-          id={`button${item.id}`}
-          className="rewind"
-          onClick={() => rewindMusic(index)}
-        >
-          rewind
-        </button>
         <div className={"comment"}>
           {user.image_profile === null && (
             <img src="img/user_img.png" alt="me" />
