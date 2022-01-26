@@ -48,8 +48,30 @@ function App() {
             path="/:permalink/sets"
             component={ArtistPagePlaylists}
           />
-          <Route exact path="/:username/:trackname" component={TrackPage} />
-          <Route exact path="/:username/sets/:playlist" component={SetPage} />
+          <Route
+            exact
+            path="/:username/:trackname"
+            render={(props) => (
+              <TrackPage
+                key={props.match.params.username.concat(
+                  props.match.params.trackname
+                )}
+                {...props}
+              />
+            )}
+          />
+          <Route
+            exact
+            path="/:username/sets/:playlist"
+            render={(props) => (
+              <SetPage
+                key={props.match.params.username.concat(
+                  props.match.params.playlist
+                )}
+                {...props}
+              />
+            )}
+          />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
         {location.pathname !== "/" && <AudioTag />}

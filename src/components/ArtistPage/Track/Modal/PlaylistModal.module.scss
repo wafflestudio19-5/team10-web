@@ -258,7 +258,7 @@
   .addToPlaylist {
     display: flex;
     align-items: center;
-    justify-items: end;
+    justify-items: right;
     text-align: right;
     width: 134px;
     svg {
@@ -293,6 +293,7 @@
       box-sizing: border-box;
       &.selected {
         color: #f50;
+        border: 1px solid #f50;
       }
     }
   }

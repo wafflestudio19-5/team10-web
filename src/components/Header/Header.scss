@@ -26,7 +26,7 @@
   background-position-x: 12px;
   background-color: rgba(255, 72, 0, 0.8);
 
-  a {
+  span {
     display: none;
   }
 }
@@ -71,11 +71,12 @@
   align-items: center;
   justify-content: center;
 
-  a {
+  span {
     color: white;
     text-decoration: none;
     line-height: 46px;
     text-align: center;
+    cursor: pointer;
   }
 }
 

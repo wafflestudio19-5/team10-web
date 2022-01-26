@@ -7,6 +7,7 @@ import SetModal from "./Modal/SetModal";
 import SetMain from "./Main/SetMain";
 import { useAuthContext } from "../../../context/AuthContext";
 import SetEditModal from "./Modal/SetEditModal";
+import toast from "react-hot-toast";
 
 interface ISetParams {
   username: string;
@@ -15,7 +16,7 @@ interface ISetParams {
 export interface ISetTrack {
   artist: number;
   audio: string;
-  count: number;
+  play_count: number;
   id: number;
   image: string;
   is_liked: boolean;
@@ -47,7 +48,7 @@ export interface IPlaylist {
   genre: {
     id: number;
     name: string;
-  };
+  } | null;
   tags: ITag[];
   is_private: boolean;
   like_count: number;
@@ -122,7 +123,7 @@ const SetPage = () => {
           data: {},
         };
         const response = await axios(config);
-        if (response.data.creator.id === userSecret.id) {
+        if (response.data.creator.id == userSecret.id) {
           setIsMySet(true);
         } else {
           setIsMySet(false);
@@ -134,10 +135,10 @@ const SetPage = () => {
           setNoSet(true);
         }
         setSet(response.data);
-        console.log("page", data);
         setIsLoading(false);
       } catch (error) {
         console.log(error);
+        toast.error("플레이리스트 정보를 받아오는 데 실패했습니다");
       }
     } catch (error) {
       if (
@@ -151,6 +152,7 @@ const SetPage = () => {
         setNoSet(true);
         setIsLoading(false);
       }
+      toast.error("플레이리스트 정보를 받아오는 데 실패했습니다");
     }
   };
   useEffect(() => {

@@ -43,7 +43,7 @@ function Header() {
     <div className={"header_bar"}>
       <div className={"header"}>
         <div className={"header_logo"}>
-          <a href={"https://soundcloud.com/discover"}>logo</a>
+          <span onClick={() => history.push("/discover")}>logo</span>
         </div>
 
         <div className={"header_menu"}>
@@ -57,7 +57,7 @@ function Header() {
         </div>
 
         <div className={"upload"}>
-          <a href={"/upload"}>Upload</a>
+          <span onClick={() => history.push("/upload")}>Upload</span>
         </div>
 
         <div className={"header_user"}>

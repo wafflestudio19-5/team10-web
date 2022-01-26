@@ -263,6 +263,7 @@ const TrackBar = () => {
 
   useEffect(() => {
     if (audioPlayer.current?.ended) {
+      if (trackBarPlaylist.length === 0) return;
       if (
         audioPlayer.current.src ===
         trackBarPlaylist[trackBarPlaylist.length - 1].audio
@@ -277,6 +278,11 @@ const TrackBar = () => {
   }, [playingTime]);
 
   const shuffleTracks = () => {
+    if (trackBarPlaylist.length === 0) {
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
+    }
     const currentIndex = trackBarPlaylist.findIndex(
       (track) => track.id === trackBarTrack.id
     );
@@ -314,7 +320,7 @@ const TrackBar = () => {
       }
     };
     putHit();
-  }, [audioPlayer.current.src]);
+  }, [audioSrc]);
 
   return (
     <>
@@ -450,8 +456,8 @@ const TrackBar = () => {
                     <TrackBarList
                       key={track.id}
                       track={track}
-                      clickArtist={clickArtist}
-                      clickTrack={clickTrack}
+                      //   clickArtist={clickArtist}
+                      //   clickTrack={clickTrack}
                     />
                   );
                 })}
@@ -466,12 +472,12 @@ const TrackBar = () => {
 
 const TrackBarList = ({
   track,
-  clickArtist,
-  clickTrack,
-}: {
+}: //   clickArtist,
+//   clickTrack,
+{
   track: ITrackBarPlaylist;
-  clickArtist: () => void;
-  clickTrack: () => void;
+  //   clickArtist: () => void;
+  //   clickTrack: () => void;
 }) => {
   const [play, setPlay] = useState(false);
   const {
@@ -483,7 +489,9 @@ const TrackBarList = ({
     setTrackIsPlaying,
     trackIsPlaying,
     trackBarTrack,
+    setTrackBarArtist,
   } = useTrackContext();
+  const history = useHistory();
   const headerTrackSrc = track.audio.split("?")[0];
   const barTrackSrc = audioSrc.split("?")[0];
   const togglePlayButton = () => {
@@ -493,11 +501,11 @@ const TrackBarList = ({
         audioPlayer.current.src = track.audio;
         setAudioSrc(track.audio);
         audioPlayer.current.load();
-        // setTrackBarArtist({
-        //   display_name: username,
-        //   id: track.artist,
-        //   permalink: userSecret.permalink,
-        // });
+        setTrackBarArtist({
+          display_name: track.artist_display_name,
+          id: track.artist,
+          permalink: track.artist_permalink,
+        });
         setTrackBarTrack(track);
       }
       setPlay(true);
@@ -518,6 +526,9 @@ const TrackBarList = ({
       setPlay(false);
     }
   }, [audioSrc, trackIsPlaying]);
+  const clickArtist = () => history.push(`/${track.permalink}`);
+  const clickTrack = () =>
+    history.push(`/${track.artist_permalink}/${track.permalink}`);
 
   return (
     <li
@@ -532,7 +543,7 @@ const TrackBarList = ({
       </div>
       <div className={styles.content}>
         <span className={styles.artistName} onClick={clickArtist}>
-          {track.artist} -
+          {track.artist_display_name} -
         </span>
         &nbsp;
         <span className={styles.trackTitle} onClick={clickTrack}>

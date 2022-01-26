@@ -26,6 +26,7 @@ import ArtworkModal from "./ArtworkModal";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import PrivacyModal from "./PrivacyModal";
+import toast from "react-hot-toast";
 dayjs.extend(relativeTime);
 
 export interface IYourTracks {
@@ -38,8 +39,9 @@ export interface IYourTracks {
   repost_count: number;
   comment_count: number;
   genre: string | null;
-  count: number;
+  play_count: number;
   is_private: boolean;
+  tags: ITag[];
 }
 
 const YourTracks = () => {
@@ -425,13 +427,13 @@ const Track = ({
     audioPlayer,
     setPlayingTime,
     setTrackBarArtist,
+    setTrackBarPlaylist,
   } = useTrackContext();
   const history = useHistory();
 
   useEffect(() => {
     setChecked(isAllChecked);
   }, [isAllChecked]);
-  console.log(track.title, checked);
 
   const checkHandler = () => {
     const prevValue = checked;
@@ -505,6 +507,8 @@ const Track = ({
 
   const togglePlayButton = () => {
     if (track && userSecret.permalink) {
+      setTrackBarPlaylist([]);
+
       if (!play) {
         if (
           headerTrackSrc !== barTrackSrc &&
@@ -607,6 +611,7 @@ const Track = ({
               }
             } catch (error) {
               console.log(error);
+              toast.error("트랙을 제거하는데 실패했습니다");
             }
           },
         },
@@ -660,10 +665,10 @@ const Track = ({
               <span>{track.comment_count}</span>
             </li>
           )}
-          {track.count !== 0 && (
+          {track.play_count !== 0 && (
             <li>
               <FaPlay />
-              <span>{track.count}</span>
+              <span>{track.play_count}</span>
             </li>
           )}
           {track.like_count !== 0 && (
@@ -696,7 +701,7 @@ const Track = ({
                 <span data-tip="This track is private.">
                   <BsFillFileLock2Fill />
                 </span>
-                <ReactTooltip />
+                <ReactTooltip effect="solid" />
               </div>
             )}
           </div>

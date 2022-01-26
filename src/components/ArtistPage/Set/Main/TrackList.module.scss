@@ -85,7 +85,8 @@
     height: 44px;
     display: flex;
     align-items: center;
-    justify-content: right;
+    justify-content: start;
+    width: 50px;
     span {
       font-size: 12px;
       line-height: 16px;
@@ -114,8 +115,11 @@
       border-radius: 4px;
       margin-right: 5px;
       cursor: pointer;
-      &.liked svg {
-        color: #ff5500;
+      &.liked {
+        border: 1px solid #f50;
+        svg {
+          color: #ff5500;
+        }
       }
     }
     visibility: hidden;

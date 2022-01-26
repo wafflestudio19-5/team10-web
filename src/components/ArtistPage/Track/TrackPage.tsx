@@ -100,7 +100,6 @@ const TrackPage = () => {
   //       setNoTrack(true);
   //     }
   //   }, [userSecret.permalink, track.is_private, isLoading]);
-
   const fetchTrack = async () => {
     if (typeof userSecret.jwt === "string") {
       try {
@@ -119,7 +118,7 @@ const TrackPage = () => {
           };
           const response = await axios(config);
           const artist = response.data.artist;
-          if (artist.id === userSecret.id) {
+          if (artist.id == userSecret.id) {
             setIsMyTrack(true);
           } else {
             setIsMyTrack(false);

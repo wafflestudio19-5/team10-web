@@ -66,10 +66,10 @@ const SetHeader = ({
     changePlayerCurrentTime();
   };
   useEffect(() => {
-    if (noSet || playlist?.tracks?.length === 0) {
+    if (noSet === false && playlist?.tracks !== null) {
       setButtonDisabled(false);
     }
-  }, [playlist.tracks]);
+  }, [playlist.tracks, noSet]);
   //   const buttonDisabled = false;
   const togglePlayPause = () => {
     if (playing === "before") {

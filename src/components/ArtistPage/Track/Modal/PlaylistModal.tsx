@@ -73,6 +73,8 @@ const PlaylistModal = ({
       };
       try {
         await axios(trackConfig);
+        toast.success("트랙이 추가되었습니다");
+        closeModal();
         // console.log(response);
       } catch (error) {
         console.log(error);
@@ -88,7 +90,9 @@ const PlaylistModal = ({
     }
   };
   const fetchMyPlaylists = async (page: number) => {
-    setIsLoading(true);
+    if (currentPage.current === 1) {
+      setIsLoading(true);
+    }
     const config: any = {
       method: "get",
       url: `/users/${userSecret.id}/sets?page=${page}&page_size=${5}`,
@@ -127,7 +131,7 @@ const PlaylistModal = ({
         scrollHeight &&
         scrollTop &&
         clientHeight &&
-        scrollHeight - scrollTop <= clientHeight + 20
+        scrollHeight - scrollTop == clientHeight
       ) {
         fetchMyPlaylists(currentPage.current);
       }
@@ -162,17 +166,19 @@ const PlaylistModal = ({
                 Add to Playlist
               </div>
             )}
-            <div
-              className={`${styles.modalTitle} ${
-                mode === CREATE && styles.headerSelected
-              }`}
-              onClick={clickCreate}
-            >
-              Create a Playlist
-            </div>
+            {isLoading === false && (
+              <div
+                className={`${styles.modalTitle} ${
+                  mode === CREATE && styles.headerSelected
+                }`}
+                onClick={clickCreate}
+              >
+                Create a Playlist
+              </div>
+            )}
           </div>
           <div className={styles.main}>
-            {mode === ADD ? (
+            {mode === ADD && isLoading === false && (
               <div
                 className={styles.myPlaylist}
                 ref={playlistContainer}
@@ -187,13 +193,15 @@ const PlaylistModal = ({
                             playlist={playlist}
                             track={track}
                             key={playlist.id}
+                            closeModal={closeModal}
                           />
                         </li>
                       );
                     })}
                 </ul>
               </div>
-            ) : (
+            )}
+            {mode === CREATE && isLoading === false && (
               <>
                 <div className={styles.playlistTitle}>
                   <label htmlFor="playlist-title">Playlist title</label>
@@ -264,16 +272,18 @@ const PlaylistModal = ({
 const PlaylistList = ({
   playlist,
   track,
+  closeModal,
 }: {
   playlist: IPlaylist;
   track: ITrack;
+  closeModal: () => void;
 }) => {
   const [isAlreadyIn, setIsAlreadyIn] = useState<boolean | undefined>(
     undefined
   );
   const { userSecret } = useAuthContext();
   useEffect(() => {
-    if (playlist.tracks.find((element) => element.id === track.id)) {
+    if (playlist.tracks?.find((element) => element.id === track.id)) {
       setIsAlreadyIn(true);
     } else {
       setIsAlreadyIn(false);
@@ -292,11 +302,15 @@ const PlaylistList = ({
     };
     try {
       await axios(config);
-      setIsAlreadyIn(!isAlreadyIn);
+      const prevValue = !isAlreadyIn;
+      setIsAlreadyIn(prevValue);
+      closeModal();
     } catch (error) {
       console.log(error);
+      toast.error("실패했습니다");
     }
   };
+
   const history = useHistory();
   const clickPlaylist = () =>
     history.push(`/${userSecret.permalink}/sets/${playlist.permalink}`);

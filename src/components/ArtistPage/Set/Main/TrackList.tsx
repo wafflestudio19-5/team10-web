@@ -139,7 +139,7 @@ const TrackList = ({
       <div className={styles.count}>
         <span>
           <FaPlay />
-          &nbsp;{track.count}
+          &nbsp;{track.play_count}
         </span>
       </div>
       <div className={styles.reaction}>

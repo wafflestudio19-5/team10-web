@@ -180,7 +180,7 @@ const SetEngagement = ({
     });
   };
   const openEditModal = () => setEditModal(true);
-  console.log(playlist);
+  //   console.log(playlist);
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>

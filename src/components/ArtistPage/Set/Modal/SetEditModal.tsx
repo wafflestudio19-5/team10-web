@@ -151,7 +151,9 @@ const SetEditModal = ({
           description: description,
           is_private: isPrivate,
           image_extension: imageFile.name.split(".").at(-1),
-          tags_input: tagInput.replace(/,/g, "").split(" "),
+          ...(tagInput && {
+            tags_input: tagInput.replace(/,/g, "").split(" "),
+          }),
           genre_input: genre,
         },
       };
@@ -192,7 +194,9 @@ const SetEditModal = ({
           permalink: tPermalink,
           description: description,
           is_private: isPrivate,
-          tags_input: tagInput.replace(/,/g, "").split(" "),
+          ...(tagInput && {
+            tags_input: tagInput.replace(/,/g, "").split(" "),
+          }),
           genre_input: genre,
         },
       };
@@ -251,7 +255,7 @@ const SetEditModal = ({
               headers: {
                 Authorization: `JWT ${userSecret.jwt}`,
               },
-              data: { track_id: track.id },
+              data: { track_ids: { id: track.id } },
             };
             try {
               await axios(config);
@@ -295,7 +299,7 @@ const SetEditModal = ({
         <div className={styles["upload-modal-body"]}>
           {tab === TRACKS && (
             <ul className={styles.trackContainer}>
-              {playlist.tracks.map((track) => {
+              {playlist.tracks?.map((track) => {
                 return (
                   <li key={track.id}>
                     <div className={styles.imageContainer}>
@@ -303,7 +307,7 @@ const SetEditModal = ({
                     </div>
                     <div className={styles.content}>
                       <span className={styles.artistName}>
-                        {track.artist} -
+                        {track.artist_display_name} -
                       </span>
                       &nbsp;
                       <span className={styles.trackTitle}>{track.title}</span>
