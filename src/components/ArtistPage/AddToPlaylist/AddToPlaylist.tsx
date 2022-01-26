@@ -18,7 +18,9 @@ function AddToPlaylist({
   const [addOption, setAddOption] = useState<boolean>(true);
   const { userSecret } = useAuthContext();
   const [ref, inView] = useInView();
-  console.log(setAddOption);
+
+  const [pTitle, setPTitle] = useState<any>();
+  const [pPrivate, setPPrivate] = useState<boolean>(false);
 
   // 서버 일시오류가 있는 것 같으니 나중에 다시 해보기 (500에러)
   const addToPlaylist = (id: any) => {
@@ -49,6 +51,47 @@ function AddToPlaylist({
       }
     }
   }, [inView]);
+
+  const createPlaylist = () => {
+    axios
+      .post(
+        "https://api.soundwaffle.com/sets",
+        {
+          title: pTitle,
+          permalink: pTitle,
+          type: "playlist",
+          is_private: pPrivate,
+        },
+        {
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+        }
+      )
+      .then((res) => {
+        axios
+          .post(
+            `https://api.soundwaffle.com/sets/${res.data.id}/tracks`,
+            {
+              track_ids: [{ id: item.id }],
+            },
+            {
+              headers: {
+                Authorization: `JWT ${userSecret.jwt}`,
+              },
+            }
+          )
+          .then(() => {
+            toast("플레이리스트 생성 완료");
+          })
+          .catch(() => {
+            toast("set에 추가 실패");
+          });
+      })
+      .catch(() => {
+        toast("플레이리스트 생성 실패");
+      });
+  };
 
   return (
     <div className={playlistModal2 ? "playlistModal2 open" : "playlistModal2"}>
@@ -107,7 +150,10 @@ function AddToPlaylist({
           {!addOption && (
             <div className="create-option">
               <div className="create-option-title">Playlist title *</div>
-              <input className="create-option-input" />
+              <input
+                className="create-option-input"
+                onChange={(e) => setPTitle(e.target.value)}
+              />
               <div className="create-option-privacy-save">
                 <div className="create-option-privacy">
                   <div className="privacy-text">Privacy:</div>
@@ -117,8 +163,9 @@ function AddToPlaylist({
                       type="radio"
                       name="flexRadioDefault"
                       id="flexRadioDefault2"
+                      onChange={() => setPPrivate(false)}
                     />
-                    <label className="form-check-label">Public</label>
+                    <label className="form-check-label">Public (default)</label>
                   </div>
                   <div className="form-check">
                     <input
@@ -126,11 +173,12 @@ function AddToPlaylist({
                       type="radio"
                       name="flexRadioDefault"
                       id="flexRadioDefault1"
+                      onChange={() => setPPrivate(true)}
                     />
                     <label className="form-check-label">Privacy</label>
                   </div>
                 </div>
-                <button>Save</button>
+                <button onClick={createPlaylist}>Save</button>
               </div>
               <div className="create-option-track">
                 {item.image && <img src={item.image} alt="img" />}
