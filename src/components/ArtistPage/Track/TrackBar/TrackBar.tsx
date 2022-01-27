@@ -305,10 +305,7 @@ const TrackBar = () => {
       if (trackIsPlaying) {
         const config: any = {
           method: "put",
-          url:
-            trackBarPlaylist.length === 0
-              ? `/tracks/${trackBarTrack.id}/hit`
-              : `/tracks/${trackBarTrack.id}/hit?set_id=4`,
+          url: `/tracks/${trackBarTrack.id}/hit`,
           Authorization: userSecret.jwt,
           data: {},
         };
@@ -321,6 +318,42 @@ const TrackBar = () => {
     };
     putHit();
   }, [audioSrc]);
+
+  useEffect(() => {
+    const getLastTrack = async () => {
+      if (userSecret.id != 0) {
+        const config: any = {
+          method: "get",
+          url: `/users/${userSecret.id}/history/tracks`,
+          Authorization: userSecret.jwt,
+          data: {},
+        };
+        try {
+          const { data } = await axios(config);
+          if (data.count != 0) {
+            const track = data.results[0];
+            setTrackBarTrack({
+              id: track.id,
+              title: track.title,
+              permalink: track.permalink,
+              audio: track.audio,
+              image: track.image,
+            });
+            setAudioSrc(track.audio);
+            setTrackBarArtist({
+              id: track.artist.id,
+              permalink: track.artist.permalink,
+              display_name: track.artist.display_name,
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error("마지막으로 들었던 트랙 정보를 불러오는 데 실패했습니다");
+        }
+      }
+    };
+    getLastTrack();
+  }, [userSecret.id]);
 
   return (
     <>

@@ -8,6 +8,7 @@ import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
 import EditModal from "../../Upload/YourTracks/EditModal";
 import PlaylistModal from "./Modal/PlaylistModal";
+import toast from "react-hot-toast";
 
 export interface ITrack {
   id: number;
@@ -160,6 +161,7 @@ const TrackPage = () => {
           setIsLoading(false);
         } catch (error) {
           console.log(error);
+          toast.error("트랙 정보를 받아오는 데 실패했습니다");
         }
       } catch (error) {
         if (

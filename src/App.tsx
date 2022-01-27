@@ -41,12 +41,29 @@ function App() {
           <Route exact path="/you/following" component={Following} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
-          <Route exact path="/:permalink" component={ArtistPageTracks} />
-          <Route exact path="/:permalink/tracks" component={ArtistPageTracks} />
+          <Route
+            exact
+            path="/:permalink"
+            render={(props) => (
+              <ArtistPageTracks key={props.match.params.permalink} {...props} />
+            )}
+          />
+          <Route
+            exact
+            path="/:permalink/tracks"
+            render={(props) => (
+              <ArtistPageTracks key={props.match.params.permalink} {...props} />
+            )}
+          />
           <Route
             exact
             path="/:permalink/sets"
-            component={ArtistPagePlaylists}
+            render={(props) => (
+              <ArtistPagePlaylists
+                key={props.match.params.permalink}
+                {...props}
+              />
+            )}
           />
           <Route
             exact

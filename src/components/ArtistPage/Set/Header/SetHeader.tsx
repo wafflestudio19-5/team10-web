@@ -1,3 +1,4 @@
+import axios from "axios";
 import { throttle } from "lodash";
 import React, {
   SetStateAction,
@@ -8,6 +9,7 @@ import React, {
   //   useState,
 } from "react";
 import { MdOutlineCancel } from "react-icons/md";
+import { useAuthContext } from "../../../../context/AuthContext";
 import { useTrackContext } from "../../../../context/TrackContext";
 import { IPlaylist } from "../SetPage";
 import SetButton from "./SetButton";
@@ -50,6 +52,7 @@ const SetHeader = ({
     // trackBarTrack,
     setTrackBarPlaylist,
   } = useTrackContext();
+  const { userSecret } = useAuthContext();
   const progressBar = useRef<any>(null); // 재생 바 태그 접근(input)
   const animationRef = useRef(0); // 재생 애니메이션
   const calculateTime = (secs: number) => {
@@ -71,9 +74,25 @@ const SetHeader = ({
     }
   }, [playlist.tracks, noSet]);
   //   const buttonDisabled = false;
+  const putHit = async () => {
+    if (trackIsPlaying) {
+      const config: any = {
+        method: "put",
+        url: `/tracks/${playlist.tracks[0].id}/hit?set_id=${playlist.id}`,
+        Authorization: userSecret.jwt,
+        data: {},
+      };
+      try {
+        await axios(config);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   const togglePlayPause = () => {
     if (playing === "before") {
       setPlaying("playing");
+      putHit();
       setAudioSrc(playlist.tracks[0].audio);
       setTrackIsPlaying(true);
       setTrackBarArtist({

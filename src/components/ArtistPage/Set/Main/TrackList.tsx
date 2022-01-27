@@ -59,6 +59,21 @@ const TrackList = ({
       setPlay(false);
     }
   }, [audioSrc, trackIsPlaying]);
+  const putHit = async (id: number) => {
+    if (trackIsPlaying) {
+      const config: any = {
+        method: "put",
+        url: `/tracks/${id}/hit?set_id=${playlist.id}`,
+        Authorization: userSecret.jwt,
+        data: {},
+      };
+      try {
+        await axios(config);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   const togglePlayButton = () => {
     if (track && userSecret.permalink) {
       if (!play) {
@@ -84,6 +99,7 @@ const TrackList = ({
         }, 1);
         if (playing === "before") {
           setTrackBarPlaylist(playlist.tracks);
+          putHit(track.id);
         }
       } else {
         audioPlayer.current.pause();

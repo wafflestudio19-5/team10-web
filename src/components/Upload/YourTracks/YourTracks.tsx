@@ -104,6 +104,7 @@ const YourTracks = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error("트랙 정보를 받아오는 데 실패했습니다");
     }
     // }
   };
@@ -140,7 +141,7 @@ const YourTracks = () => {
           setTrackCount(data.count);
           setCurrentTracks(data.results);
           setLoading(false);
-          console.log(data);
+          //   console.log(data);
           if (data.next) {
             // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
             nextPage.current += 1;
@@ -154,6 +155,7 @@ const YourTracks = () => {
         }
       } catch (error) {
         console.log(error);
+        toast.error("트랙 정보를 받아오는 데 실패했습니다");
       }
     }
   };
@@ -439,7 +441,7 @@ const Track = ({
     const prevValue = checked;
     setChecked(!checked);
     checkedItemHandler(track.id, !prevValue);
-    console.log(checkedItems);
+    // console.log(checkedItems);
   };
 
   //   useEffect(() => {
@@ -579,6 +581,7 @@ const Track = ({
         });
       } catch (error) {
         console.log(error);
+        toast.error("트랙 정보를 받아오는 데 실패했습니다");
       }
     }
   };
