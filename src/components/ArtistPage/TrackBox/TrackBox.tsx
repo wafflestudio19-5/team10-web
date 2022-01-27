@@ -25,7 +25,7 @@ function TrackBox({
 
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [reposted, setReposted] = useState<boolean>(false);
-  const [comment, setComment] = useState<string>();
+  const [comment, setComment] = useState<string>("");
   const [likes, setLikes] = useState<number>(item.like_count);
   const [reposts, setReposts] = useState<number>(item.repost_count);
 
@@ -105,25 +105,29 @@ function TrackBox({
 
   const postComment = (e: any) => {
     if (e.key === "Enter") {
-      axios
-        .post(
-          `/tracks/${item.id}/comments`,
-          {
-            content: comment,
-          },
-          {
-            headers: {
-              Authorization: `JWT ${userSecret.jwt}`,
+      if (comment !== "") {
+        axios
+          .post(
+            `/tracks/${item.id}/comments`,
+            {
+              content: comment,
             },
-          }
-        )
-        .then(() => {
-          toast("댓글 작성 완료");
-          setComment("");
-        })
-        .catch(() => {
-          toast("댓글 작성 실패");
-        });
+            {
+              headers: {
+                Authorization: `JWT ${userSecret.jwt}`,
+              },
+            }
+          )
+          .then(() => {
+            toast("댓글 작성 완료");
+            setComment("");
+          })
+          .catch(() => {
+            toast("댓글 작성 실패");
+          });
+      } else {
+        toast("댓글을 입력해주세요.");
+      }
     }
   };
 

@@ -255,7 +255,6 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   useEffect(() => {
     trackBarTrack.id === item.id ? null : setBarPlaying(false);
-    console.log(1);
   }, [trackBarTrack]);
 
   const moveWeb = async () => {
@@ -264,18 +263,15 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   useEffect(() => {
     trackBarTrack.id === item.id ? moveWeb().then(() => playMusicBar()) : null;
-    console.log(2);
   }, []);
 
   useEffect(() => {
     trackBarTrack.id === item.id ? setBarPlaying(trackIsPlaying) : null;
-    console.log(3);
   }, [trackIsPlaying]);
 
   useEffect(() => {
     if (seekTime !== 0) {
       document.getElementById(`seek${currentPlay}`)?.click();
-      console.log(4);
     }
   }, [seekTime]);
 
