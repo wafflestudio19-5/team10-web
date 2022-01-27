@@ -252,6 +252,12 @@ function TrackBox({
     handlePlay(e);
   };
 
+  const moveTrackBar = () => {
+    const seeked = player.current.audio.current.currentTime;
+    setCurrent(seeked);
+    audioPlayer.current.currentTime = seeked;
+  };
+
   useEffect(() => {
     trackBarTrack.id === item.id ? null : setBarPlaying(false);
   }, [trackBarTrack]);
@@ -334,6 +340,7 @@ function TrackBox({
           src={item.audio}
           key={item.id}
           ref={player}
+          onSeeked={moveTrackBar}
           volume={0}
         />
         <div className={"comment"}>
