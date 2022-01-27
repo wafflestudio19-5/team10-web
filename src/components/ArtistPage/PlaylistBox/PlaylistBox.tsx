@@ -155,6 +155,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     trackIsPlaying,
     trackBarTrack,
     seekTime,
+    setTrackBarPlaylist,
   } = useTrackContext();
 
   const playMusicBar = () => {
@@ -167,9 +168,9 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     }
   };
 
-  const togglePlayPause = (track: any, artist: any) => {
+  const togglePlayPause = (playlist: any, artist: any) => {
     // 재생/일시정지 버튼 누를 때
-    if (trackBarTrack.id === track.id) {
+    if (trackBarTrack.id === playlist[trackIndex].id) {
       const prevValue = trackIsPlaying;
       setTrackIsPlaying(!prevValue);
       if (!prevValue) {
@@ -180,12 +181,15 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
         setPlayingTime(audioPlayer.current.currentTime);
       }
     } else {
-      setAudioSrc(track.audio);
+      setAudioSrc(playlist[trackIndex].audio);
       setTrackIsPlaying(true);
       setTrackBarArtist(artist);
-      setTrackBarTrack(track);
-      audioPlayer.current.src = track.audio;
-      audioPlayer.current.currentTime = current;
+      setTrackBarTrack(playlist[trackIndex]);
+      setTrackBarPlaylist(playlist);
+      audioPlayer.current.src = playlist[trackIndex].audio;
+      if (trackBarTrack === playlist[trackIndex]) {
+        audioPlayer.current.currentTime = current;
+      }
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
@@ -197,7 +201,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   const handlePlay = (e: any) => {
     e.stopPropagation();
-    togglePlayPause(item.tracks[trackIndex], item.creator);
+    togglePlayPause(item.tracks, item.creator);
     trackBarTrack.id === item.id
       ? setBarPlaying(!trackIsPlaying)
       : setBarPlaying(true);
@@ -225,11 +229,12 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     handlePlay(e);
   };
 
-  const playNextTrack = () => {
+  const playNextTrack = (e: any) => {
     if (item.tracks.length === trackIndex + 1) {
       setTrackIndex(0);
     } else {
       setTrackIndex(trackIndex + 1);
+      handlePlay(e);
     }
   };
 
@@ -250,6 +255,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   useEffect(() => {
     trackBarTrack.id === item.id ? null : setBarPlaying(false);
+    console.log(1);
   }, [trackBarTrack]);
 
   const moveWeb = async () => {
@@ -258,15 +264,18 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   useEffect(() => {
     trackBarTrack.id === item.id ? moveWeb().then(() => playMusicBar()) : null;
+    console.log(2);
   }, []);
 
   useEffect(() => {
     trackBarTrack.id === item.id ? setBarPlaying(trackIsPlaying) : null;
+    console.log(3);
   }, [trackIsPlaying]);
 
   useEffect(() => {
     if (seekTime !== 0) {
       document.getElementById(`seek${currentPlay}`)?.click();
+      console.log(4);
     }
   }, [seekTime]);
 
@@ -332,7 +341,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           className={`player${item.tracks.id}`}
           key={item.tracks.id}
           src={item.tracks[trackIndex].audio}
-          onEnded={playNextTrack}
+          onEnded={(e) => playNextTrack(e)}
           onSeeked={moveTrackBar}
           volume={0}
         />
