@@ -18,7 +18,7 @@ const LikeItems = ({
   title,
   img,
   artist,
-  count,
+  play_count,
   like,
   comment,
   repost,
@@ -28,13 +28,15 @@ const LikeItems = ({
   togglePlayPause,
   track,
   playMusic,
+  setNewTrackList,
+  setMostTrackList,
 }: {
   userPermal: string;
   trackPermal: string;
   title: string;
   img: string;
   artist: string;
-  count: number;
+  play_count: number;
   like: number;
   comment: number;
   repost: number;
@@ -44,6 +46,8 @@ const LikeItems = ({
   togglePlayPause: any;
   track: any;
   playMusic: any;
+  setNewTrackList: any;
+  setMostTrackList: any;
 }) => {
   const [play, setPlay] = useState(false);
   const [heart, setHeart] = useState(true);
@@ -90,13 +94,34 @@ const LikeItems = ({
       });
       setHeart(!heart);
     }
-    await axios
-      .get(`/users/${userSecret.id}/likes/tracks`)
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/likes/tracks`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    })
       .then((res) => {
-        setLikeList(res.data.results);
         setLikeCount(res.data.count);
+        setLikeList(res.data.results);
       })
       .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
+    axios({
+      method: "get",
+      url: "/tracks",
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    })
+      .then((r: any) => {
+        const mostList = r.data.results.slice(0, 4);
+        const newList = r.data.results.slice(-6);
+        setMostTrackList(mostList);
+        setNewTrackList(newList);
+      })
+      .catch(() => toast.error("트랙 정보 불러오기를 실패하였습니다"));
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
@@ -163,7 +188,7 @@ const LikeItems = ({
         <div className={styles.counts}>
           <div className={styles.playCount}>
             <BsFillPlayFill />
-            &nbsp; {count}
+            &nbsp; {play_count}
           </div>
           <div className={styles.likeCount}>
             <AiFillHeart />

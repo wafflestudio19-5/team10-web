@@ -14,7 +14,6 @@ const NewItems = ({
   title,
   img,
   trackId,
-  likeListId,
   trackPermalink,
   artistPermalink,
   setLikeList,
@@ -22,11 +21,11 @@ const NewItems = ({
   togglePlayPause,
   track,
   playMusic,
+  is_liked,
 }: {
   title: string;
   img: string;
   trackId: number | string;
-  likeListId: any;
   trackPermalink: string;
   artistPermalink: string;
   setLikeList: any;
@@ -34,6 +33,7 @@ const NewItems = ({
   togglePlayPause: any;
   track: any;
   playMusic: any;
+  is_liked: boolean;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -81,11 +81,17 @@ const NewItems = ({
       });
       setHeart(!heart);
     }
-    await axios
-      .get(`/users/${userSecret.id}/likes/tracks`)
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/likes/tracks`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    })
       .then((res) => {
-        setLikeList(res.data.results);
         setLikeCount(res.data.count);
+        setLikeList(res.data.results);
       })
       .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };
@@ -94,16 +100,16 @@ const NewItems = ({
     toast.error("아직 구현되지 않은 기능입니다");
   };
   useEffect(() => {
-    if (trackId <= 999990 && likeListId[0] !== -1) {
+    if (trackId <= 999990) {
       const permalink = {
         artistPermal: artistPermalink,
         trackPermal: trackPermalink,
       };
       setPermalink(permalink);
 
-      setHeart(likeListId.includes(trackId));
+      setHeart(is_liked);
     }
-  }, [trackId, likeListId]);
+  }, [trackId, is_liked, track]);
   return (
     <div className={styles.wrapper}>
       {img === null ? (

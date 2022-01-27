@@ -26,7 +26,7 @@ const Discover = () => {
       repost_count: 0,
       like_count: 0,
       comment_count: 0,
-      count: 0,
+      play_count: 0,
       audio: "",
       image: "",
       id: -1,
@@ -38,7 +38,6 @@ const Discover = () => {
       audio_length: 0,
     },
   ]);
-  const [likeListId, setLikeListId] = useState([-1]);
   const [likeCount, setLikeCount] = useState(0);
   const [mostTrackList, setMostTrackList] = useState([
     {
@@ -64,6 +63,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -88,6 +88,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -112,6 +113,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -136,6 +138,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
   ]);
   const [newTrackList, setNewTrackList] = useState([
@@ -162,6 +165,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -186,6 +190,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -210,6 +215,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -234,6 +240,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -258,6 +265,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
     {
       artist: {
@@ -282,6 +290,7 @@ const Discover = () => {
       tags: [],
       is_private: false,
       audio_length: 0,
+      is_liked: false,
     },
   ]);
   const [followingList, setFollowingList] = useState([
@@ -302,6 +311,7 @@ const Discover = () => {
     setTrackBarTrack,
     trackIsPlaying,
     trackBarTrack,
+    setTrackBarPlaylist,
   } = useTrackContext();
   const playMusic = () => {
     if (trackIsPlaying) {
@@ -315,6 +325,16 @@ const Discover = () => {
   const history = useHistory();
   const goLikes = () => history.push("/you/likes");
   const goFollowing = () => history.push("/you/following");
+  const hitTrack = async (track_id: string | number) => {
+    await axios({
+      method: "put",
+      url: `tracks/${track_id}/hit`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    });
+  };
   const togglePlayPause = (track: any, artist: any) => {
     // 재생/일시정지 버튼 누를 때
     if (trackBarTrack.id === track.id) {
@@ -333,6 +353,8 @@ const Discover = () => {
       setTrackBarArtist(artist);
       setTrackBarTrack(track);
       audioPlayer.current.src = track.audio;
+      setTrackBarPlaylist([]);
+      hitTrack(track.id);
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
@@ -351,25 +373,8 @@ const Discover = () => {
         id: ID,
       });
     };
-    const fetchMostNewList = () => {
-      axios
-        .get("/tracks")
-        .then((r: any) => {
-          const mostList = r.data.results.slice(0, 4);
-          const newList = r.data.results.slice(-6);
-          setMostTrackList(mostList);
-          setNewTrackList(newList);
-        })
-        .catch(() => toast.error("트랙 정보 불러오기를 실패하였습니다"));
-    };
     checkValid();
-    fetchMostNewList();
   }, []);
-  useEffect(() => {
-    if (likeList !== [] || likeList[0].id !== -1) {
-      setLikeListId(likeList.map((item: any) => item.id));
-    }
-  }, [likeList]);
   const _ = require("lodash");
   const fetchFollowList = _.throttle(() => {
     const asyncFetchFollwList = async () => {
@@ -400,19 +405,42 @@ const Discover = () => {
   }, 200);
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
+      const fetchMostNewList = () => {
+        axios({
+          method: "get",
+          url: "/tracks",
+          headers: { Authorization: `JWT ${userSecret.jwt}` },
+          data: {
+            user_id: userSecret.id,
+          },
+        })
+          .then((r: any) => {
+            const mostList = r.data.results.slice(0, 4);
+            const newList = r.data.results.slice(-6);
+            setMostTrackList(mostList);
+            setNewTrackList(newList);
+          })
+          .catch(() => toast.error("트랙 정보 불러오기를 실패하였습니다"));
+      };
       const fetchUserId = async () => {
         try {
-          await axios
-            .get(`/users/${userSecret.id}/likes/tracks`)
-            .then((res) => {
-              setLikeCount(res.data.count);
-              setLikeList(res.data.results);
-            });
+          await axios({
+            method: "get",
+            url: `/users/${userSecret.id}/likes/tracks`,
+            headers: { Authorization: `JWT ${userSecret.jwt}` },
+            data: {
+              user_id: userSecret.id,
+            },
+          }).then((res) => {
+            setLikeCount(res.data.count);
+            setLikeList(res.data.results);
+          });
           fetchFollowList();
         } catch {
           toast.error("like list 불러오기를 실패하였습니다");
         }
       };
+      fetchMostNewList();
       fetchUserId();
     }
   }, [userSecret]);
@@ -444,7 +472,6 @@ const Discover = () => {
             </div>
             <MostList
               mostTrackList={mostTrackList}
-              likeListId={likeListId}
               setLikeList={setLikeList}
               setLikeCount={setLikeCount}
               togglePlayPause={togglePlayPause}
@@ -471,7 +498,6 @@ const Discover = () => {
               <NewList
                 listScroll={listScroll}
                 newTrackList={newTrackList}
-                likeListId={likeListId}
                 setLikeList={setLikeList}
                 setLikeCount={setLikeCount}
                 togglePlayPause={togglePlayPause}
@@ -492,6 +518,8 @@ const Discover = () => {
               setLikeCount={setLikeCount}
               togglePlayPause={togglePlayPause}
               playMusic={playMusic}
+              setNewTrackList={setNewTrackList}
+              setMostTrackList={setMostTrackList}
             />
           </div>
           <div className={styles.following}>

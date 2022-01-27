@@ -90,9 +90,12 @@
   }
   .likesWrapper,
   .followerWrapper,
-  .setrWrapper {
+  .setWrapper {
     display: flex;
     flex-direction: row;
-    margin: auto;
+  }
+  .likesWrapper,
+  .setWrapper {
+    margin-left: 35px;
   }
 }

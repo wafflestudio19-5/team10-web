@@ -111,9 +111,8 @@
         align-items: center;
         .noLike {
           color: #cccccc;
-          width: 200px;
-          height: 200px;
-          margin-top: 50px;
+          width: 250px;
+          height: 250px;
         }
         .text {
           font-size: 16px;
@@ -130,5 +129,11 @@
     .noItemsWrapper {
       justify-content: center;
     }
+  }
+  .trackBox {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    width: 1220px;
   }
 }

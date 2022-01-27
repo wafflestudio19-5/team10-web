@@ -143,6 +143,12 @@ const Following = () => {
           </div>
 
           <div className={styles.focus}>Following</div>
+          <div
+            className={styles.others}
+            onClick={() => goToSomewhere("/you/history")}
+          >
+            History
+          </div>
         </div>
         <div className={styles.recent_played}>
           <div className={styles.listHeader}>

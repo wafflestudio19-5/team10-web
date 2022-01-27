@@ -1,84 +1,128 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { AiFillAppstore } from "react-icons/ai";
-import { BiHeartSquare } from "react-icons/bi";
+import { FiClock } from "react-icons/fi";
 import { useHistory } from "react-router";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useTrackContext } from "../../../context/TrackContext";
-import LikeItem from "./LikeItem";
-import styles from "./Likes.module.scss";
+import ListItem from "../Playlists/ListItem";
+import styles from "./History.module.scss";
+import HistoryItem from "./HistoryItem";
 
-const Likes = () => {
+const History = () => {
   const history = useHistory();
   const goToSomewhere = (sth: string) => {
     history.push(sth);
   };
   const [filterInput, setFilterInput] = useState("");
-  const [likeList, setLikeList] = useState([
+  const [setList, setSetlist] = useState([
+    {
+      id: -1,
+      permalink: "",
+      title: "",
+      type: "album",
+      is_private: false,
+      is_liked: false,
+      image: "",
+      creator: {
+        display_name: "",
+        permalink: "",
+        id: -1,
+        is_followed: false,
+      },
+      tracks: [
+        {
+          audio: "",
+          image: "",
+        },
+      ],
+    },
+  ]);
+  const [filteredList, setFilteredList] = useState([
+    {
+      id: -1,
+      permalink: "",
+      title: "",
+      type: "album",
+      is_private: false,
+      is_liked: false,
+      image: "",
+      creator: {
+        display_name: "",
+        permalink: "",
+        id: -1,
+        is_followed: false,
+      },
+      tracks: [
+        {
+          audio: "",
+          image: "",
+        },
+      ],
+    },
+  ]);
+  const [historyList, setHistoryList] = useState([
     {
       artist: {
         permalink: "",
         display_name: "",
         id: -1,
-        city: "",
-        country: "",
-        is_followed: false,
       },
       permailink: "",
       title: "",
+      is_liked: false,
+      is_reposted: false,
       repost_count: 0,
       like_count: 0,
       comment_count: 0,
-      count: 0,
+      play_count: 0,
       audio: "",
       image: "",
       id: -1,
       created_at: "",
-      description: "",
-      genre: null,
       tags: [],
       is_private: false,
       audio_length: 0,
     },
   ]);
-  const [filteredLike, setFilteredLike] = useState([
+  const [filteredHistory, setFilteredHistory] = useState([
     {
       artist: {
         permalink: "",
         display_name: "",
         id: -1,
-        city: "",
-        country: "",
-        is_followed: false,
       },
       permailink: "",
       title: "",
+      is_liked: false,
+      is_reposted: false,
       repost_count: 0,
       like_count: 0,
       comment_count: 0,
-      count: 0,
+      play_count: 0,
       audio: "",
       image: "",
       id: -1,
       created_at: "",
-      description: "",
-      genre: null,
       tags: [],
       is_private: false,
       audio_length: 0,
     },
   ]);
   const [nextPage, setNextPage] = useState<string | null>(null);
+  const [userImg, setUserImg] = useState("");
   const { userSecret, setUserSecret } = useAuthContext();
   const filter = (e: any) => {
     setFilterInput(e.target.value);
-    const newList = likeList.filter((item) =>
+    const newList = setList.filter((item) =>
       item.title.includes(e.target.value)
     );
-    setFilteredLike(newList);
+    const newTracks = historyList.filter((item) =>
+      item.title.includes(e.target.value)
+    );
+    setFilteredList(newList);
+    setFilteredHistory(newTracks);
   };
-  const _ = require("lodash");
   useEffect(() => {
     const checkValid = async () => {
       if (userSecret.permalink === undefined) {
@@ -95,28 +139,57 @@ const Likes = () => {
     };
     checkValid();
   }, []);
-  const fetchLikesList = async () => {
+  const setInitialList = async () => {
     await axios({
       method: "get",
-      url: `/users/${userSecret.id}/likes/tracks?page_size=24`,
+      url: `/users/${userSecret.id}/history/sets?page_size=6`,
       headers: { Authorization: `JWT ${userSecret.jwt}` },
       data: {
         user_id: userSecret.id,
       },
-    }).then((res) => {
-      setLikeList(res.data.results);
-      setFilteredLike(res.data.results);
-      res.data.next === null
-        ? null
-        : setNextPage(`users${res.data.next.split("users")[1]}`);
-    });
+    })
+      .then((res) => {
+        setSetlist(res.data.results);
+        setFilteredList(res.data.results);
+      })
+      .catch(() => toast.error("set list를 가져오지 못하였습니다"));
+    setFilterInput("");
+  };
+  const fetchHistoryTracks = async () => {
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/history/tracks?page_size=10`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    })
+      .then((res) => {
+        setHistoryList(res.data.results);
+        setFilteredHistory(res.data.results);
+        res.data.next === null
+          ? null
+          : setNextPage(`users${res.data.next.split("users")[1]}`);
+      })
+      .catch(() => toast.error("history list를 가져오지 못하였습니다"));
     setFilterInput("");
   };
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
         try {
-          fetchLikesList();
+          setInitialList();
+          fetchHistoryTracks();
+          axios({
+            method: "get",
+            url: "/users/me",
+            headers: { Authorization: `JWT ${userSecret.jwt}` },
+            data: {
+              user_id: userSecret.id,
+            },
+          }).then((res) => {
+            setUserImg(res.data.image_profile);
+          });
         } catch {
           toast.error("유저 정보 불러오기에 실패하였습니다");
         }
@@ -124,8 +197,8 @@ const Likes = () => {
       fetchUserId();
     }
   }, [userSecret]);
-  const addLikeList = () => {
-    if (nextPage !== null && likeList.length === filteredLike.length) {
+  const addHistoryList = () => {
+    if (nextPage !== null && historyList.length === filteredHistory.length) {
       axios({
         method: "get",
         url: nextPage,
@@ -135,28 +208,29 @@ const Likes = () => {
         },
       })
         .then((res) => {
-          setLikeList([...likeList, ...res.data.results]);
-          setFilteredLike([...likeList, ...res.data.results]);
+          setHistoryList([...historyList, ...res.data.results]);
+          setFilteredHistory([...historyList, ...res.data.results]);
           res.data.next === null
             ? setNextPage(null)
             : setNextPage(`users${res.data.next.split("users")[1]}`);
         })
-        .catch(() => toast.error("like list 불러오기에 실패하였습니다"));
+        .catch(() => toast.error("history list 불러오기에 실패하였습니다"));
     }
   };
-  const fetchLikeList = _.throttle(() => {
+  const _ = require("lodash");
+  const fetchHistoryList = _.throttle(() => {
     const scrollHeight = document.documentElement.scrollHeight;
     const scrollTop = document.documentElement.scrollTop;
     const clientHeight = document.documentElement.clientHeight;
     if (scrollTop + clientHeight >= scrollHeight) {
       // 페이지 끝에 도달하면 추가 데이터를 받아온다
-      addLikeList();
+      addHistoryList();
     }
   }, 500);
   useEffect(() => {
-    window.addEventListener("scroll", fetchLikeList);
+    window.addEventListener("scroll", fetchHistoryList);
     return () => {
-      window.removeEventListener("scroll", fetchLikeList);
+      window.removeEventListener("scroll", fetchHistoryList);
     };
   });
   const {
@@ -167,7 +241,7 @@ const Likes = () => {
     setTrackBarArtist,
     setTrackBarTrack,
     trackIsPlaying,
-    trackBarTrack,
+    trackBarPlaylist,
     setTrackBarPlaylist,
   } = useTrackContext();
   const playMusic = () => {
@@ -179,19 +253,19 @@ const Likes = () => {
       setPlayingTime(audioPlayer.current.currentTime);
     }
   };
-  const hitTrack = async (track_id: string | number) => {
+  const hitSet = async (set_id: string | number, track_id: string | number) => {
     await axios({
       method: "put",
-      url: `tracks/${track_id}/hit`,
+      url: `tracks/${track_id}/hit?set_id=${set_id}`,
       headers: { Authorization: `JWT ${userSecret.jwt}` },
       data: {
         user_id: userSecret.id,
       },
     });
   };
-  const togglePlayPause = (track: any, artist: any) => {
+  const togglePlayPause = (playlist: any) => {
     // 재생/일시정지 버튼 누를 때
-    if (trackBarTrack.id === track.id) {
+    if (trackBarPlaylist === playlist.tracks) {
       const prevValue = trackIsPlaying;
       setTrackIsPlaying(!prevValue);
       if (!prevValue) {
@@ -202,20 +276,19 @@ const Likes = () => {
         setPlayingTime(audioPlayer.current.currentTime);
       }
     } else {
-      setAudioSrc(track.audio);
+      setAudioSrc(playlist.tracks[0].audio);
       setTrackIsPlaying(true);
-      setTrackBarArtist(artist);
-      setTrackBarTrack(track);
-      audioPlayer.current.src = track.audio;
-      setTrackBarPlaylist([]);
-      hitTrack(track.id);
+      setTrackBarArtist(playlist.tracks[0].artist);
+      setTrackBarTrack(playlist.tracks[0]);
+      setTrackBarPlaylist(playlist.tracks);
+      audioPlayer.current.src = playlist.tracks[0].audio;
+      hitSet(playlist.id, playlist.tracks[0].id);
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
       }, 1);
     }
   };
-
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.wrapper}>
@@ -226,7 +299,12 @@ const Likes = () => {
           >
             Overview
           </div>
-          <div className={styles.focus}>Likes</div>
+          <div
+            className={styles.others}
+            onClick={() => goToSomewhere("/you/likes")}
+          >
+            Likes
+          </div>
           <div
             className={styles.others}
             onClick={() => goToSomewhere("/you/sets")}
@@ -246,21 +324,13 @@ const Likes = () => {
           >
             Following
           </div>
-          <div
-            className={styles.others}
-            onClick={() => goToSomewhere("/you/history")}
-          >
-            History
-          </div>
+          <div className={styles.focus}>History</div>
         </div>
+
         <div className={styles.recent_played}>
           <div className={styles.listHeader}>
-            <div className={styles.headerText}>
-              Hear the tracks you’ve liked:
-            </div>
+            <div className={styles.headerText}>Recently played sets:</div>
             <div className={styles.filterWrapper}>
-              <div>View</div>
-              <AiFillAppstore className={styles.squareIcon} />
               <input
                 type="text"
                 className={styles.filter}
@@ -272,41 +342,52 @@ const Likes = () => {
           </div>
           <div
             className={
-              likeList.length === 0
-                ? styles.noItemsWrapper
-                : styles.itemsWrapper
+              setList.length === 0 ? styles.noItemsWrapper : styles.itemsWrapper
             }
           >
-            {likeList.length === 0 ? (
+            {setList.length === 0 ? (
               <div className={styles.noLikeWrapper}>
-                <BiHeartSquare className={styles.noLike} />
-                <div className={styles.text}>You have no likes yet</div>
+                <FiClock className={styles.noLike} />
+                <div className={styles.text}>
+                  You have no listening history yet.
+                </div>
                 <a href="/discover">Browse trending playlists</a>
               </div>
             ) : (
-              filteredLike.map((item: any) => (
-                <LikeItem
+              filteredList.map((item: any) => (
+                <ListItem
                   title={item.title}
-                  img={item.image}
+                  setImage={item.image}
                   key={item.id}
-                  trackId={item.id}
-                  artist={item.artist.display_name}
-                  artistId={item.artist.id}
-                  trackPermal={item.permalink}
-                  artistPermal={item.artist.permalink}
+                  setId={item.id}
+                  setPermal={item.permalink}
+                  is_private={item.is_private}
+                  is_liked={item.is_liked}
+                  creator={item.creator.display_name}
+                  creatorId={item.creator.id}
+                  is_followed={item.creator.is_followed}
+                  creatorPermal={item.creator.permalink}
                   togglePlayPause={togglePlayPause}
-                  track={item}
                   playMusic={playMusic}
-                  fetchLikesList={fetchLikesList}
-                  is_followed={item.artist.is_followed}
+                  setInitialList={setInitialList}
+                  playlist={item}
                 />
               ))
             )}
           </div>
+        </div>
+        <div className={styles.trackBox}>
+          {filteredHistory.map((item: any) => (
+            <HistoryItem
+              historyTrack={item}
+              userImg={userImg}
+              fetchHistoryTracks={fetchHistoryTracks}
+            />
+          ))}
         </div>
       </div>
     </div>
   );
 };
 
-export default Likes;
+export default History;

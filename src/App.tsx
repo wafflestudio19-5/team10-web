@@ -20,6 +20,7 @@ import axios from "axios";
 import SetPage from "./components/ArtistPage/Set/SetPage";
 import ArtistPageTracks from "./components/ArtistPage/ArtistPageTracks/ArtistPageTracks";
 import ArtistPagePlaylists from "./components/ArtistPage/ArtistPagePlaylists/ArtistPagePlaylists";
+import History from "./components/Library/History/History";
 
 function App() {
   const location = useLocation();
@@ -39,6 +40,7 @@ function App() {
           <Route exact path="/you/sets" component={Playlists} />
           <Route exact path="/you/albums" component={Albums} />
           <Route exact path="/you/following" component={Following} />
+          <Route exact path="/you/history" component={History} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
           <Route exact path="/:permalink" component={ArtistPageTracks} />

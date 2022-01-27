@@ -18,12 +18,11 @@ const LikeItem = ({
   artistId,
   trackPermal,
   artistPermal,
-  followList,
-  fetchFollowList,
   togglePlayPause,
   track,
   playMusic,
   fetchLikesList,
+  is_followed,
 }: {
   title: string;
   img: string;
@@ -32,12 +31,11 @@ const LikeItem = ({
   artistId: number;
   trackPermal: string;
   artistPermal: string;
-  followList: any;
-  fetchFollowList: any;
   togglePlayPause: any;
   track: any;
   playMusic: any;
   fetchLikesList: any;
+  is_followed: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -75,14 +73,14 @@ const LikeItem = ({
         method: "post",
         url: `/likes/tracks/${trackId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      }).catch(() => toast("like에 실패하였습니다"));
+      }).catch(() => toast.error("like에 실패하였습니다"));
       setHeart(!heart);
     } else {
       await axios({
         method: "delete",
         url: `/likes/tracks/${trackId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      }).catch(() => toast("like에 실패하였습니다"));
+      }).catch(() => toast.error("like에 실패하였습니다"));
       setHeart(!heart);
     }
     fetchLikesList();
@@ -104,21 +102,19 @@ const LikeItem = ({
       }).catch(() => toast.error("팔로우에 실패하였습니다"));
       setFollow(!follow);
     }
-    fetchFollowList();
+    fetchLikesList();
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
     toast.error("아직 구현되지 않은 기능입니다");
   };
   useEffect(() => {
-    if (followList.length !== 0) {
-      artistId === userSecret.id
-        ? setFollow("no")
-        : followList.includes(artistId)
-        ? setFollow(true)
-        : setFollow(false);
-    }
-  }, [followList]);
+    artistId === userSecret.id
+      ? setFollow("no")
+      : is_followed
+      ? setFollow(true)
+      : setFollow(false);
+  }, [is_followed]);
   return (
     <div className={styles.wrapper}>
       {img === null ? (
