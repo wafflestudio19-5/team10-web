@@ -4,7 +4,6 @@ import styles from "./NewList.module.scss";
 const NewList = ({
   listScroll,
   newTrackList,
-  likeListId,
   setLikeList,
   setLikeCount,
   togglePlayPause,
@@ -12,7 +11,6 @@ const NewList = ({
 }: {
   listScroll: any;
   newTrackList: any;
-  likeListId: any;
   setLikeList: any;
   setLikeCount: any;
   togglePlayPause: any;
@@ -26,7 +24,6 @@ const NewList = ({
           img={item.image}
           key={item.id}
           trackId={item.id}
-          likeListId={likeListId}
           trackPermalink={item.permalink}
           artistPermalink={item.artist.permalink}
           setLikeList={setLikeList}
@@ -34,6 +31,7 @@ const NewList = ({
           togglePlayPause={togglePlayPause}
           track={item}
           playMusic={playMusic}
+          is_liked={item.is_liked}
         />
       ))}
     </div>

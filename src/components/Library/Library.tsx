@@ -10,6 +10,33 @@ import LikeItem from "./Likes/LikeItem";
 import ListItem from "./Playlists/ListItem";
 
 const Library = () => {
+  const [recentList, setRecentList] = useState([
+    {
+      artist: {
+        permalink: "",
+        display_name: "",
+        id: -1,
+        city: "",
+        country: "",
+        is_followed: false,
+      },
+      permailink: "",
+      title: "",
+      repost_count: 0,
+      like_count: 0,
+      comment_count: 0,
+      count: 0,
+      audio: "",
+      image: "",
+      id: -1,
+      created_at: "",
+      description: "",
+      genre: null,
+      tags: [],
+      is_private: false,
+      audio_length: 0,
+    },
+  ]);
   const [likeList, setLikeList] = useState([
     {
       artist: {
@@ -18,6 +45,7 @@ const Library = () => {
         id: -1,
         city: "",
         country: "",
+        is_followed: false,
       },
       permailink: "",
       title: "",
@@ -45,11 +73,10 @@ const Library = () => {
       follower_count: 0,
     },
   ]);
-  const [followList, setFollowList] = useState([]);
   const [playlist, setPlaylist] = useState([
     {
       id: -1,
-      permailink: "",
+      permalink: "",
       title: "",
       type: "playlist",
       is_private: false,
@@ -57,8 +84,9 @@ const Library = () => {
       image: "",
       creator: {
         display_name: "",
-        permailink: "",
+        permalink: "",
         id: -1,
+        is_followed: false,
       },
       tracks: [
         {
@@ -71,7 +99,7 @@ const Library = () => {
   const [albumsList, setAlbumsList] = useState([
     {
       id: -1,
-      permailink: "",
+      permalink: "",
       title: "",
       type: "album",
       is_private: false,
@@ -79,8 +107,9 @@ const Library = () => {
       image: "",
       creator: {
         display_name: "",
-        permailink: "",
+        permalink: "",
         id: -1,
+        is_followed: false,
       },
       tracks: [
         {
@@ -91,6 +120,7 @@ const Library = () => {
     },
   ]);
   const [isExist, setIsExist] = useState({
+    recent: false,
     likes: false,
     playlists: false,
     albums: false,
@@ -113,38 +143,14 @@ const Library = () => {
     };
     checkValid();
   }, []);
-  const _ = require("lodash");
-  const fetchFollowList = _.throttle(() => {
-    const asyncFetchFollwList = async () => {
-      await axios.get(`/users/${userSecret.id}/followings`).then((res) => {
-        if (res.data.next !== null) {
-          let fetchedFollowList = res.data.results.map((item: any) => item.id);
-          const nextUrl = res.data.next.split("users")[1];
-          const recurse = (url: string) => {
-            axios.get(`users${url}`).then((r) => {
-              if (r.data.next !== null) {
-                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
-                const nextUrl = r.data.next.split("users")[1];
-                recurse(nextUrl);
-              } else {
-                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
-                setFollowList(fetchedFollowList);
-              }
-            });
-          };
-          recurse(nextUrl);
-        } else {
-          let fetchedFollowList = res.data.results.map((item: any) => item.id);
-          setFollowList(fetchedFollowList);
-        }
-      });
-    };
-    asyncFetchFollwList();
-  }, 200);
   const fetchFollowingList = async () => {
     await axios({
       method: "get",
       url: `/users/${userSecret.id}/followings?page_size=6`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
     }).then((res) => {
       setFollowerList(res.data.results);
       res.data.count !== 0 ? setIsExist({ ...isExist, following: true }) : null;
@@ -154,6 +160,10 @@ const Library = () => {
     await axios({
       method: "get",
       url: `/users/${userSecret.id}/likes/tracks?page_size=6`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
     }).then((res) => {
       setLikeList(res.data.results);
       res.data.count !== 0 ? setIsExist({ ...isExist, likes: true }) : null;
@@ -165,14 +175,22 @@ const Library = () => {
     await axios({
       method: "get",
       url: `/users/${userSecret.id}/sets?page_size=6`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
     }).then((res) => {
       newList = res.data.results;
     });
     await axios({
       method: "get",
       url: `/users/${userSecret.id}/likes/sets?page_size=6`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
     }).then((res) => {
-      newList = [...newList, res.data.results];
+      newList = [...newList, ...res.data.results];
     });
     const arrUnique = newList.filter((character: any, idx: any, arr: any) => {
       return arr.findIndex((item: any) => item.id === character.id) === idx;
@@ -194,6 +212,19 @@ const Library = () => {
     setAlbumsList(fetchedAlbumsList);
     setIsExist(newIsExist);
   };
+  const fetchRecentList = async () => {
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/history/tracks?page_size=6`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    }).then((res) => {
+      setRecentList(res.data.results);
+      res.data.count !== 0 ? setIsExist({ ...isExist, recent: true }) : null;
+    });
+  };
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
@@ -203,6 +234,10 @@ const Library = () => {
           await axios({
             method: "get",
             url: `/users/${userSecret.id}/followings?page_size=6`,
+            headers: { Authorization: `JWT ${userSecret.jwt}` },
+            data: {
+              user_id: userSecret.id,
+            },
           }).then((res) => {
             setFollowerList(res.data.results);
             res.data.count !== 0
@@ -211,7 +246,24 @@ const Library = () => {
           });
           await axios({
             method: "get",
+            url: `/users/${userSecret.id}/history/tracks?page_size=6`,
+            headers: { Authorization: `JWT ${userSecret.jwt}` },
+            data: {
+              user_id: userSecret.id,
+            },
+          }).then((res) => {
+            setRecentList(res.data.results);
+            res.data.count !== 0
+              ? (newIsExist = { ...newIsExist, recent: true })
+              : null;
+          });
+          await axios({
+            method: "get",
             url: `/users/${userSecret.id}/likes/tracks?page_size=6`,
+            headers: { Authorization: `JWT ${userSecret.jwt}` },
+            data: {
+              user_id: userSecret.id,
+            },
           }).then((res) => {
             setLikeList(res.data.results);
             res.data.count !== 0
@@ -221,14 +273,22 @@ const Library = () => {
           await axios({
             method: "get",
             url: `/users/${userSecret.id}/sets?page_size=6`,
+            headers: { Authorization: `JWT ${userSecret.jwt}` },
+            data: {
+              user_id: userSecret.id,
+            },
           }).then((res) => {
             newList = res.data.results;
           });
           await axios({
             method: "get",
             url: `/users/${userSecret.id}/likes/sets?page_size=6`,
+            headers: { Authorization: `JWT ${userSecret.jwt}` },
+            data: {
+              user_id: userSecret.id,
+            },
           }).then((res) => {
-            newList = [...newList, res.data.results];
+            newList = [...newList, ...res.data.results];
           });
           const arrUnique = newList.filter(
             (character: any, idx: any, arr: any) => {
@@ -254,7 +314,6 @@ const Library = () => {
           setPlaylist(fetchedPlaylist);
           setAlbumsList(fetchedAlbumsList);
           setIsExist(newIsExist);
-          fetchFollowList();
         } catch {
           toast.error("유저 정보 불러오기에 실패하였습니다");
         }
@@ -283,6 +342,26 @@ const Library = () => {
       setPlayingTime(audioPlayer.current.currentTime);
     }
   };
+  const hitTrack = async (track_id: string | number) => {
+    await axios({
+      method: "put",
+      url: `tracks/${track_id}/hit`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    });
+  };
+  const hitSet = async (set_id: string | number, track_id: string | number) => {
+    await axios({
+      method: "put",
+      url: `tracks/${track_id}/hit?set_id=${set_id}`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    });
+  };
   const togglePlayPause = (track: any, artist: any) => {
     // 재생/일시정지 버튼 누를 때
     if (trackBarTrack.id === track.id) {
@@ -301,6 +380,8 @@ const Library = () => {
       setTrackBarArtist(artist);
       setTrackBarTrack(track);
       audioPlayer.current.src = track.audio;
+      setTrackBarPlaylist([]);
+      hitTrack(track.id);
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
@@ -326,6 +407,7 @@ const Library = () => {
       setTrackBarTrack(playlist.tracks[0]);
       setTrackBarPlaylist(playlist.tracks);
       audioPlayer.current.src = playlist.tracks[0].audio;
+      hitSet(playlist.id, playlist.tracks[0].id);
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
@@ -366,6 +448,57 @@ const Library = () => {
           >
             Following
           </div>
+          <div
+            className={styles.others}
+            onClick={() => goToSomewhere("/you/history")}
+          >
+            History
+          </div>
+        </div>
+        <div className={styles.likes}>
+          <div className={styles.listHeader}>
+            <div className={styles.listName}>Recently played</div>
+            <div className={styles.listHeaderRight}>
+              {isExist.recent ? null : (
+                <div className={styles.notExist}>
+                  You have no listening history yet
+                </div>
+              )}
+              <button onClick={() => goToSomewhere("/you/history")}>
+                View all
+              </button>
+            </div>
+          </div>
+          {isExist.recent ? (
+            <div className={styles.likesWrapper}>
+              {recentList.slice(0, 6).map((item: any) => (
+                <LikeItem
+                  title={item.title}
+                  img={item.image}
+                  key={item.id}
+                  trackId={item.id}
+                  artist={item.artist.display_name}
+                  artistId={item.artist.id}
+                  trackPermal={item.permalink}
+                  artistPermal={item.artist.permalink}
+                  is_followed={item.artist.is_followed}
+                  togglePlayPause={togglePlayPause}
+                  track={item}
+                  playMusic={playMusic}
+                  fetchLikesList={fetchRecentList}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className={styles.noItemList}>
+              <div className={styles.noItem}></div>
+              <div className={styles.noItem}></div>
+              <div className={styles.noItem}></div>
+              <div className={styles.noItem}></div>
+              <div className={styles.noItem}></div>
+              <div className={styles.noItem}></div>
+            </div>
+          )}
         </div>
         <div className={styles.likes}>
           <div className={styles.listHeader}>
@@ -391,8 +524,7 @@ const Library = () => {
                   artistId={item.artist.id}
                   trackPermal={item.permalink}
                   artistPermal={item.artist.permalink}
-                  followList={followList}
-                  fetchFollowList={fetchFollowList}
+                  is_followed={item.artist.is_followed}
                   togglePlayPause={togglePlayPause}
                   track={item}
                   playMusic={playMusic}
@@ -436,13 +568,12 @@ const Library = () => {
                   is_liked={item.is_liked}
                   creator={item.creator.display_name}
                   creatorId={item.creator.id}
-                  creatorPermal={item.creator.permailink}
+                  creatorPermal={item.creator.permalink}
                   togglePlayPause={togglePlayPauseSet}
                   playMusic={playMusic}
                   setInitialList={setInitialList}
                   playlist={item}
-                  fetchFollowList={fetchFollowList}
-                  followList={followList}
+                  is_followed={item.creator.is_followed}
                 />
               ))}
             </div>
@@ -484,13 +615,12 @@ const Library = () => {
                   is_liked={item.is_liked}
                   creator={item.creator.display_name}
                   creatorId={item.creator.id}
-                  creatorPermal={item.creator.permailink}
+                  creatorPermal={item.creator.permalink}
                   togglePlayPause={togglePlayPauseSet}
                   playMusic={playMusic}
                   setInitialList={setInitialList}
                   playlist={item}
-                  fetchFollowList={fetchFollowList}
-                  followList={followList}
+                  is_followed={item.creator.is_followed}
                 />
               ))}
             </div>

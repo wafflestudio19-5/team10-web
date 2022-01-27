@@ -27,7 +27,7 @@ const Playlists = () => {
   const [playlist, setPlaylist] = useState([
     {
       id: -1,
-      permailink: "",
+      permalink: "",
       title: "",
       type: "playlist",
       is_private: false,
@@ -35,8 +35,9 @@ const Playlists = () => {
       image: "",
       creator: {
         display_name: "",
-        permailink: "",
+        permalink: "",
         id: -1,
+        is_followed: false,
       },
       tracks: [
         {
@@ -49,7 +50,7 @@ const Playlists = () => {
   const [filteredList, setFilteredList] = useState([
     {
       id: -1,
-      permailink: "",
+      permalink: "",
       title: "",
       type: "playlist",
       is_private: false,
@@ -57,8 +58,9 @@ const Playlists = () => {
       image: "",
       creator: {
         display_name: "",
-        permailink: "",
+        permalink: "",
         id: -1,
+        is_followed: false,
       },
       tracks: [
         {
@@ -68,7 +70,6 @@ const Playlists = () => {
       ],
     },
   ]);
-  const [followList, setFollowList] = useState([]);
   const { userSecret, setUserSecret } = useAuthContext();
   const filter = (e: any) => {
     setFilterInput(e.target.value);
@@ -102,6 +103,10 @@ const Playlists = () => {
     await axios({
       method: "get",
       url: `/users/${userSecret.id}/sets?page_size=24`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
     }).then((res) => {
       newList = res.data.results.filter(
         (item: any) => item.type === "playlist"
@@ -116,10 +121,14 @@ const Playlists = () => {
     await axios({
       method: "get",
       url: `/users/${userSecret.id}/likes/sets?page_size=24`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
     }).then((res) => {
       newList = [
         ...newList,
-        res.data.results.filter((item: any) => item.type === "playlist"),
+        ...res.data.results.filter((item: any) => item.type === "playlist"),
       ];
       res.data.next === null
         ? null
@@ -134,41 +143,14 @@ const Playlists = () => {
     setNextPage(newNextPage);
     setPlaylist(arrUnique);
     setFilteredList(arrUnique);
+    setFilterInput("");
   };
   const _ = require("lodash");
-  const fetchFollowList = _.throttle(() => {
-    const asyncFetchFollwList = async () => {
-      await axios.get(`/users/${userSecret.id}/followings`).then((res) => {
-        if (res.data.next !== null) {
-          let fetchedFollowList = res.data.results.map((item: any) => item.id);
-          const nextUrl = res.data.next.split("users")[1];
-          const recurse = (url: string) => {
-            axios.get(`users${url}`).then((r) => {
-              if (r.data.next !== null) {
-                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
-                const nextUrl = r.data.next.split("users")[1];
-                recurse(nextUrl);
-              } else {
-                fetchedFollowList = [...fetchedFollowList, ...r.data.results];
-                setFollowList(fetchedFollowList);
-              }
-            });
-          };
-          recurse(nextUrl);
-        } else {
-          let fetchedFollowList = res.data.results.map((item: any) => item.id);
-          setFollowList(fetchedFollowList);
-        }
-      });
-    };
-    asyncFetchFollwList();
-  }, 200);
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
       const fetchUserId = async () => {
         try {
           setInitialList();
-          fetchFollowList();
         } catch {
           toast.error("유저 정보 불러오기에 실패하였습니다");
         }
@@ -196,6 +178,10 @@ const Playlists = () => {
         axios({
           method: "get",
           url: nextPage.like,
+          headers: { Authorization: `JWT ${userSecret.jwt}` },
+          data: {
+            user_id: userSecret.id,
+          },
         })
           .then((res) => {
             newList = [
@@ -214,6 +200,10 @@ const Playlists = () => {
         axios({
           method: "get",
           url: nextPage.creator,
+          headers: { Authorization: `JWT ${userSecret.jwt}` },
+          data: {
+            user_id: userSecret.id,
+          },
         })
           .then((res) => {
             newList = [
@@ -273,6 +263,16 @@ const Playlists = () => {
       setPlayingTime(audioPlayer.current.currentTime);
     }
   };
+  const hitSet = async (set_id: string | number, track_id: string | number) => {
+    await axios({
+      method: "put",
+      url: `tracks/${track_id}/hit?set_id=${set_id}`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    });
+  };
   const togglePlayPause = (playlist: any) => {
     // 재생/일시정지 버튼 누를 때
     if (trackBarPlaylist === playlist.tracks) {
@@ -292,6 +292,7 @@ const Playlists = () => {
       setTrackBarTrack(playlist.tracks[0]);
       setTrackBarPlaylist(playlist.tracks);
       audioPlayer.current.src = playlist.tracks[0].audio;
+      hitSet(playlist.id, playlist.tracks[0].id);
       setTimeout(() => {
         audioPlayer.current.play();
         setPlayingTime(audioPlayer.current.currentTime);
@@ -327,6 +328,12 @@ const Playlists = () => {
             onClick={() => goToSomewhere("/you/following")}
           >
             Following
+          </div>
+          <div
+            className={styles.others}
+            onClick={() => goToSomewhere("/you/history")}
+          >
+            History
           </div>
         </div>
         <div className={styles.recent_played}>
@@ -371,13 +378,12 @@ const Playlists = () => {
                   is_liked={item.is_liked}
                   creator={item.creator.display_name}
                   creatorId={item.creator.id}
-                  creatorPermal={item.creator.permailink}
+                  is_followed={item.creator.is_followed}
+                  creatorPermal={item.creator.permalink}
                   togglePlayPause={togglePlayPause}
                   playMusic={playMusic}
                   setInitialList={setInitialList}
                   playlist={item}
-                  fetchFollowList={fetchFollowList}
-                  followList={followList}
                 />
               ))
             )}

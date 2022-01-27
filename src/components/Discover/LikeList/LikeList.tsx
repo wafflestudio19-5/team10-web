@@ -8,12 +8,16 @@ const LikeList = ({
   setLikeCount,
   togglePlayPause,
   playMusic,
+  setNewTrackList,
+  setMostTrackList,
 }: {
   likeList: any;
   setLikeList: any;
   setLikeCount: any;
   togglePlayPause: any;
   playMusic: any;
+  setNewTrackList: any;
+  setMostTrackList: any;
 }) => {
   return (
     <>
@@ -32,7 +36,7 @@ const LikeList = ({
               title={item.title}
               img={item.image}
               artist={item.artist.display_name}
-              count={item.count}
+              play_count={item.play_count}
               like={item.like_count}
               comment={item.comment_count}
               repost={item.repost_count}
@@ -43,6 +47,8 @@ const LikeList = ({
               togglePlayPause={togglePlayPause}
               track={item}
               playMusic={playMusic}
+              setNewTrackList={setNewTrackList}
+              setMostTrackList={setMostTrackList}
             />
           ))
       )}
