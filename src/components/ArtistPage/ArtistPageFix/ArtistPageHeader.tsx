@@ -212,10 +212,8 @@ function ArtistPageHeader({ header, user, setUser, getUser, isMe }: any) {
 
         <div className={"menu-bar"}>
           <div className={"menu-left"}>
-            <a onClick={() => history.push(`/${permalink}`)}>All</a>
-            <a>Popular tracks</a>
             <a onClick={() => history.push(`/${permalink}/tracks`)}>Tracks</a>
-            <a>Albums</a>
+            <a onClick={() => history.push(`/${permalink}/albums`)}>Albums</a>
             <a onClick={() => history.push(`/${permalink}/sets`)}>Playlists</a>
             <a onClick={() => history.push(`/${permalink}/reposts`)}>Reposts</a>
           </div>

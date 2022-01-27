@@ -23,6 +23,7 @@ import ArtistPagePlaylists from "./components/ArtistPage/ArtistPagePlaylists/Art
 import ArtistPageReposts from "./components/ArtistPage/ArtistPageReposts/ArtistPageReposts";
 import ArtistPageRepostsTracks from "./components/ArtistPage/ArtistPageReposts/ArtistPageRepostsTracks/ArtistPageRepostsTracks";
 import ArtistPageRepostsSets from "./components/ArtistPage/ArtistPageReposts/ArtistPageRepostsSets/ArtistPageRepostsSets";
+import ArtistPageAlbums from "./components/ArtistPage/ArtistPageAlbums/ArtistPageAlbums";
 
 function App() {
   const location = useLocation();
@@ -46,6 +47,7 @@ function App() {
           <Route exact path="/you/tracks" component={YourTracks} />
           <Route exact path="/:permalink" component={ArtistPageTracks} />
           <Route exact path="/:permalink/tracks" component={ArtistPageTracks} />
+          <Route exact path="/:permalink/albums" component={ArtistPageAlbums} />
           <Route
             exact
             path="/:permalink/sets"
