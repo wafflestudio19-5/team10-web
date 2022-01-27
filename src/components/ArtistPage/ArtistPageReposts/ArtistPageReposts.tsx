@@ -13,6 +13,7 @@ function ArtistPageReposts() {
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState<boolean>();
+  const [isMe, setIsMe] = useState<boolean>();
 
   const params = useParams<any>();
   const permalink = params.permalink;
@@ -98,6 +99,13 @@ function ArtistPageReposts() {
     setIsLoading(true);
 
     const myPermalink = localStorage.getItem("permalink");
+
+    // 내 페이지인지 확인
+    if (permalink === myPermalink) {
+      setIsMe(true);
+    } else {
+      setIsMe(false);
+    }
 
     // 내 아이디 받아오기 (나중에 context로 바꾸기)
     const myResolve = `https://soundwaffle.com/${myPermalink}`;
@@ -189,6 +197,7 @@ function ArtistPageReposts() {
             user={user}
             setUser={setUser}
             getUser={getUser}
+            isMe={isMe}
           />
           <div className="artist-body">
             <div className={"recent"}>
