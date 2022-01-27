@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router";
+import { useAuthContext } from "../../../context/AuthContext";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
 import PlaylistBox from "../PlaylistBox/PlaylistBox";
 import "./ArtistPagePlaylists.scss";
 
 function ArtistPagePlaylists() {
+  const { userSecret } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [isMe, setIsMe] = useState<boolean>();
 
@@ -44,17 +46,19 @@ function ArtistPagePlaylists() {
       });
   };
 
-  const getPlaylists = async (id: any, page: any) => {
+  const getPlaylists = async (id: any, page: any, token: any) => {
     axios
-      .get(`/users/${id}/sets?page=${page}`)
+      .get(`/users/${id}/sets?page=${page}`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      })
       .then((res) => {
         if (page === 1) {
           setPlaylists(
             res.data.results.filter(
               (item: any) =>
-                item.is_private === false &&
-                item.tracks.length !== 0 &&
-                item.type === "playlist"
+                item.tracks.length !== 0 && item.type === "playlist"
             )
           );
         } else {
@@ -62,9 +66,7 @@ function ArtistPagePlaylists() {
             ...item,
             ...res.data.results.filter(
               (item: any) =>
-                item.is_private === false &&
-                item.tracks.length !== 0 &&
-                item.type === "playlist"
+                item.tracks.length !== 0 && item.type === "playlist"
             ),
           ]);
         }
@@ -83,6 +85,7 @@ function ArtistPagePlaylists() {
     setIsLoading(true);
 
     const myPermalink = localStorage.getItem("permalink");
+    const myToken = localStorage.getItem("jwt_token");
 
     // 내 페이지인지 확인
     if (permalink === myPermalink) {
@@ -112,7 +115,7 @@ function ArtistPagePlaylists() {
           // 유저 정보
           getUser(res1.data.id);
           // 플레이리스트 불러오기
-          getPlaylists(res1.data.id, 1);
+          getPlaylists(res1.data.id, 1, myToken);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -125,7 +128,7 @@ function ArtistPagePlaylists() {
   useEffect(() => {
     if (!isLoading && playlistPage !== null) {
       if (inView) {
-        getPlaylists(pageId, playlistPage);
+        getPlaylists(pageId, playlistPage, userSecret.jwt);
       }
     }
   }, [inView]);

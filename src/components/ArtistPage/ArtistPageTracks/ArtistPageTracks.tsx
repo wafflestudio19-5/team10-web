@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router";
+import { useAuthContext } from "../../../context/AuthContext";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
 import TrackBox from "../TrackBox/TrackBox";
 import "./ArtistPageTracks.scss";
 
 function ArtistPageTracks() {
+  const { userSecret } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [isMe, setIsMe] = useState<boolean>();
 
@@ -138,11 +140,9 @@ function ArtistPageTracks() {
   }, []);
 
   useEffect(() => {
-    const myToken = localStorage.getItem("jwt_token");
-
     if (!isLoading && trackPage !== null) {
       if (inView) {
-        getTracks(pageId, trackPage, myToken);
+        getTracks(pageId, trackPage, userSecret.jwt);
       }
     }
   }, [inView]);
