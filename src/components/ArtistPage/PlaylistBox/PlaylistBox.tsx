@@ -168,9 +168,9 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     }
   };
 
-  const togglePlayPause = (playlist: any, artist: any) => {
+  const togglePlayPause = (playlist: any, index: any, artist: any) => {
     // 재생/일시정지 버튼 누를 때
-    if (trackBarTrack.id === playlist[trackIndex].id) {
+    if (trackBarTrack.id === playlist[index].id) {
       const prevValue = trackIsPlaying;
       setTrackIsPlaying(!prevValue);
       if (!prevValue) {
@@ -181,13 +181,13 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
         setPlayingTime(audioPlayer.current.currentTime);
       }
     } else {
-      setAudioSrc(playlist[trackIndex].audio);
+      setAudioSrc(playlist[index].audio);
       setTrackIsPlaying(true);
       setTrackBarArtist(artist);
-      setTrackBarTrack(playlist[trackIndex]);
+      setTrackBarTrack(playlist[index]);
       setTrackBarPlaylist(playlist);
-      audioPlayer.current.src = playlist[trackIndex].audio;
-      if (trackBarTrack === playlist[trackIndex]) {
+      audioPlayer.current.src = playlist[index].audio;
+      if (trackBarTrack === playlist[index]) {
         audioPlayer.current.currentTime = current;
       }
       setTimeout(() => {
@@ -199,9 +199,9 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   const [barPlaying, setBarPlaying] = useState(false);
 
-  const handlePlay = (e: any) => {
+  const handlePlay = (e: any, index: any) => {
     e.stopPropagation();
-    togglePlayPause(item.tracks, item.creator);
+    togglePlayPause(item.tracks, index, item.creator);
     trackBarTrack.id === item.id
       ? setBarPlaying(!trackIsPlaying)
       : setBarPlaying(true);
@@ -209,7 +209,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   const playMusic = (e: any) => {
     if (barPlaying) {
-      handlePlay(e);
+      handlePlay(e, trackIndex);
     }
     if (currentPlay !== null) {
       let current = document.getElementById(`button${currentPlay}`);
@@ -218,7 +218,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     setIsPlaying(true);
     player.current.audio.current.play();
     setCurrentPlay(item.id);
-    handlePlay(e);
+    handlePlay(e, trackIndex);
   };
 
   const pauseMusic = (e: any) => {
@@ -226,14 +226,15 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     setCurrent(player.current.audio.current.currentTime);
     setIsPlaying(false);
     player.current.audio.current.pause();
-    handlePlay(e);
+    handlePlay(e, trackIndex);
   };
 
-  const playNextTrack = () => {
+  const playNextTrack = (e: any) => {
     if (item.tracks.length === trackIndex + 1) {
       setTrackIndex(0);
     } else {
       setTrackIndex(trackIndex + 1);
+      handlePlay(e, trackIndex + 1);
     }
   };
 
@@ -340,7 +341,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           className={`player${item.tracks.id}`}
           key={item.tracks.id}
           src={item.tracks[trackIndex].audio}
-          onEnded={playNextTrack}
+          onEnded={(e) => playNextTrack(e)}
           onSeeked={moveTrackBar}
           volume={0}
         />
