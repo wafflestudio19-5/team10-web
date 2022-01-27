@@ -81,45 +81,75 @@
     }
 }
 
-.track-buttons {
+.track-buttons-count {
     display: flex;
-    flex-direction: row;
-    margin-top: 10px;
+    justify-content: space-between;
+    align-items: center;
 
-    button {
+    .track-buttons {
         display: flex;
-        justify-content: center;
         align-items: center;
-        width: 65px;
+        margin-top: 10px;
+
+        button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 65px;
+            height: 22px;
+            background-color: white;
+            border: 1px solid #ccc;
+            font-size: 11px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        img {
+            width: 20px;
+            height: 20px;
+            color: #333;
+            margin-right: 3px;
+        }
+
+        div {
+            line-height: 22px;
+        }
+
+        .liked-button {
+            color: #ff5500;
+        }
+
+        .reposted-button {
+            color: #ff5500;
+        }
+
+        .add-to-playlist {
+            width: 120px;
+        }
+    }
+
+    .track-count {
         height: 22px;
-        background-color: white;
-        border: 1px solid #ccc;
-        font-size: 11px;
-        border-radius: 3px;
-        margin-right: 10px;
-    }
+        display: flex;
+        align-items: center;
 
-    img {
-        width: 20px;
-        height: 20px;
-        color: #333;
-        margin-right: 3px;
-    }
+        .track-count-play {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+            margin-top: 10px;
 
-    div {
-        line-height: 22px;
-    }
+            img {
+                width: 16px;
+                height: 16px;
+            }
 
-    .liked-button {
-        color: #ff5500;
-    }
-
-    .reposted-button {
-        color: #ff5500;
-    }
-
-    .add-to-playlist {
-        width: 120px;
+            div {
+                color: #999;
+                font-size: 11px;
+                line-height: 22px;
+            }
+        }
     }
 }
 
