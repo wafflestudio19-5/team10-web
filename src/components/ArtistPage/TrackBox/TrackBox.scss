@@ -167,3 +167,25 @@
   .rewind {
       display: none;
   }
+
+  .track-info-private {
+      display: flex;
+      justify-content: space-between;
+
+      .track-private {
+          width: 65px;
+          height: 18px;
+          display: flex;
+          background-color: #ff5500;
+          border-radius: 10px;
+          justify-content: center;
+          align-items: center;
+
+          div {
+              color: white;
+              font-size: 11px;
+              margin-right: 5px;
+              line-height: 18px;
+          }
+      }
+  }

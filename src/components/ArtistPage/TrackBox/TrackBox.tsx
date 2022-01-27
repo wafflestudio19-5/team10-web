@@ -281,9 +281,7 @@ function TrackBox({
           className="track-Img"
           src={item.image}
           alt={"trackImg"}
-          onClick={() =>
-            history.push(`/${userSecret.permalink}/${item.permalink}`)
-          }
+          onClick={() => history.push(`/${user.permalink}/${item.permalink}`)}
         />
       )}
       {item.image === null && (
@@ -291,49 +289,58 @@ function TrackBox({
           className="track-Img"
           src="/default_track_image.svg"
           alt={"trackImg"}
-          onClick={() =>
-            history.push(`/${userSecret.permalink}/${item.permalink}`)
-          }
+          onClick={() => history.push(`/${user.permalink}/${item.permalink}`)}
         />
       )}
       <div className={"track-right"}>
-        <div className={"track-info"}>
-          {!isPlaying && (
-            <button onClick={(e) => playMusic(e)} className="play-button">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="25"
-                height="25"
-                fill="white"
-                className="bi bi-caret-right-fill"
-                viewBox="0 0 16 16"
+        <div className="track-info-private">
+          <div className={"track-info"}>
+            {!isPlaying && (
+              <button onClick={(e) => playMusic(e)} className="play-button">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="25"
+                  fill="white"
+                  className="bi bi-caret-right-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+                </svg>
+              </button>
+            )}
+            {isPlaying && (
+              <button
+                onClick={(e) => pauseMusic(e)}
+                id={`button${item.id}`}
+                className="play-button"
               >
-                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
-              </svg>
-            </button>
-          )}
-          {isPlaying && (
-            <button
-              onClick={(e) => pauseMusic(e)}
-              id={`button${item.id}`}
-              className="play-button"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="25"
-                height="25"
-                fill="white"
-                className="bi bi-pause-fill"
-                viewBox="0 0 16 16"
-              >
-                <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
-              </svg>
-            </button>
-          )}
-          <div className={"track-info-name"}>
-            <div className={"artistname"}>{artistName}</div>
-            <div className={"trackname"}>{item.title}</div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="25"
+                  fill="white"
+                  className="bi bi-pause-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
+                </svg>
+              </button>
+            )}
+            <div className={"track-info-name"}>
+              <div className={"artistname"}>{artistName}</div>
+              <div className={"trackname"}>{item.title}</div>
+            </div>
           </div>
+          {item.is_private && (
+            <div className="track-private">
+              <img
+                src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxwYXRoIGQ9Ik0xMi4wMDMgNy4yNWMuNTQ0IDAgLjk5Ny40NDQuOTk3Ljk5djQuMDJjMCAuNTM5LS40NDYuOTktLjk5Ny45OUg1Ljk5N0EuOTk4Ljk5OCAwIDAxNSAxMi4yNlY4LjI0YzAtLjUzOS40NDYtLjk5Ljk5Ny0uOTl6TTEwIDguNzVIOHYzaDJ2LTN6IiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz4KICAgIDxwYXRoIGQ9Ik0xMS41IDkuNzQ2VjYuMjU0QTIuNDk2IDIuNDk2IDAgMDA5IDMuNzVjLTEuMzggMC0yLjUgMS4xMTEtMi41IDIuNTA0djMuNDkyIiBzdHJva2U9InJnYigyNTUsIDI1NSwgMjU1KSIvPgogIDwvZz4KPC9zdmc+Cg=="
+                alt="private"
+              />
+              <div>Private</div>
+            </div>
+          )}
         </div>
         <AudioPlayer
           className={`player${item.id}`}

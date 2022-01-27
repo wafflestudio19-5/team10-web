@@ -47,21 +47,18 @@ function ArtistPageTracks() {
       });
   };
 
-  const getTracks = async (id: any, page: any) => {
+  const getTracks = async (id: any, page: any, token: any) => {
     axios
-      .get(`/users/${id}/tracks?page=${page}`)
+      .get(`/users/${id}/tracks?page=${page}`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      })
       .then((res) => {
         if (page === 1) {
-          setTracks(
-            res.data.results.filter((item: any) => item.is_private === false)
-          );
+          setTracks(res.data.results);
         } else {
-          setTracks((item: any) => [
-            ...item,
-            ...res.data.results.filter(
-              (item: any) => item.is_private === false
-            ),
-          ]);
+          setTracks((item: any) => [...item, ...res.data.results]);
         }
         if (res.data.next === null) {
           setTrackPage(null);
@@ -99,6 +96,7 @@ function ArtistPageTracks() {
     setIsLoading(true);
 
     const myPermalink = localStorage.getItem("permalink");
+    const myToken = localStorage.getItem("jwt_token");
 
     // 내 페이지인지 확인
     if (permalink === myPermalink) {
@@ -129,7 +127,7 @@ function ArtistPageTracks() {
           // 유저 정보
           getUser(res1.data.id);
           //트랙 불러오기
-          getTracks(res1.data.id, 1);
+          getTracks(res1.data.id, 1, myToken);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -140,9 +138,11 @@ function ArtistPageTracks() {
   }, []);
 
   useEffect(() => {
+    const myToken = localStorage.getItem("jwt_token");
+
     if (!isLoading && trackPage !== null) {
       if (inView) {
-        getTracks(pageId, trackPage);
+        getTracks(pageId, trackPage, myToken);
       }
     }
   }, [inView]);
