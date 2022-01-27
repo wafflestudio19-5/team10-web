@@ -21,6 +21,7 @@ import SetPage from "./components/ArtistPage/Set/SetPage";
 import ArtistPageTracks from "./components/ArtistPage/ArtistPageTracks/ArtistPageTracks";
 import ArtistPagePlaylists from "./components/ArtistPage/ArtistPagePlaylists/ArtistPagePlaylists";
 import ArtistPageReposts from "./components/ArtistPage/ArtistPageReposts/ArtistPageReposts";
+import ArtistPageRepostsTracks from "./components/ArtistPage/ArtistPageReposts/ArtistPageRepostsTracks/ArtistPageRepostsTracks";
 
 function App() {
   const location = useLocation();
@@ -53,6 +54,11 @@ function App() {
             exact
             path="/:permalink/reposts"
             component={ArtistPageReposts}
+          />
+          <Route
+            exact
+            path="/:permalink/reposts/tracks"
+            component={ArtistPageRepostsTracks}
           />
           <Route exact path="/:username/:trackname" component={TrackPage} />
           <Route exact path="/:username/sets/:playlist" component={SetPage} />

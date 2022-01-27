@@ -1,28 +1,27 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useHistory, useParams } from "react-router";
-import { useTrackContext } from "../../../context/TrackContext";
-import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
-import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
-import PlaylistBox from "../PlaylistBox/PlaylistBox";
-import TrackBox from "../TrackBox/TrackBox";
-import "./ArtistPageReposts.scss";
+import { useInView } from "react-intersection-observer";
+import { useParams } from "react-router";
+import ArtistPageHeader from "../../ArtistPageFix/ArtistPageHeader";
+import ArtistPageRight from "../../ArtistPageFix/ArtistPageRight";
+import TrackBox from "../../TrackBox/TrackBox";
+import "./ArtistPageRepostsTracks.scss";
 
-function ArtistPageReposts() {
-  const history = useHistory();
-
+function ArtistPageRepostsTracks() {
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const params = useParams<any>();
   const permalink = params.permalink;
+  const [pageId, setPageId] = useState<number>();
   const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
   const [header, setHeader] = useState<any>();
+  const [ref, inView] = useInView();
 
   const [repostTracks, setRepostTracks] = useState<any>();
-  const [repostSets, setRepostSets] = useState<any>();
+  const [repostTrackPage, setRepostTrackPage] = useState<any>(null);
 
   const [currentPlay, setCurrentPlay] = useState<any>(null);
 
@@ -47,29 +46,30 @@ function ArtistPageReposts() {
       });
   };
 
-  const getRepostTracks = async (id: any) => {
+  const getRepostTracks = async (id: any, page: any) => {
     axios
-      .get(`/users/${id}/reposts/tracks?page_size=2`)
+      .get(`/users/${id}/reposts/tracks?page=${page}`)
       .then((res) => {
-        setRepostTracks(
-          res.data.results.filter((item: any) => item.is_private === false)
-        );
+        if (page === 1) {
+          setRepostTracks(
+            res.data.results.filter((item: any) => item.is_private === false)
+          );
+        } else {
+          setRepostTracks((item: any) => [
+            ...item,
+            ...res.data.results.filter(
+              (item: any) => item.is_private === false
+            ),
+          ]);
+        }
+        if (res.data.next === null) {
+          setRepostTrackPage(null);
+        } else {
+          setRepostTrackPage(page + 1);
+        }
       })
       .catch(() => {
-        toast("리포스트 트랙 불러오기 실패");
-      });
-  };
-
-  const getRepostSets = async (id: any) => {
-    axios
-      .get(`/users/${id}/reposts/sets?page_size=2`)
-      .then((res) => {
-        setRepostSets(
-          res.data.results.filter((item: any) => item.is_private === false)
-        );
-      })
-      .catch(() => {
-        toast("리포스트 트랙 불러오기 실패");
+        toast("리포스트 불러오기 실패");
       });
   };
 
@@ -117,11 +117,11 @@ function ArtistPageReposts() {
       axios
         .get(`resolve?url=${url}`)
         .then((res1) => {
+          setPageId(res1.data.id);
           // 유저 정보
           getUser(res1.data.id);
-          //리포스트 불러오기
-          getRepostTracks(res1.data.id);
-          getRepostSets(res1.data.id);
+          //트랙 불러오기
+          getRepostTracks(res1.data.id, 1);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -131,52 +131,13 @@ function ArtistPageReposts() {
     setIsLoading(false);
   }, []);
 
-  // 하단바 재생관련
-  const {
-    setTrackIsPlaying,
-    setPlayingTime,
-    audioPlayer,
-    setAudioSrc,
-    setTrackBarArtist,
-    setTrackBarTrack,
-    trackIsPlaying,
-    trackBarTrack,
-  } = useTrackContext();
-
-  const playMusic = () => {
-    if (trackIsPlaying) {
-      audioPlayer.current.play();
-      setPlayingTime(audioPlayer.current.currentTime);
-    } else {
-      audioPlayer.current.pause();
-      setPlayingTime(audioPlayer.current.currentTime);
-    }
-  };
-
-  const togglePlayPause = (track: any, artist: any) => {
-    // 재생/일시정지 버튼 누를 때
-    if (trackBarTrack.id === track.id) {
-      const prevValue = trackIsPlaying;
-      setTrackIsPlaying(!prevValue);
-      if (!prevValue) {
-        audioPlayer.current.play();
-        setPlayingTime(audioPlayer.current.currentTime);
-      } else {
-        audioPlayer.current.pause();
-        setPlayingTime(audioPlayer.current.currentTime);
+  useEffect(() => {
+    if (!isLoading && repostTrackPage !== null) {
+      if (inView) {
+        getRepostTracks(pageId, repostTrackPage);
       }
-    } else {
-      setAudioSrc(track.audio);
-      setTrackIsPlaying(true);
-      setTrackBarArtist(artist);
-      setTrackBarTrack(track);
-      audioPlayer.current.src = track.audio;
-      setTimeout(() => {
-        audioPlayer.current.play();
-        setPlayingTime(audioPlayer.current.currentTime);
-      }, 1);
     }
-  };
+  }, [inView]);
 
   if (isLoading || user === undefined) {
     return <div>Loading...</div>;
@@ -192,10 +153,11 @@ function ArtistPageReposts() {
           />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Reposts (Tracks)</text>
+              <text>My Tracks</text>
               {repostTracks &&
-                repostTracks.map((item: any) => (
+                repostTracks.map((item: any, index: any) => (
                   <TrackBox
+                    index={index}
                     item={item}
                     artistName={user.display_name}
                     myId={myId}
@@ -205,27 +167,11 @@ function ArtistPageReposts() {
                     myPlaylist={myPlaylist}
                     modalPage={modalPage}
                     getMyPlaylist={getMyPlaylist}
-                    togglePlayPause={togglePlayPause}
-                    playMusicBar={playMusic}
                   />
                 ))}
-              <div
-                className="reposts-more"
-                onClick={() => history.push(`/${permalink}/reposts/tracks`)}
-              >
-                + More Tracks
+              <div ref={ref} className="inView">
+                text
               </div>
-              <text>My Reposts (Sets)</text>
-              {repostSets &&
-                repostSets.map((item: any) => (
-                  <PlaylistBox
-                    item={item}
-                    user={user}
-                    currentPlay={currentPlay}
-                    setCurrentPlay={setCurrentPlay}
-                  />
-                ))}
-              <div className="reposts-more">+ More Sets</div>
             </div>
             <ArtistPageRight user={user} />
           </div>
@@ -235,4 +181,4 @@ function ArtistPageReposts() {
   }
 }
 
-export default ArtistPageReposts;
+export default ArtistPageRepostsTracks;
