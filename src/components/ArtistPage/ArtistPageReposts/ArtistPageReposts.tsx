@@ -17,7 +17,6 @@ function ArtistPageReposts() {
 
   const params = useParams<any>();
   const permalink = params.permalink;
-  const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
   const [header, setHeader] = useState<any>();
@@ -112,7 +111,6 @@ function ArtistPageReposts() {
     axios
       .get(`resolve?url=${myResolve}`)
       .then((res) => {
-        setMyId(res.data.id);
         getMyPlaylist(res.data.id, 1);
       })
       .catch(() => {
@@ -207,7 +205,6 @@ function ArtistPageReposts() {
                   <TrackBox
                     item={item}
                     artistName={user.display_name}
-                    myId={myId}
                     user={user}
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}

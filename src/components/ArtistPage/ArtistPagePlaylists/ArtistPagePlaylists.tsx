@@ -17,7 +17,6 @@ function ArtistPagePlaylists() {
   const params = useParams<any>();
   const permalink = params.permalink;
   const [pageId, setPageId] = useState<number>();
-  // const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
   const [header, setHeader] = useState<any>();
@@ -93,17 +92,6 @@ function ArtistPagePlaylists() {
     } else {
       setIsMe(false);
     }
-
-    // 내 아이디 받아오기 (나중에 context로 바꾸기)
-    const myResolve = `https://soundwaffle.com/${myPermalink}`;
-    axios
-      .get(`resolve?url=${myResolve}`)
-      // .then((res) => {
-      //   setMyId(res.data.id);
-      // })
-      .catch(() => {
-        toast("유저 아이디 불러오기 실패");
-      });
 
     const getInfo = () => {
       // resolve api

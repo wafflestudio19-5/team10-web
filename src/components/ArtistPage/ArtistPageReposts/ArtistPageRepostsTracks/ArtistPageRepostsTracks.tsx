@@ -15,7 +15,6 @@ function ArtistPageRepostsTracks() {
   const params = useParams<any>();
   const permalink = params.permalink;
   const [pageId, setPageId] = useState<number>();
-  const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
   const [header, setHeader] = useState<any>();
@@ -112,7 +111,6 @@ function ArtistPageRepostsTracks() {
     axios
       .get(`resolve?url=${myResolve}`)
       .then((res) => {
-        setMyId(res.data.id);
         getMyPlaylist(res.data.id, 1);
       })
       .catch(() => {
@@ -169,7 +167,6 @@ function ArtistPageRepostsTracks() {
                     index={index}
                     item={item}
                     artistName={user.display_name}
-                    myId={myId}
                     user={user}
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}

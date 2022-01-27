@@ -130,14 +130,14 @@ function TrackBox({
   useEffect(() => {
     player.current.audio.current.pause();
 
-    const getIsLiking = () => {
-      axios.get(`/users/${myId}/likes/tracks`).then((res) => {
+    const getIsLiking = (id: any) => {
+      axios.get(`/users/${id}/likes/tracks`).then((res) => {
         const pages = Array.from(
           { length: Math.floor(res.data.count / 10) + 1 },
           (_, i) => i + 1
         );
         pages.map((page) => {
-          axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
+          axios.get(`users/${id}/likes/tracks?page=${page}`).then((res) => {
             const filter1 = res.data.results.filter(
               (track: any) => track.id === item.id
             );
@@ -149,14 +149,14 @@ function TrackBox({
       });
     };
 
-    const getReposted = () => {
-      axios.get(`/users/${myId}/reposts/tracks`).then((res) => {
+    const getReposted = (id: any) => {
+      axios.get(`/users/${id}/reposts/tracks`).then((res) => {
         const pages = Array.from(
           { length: Math.floor(res.data.count / 10) + 1 },
           (_, i) => i + 1
         );
         pages.map((page) => {
-          axios.get(`users/${myId}/reposts/tracks?page=${page}`).then((res) => {
+          axios.get(`users/${id}/reposts/tracks?page=${page}`).then((res) => {
             const filter2 = res.data.results.filter(
               (track: any) => track.id === item.id
             );
@@ -168,8 +168,19 @@ function TrackBox({
       });
     };
 
-    getIsLiking();
-    getReposted();
+    const myPermalink = localStorage.getItem("permalink");
+
+    // 내 아이디 받아오기 (나중에 context로 바꾸기)
+    const myResolve = `https://soundwaffle.com/${myPermalink}`;
+    axios
+      .get(`resolve?url=${myResolve}`)
+      .then((res) => {
+        getIsLiking(res.data.id);
+        getReposted(res.data.id);
+      })
+      .catch(() => {
+        toast("유저 아이디 불러오기 실패");
+      });
   }, []);
 
   // 하단바 재생 관련

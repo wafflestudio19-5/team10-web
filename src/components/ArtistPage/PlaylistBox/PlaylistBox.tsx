@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
@@ -114,6 +114,62 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
       toast("플레이리스트 리포스트 취소 실패");
     }
   };
+
+  useEffect(() => {
+    player.current.audio.current.pause();
+
+    const getIsLiking = (id: any) => {
+      axios.get(`/users/${id}/likes/sets`).then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/likes/sets?page=${page}`).then((res) => {
+            const filter1 = res.data.results.filter(
+              (track: any) => track.id === item.id
+            );
+            if (filter1.length !== 0) {
+              setIsLiking(true);
+            }
+          });
+        });
+      });
+    };
+
+    const getReposted = (id: any) => {
+      axios.get(`/users/${id}/reposts/sets`).then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/reposts/sets?page=${page}`).then((res) => {
+            const filter2 = res.data.results.filter(
+              (track: any) => track.id === item.id
+            );
+            if (filter2.length !== 0) {
+              setReposted(true);
+            }
+          });
+        });
+      });
+    };
+
+    const myPermalink = localStorage.getItem("permalink");
+
+    // 내 아이디 받아오기 (나중에 context로 바꾸기)
+    const myResolve = `https://soundwaffle.com/${myPermalink}`;
+    axios
+      .get(`resolve?url=${myResolve}`)
+      .then((res) => {
+        getIsLiking(res.data.id);
+        getReposted(res.data.id);
+      })
+      .catch(() => {
+        toast("유저 아이디 불러오기 실패");
+      });
+  }, []);
 
   return (
     <div className={"recent-track"}>
