@@ -87,6 +87,7 @@ const TrackBar = () => {
     // setTrackBarArtist,
     // setAudioSrc,
     trackBarPlaylist,
+    setSeekTime,
   } = useTrackContext();
   //   const { userSecret } = useAuthContext();
 
@@ -169,6 +170,7 @@ const TrackBar = () => {
     audioPlayer.current.pause();
     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
     setPlayingTime(progressBar.current.value);
+    setSeekTime(progressBar.current.value);
     setTrackIsPlaying(true);
     setTimeout(() => {
       audioPlayer.current.play();

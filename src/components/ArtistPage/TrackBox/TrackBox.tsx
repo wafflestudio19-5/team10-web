@@ -182,6 +182,7 @@ function TrackBox({
     setTrackBarTrack,
     trackIsPlaying,
     trackBarTrack,
+    seekTime,
   } = useTrackContext();
 
   const playMusicBar = () => {
@@ -258,6 +259,10 @@ function TrackBox({
     audioPlayer.current.currentTime = seeked;
   };
 
+  const seekPlayer = () => {
+    player.current.audio.current.currentTime = seekTime;
+  };
+
   useEffect(() => {
     trackBarTrack.id === item.id ? null : setBarPlaying(false);
   }, [trackBarTrack]);
@@ -273,6 +278,12 @@ function TrackBox({
   useEffect(() => {
     trackBarTrack.id === item.id ? setBarPlaying(trackIsPlaying) : null;
   }, [trackIsPlaying]);
+
+  useEffect(() => {
+    if (seekTime !== 0) {
+      document.getElementById(`seek${currentPlay}`)?.click();
+    }
+  }, [seekTime]);
 
   return (
     <div className={"recent-track"}>
@@ -350,6 +361,9 @@ function TrackBox({
           onSeeked={moveTrackBar}
           volume={0}
         />
+        <button className="seek" id={`seek${item.id}`} onClick={seekPlayer}>
+          seek
+        </button>
         <div className={"comment"}>
           {user.image_profile === null && (
             <img src="img/user_img.png" alt="me" />
