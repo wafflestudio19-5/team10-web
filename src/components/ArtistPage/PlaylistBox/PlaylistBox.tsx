@@ -3,12 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
+import { useHistory } from "react-router";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useTrackContext } from "../../../context/TrackContext";
 import "./PlaylistBox.scss";
 
 function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
   const { userSecret } = useAuthContext();
+  const history = useHistory();
 
   const player = useRef<any>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
@@ -278,13 +280,23 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
   return (
     <div className={"recent-track"}>
       {item.image && (
-        <img className="track-Img" src={item.image} alt={"trackImg"} />
+        <img
+          className="track-Img"
+          src={item.image}
+          alt={"trackImg"}
+          onClick={() =>
+            history.push(`/${item.creator.permalink}/sets/${item.permalink}`)
+          }
+        />
       )}
       {!item.image && (
         <img
           className="track-Img"
           src="/default_track_image.svg"
           alt={"trackImg"}
+          onClick={() =>
+            history.push(`/${item.creator.permalink}/sets/${item.permalink}`)
+          }
         />
       )}
       <div className={"track-right"}>
