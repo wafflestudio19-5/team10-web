@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-// import { useInView } from "react-intersection-observer";
+import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
@@ -13,15 +13,15 @@ function ArtistPagePlaylists() {
 
   const params = useParams<any>();
   const permalink = params.permalink;
-  // const [pageId, setPageId] = useState<number>();
+  const [pageId, setPageId] = useState<number>();
   // const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
   const [header, setHeader] = useState<any>();
-  // const [ref, inView] = useInView();
+  const [ref, inView] = useInView();
 
   const [playlists, setPlaylists] = useState<any>();
-  // const [playlistPage, setPlaylistPage] = useState<any>(null);
+  const [playlistPage, setPlaylistPage] = useState<any>(null);
 
   const [currentPlay, setCurrentPlay] = useState<any>(null);
 
@@ -67,11 +67,11 @@ function ArtistPagePlaylists() {
             ),
           ]);
         }
-        // if (res.data.next === null) {
-        //   setPlaylistPage(null);
-        // } else {
-        //   setPlaylistPage(page + 1);
-        // }
+        if (res.data.next === null) {
+          setPlaylistPage(null);
+        } else {
+          setPlaylistPage(page + 1);
+        }
       })
       .catch(() => {
         toast("플레이리스트 불러오기 실패");
@@ -100,7 +100,7 @@ function ArtistPagePlaylists() {
       axios
         .get(`resolve?url=${url}`)
         .then((res1) => {
-          // setPageId(res1.data.id);
+          setPageId(res1.data.id);
           // 유저 정보
           getUser(res1.data.id);
           // 플레이리스트 불러오기
@@ -114,13 +114,13 @@ function ArtistPagePlaylists() {
     setIsLoading(false);
   }, []);
 
-  // useEffect(() => {
-  //   if (!isLoading && trackPage !== null) {
-  //     if (inView) {
-  //       getTracks(pageId, trackPage);
-  //     }
-  //   }
-  // }, [inView]);
+  useEffect(() => {
+    if (!isLoading && playlistPage !== null) {
+      if (inView) {
+        getPlaylists(pageId, playlistPage);
+      }
+    }
+  }, [inView]);
 
   if (isLoading || user === undefined) {
     return <div>Loading...</div>;
@@ -146,9 +146,9 @@ function ArtistPagePlaylists() {
                     setCurrentPlay={setCurrentPlay}
                   />
                 ))}
-              {/* <div ref={ref} className="inView">
+              <div ref={ref} className="inView">
                 text
-              </div> */}
+              </div>
             </div>
             <ArtistPageRight user={user} />
           </div>
