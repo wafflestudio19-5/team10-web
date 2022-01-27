@@ -4,6 +4,7 @@ import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useTrackContext } from "../../../context/TrackContext";
 import "./PlaylistBox.scss";
 
 function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
@@ -12,40 +13,12 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
   const player = useRef<any>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
   const [trackIndex, setTrackIndex] = useState<number>(0);
+  const [current, setCurrent] = useState<any>(0);
 
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [reposted, setReposted] = useState<boolean>(false);
   const [likes, setLikes] = useState<number>(item.like_count);
   const [reposts, setReposts] = useState<number>(item.repost_count);
-
-  const playMusic = () => {
-    if (currentPlay !== null) {
-      let current = document.getElementById(`button${currentPlay}`);
-      current?.click();
-    }
-    setIsPlaying(true);
-    player.current.audio.current.play();
-    setCurrentPlay(item.id);
-  };
-
-  const pauseMusic = () => {
-    setCurrentPlay(null);
-    setIsPlaying(false);
-    player.current.audio.current.pause();
-  };
-
-  const playNextTrack = () => {
-    if (item.tracks.length === trackIndex + 1) {
-      setTrackIndex(0);
-    } else {
-      setTrackIndex(trackIndex + 1);
-    }
-  };
-
-  const playThisTrack = (num: any) => {
-    setTrackIndex(num);
-    playMusic();
-  };
 
   const likePlaylist = async () => {
     const config: any = {
@@ -171,6 +144,132 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
       });
   }, []);
 
+  // 하단바 재생 관련
+  const {
+    setTrackIsPlaying,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    trackIsPlaying,
+    trackBarTrack,
+    seekTime,
+  } = useTrackContext();
+
+  const playMusicBar = () => {
+    if (trackIsPlaying) {
+      audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
+    } else {
+      audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
+    }
+  };
+
+  const togglePlayPause = (track: any, artist: any) => {
+    // 재생/일시정지 버튼 누를 때
+    if (trackBarTrack.id === track.id) {
+      const prevValue = trackIsPlaying;
+      setTrackIsPlaying(!prevValue);
+      if (!prevValue) {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else {
+        audioPlayer.current.pause();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }
+    } else {
+      setAudioSrc(track.audio);
+      setTrackIsPlaying(true);
+      setTrackBarArtist(artist);
+      setTrackBarTrack(track);
+      audioPlayer.current.src = track.audio;
+      audioPlayer.current.currentTime = current;
+      setTimeout(() => {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }, 1);
+    }
+  };
+
+  const [barPlaying, setBarPlaying] = useState(false);
+
+  const handlePlay = (e: any) => {
+    e.stopPropagation();
+    togglePlayPause(item.tracks[trackIndex], item.creator);
+    trackBarTrack.id === item.id
+      ? setBarPlaying(!trackIsPlaying)
+      : setBarPlaying(true);
+  };
+
+  const playMusic = (e: any) => {
+    if (barPlaying) {
+      handlePlay(e);
+    }
+    if (currentPlay !== null) {
+      let current = document.getElementById(`button${currentPlay}`);
+      current?.click();
+    }
+    setIsPlaying(true);
+    player.current.audio.current.play();
+    setCurrentPlay(item.id);
+    handlePlay(e);
+  };
+
+  const pauseMusic = (e: any) => {
+    setCurrentPlay(null);
+    setCurrent(player.current.audio.current.currentTime);
+    setIsPlaying(false);
+    player.current.audio.current.pause();
+    handlePlay(e);
+  };
+
+  const playNextTrack = () => {
+    if (item.tracks.length === trackIndex + 1) {
+      setTrackIndex(0);
+    } else {
+      setTrackIndex(trackIndex + 1);
+    }
+  };
+
+  const playThisTrack = (num: any, e: any) => {
+    setTrackIndex(num);
+    playMusic(e);
+  };
+
+  const moveTrackBar = () => {
+    const seeked = player.current.audio.current.currentTime;
+    setCurrent(seeked);
+    audioPlayer.current.currentTime = seeked;
+  };
+
+  const seekPlayer = () => {
+    player.current.audio.current.currentTime = seekTime;
+  };
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? null : setBarPlaying(false);
+  }, [trackBarTrack]);
+
+  const moveWeb = async () => {
+    setBarPlaying(true);
+  };
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? moveWeb().then(() => playMusicBar()) : null;
+  }, []);
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? setBarPlaying(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
+
+  useEffect(() => {
+    if (seekTime !== 0) {
+      document.getElementById(`seek${currentPlay}`)?.click();
+    }
+  }, [seekTime]);
+
   return (
     <div className={"recent-track"}>
       <img
@@ -182,7 +281,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
         <div className="track-info-private">
           <div className={"track-info"}>
             {!isPlaying && (
-              <button onClick={playMusic} className="play-button">
+              <button onClick={(e) => playMusic(e)} className="play-button">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="25"
@@ -197,7 +296,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
             )}
             {isPlaying && (
               <button
-                onClick={pauseMusic}
+                onClick={(e) => pauseMusic(e)}
                 id={`button${item.id}`}
                 className="play-button"
               >
@@ -234,7 +333,12 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           key={item.tracks.id}
           src={item.tracks[trackIndex].audio}
           onEnded={playNextTrack}
+          onSeeked={moveTrackBar}
+          volume={0}
         />
+        <button className="seek" id={`seek${item.id}`} onClick={seekPlayer}>
+          seek
+        </button>
         {item.tracks.length !== 0 &&
           Array.from({ length: item.tracks.length }, (_, i) => i).map(
             (num: any) => (
@@ -247,7 +351,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
                     <img src={item.tracks[num].image} alt="me" />
                   )}
                   <div>{num + 1}</div>
-                  <div onClick={() => playThisTrack(num)}>
+                  <div onClick={(e) => playThisTrack(num, e)}>
                     {item.tracks[num].title}
                   </div>
                 </div>

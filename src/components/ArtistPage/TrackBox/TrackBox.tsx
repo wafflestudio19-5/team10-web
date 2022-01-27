@@ -377,7 +377,7 @@ function TrackBox({
         </button>
         <div className={"comment"}>
           {user.image_profile === null && (
-            <img src="img/user_img.png" alt="me" />
+            <img src="/default_user_image.png" alt="me" />
           )}
           {user.image_profile !== null && (
             <img src={user.image_profile} alt="me" />

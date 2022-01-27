@@ -170,7 +170,7 @@ function ArtistPageHeader({ header, user, setUser, getUser, isMe }: any) {
           {user.image_profile === null && (
             <img
               className="profile-img"
-              src={"img/user_img.png"}
+              src="/default_user_image.png"
               alt={"profileImg"}
             />
           )}
