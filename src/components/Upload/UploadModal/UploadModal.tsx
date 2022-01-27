@@ -31,7 +31,7 @@ any) {
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
-    let fileInput = document.getElementById("file-input");
+    let fileInput = document.getElementById("file-input-up");
     fileInput?.click();
   };
 
@@ -202,7 +202,7 @@ any) {
           </button>
           <input
             type="file"
-            id="file-input"
+            id="file-input-up"
             accept=".png"
             onChange={imageToUrl}
           />

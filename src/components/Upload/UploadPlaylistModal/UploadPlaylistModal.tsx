@@ -26,7 +26,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
-    let fileInput = document.getElementById("file-input");
+    let fileInput = document.getElementById("file-input-upm");
     fileInput?.click();
   };
 
@@ -49,8 +49,6 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
 
   const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
-    // 이미지 파일 기능 추가해야됨
-    console.log(imageFile);
     const myToken = localStorage.getItem("jwt_token");
 
     // set 만들기
@@ -63,6 +61,11 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           type: playlistType,
           description: description,
           is_private: isPrivate,
+          image_extension:
+            imageFile &&
+            imageFile.name.substr(
+              -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+            ),
         },
         {
           headers: {
@@ -71,6 +74,21 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         }
       )
       .then((res1) => {
+        // 이미지 업로드 하기
+        if (imageFile) {
+          const img_options = {
+            headers: {
+              "Content-Type": imageFile.type,
+            },
+          };
+
+          axios
+            .put(res1.data.image_presigned_url, imageFile, img_options)
+            .catch(() => {
+              toast("이미지파일 업로드 실패");
+            });
+        }
+
         // 개별 track 만들기
         const tracks = Array.from(
           { length: selectedFiles.length },
@@ -193,7 +211,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           </button>
           <input
             type="file"
-            id="file-input"
+            id="file-input-upm"
             accept=".png"
             onChange={imageToUrl}
           />

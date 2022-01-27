@@ -277,11 +277,16 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   return (
     <div className={"recent-track"}>
-      <img
-        className="track-Img"
-        src="/default_track_image.svg"
-        alt={"trackImg"}
-      />
+      {item.image && (
+        <img className="track-Img" src={item.image} alt={"trackImg"} />
+      )}
+      {!item.image && (
+        <img
+          className="track-Img"
+          src="/default_track_image.svg"
+          alt={"trackImg"}
+        />
+      )}
       <div className={"track-right"}>
         <div className="track-info-private">
           <div className={"track-info"}>
