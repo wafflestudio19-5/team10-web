@@ -207,7 +207,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
       : setBarPlaying(true);
   };
 
-  const playMusic = (e: any) => {
+  const playMusic = (e: any, index: any) => {
     if (barPlaying) {
       handlePlay(e, trackIndex);
     }
@@ -218,7 +218,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     setIsPlaying(true);
     player.current.audio.current.play();
     setCurrentPlay(item.id);
-    handlePlay(e, trackIndex);
+    handlePlay(e, index);
   };
 
   const pauseMusic = (e: any) => {
@@ -240,7 +240,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   const playThisTrack = (num: any, e: any) => {
     setTrackIndex(num);
-    playMusic(e);
+    playMusic(e, num);
   };
 
   const moveTrackBar = () => {
@@ -290,7 +290,10 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
         <div className="track-info-private">
           <div className={"track-info"}>
             {!isPlaying && (
-              <button onClick={(e) => playMusic(e)} className="play-button">
+              <button
+                onClick={(e) => playMusic(e, trackIndex)}
+                className="play-button"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="25"
