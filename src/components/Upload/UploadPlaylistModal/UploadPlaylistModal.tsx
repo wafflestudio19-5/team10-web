@@ -61,11 +61,11 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           type: playlistType,
           description: description,
           is_private: isPrivate,
-          image_extension:
-            imageFile &&
-            imageFile.name.substr(
-              -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
-            ),
+          image_extension: imageFile
+            ? imageFile.name.substr(
+                -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+              )
+            : undefined,
         },
         {
           headers: {
@@ -239,10 +239,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           <div className="upload-type-date">
             <div className="upload-info-genre">
               <text>Playlist type</text>
-              <select
-                value="playlist"
-                onChange={(e: any) => setPlaylistType(e.target.value)}
-              >
+              <select onChange={(e: any) => setPlaylistType(e.target.value)}>
                 <option value="playlist">playlist</option>
                 <option value="album">album</option>
               </select>
