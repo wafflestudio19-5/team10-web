@@ -415,12 +415,24 @@ const Discover = () => {
           },
         })
           .then((r: any) => {
-            const mostList = r.data.results.slice(0, 4);
             const newList = r.data.results.slice(-6);
-            setMostTrackList(mostList);
             setNewTrackList(newList);
           })
           .catch(() => toast.error("트랙 정보 불러오기를 실패하였습니다"));
+      };
+      const fetchHistoryTracks = async () => {
+        await axios({
+          method: "get",
+          url: `/users/${userSecret.id}/history/tracks?page_size=4`,
+          headers: { Authorization: `JWT ${userSecret.jwt}` },
+          data: {
+            user_id: userSecret.id,
+          },
+        })
+          .then((res) => {
+            setMostTrackList(res.data.results);
+          })
+          .catch(() => toast.error("history list를 가져오지 못하였습니다"));
       };
       const fetchUserId = async () => {
         try {
@@ -441,6 +453,7 @@ const Discover = () => {
         }
       };
       fetchMostNewList();
+      fetchHistoryTracks();
       fetchUserId();
     }
   }, [userSecret]);
@@ -467,8 +480,8 @@ const Discover = () => {
         <div className={styles.main}>
           <div className={styles.most}>
             <div>
-              <h2>More of what you like</h2>
-              <div>Suggestions based on what you've liked or played</div>
+              <h2>Most of what you heard</h2>
+              <div>The tracks you heard</div>
             </div>
             <MostList
               mostTrackList={mostTrackList}

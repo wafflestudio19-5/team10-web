@@ -310,7 +310,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
     trackBarTrack.id === historyTrack.id
       ? moveWeb().then(() => playMusic())
       : null;
-  }, []);
+  }, [historyTrack]);
   useEffect(() => {
     trackBarTrack.id === historyTrack.id ? setIsPlaying(trackIsPlaying) : null;
   }, [trackIsPlaying, audioSrc]);
