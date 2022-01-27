@@ -1,3 +1,4 @@
+import React from "react";
 import { useHistory } from "react-router";
 import "./Header.scss";
 import { useEffect, useState } from "react";
@@ -38,6 +39,12 @@ function Header() {
     cookies.remove("is_logged_in", { path: "/" });
     history.push("/logout");
   };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
+  };
 
   return (
     <div className={"header_bar"}>
@@ -69,7 +76,11 @@ function Header() {
                     <img src={me.image_profile} alt={"user"} />
                   )}
                   {me.image_profile === null && (
-                    <img src={"/img/user_img.png"} alt={"user"} />
+                    <img
+                      src={"/img/user_img.png"}
+                      onError={onImageError}
+                      alt={"user"}
+                    />
                   )}
                   <text>{me.display_name}</text>
                 </div>

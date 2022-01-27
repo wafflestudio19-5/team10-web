@@ -18,12 +18,14 @@ const SetMain = ({
   fetchSet,
   setEditModal,
   playing,
+  setPlaying,
   isMySet,
 }: {
   playlist: IPlaylist;
   fetchSet: () => void;
   setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
   playing: string;
+  setPlaying: React.Dispatch<React.SetStateAction<string>>;
   isMySet: boolean | undefined;
 }) => {
   //   const [isMySet, setIsMySet] = useState<undefined | boolean>(undefined);
@@ -109,6 +111,7 @@ const SetMain = ({
                     playlist={playlist}
                     key={track.id}
                     playing={playing}
+                    setPlaying={setPlaying}
                     fetchSet={fetchSet}
                   />
                 );

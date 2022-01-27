@@ -1,3 +1,4 @@
+import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -16,11 +17,13 @@ const TrackList = ({
   track,
   playlist,
   playing,
+  setPlaying,
   fetchSet,
 }: {
   track: ISetTrack;
   playlist: IPlaylist;
   playing: string;
+  setPlaying: React.Dispatch<React.SetStateAction<string>>;
   fetchSet: () => void;
 }) => {
   const [play, setPlay] = useState(false);
@@ -96,6 +99,7 @@ const TrackList = ({
           audioPlayer.current.play();
         }, 1);
         if (playing === "before") {
+          setPlaying("playing");
           setTrackBarPlaylist(playlist.tracks);
           putHit(track.id);
         }

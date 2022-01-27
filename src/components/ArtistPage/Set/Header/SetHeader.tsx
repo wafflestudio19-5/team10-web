@@ -11,7 +11,7 @@ import React, {
 import { MdOutlineCancel } from "react-icons/md";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { useTrackContext } from "../../../../context/TrackContext";
-import { IPlaylist } from "../SetPage";
+import { IPlaylist, ISetTrack } from "../SetPage";
 import SetButton from "./SetButton";
 import styles from "./SetHeader.module.scss";
 import SetImage from "./SetImage";
@@ -69,7 +69,8 @@ const SetHeader = ({
     changePlayerCurrentTime();
   };
   useEffect(() => {
-    if (noSet === false && playlist?.tracks !== null) {
+    const tracks: ISetTrack[] = playlist.tracks;
+    if (playlist?.tracks !== null && tracks.length != 0) {
       setButtonDisabled(false);
     }
   }, [playlist.tracks, noSet]);

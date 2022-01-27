@@ -13,6 +13,8 @@ import { IArtist, ITrack, IUserMe } from "../TrackPage";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
 import toast from "react-hot-toast";
+import RelatedTracks from "./Side/RelatedTracks";
+import InPlaylists from "./Side/InPlaylists";
 
 export interface IComment {
   id: number;
@@ -275,8 +277,8 @@ const TrackMain = ({
         </div>
       </div>
       <div className={styles.side}>
-        {/* <RelatedTracks />
-        <InPlaylists /> */}
+        <RelatedTracks artist={artist} track={track} />
+        <InPlaylists artist={artist} />
         <LikeUsers
           //   track={track}
           //   artist={artist}

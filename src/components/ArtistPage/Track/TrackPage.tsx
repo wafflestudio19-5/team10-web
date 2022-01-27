@@ -104,65 +104,56 @@ const TrackPage = () => {
   const fetchTrack = async () => {
     if (typeof userSecret.jwt === "string") {
       try {
-        const response = await axios.get(
-          `https://api.soundwaffle.com/resolve?url=https://www.soundwaffle.com/${username}/${trackname}`
-        );
-        const data = response.data;
-        try {
-          const config: any = {
-            method: "get",
-            url: `/tracks/${data.id}`,
-            headers: {
-              Authorization: `JWT ${userSecret.jwt}`,
-            },
-            data: {},
-          };
-          const response = await axios(config);
-          const artist = response.data.artist;
-          if (artist.id == userSecret.id) {
-            setIsMyTrack(true);
-          } else {
-            setIsMyTrack(false);
-          }
-          if (artist.id !== userSecret.id && response.data.is_private) {
-            setNoTrack(true);
-          }
-          const tagList = data.tags.map((value: ITag) => value.name);
-          setTrack({
-            id: response.data.id,
-            title: response.data.title,
-            permalink: response.data.permalink,
-            audio: response.data.audio,
-            comment_count: response.data.comment_count,
-            play_count: response.data.play_count,
-            created_at: response.data.created_at,
-            description: response.data.description,
-            genre: response.data.genre,
-            image: response.data.image,
-            like_count: response.data.like_count,
-            repost_count: response.data.repost_count,
-            tags: tagList,
-            is_private: response.data.is_private,
-            // audio_length: 0,
-            is_liked: response.data.is_liked,
-            is_reposted: response.data.is_reposted,
-            is_followed: response.data.is_followed,
-          });
-          setArtist({
-            city: artist.city,
-            country: artist.country,
-            display_name: artist.display_name,
-            id: artist.id,
-            permalink: artist.permalink,
-            track_count: artist.track_count,
-            follower_count: artist.follower_count,
-            image_profile: artist.image_profile,
-          });
-          setIsLoading(false);
-        } catch (error) {
-          console.log(error);
-          toast.error("트랙 정보를 받아오는 데 실패했습니다");
+        const config: any = {
+          method: "get",
+          url: `https://api.soundwaffle.com/resolve?url=https://www.soundwaffle.com/${username}/${trackname}`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        const response = await axios(config);
+        const artist = response.data.artist;
+        if (artist.id == userSecret.id) {
+          setIsMyTrack(true);
+        } else {
+          setIsMyTrack(false);
         }
+        if (artist.id !== userSecret.id && response.data.is_private) {
+          setNoTrack(true);
+        }
+        const tagList = response.data.tags.map((value: ITag) => value.name);
+        setTrack({
+          id: response.data.id,
+          title: response.data.title,
+          permalink: response.data.permalink,
+          audio: response.data.audio,
+          comment_count: response.data.comment_count,
+          play_count: response.data.play_count,
+          created_at: response.data.created_at,
+          description: response.data.description,
+          genre: response.data.genre,
+          image: response.data.image,
+          like_count: response.data.like_count,
+          repost_count: response.data.repost_count,
+          tags: tagList,
+          is_private: response.data.is_private,
+          // audio_length: 0,
+          is_liked: response.data.is_liked,
+          is_reposted: response.data.is_reposted,
+          is_followed: response.data.is_followed,
+        });
+        setArtist({
+          city: artist.city,
+          country: artist.country,
+          display_name: artist.display_name,
+          id: artist.id,
+          permalink: artist.permalink,
+          track_count: artist.track_count,
+          follower_count: artist.follower_count,
+          image_profile: artist.image_profile,
+        });
+        setIsLoading(false);
       } catch (error) {
         if (
           (axios.isAxiosError(error) &&
@@ -175,8 +166,8 @@ const TrackPage = () => {
           setNoTrack(true);
           setIsLoading(false);
         }
+        toast.error("트랙 정보를 받아올 수 없습니다");
       }
-      return;
     }
   };
   const fetchMe = async () => {

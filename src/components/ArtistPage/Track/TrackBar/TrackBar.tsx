@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "./TrackBar.module.scss";
 import {
   IoPlaySkipBackSharp,
@@ -338,27 +339,6 @@ const TrackBar = () => {
   const toggleNextup = () => setNextup(!nextup);
 
   useEffect(() => {
-    const putHit = async () => {
-      if (trackIsPlaying && userSecret.jwt) {
-        const config: any = {
-          method: "put",
-          url: `/tracks/${trackBarTrack.id}/hit`,
-          headers: {
-            Authorization: `JWT ${userSecret.jwt}`,
-          },
-          data: {},
-        };
-        try {
-          await axios(config);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-    putHit();
-  }, [audioSrc, userSecret.jwt]);
-
-  useEffect(() => {
     const getLastTrack = async () => {
       if (userSecret.id != 0) {
         const config: any = {
@@ -395,6 +375,34 @@ const TrackBar = () => {
     };
     getLastTrack();
   }, [userSecret.id]);
+
+  useEffect(() => {
+    const putHit = async () => {
+      if (trackIsPlaying && userSecret.jwt) {
+        const config: any = {
+          method: "put",
+          url: `/tracks/${trackBarTrack.id}/hit`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          await axios(config);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    putHit();
+  }, [audioPlayer.current.src, userSecret.jwt]);
+
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
 
   return (
     <>
@@ -457,6 +465,7 @@ const TrackBar = () => {
             <div className={styles.trackInfo}>
               <img
                 src={trackBarTrack.image || "/default_track_image.svg"}
+                onError={onImageError}
                 alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
               />
               <div className={styles.artistTrackName}>

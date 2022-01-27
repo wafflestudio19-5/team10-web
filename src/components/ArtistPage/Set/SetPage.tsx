@@ -109,37 +109,28 @@ const SetPage = () => {
   const { userSecret } = useAuthContext();
   const fetchSet = async () => {
     try {
-      const response = await axios.get(
-        `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`
-      );
-      const data = response.data;
-      try {
-        const config: any = {
-          method: "get",
-          url: `/sets/${data.id}`,
-          headers: {
-            Authorization: `JWT ${userSecret.jwt}`,
-          },
-          data: {},
-        };
-        const response = await axios(config);
-        if (response.data.creator.id == userSecret.id) {
-          setIsMySet(true);
-        } else {
-          setIsMySet(false);
-        }
-        if (
-          response.data.creator.id !== userSecret.id &&
-          response.data.is_private
-        ) {
-          setNoSet(true);
-        }
-        setSet(response.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-        toast.error("플레이리스트 정보를 받아올 수 없습니다");
+      const config: any = {
+        method: "get",
+        url: `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      const response = await axios(config);
+      if (response.data.creator.id == userSecret.id) {
+        setIsMySet(true);
+      } else {
+        setIsMySet(false);
       }
+      if (
+        response.data.creator.id !== userSecret.id &&
+        response.data.is_private
+      ) {
+        setNoSet(true);
+      }
+      setSet(response.data);
+      setIsLoading(false);
     } catch (error) {
       if (
         (axios.isAxiosError(error) &&
@@ -203,6 +194,7 @@ const SetPage = () => {
               fetchSet={fetchSet}
               setEditModal={setEditModal}
               playing={playing}
+              setPlaying={setPlaying}
               isMySet={isMySet}
             />
           )}

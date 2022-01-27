@@ -141,11 +141,19 @@ const ListenArtistInfo = ({
     }
   };
 
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
+  };
+
   return (
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}>
         <img
           src={artist.image_profile || "/default_user_image.png"}
+          onError={onImageError}
           alt={`${artist.display_name}의 프로필 사진`}
         />
       </div>

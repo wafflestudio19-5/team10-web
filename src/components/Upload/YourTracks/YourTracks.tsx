@@ -491,7 +491,7 @@ const Track = ({
     } else {
       setPlay(false);
     }
-  }, [audioSrc, trackIsPlaying]);
+  }, [audioSrc, trackIsPlaying, audioPlayer.current.src]);
 
   //   const calculateTime = (secs: number) => {
   //     // 트랙 길이를 분:초 단위로 환산
