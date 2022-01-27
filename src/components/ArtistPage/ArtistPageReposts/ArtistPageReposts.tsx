@@ -225,7 +225,12 @@ function ArtistPageReposts() {
                     setCurrentPlay={setCurrentPlay}
                   />
                 ))}
-              <div className="reposts-more">+ More Sets</div>
+              <div
+                className="reposts-more"
+                onClick={() => history.push(`/${permalink}/reposts/sets`)}
+              >
+                + More Sets
+              </div>
             </div>
             <ArtistPageRight user={user} />
           </div>
