@@ -229,12 +229,11 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     handlePlay(e);
   };
 
-  const playNextTrack = (e: any) => {
+  const playNextTrack = () => {
     if (item.tracks.length === trackIndex + 1) {
       setTrackIndex(0);
     } else {
       setTrackIndex(trackIndex + 1);
-      handlePlay(e);
     }
   };
 
@@ -341,7 +340,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           className={`player${item.tracks.id}`}
           key={item.tracks.id}
           src={item.tracks[trackIndex].audio}
-          onEnded={(e) => playNextTrack(e)}
+          onEnded={playNextTrack}
           onSeeked={moveTrackBar}
           volume={0}
         />
