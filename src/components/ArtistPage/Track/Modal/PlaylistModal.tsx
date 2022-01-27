@@ -78,6 +78,7 @@ const PlaylistModal = ({
         // console.log(response);
       } catch (error) {
         console.log(error);
+        toast.error("트랙을 추가하는데 실패했습니다");
       }
     } catch (error) {
       if (
@@ -113,6 +114,7 @@ const PlaylistModal = ({
       setIsLoading(false);
     } catch (error) {
       console.log(error);
+      toast.error("플레이리스트 정보를 받아올 수 없습니다");
       setIsLoading(false);
     }
   };
@@ -305,6 +307,7 @@ const PlaylistList = ({
       const prevValue = !isAlreadyIn;
       setIsAlreadyIn(prevValue);
       closeModal();
+      toast.success(`트랙이 ${action === POST ? "추가" : "제거"}되었습니다`);
     } catch (error) {
       console.log(error);
       toast.error("실패했습니다");

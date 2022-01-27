@@ -57,7 +57,7 @@ const TrackHeader = ({
     } else {
       setIsSameTrack(false);
     }
-  }, [track]);
+  }, [track, audioSrc]);
 
   useEffect(() => {
     // 필요없음

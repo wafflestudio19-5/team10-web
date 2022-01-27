@@ -13,6 +13,7 @@ import { useAuthContext } from "../../../../../context/AuthContext";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { throttle } from "lodash";
+import toast from "react-hot-toast";
 
 const Comments = ({
   comments,
@@ -103,11 +104,12 @@ const CommentItem = ({
         },
       };
       try {
-        const response = await axios(config);
-        console.log(response);
+        await axios(config);
+        // console.log(response);
         fetchComments();
       } catch (error) {
-        console.log(console.error());
+        console.log(error);
+        toast.error("댓글을 작성하는데 실패했습니다");
       }
     }, 1000);
     submitInput();
@@ -157,6 +159,7 @@ const CommentItem = ({
               }
             } catch (error) {
               console.log(error);
+              toast.error("댓글을 삭제하는데 실패했습니다");
             }
           },
         },

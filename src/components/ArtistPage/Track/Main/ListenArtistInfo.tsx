@@ -7,6 +7,7 @@ import { useHistory } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { IArtist, ITrack, IUserMe } from "../TrackPage";
+import toast from "react-hot-toast";
 
 // interface IArtistInfo {
 //   image: null | string;
@@ -119,6 +120,7 @@ const ListenArtistInfo = ({
       fetchTrack();
     } catch (error) {
       console.log(error);
+      toast.error("유저를 팔로우하는데 실패했습니다");
     }
   };
   const unfollowUser = async () => {
@@ -135,6 +137,7 @@ const ListenArtistInfo = ({
       fetchTrack();
     } catch (error) {
       console.log(error);
+      toast.error("유저를 언팔로우하는데 실패했습니다");
     }
   };
 

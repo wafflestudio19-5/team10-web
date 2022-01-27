@@ -93,7 +93,9 @@ const SetEditModal = ({
           link.permalink === tPermalink && link.id !== playlist.id
       )
     ) {
-      toast.error(`동일한 링크의 다른 트랙이 존재합니다(${tPermalink})`);
+      toast.error(
+        `동일한 링크의 다른 플레이리스트가 존재합니다(${tPermalink})`
+      );
     }
   };
 
@@ -179,6 +181,8 @@ const SetEditModal = ({
           error.response.status === 400
         ) {
           toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+        } else {
+          toast.error("플레이리스트를 업데이트할 수 없습니다");
         }
         console.log(error);
       }
@@ -205,6 +209,7 @@ const SetEditModal = ({
         if (response) {
           fetchSet();
           setModal(false);
+          toast.success("플레이리스트를 업데이트했습니다");
         }
       } catch (error) {
         if (
@@ -213,6 +218,8 @@ const SetEditModal = ({
           error.response.status === 400
         ) {
           toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+        } else {
+          toast.error("플레이리스트를 업데이트할 수 없습니다");
         }
         console.log(error);
       }

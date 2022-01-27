@@ -75,18 +75,18 @@ const SetHeader = ({
   }, [playlist.tracks, noSet]);
   //   const buttonDisabled = false;
   const putHit = async () => {
-    if (trackIsPlaying) {
-      const config: any = {
-        method: "put",
-        url: `/tracks/${playlist.tracks[0].id}/hit?set_id=${playlist.id}`,
-        Authorization: userSecret.jwt,
-        data: {},
-      };
-      try {
-        await axios(config);
-      } catch (error) {
-        console.log(error);
-      }
+    const config: any = {
+      method: "put",
+      url: `/tracks/${playlist.tracks[0].id}/hit?set_id=${playlist.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      await axios(config);
+    } catch (error) {
+      console.log(error);
     }
   };
   const togglePlayPause = () => {
@@ -106,12 +106,6 @@ const SetHeader = ({
         permalink: playlist.tracks[0].permalink,
         audio: playlist.tracks[0].audio,
         image: playlist.tracks[0].image,
-        // like_count: track.like_count,
-        // repost_count: track.repost_count,
-        // comment_count: track.comment_count,
-        // genre: track.genre,
-        // count: track.count,
-        // is_private: track.is_private,
       });
       setTrackBarPlaylist(playlist.tracks);
       audioPlayer.current.src = playlist.tracks[0].audio;

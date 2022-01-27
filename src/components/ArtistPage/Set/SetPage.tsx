@@ -138,7 +138,7 @@ const SetPage = () => {
         setIsLoading(false);
       } catch (error) {
         console.log(error);
-        toast.error("플레이리스트 정보를 받아오는 데 실패했습니다");
+        toast.error("플레이리스트 정보를 받아올 수 없습니다");
       }
     } catch (error) {
       if (

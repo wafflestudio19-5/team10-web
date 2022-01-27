@@ -199,7 +199,7 @@ const TrackBar = () => {
     history.push(`/${trackBarArtist.permalink}/${trackBarTrack.permalink}`);
   };
 
-  const nextTrack = () => {
+  const nextTrack = async () => {
     if (trackBarPlaylist.length === 0) {
       return toast.error(
         "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
@@ -212,6 +212,43 @@ const TrackBar = () => {
       return toast.error("다음 트랙이 없습니다");
     }
     audioPlayer.current.pause();
+    // 새로 url 받아오는 경우
+    // const config: any = {
+    //     method: "get",
+    //     url: `/tracks/${trackBarPlaylist[current + 1].id}`,
+    //     headers: {
+    //       Authorization: `JWT ${userSecret.jwt}`,
+    //     },
+    //     data: {},
+    //   };
+    //   try {
+    //     const { data } = await axios(config);
+    //     setPlayingTime(0);
+    //     setTrackIsPlaying(true);
+    //     setTrackBarTrack({
+    //       id: data.id,
+    //       permalink: data.permalink,
+    //       audio: data.audio,
+    //       image: data.image,
+    //       title: data.title,
+    //     });
+    //     setTrackBarArtist({
+    //       display_name: trackBarPlaylist[current + 1].artist_display_name,
+    //       id: trackBarPlaylist[current + 1].artist,
+    //       permalink: trackBarPlaylist[current + 1].artist_permalink,
+    //     });
+    //     audioPlayer.current.src = data.audio;
+    //     setAudioSrc(data.audio);
+    //     audioPlayer.current.load();
+    //     audioPlayer.current.pause();
+    //     setTimeout(() => {
+    //       audioPlayer.current.play();
+    //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    //     }, 1);
+    //   } catch (error) {
+    //     console.log(error);
+    //     toast.error("이전 트랙을 불러올 수 없습니다");
+    //   }
     setPlayingTime(0);
     setTrackIsPlaying(true);
     setTrackBarTrack(trackBarPlaylist[current + 1]);
@@ -230,7 +267,7 @@ const TrackBar = () => {
     }, 1);
   };
 
-  const prevTrack = () => {
+  const prevTrack = async () => {
     if (trackBarPlaylist.length === 0) {
       return toast.error(
         "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
@@ -302,11 +339,13 @@ const TrackBar = () => {
 
   useEffect(() => {
     const putHit = async () => {
-      if (trackIsPlaying) {
+      if (trackIsPlaying && userSecret.jwt) {
         const config: any = {
           method: "put",
           url: `/tracks/${trackBarTrack.id}/hit`,
-          Authorization: userSecret.jwt,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
           data: {},
         };
         try {
@@ -317,7 +356,7 @@ const TrackBar = () => {
       }
     };
     putHit();
-  }, [audioSrc]);
+  }, [audioSrc, userSecret.jwt]);
 
   useEffect(() => {
     const getLastTrack = async () => {
@@ -325,7 +364,9 @@ const TrackBar = () => {
         const config: any = {
           method: "get",
           url: `/users/${userSecret.id}/history/tracks`,
-          Authorization: userSecret.jwt,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
           data: {},
         };
         try {
@@ -348,7 +389,7 @@ const TrackBar = () => {
           }
         } catch (error) {
           console.log(error);
-          toast.error("마지막으로 들었던 트랙 정보를 불러오는 데 실패했습니다");
+          toast.error("마지막으로 들었던 트랙 정보를 불러올 수 없습니다");
         }
       }
     };

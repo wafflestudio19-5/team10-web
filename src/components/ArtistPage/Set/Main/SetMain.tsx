@@ -11,6 +11,7 @@ import axios from "axios";
 import LikeUsers from "../../Track/Main/Side/LikeUsers";
 import RepostUsers from "../../Track/Main/Side/RepostUsers";
 import TrackList from "./TrackList";
+import toast from "react-hot-toast";
 
 const SetMain = ({
   playlist,
@@ -53,6 +54,9 @@ const SetMain = ({
       setSetLikers(data.results);
     } catch (error) {
       console.log(error);
+      toast.error(
+        "해당 플레이리스트를을 좋아요한 유저 목록을 받아올 수 없습니다"
+      );
     }
   };
   const fetchReposters = async () => {
@@ -70,6 +74,9 @@ const SetMain = ({
       setSetReposters(data.results);
     } catch (error) {
       console.log(error);
+      toast.error(
+        "해당 플레이리스트를 리포스트한 유저 목록을 받아올 수 없습니다"
+      );
     }
   };
 

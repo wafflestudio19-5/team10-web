@@ -69,7 +69,7 @@ function Header() {
                     <img src={me.image_profile} alt={"user"} />
                   )}
                   {me.image_profile === null && (
-                    <img src={"img/user_img.png"} alt={"user"} />
+                    <img src={"/img/user_img.png"} alt={"user"} />
                   )}
                   <text>{me.display_name}</text>
                 </div>

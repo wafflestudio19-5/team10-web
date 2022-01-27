@@ -121,6 +121,7 @@ const ListenEngagement = ({
       }
     } catch (error) {
       console.log(error);
+      toast.error("실패했습니다");
     }
   };
 
@@ -146,12 +147,14 @@ const ListenEngagement = ({
         error &&
         error?.response?.status === 401
       ) {
-        console.log("asdfasd");
+        toast.error("Unauthorized");
+      } else {
+        toast.error("실패했습니다");
       }
     }
   };
   const repostTrack = async () => {
-    console.log(axios.defaults.headers);
+    // console.log(axios.defaults.headers);
     const config: any = {
       method: "post",
       url: `/reposts/tracks/${track.id}`,
@@ -167,6 +170,7 @@ const ListenEngagement = ({
       fetchReposters();
     } catch (error) {
       console.log(error);
+      toast.error("실패했습니다");
     }
     return;
   };
@@ -186,6 +190,7 @@ const ListenEngagement = ({
       fetchReposters();
     } catch (error) {
       console.log(error);
+      toast.error("실패했습니다");
     }
     return;
   };

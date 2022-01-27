@@ -60,18 +60,16 @@ const TrackList = ({
     }
   }, [audioSrc, trackIsPlaying]);
   const putHit = async (id: number) => {
-    if (trackIsPlaying) {
-      const config: any = {
-        method: "put",
-        url: `/tracks/${id}/hit?set_id=${playlist.id}`,
-        Authorization: userSecret.jwt,
-        data: {},
-      };
-      try {
-        await axios(config);
-      } catch (error) {
-        console.log(error);
-      }
+    const config: any = {
+      method: "put",
+      url: `/tracks/${id}/hit?set_id=${playlist.id}`,
+      Authorization: userSecret.jwt,
+      data: {},
+    };
+    try {
+      await axios(config);
+    } catch (error) {
+      console.log(error);
     }
   };
   const togglePlayButton = () => {
@@ -129,6 +127,22 @@ const TrackList = ({
       toast.error("실패했습니다");
     }
   };
+  const repostTrack = async () => {
+    const config: any = {
+      method: track.is_reposted ? "delete" : "post",
+      url: `/reposts/tracks/${track.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      await axios(config);
+      fetchSet();
+    } catch (error) {
+      toast.error("실패했습니다");
+    }
+  };
   const copyLink = async () => {
     await navigator.clipboard.writeText(location.href);
     toast.success("Link has been copied to the clipboard!");
@@ -165,7 +179,10 @@ const TrackList = ({
         >
           <BsSuitHeartFill />
         </button>
-        <button className={track.is_reposted ? styles.liked : undefined}>
+        <button
+          className={track.is_reposted ? styles.liked : undefined}
+          onClick={repostTrack}
+        >
           <BiRepost />
         </button>
         <button onClick={copyLink}>
