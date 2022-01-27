@@ -156,7 +156,7 @@ function TrackBox({
           (_, i) => i + 1
         );
         pages.map((page) => {
-          axios.get(`users/${myId}/likes/tracks?page=${page}`).then((res) => {
+          axios.get(`users/${myId}/reposts/tracks?page=${page}`).then((res) => {
             const filter2 = res.data.results.filter(
               (track: any) => track.id === item.id
             );
