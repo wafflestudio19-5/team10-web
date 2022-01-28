@@ -112,7 +112,7 @@ function UploadModal({ selectedFile, setModal }: any) {
         console.log(err.response);
         toast("업로드 실패");
         if (title === "") {
-          toast("❗️ 제목은 필수입니다.");
+          toast("❗️ 트랙 제목을 입력하세요.");
         }
         if (/\s/g.test(tPermalink)) {
           toast("❗️ 트랙 url에서 띄어쓰기는 불가능합니다.");
@@ -123,6 +123,13 @@ function UploadModal({ selectedFile, setModal }: any) {
             `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
         ) {
           toast("❗️ 트랙 url은 영어 / 숫자만 가능합니다");
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            "Ensure this field has at least 3 characters."
+        ) {
+          toast("❗️ 플레이리스트 url은 3글자 이상이어야 합니다.");
         }
         if (
           err.response.data.non_field_errors &&

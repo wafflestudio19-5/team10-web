@@ -207,6 +207,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         });
       })
       .catch((err) => {
+        console.log(err.response);
         toast("업로드 실패");
         if (title === "") {
           toast("❗️ 플레이리스트 제목을 입력하세요.");
@@ -217,6 +218,23 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
             "Already existing set permalink for the requested user."
         ) {
           toast("❗️ 플레이리스트 url이 중복되었습니다.");
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
+        ) {
+          toast("❗️ 트랙 url은 띄어쓰기 없이 영어 / 숫자만 가능합니다");
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            "Ensure this field has at least 3 characters."
+        ) {
+          toast("❗️ 플레이리스트 url은 3글자 이상이어야 합니다.");
+        }
+        if (err.response.status === 500) {
+          toast("❗️ 서버오류");
         }
       });
   };
