@@ -316,9 +316,9 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
   useEffect(() => {
     if (trackBarPlaylistId === item.id) {
       if (trackIsPlaying) {
-        console.log("hi");
         setIsPlaying(true);
-        setTrackIndex(trackBarTrack.id);
+        const thisTrack = (element: any) => element.id === trackBarTrack.id;
+        setTrackIndex(item.tracks.findIndex(thisTrack));
         player.current.audio.current.currentTime =
           audioPlayer.current.currentTime;
         player.current.audio.current.play();
