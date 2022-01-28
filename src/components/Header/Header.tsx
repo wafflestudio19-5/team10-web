@@ -10,19 +10,14 @@ import toast from "react-hot-toast";
 function Header() {
   const history = useHistory();
   const cookies = new Cookies();
-  const { userInfo } = useAuthContext();
+  const { userInfo, setUserInfo } = useAuthContext();
   const [me, setMe] = useState<any>();
-  const userInfoUndefined = {
-    profile_img: undefined,
-    display_name: undefined,
-    permalink: undefined,
-  };
 
   useEffect(() => {
     if (cookies.get("is_logged_in") === undefined) {
       history.push("/");
     }
-    if (userInfo === userInfoUndefined) {
+    if (userInfo.permalink === undefined) {
       const myToken = localStorage.getItem("jwt_token");
       const getMe = async () => {
         const config: any = {
@@ -52,8 +47,14 @@ function Header() {
     localStorage.removeItem("permalink");
     localStorage.removeItem("id");
     cookies.remove("is_logged_in", { path: "/" });
+    setUserInfo({
+      profile_img: undefined,
+      display_name: undefined,
+      permalink: undefined,
+    });
     history.push("/logout");
   };
+
   const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
     currentTarget,
   }) => {
@@ -85,7 +86,7 @@ function Header() {
         <div className={"header_user"}>
           <div className="dropdown">
             <button type="button" data-bs-toggle="dropdown">
-              {userInfo !== userInfoUndefined && (
+              {userInfo.permalink !== undefined && (
                 <div>
                   {userInfo.profile_img !== null && (
                     <img src={userInfo.profile_img} alt={"user"} />
@@ -100,19 +101,30 @@ function Header() {
                   <text>{userInfo.display_name}</text>
                 </div>
               )}
-              {userInfo === userInfoUndefined && (
+              {userInfo.permalink === undefined && (
                 <div>
-                  {me.profile_img !== null && (
-                    <img src={me.profile_img} alt={"user"} />
+                  {me && me.profileImg && (
+                    <div>
+                      <img src={me.profile_img} alt={"user"} />
+                      <text>{me.display_name}</text>
+                    </div>
                   )}
-                  {me.profile_img === null && (
-                    <img
-                      src="/default_user_image.png"
-                      alt={"user"}
-                      onError={onImageError}
-                    />
+                  {me && !me.profileImg && (
+                    <div>
+                      <img src="/default_user_image.png" alt={"user"} />
+                      <text>user</text>
+                    </div>
                   )}
-                  <text>{me.display_name}</text>
+                  {!me && (
+                    <div>
+                      <img
+                        src="/default_user_image.png"
+                        alt={"user"}
+                        onError={onImageError}
+                      />
+                      <text>user</text>
+                    </div>
+                  )}
                 </div>
               )}
             </button>
