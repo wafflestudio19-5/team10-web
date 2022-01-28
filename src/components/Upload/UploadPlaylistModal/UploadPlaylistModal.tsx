@@ -4,7 +4,8 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadPlaylistModal.scss";
 // import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// import "react-datepicker/dist/react-datepicker.css";
+import { TagsInput } from "react-tag-input-component";
 import PlaylistTrack from "./PlaylistTrack/PlaylistTrack";
 
 function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
@@ -23,7 +24,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const [listPermalink, setListPermalink] = useState<string>("");
   const [genre, setGenre] = useState<string | undefined>();
   const [customGenre, setCustomGenre] = useState<any>();
-  const [tag, setTag] = useState<any>();
+  const [tags, setTags] = useState<any>();
   // const [date, setDate] = useState(new Date());
 
   const [newFiles, setNewFiles] = useState<any>(selectedFiles);
@@ -77,7 +78,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           type: playlistType,
           description: description,
           genre_input: genre === "custom" ? customGenre : undefined,
-          tags_input: tag ? [tag] : undefined,
+          tags_input: tags !== [] ? tags : undefined,
           is_private: isPrivate,
           image_extension: imageFile
             ? imageFile.name.substr(
@@ -208,13 +209,14 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
       .catch((err) => {
         toast("업로드 실패");
         if (title === "") {
-          toast("❗️플레이리스트 제목을 입력하세요.");
+          toast("❗️ 플레이리스트 제목을 입력하세요.");
         }
         if (
+          err.response.data.non_field_errors &&
           err.response.data.non_field_errors[0] ===
-          "Already existing set permalink for the requested user."
+            "Already existing set permalink for the requested user."
         ) {
-          toast("❗️ 플레이리스트 주소가 중복되었습니다.");
+          toast("❗️ 플레이리스트 url이 중복되었습니다.");
         }
       });
   };
@@ -299,9 +301,11 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           </div> */}
           <div className="upload-info-tag">
             <text>Additional tags</text>
-            <input
-              placeholder="Add tags to describe the genre and mood of your track"
-              onChange={(e) => setTag(e.target.value)}
+            <TagsInput
+              value={tags}
+              onChange={setTags}
+              name="tags"
+              placeHolder="Describe the genre and mood of your track. (Press Enter)"
             />
           </div>
           <div className="upload-info-description">
