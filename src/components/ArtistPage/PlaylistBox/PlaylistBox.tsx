@@ -315,13 +315,15 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   useEffect(() => {
     if (trackBarPlaylistId === item.id) {
-      console.log("hi");
-      setIsPlaying(true);
-      setTrackIndex(trackBarTrack.id);
-      player.current.audio.current.currentTime =
-        audioPlayer.current.currentTime;
-      player.current.audio.current.play();
-      setCurrentPlay(item.id);
+      if (trackIsPlaying) {
+        console.log("hi");
+        setIsPlaying(true);
+        setTrackIndex(trackBarTrack.id);
+        player.current.audio.current.currentTime =
+          audioPlayer.current.currentTime;
+        player.current.audio.current.play();
+        setCurrentPlay(item.id);
+      }
     }
   }, []);
 
