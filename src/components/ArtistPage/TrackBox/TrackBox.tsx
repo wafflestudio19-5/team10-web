@@ -12,7 +12,6 @@ import "./TrackBox.scss";
 function TrackBox({
   item,
   artistName,
-  myId,
   user,
   currentPlay,
   setCurrentPlay,
@@ -20,7 +19,7 @@ function TrackBox({
   modalPage,
   getMyPlaylist,
 }: any) {
-  const { userSecret } = useAuthContext();
+  const { userSecret, userInfo } = useAuthContext();
   const history = useHistory();
 
   const [isLiking, setIsLiking] = useState<boolean>(false);
@@ -137,7 +136,12 @@ function TrackBox({
     const getIsLiking = (id: any) => {
       axios.get(`/users/${id}/likes/tracks`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -156,7 +160,12 @@ function TrackBox({
     const getReposted = (id: any) => {
       axios.get(`/users/${id}/reposts/tracks`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -312,6 +321,16 @@ function TrackBox({
     }
   }, [seekTime]);
 
+  useEffect(() => {
+    if (trackBarTrack.id === item.id) {
+      setIsPlaying(true);
+      player.current.audio.current.currentTime =
+        audioPlayer.current.currentTime;
+      player.current.audio.current.play();
+      setCurrentPlay(item.id);
+    }
+  }, []);
+
   return (
     <div className={"recent-track"}>
       {item.image !== null && (
@@ -392,11 +411,11 @@ function TrackBox({
           seek
         </button>
         <div className={"comment"}>
-          {user.image_profile === null && (
+          {userInfo.profile_img === null && (
             <img src="/default_user_image.png" alt="me" />
           )}
-          {user.image_profile !== null && (
-            <img src={user.image_profile} alt="me" />
+          {userInfo.profile_img !== null && (
+            <img src={userInfo.profile_img} alt="me" />
           )}
           <input
             placeholder={"Write a comment and Press Enter"}
@@ -460,7 +479,6 @@ function TrackBox({
               item={item}
               modalPage={modalPage}
               getMyPlaylist={getMyPlaylist}
-              myId={myId}
               artistName={artistName}
             />
             {/* <button>

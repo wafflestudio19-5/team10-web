@@ -55,16 +55,12 @@ function ArtistPageAlbums() {
       .then((res) => {
         if (page === 1) {
           setAlbums(
-            res.data.results.filter(
-              (item: any) => item.tracks.length !== 0 && item.type === "album"
-            )
+            res.data.results.filter((item: any) => item.type === "album")
           );
         } else {
           setAlbums((item: any) => [
             ...item,
-            ...res.data.results.filter(
-              (item: any) => item.tracks.length !== 0 && item.type === "album"
-            ),
+            ...res.data.results.filter((item: any) => item.type === "album"),
           ]);
         }
         if (res.data.next === null) {
@@ -134,7 +130,7 @@ function ArtistPageAlbums() {
           />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Playlists</text>
+              <text>My Albums</text>
               {albums &&
                 albums.map((item: any) => (
                   <PlaylistBox

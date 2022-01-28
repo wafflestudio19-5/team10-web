@@ -96,7 +96,12 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     const getIsLiking = (id: any) => {
       axios.get(`/users/${id}/likes/sets`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -115,7 +120,12 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     const getReposted = (id: any) => {
       axios.get(`/users/${id}/reposts/sets`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -158,6 +168,8 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     trackBarTrack,
     seekTime,
     setTrackBarPlaylist,
+    trackBarPlaylistId,
+    setTrackBarPlaylistId,
   } = useTrackContext();
 
   const putHit = async () => {
@@ -207,6 +219,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
       setTrackBarArtist(artist);
       setTrackBarTrack(playlist[index]);
       setTrackBarPlaylist(playlist);
+      setTrackBarPlaylistId(item.id);
       audioPlayer.current.src = playlist[index].audio;
       if (trackBarTrack === playlist[index]) {
         audioPlayer.current.currentTime = current;
@@ -300,6 +313,18 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     }
   }, [seekTime]);
 
+  useEffect(() => {
+    if (trackBarPlaylistId === item.id) {
+      console.log("hi");
+      setIsPlaying(true);
+      setTrackIndex(trackBarTrack.id);
+      player.current.audio.current.currentTime =
+        audioPlayer.current.currentTime;
+      player.current.audio.current.play();
+      setCurrentPlay(item.id);
+    }
+  }, []);
+
   return (
     <div className={"recent-track"}>
       {item.image && (
@@ -379,7 +404,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           ref={player}
           className={`player${item.tracks.id}`}
           key={item.tracks.id}
-          src={item.tracks[trackIndex]?.audio}
+          src={item.tracks.length !== 0 && item.tracks[trackIndex]?.audio}
           onEnded={(e) => playNextTrack(e)}
           onSeeked={moveTrackBar}
           volume={0}
@@ -413,6 +438,15 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
               </div>
             )
           )}
+        {item.tracks.length === 0 && (
+          <div className={"playlist-track-null"}>
+            <img
+              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAOCAAAAAB4YAGaAAAAtElEQVR4AY3RT+uCMADG8d7/O3gKifLQQTpoHbp0+RlFET+LKDP6R5Ag08ogvKhrRIlbq/w+bKfPaSvRgklg4rQURV+mP6GGR3r0HZoUeMr0M0zaMSK8WkthnBj0dC2HOGSwaVrRGySdEOeqix1myKWGIlyoHmxM2QbI1xXhCFsM0WPnj4MNEU5wxD/GsNDnoCFCp0Zgs60w5+BehDfnAhceAvj1TFW0jewdfRpQwu7Cfy3vDqsH6oJzha+DAAAAAElFTkSuQmCC"
+              alt="me"
+            />
+            <div>This set is empty.</div>
+          </div>
+        )}
         <div className={"track-buttons"}>
           {isLiking === false && (
             <button onClick={likePlaylist}>
