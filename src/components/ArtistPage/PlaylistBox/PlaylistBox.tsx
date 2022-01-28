@@ -242,7 +242,11 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
 
   const playThisTrack = (num: any, e: any) => {
     setTrackIndex(num);
-    playMusic(e, num);
+    if (trackIndex === num) {
+      player.current.audio.current.currentTime = 0;
+    } else {
+      playMusic(e, num);
+    }
   };
 
   const moveTrackBar = () => {
