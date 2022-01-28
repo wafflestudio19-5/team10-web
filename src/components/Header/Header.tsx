@@ -4,11 +4,24 @@ import "./Header.scss";
 import { useEffect } from "react";
 import Cookies from "universal-cookie";
 import { useAuthContext } from "../../context/AuthContext";
+import { useTrackContext } from "../../context/TrackContext";
 
 function Header() {
   const history = useHistory();
   const cookies = new Cookies();
-  const { userInfo } = useAuthContext();
+  const { userInfo, setUserInfo, setUserSecret } = useAuthContext();
+  const {
+    setTrackBarArtist,
+    setTrackDuration,
+    setTrackIsPlaying,
+    setPlayingTime,
+    setAudioSrc,
+    setIsMuted,
+    setLoop,
+    setTrackBarPlaylist,
+    setTrackBarTrack,
+    setSeekTime,
+  } = useTrackContext();
 
   useEffect(() => {
     cookies.get("is_logged_in") === undefined && history.push("/");
@@ -19,6 +32,36 @@ function Header() {
     localStorage.removeItem("permalink");
     localStorage.removeItem("id");
     cookies.remove("is_logged_in", { path: "/" });
+    setTrackDuration(0);
+    setTrackIsPlaying(false);
+    setPlayingTime(0);
+    setAudioSrc("");
+    setIsMuted(false);
+    setLoop(false);
+    setTrackBarArtist({
+      display_name: "",
+      id: 0,
+      permalink: "",
+    });
+    setTrackBarPlaylist([]);
+    setTrackBarTrack({
+      id: 0,
+      title: "",
+      permalink: "",
+      audio: "",
+      image: "",
+    });
+    setSeekTime(0);
+    setUserSecret({
+      jwt: undefined,
+      permalink: undefined,
+      id: 0,
+    });
+    setUserInfo({
+      profile_img: undefined,
+      display_name: undefined,
+      permalink: undefined,
+    });
     history.push("/logout");
   };
   const onImageError: React.ReactEventHandler<HTMLImageElement> = ({

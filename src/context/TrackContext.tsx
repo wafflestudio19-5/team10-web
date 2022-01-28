@@ -95,13 +95,7 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     title: "",
     permalink: "",
     audio: "",
-    // comment_count: 0,
-    // count: 0,
-    // genre: null,
     image: "",
-    // like_count: 0,
-    // repost_count: 0,
-    // is_private: false,
   });
   const [trackBarPlaylist, setTrackBarPlaylist] = useState<ITrackBarPlaylist[]>(
     []
