@@ -186,19 +186,6 @@
                     font-size: 14px;
                 }
             }
-
-            .upload-info-privacy {
-                font-size: 14px;
-                margin-bottom: 30px;
-
-                text {
-                    font-size: 12px;
-                }
-
-                div {
-                    margin-top: 7px;
-                }
-            }
         }
     }
 
@@ -236,12 +223,6 @@
             margin-right: 25px;
         }
     }
-}
-
-.upload-tracks-for-playlist {
-    font-size: 20px;
-    margin-left: 60px;
-    margin-bottom: 15px;
 }
 
 .upload-playlist-for-playlist {
@@ -283,5 +264,37 @@
         border-radius: 3px;
         margin-left: 10px;
         margin-right: 25px;
+    }
+}
+
+.upload-tracks-for-playlist-privacy {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+
+    .upload-tracks-for-playlist {
+        font-size: 20px;
+        margin-left: 60px;
+    }
+
+    .upload-info-privacy {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        margin-right: 60px;
+
+        text {
+            font-size: 14px;
+        }
+
+        div {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        input {
+            margin-right: 5px;
+        }
     }
 }

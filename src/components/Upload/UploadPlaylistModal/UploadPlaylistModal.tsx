@@ -73,14 +73,15 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         .post(
           "https://api.soundwaffle.com/tracks",
           {
-            title: newFiles[item].name,
-            permalink:
+            title:
               newFiles[item].name.lastIndexOf(".") === -1
                 ? newFiles[item].name
                 : newFiles[item].name.substr(
                     0,
                     newFiles[item].name.lastIndexOf(".")
                   ),
+            permalink:
+              "play" + Math.floor(Math.random() * (100000000 - 100 + 1)) + 100,
             is_private: isPrivate,
             audio_extension: selectedFiles[item].name.substr(
               -selectedFiles[item].name.length +
@@ -107,38 +108,45 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
               selectedFiles[item],
               music_options
             )
-            .then((res) => {
+            .then(() => {
               toast(`✅ ${item + 1}번째 트랙 업로드 성공`);
-              setUploads((item: any) => [...item, { id: res.data.id }]);
+              setUploads((item: any) => [...item, { id: res2.data.id }]);
             })
             .catch(() => {
-              // 조건문 추가 (재업로드할경우)
               toast(`❗️ ${item + 1}번째 음악파일 업로드 실패`);
               deleteErrorTrack(res2.data.id);
             });
         })
         .catch((err) => {
-          toast(`❗️ ${item + 1} 번째 트랙 제목을 변경해주세요.`);
           if (
             err.response.data.permalink &&
             err.response.data.permalink[0] ===
               `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
           ) {
-            toast("❗️ 트랙 제목은 띄어쓰기 없이 영어 / 숫자만 가능합니다");
+            toast(
+              `❗️ ${item + 1}번째 트랙 제목을 변경해주세요.
+              트랙 제목은 띄어쓰기 없이 영어 / 숫자만 가능합니다`
+            );
           }
           if (
             err.response.data.permalink &&
             err.response.data.permalink[0] ===
               "Ensure this field has at least 3 characters."
           ) {
-            toast("❗️ 트랙 제목은 3글자 이상이어야 합니다.");
+            toast(
+              `❗️ ${item + 1}번째 트랙 제목을 변경해주세요.
+              트랙 제목은 3글자 이상이어야 합니다.`
+            );
           }
           if (
             err.response.data.non_field_errors &&
             err.response.data.non_field_errors[0] ===
               "Already existing permalink for the requested user."
           ) {
-            toast("❗️ 트랙 제목이 중복되었습니다.");
+            toast(
+              `❗️ ${item + 1}번째 트랙 제목을 변경해주세요.
+              트랙 제목이 중복되었습니다.`
+            );
           }
           if (err.response.status === 500) {
             toast("❗️ 서버오류");
@@ -211,7 +219,6 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           });
       })
       .catch((err) => {
-        console.log(err.response);
         toast("업로드 실패");
         if (title === "") {
           toast("❗️ 플레이리스트 제목을 입력하세요.");
@@ -254,7 +261,32 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         <div>Advanced</div>
       </div>
 
-      <div className="upload-tracks-for-playlist">Tracks</div>
+      <div className="upload-tracks-for-playlist-privacy">
+        <div className="upload-tracks-for-playlist">Tracks</div>
+        <div className="upload-info-privacy">
+          <text>Privacy:</text>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="flexRadioDefault2"
+              onChange={() => setIsPrivate(false)}
+            />
+            <label className="form-check-label">Public (default)</label>
+          </div>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="flexRadioDefault1"
+              onChange={() => setIsPrivate(true)}
+            />
+            <label className="form-check-label">Private</label>
+          </div>
+        </div>
+      </div>
       {trackNum.map((item: number) => (
         <PlaylistTrack
           item={item}
@@ -361,29 +393,6 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
               placeholder="Describe your track"
               onChange={(e) => setDescription(e.target.value)}
             />
-          </div>
-          <div className="upload-info-privacy">
-            <text>Privacy:</text>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="flexRadioDefault"
-                id="flexRadioDefault2"
-                onChange={() => setIsPrivate(false)}
-              />
-              <label className="form-check-label">Public (default)</label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="flexRadioDefault"
-                id="flexRadioDefault1"
-                onChange={() => setIsPrivate(true)}
-              />
-              <label className="form-check-label">Privacy</label>
-            </div>
           </div>
         </div>
       </div>
