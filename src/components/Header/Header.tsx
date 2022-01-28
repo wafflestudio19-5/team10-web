@@ -138,14 +138,6 @@ function Header() {
               <li>
                 <a
                   className="dropdown-item"
-                  onClick={() => history.push("/you/stations")}
-                >
-                  Stations
-                </a>
-              </li>
-              <li>
-                <a
-                  className="dropdown-item"
                   onClick={() => history.push("/you/following")}
                 >
                   Following
@@ -173,9 +165,6 @@ function Header() {
               </svg>
             </button>
             <ul className="dropdown-menu">
-              <li>
-                <a className="dropdown-item">About us</a>
-              </li>
               <li>
                 <a className="dropdown-item" onClick={onSignOut}>
                   Sign out
