@@ -1,27 +1,28 @@
 import React, { useEffect, useRef } from "react";
 import styles from "./PlaylistModal.module.scss";
 import { GrClose } from "react-icons/gr";
-import { IArtist, ITrack } from "../TrackPage";
+// import { IArtist, ITrack } from "../TrackPage";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useAuthContext } from "../../../../context/AuthContext";
+// import { useAuthContext } from "../../../../context/AuthContext";
 import axios from "axios";
-import { IPlaylist } from "../../Set/SetPage";
+// import { IPlaylist } from "../../Set/SetPage";
 import { IoStatsChart } from "react-icons/io5";
 import { BsFillFileLock2Fill } from "react-icons/bs";
 import { throttle } from "lodash";
 import { useHistory } from "react-router";
+// import { IArtist, ITrack } from "../../ArtistPage/Track/TrackPage";
+import { IPlaylist } from "../../ArtistPage/Set/SetPage";
+import { useAuthContext } from "../../../context/AuthContext";
 
 const PlaylistModal = ({
   modal,
   closeModal,
-  track,
-  artist,
+  checkedId,
 }: {
   modal: boolean;
   closeModal: () => void;
-  track: ITrack;
-  artist: IArtist;
+  checkedId: number[];
 }) => {
   const [playlistTitle, setPlaylistTitle] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -42,17 +43,19 @@ const PlaylistModal = ({
     event
   ) => {
     setSetPermalink(event.target.value);
-    if (event.target.value.length === 0) {
-      toast.error("링크를 작성해주세요");
-    }
   };
   const onPrivacyChange = () => setIsPrivate(!isPrivate);
   const onSave = async () => {
     if (playlistTitle.trim().length === 0) {
       return toast.error("플레이리스트 이름을 작성해 주세요");
     }
-    if (setPermalink.trim().length === 1) {
+    if (setPermalink.trim().length === 0) {
       return toast.error("플레이리스트 링크를 작성해주세요");
+    }
+    if (!/^[0-9a-z_-]+$/g.test(setPermalink)) {
+      return toast.error(
+        `링크에는 숫자, 알파벳 소문자, -, _ 만 사용해 주세요.`
+      );
     }
     const config: any = {
       method: "post",
@@ -76,13 +79,16 @@ const PlaylistModal = ({
           Authorization: `JWT ${userSecret.jwt}`,
         },
         data: {
-          track_id: track.id,
-          track_ids: [{ id: track.id }],
+          track_ids: checkedId.map((number) => {
+            return { id: number };
+          }),
         },
       };
       try {
         await axios(trackConfig);
         toast.success("트랙이 추가되었습니다");
+        setSetPermalink("");
+        setPlaylistTitle("");
         closeModal();
         // console.log(response);
       } catch (error) {
@@ -113,7 +119,11 @@ const PlaylistModal = ({
     };
     try {
       const { data } = await axios(config);
-      setMyPlaylist(myPlaylist.concat(data.results));
+      if (currentPage.current !== 1) {
+        setMyPlaylist(myPlaylist.concat(data.results));
+      } else {
+        setMyPlaylist(data.results);
+      }
       if (data.next === null) {
         setIsFinal(true);
       } else {
@@ -129,9 +139,12 @@ const PlaylistModal = ({
   };
   useEffect(() => {
     if (userSecret.id) {
+      currentPage.current = 1;
+      setIsFinal(false);
       fetchMyPlaylists(1);
     }
-  }, [userSecret.id]);
+  }, [userSecret.id, modal]);
+  console.log(currentPage.current);
 
   const handleScroll = () => {
     if (!isFinal && !isLoading) {
@@ -153,12 +166,6 @@ const PlaylistModal = ({
 
   const clickAdd = () => setMode(ADD);
   const clickCreate = () => setMode(CREATE);
-  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
-    currentTarget,
-  }) => {
-    currentTarget.onerror = null;
-    currentTarget.src = "/default_track_image.svg";
-  };
 
   return (
     <div
@@ -208,8 +215,8 @@ const PlaylistModal = ({
                         <li key={playlist.id}>
                           <PlaylistList
                             playlist={playlist}
-                            track={track}
                             key={playlist.id}
+                            checkedId={checkedId}
                             closeModal={closeModal}
                           />
                         </li>
@@ -276,7 +283,7 @@ const PlaylistModal = ({
                     Save
                   </button>
                 </div>
-                <div className={styles.trackItem}>
+                {/* <div className={styles.trackItem}>
                   <div className={styles.image}>
                     <img
                       src={track.image || "/default_track_image.svg"}
@@ -289,7 +296,7 @@ const PlaylistModal = ({
                     </span>{" "}
                     <span className={styles.trackTitle}>{track.title}</span>
                   </div>
-                </div>
+                </div> */}
               </>
             )}
           </div>
@@ -301,10 +308,11 @@ const PlaylistModal = ({
 
 const PlaylistList = ({
   playlist,
-  track,
+  checkedId,
+  closeModal,
 }: {
   playlist: IPlaylist;
-  track: ITrack;
+  checkedId: number[];
   closeModal: () => void;
 }) => {
   const [isAlreadyIn, setIsAlreadyIn] = useState<boolean | undefined>(
@@ -312,12 +320,16 @@ const PlaylistList = ({
   );
   const { userSecret } = useAuthContext();
   useEffect(() => {
-    if (playlist.tracks?.find((element) => element.id === track.id)) {
+    if (
+      checkedId
+        .map((id) => playlist.tracks.find((track) => track.id === id))
+        .filter((element) => element !== undefined).length === checkedId.length
+    ) {
       setIsAlreadyIn(true);
     } else {
       setIsAlreadyIn(false);
     }
-  }, [playlist.tracks]);
+  }, [playlist]);
   const POST = "post";
   const DELETE = "delete";
   const addTrack = async (action: string) => {
@@ -327,13 +339,31 @@ const PlaylistList = ({
       headers: {
         Authorization: `JWT ${userSecret.jwt}`,
       },
-      data: { track_id: track.id, track_ids: [{ id: track.id }] },
+      data:
+        action === POST
+          ? {
+              track_ids: checkedId
+                .filter(
+                  (number) =>
+                    playlist.tracks.find((track) => track.id === number) ===
+                    undefined
+                )
+                .map((checked) => {
+                  return { id: checked };
+                }),
+            }
+          : {
+              track_ids: checkedId.map((checked) => {
+                return { id: checked };
+              }),
+            },
     };
     try {
       await axios(config);
       const prevValue = !isAlreadyIn;
       setIsAlreadyIn(prevValue);
       toast.success(`트랙이 ${action === POST ? "추가" : "제거"}되었습니다`);
+      closeModal();
     } catch (error) {
       console.log(error);
       toast.error("실패했습니다");

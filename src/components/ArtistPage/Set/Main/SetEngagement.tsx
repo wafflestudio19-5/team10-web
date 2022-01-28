@@ -188,25 +188,25 @@ const SetEngagement = ({
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>
-        {isMySet === false && playlist.is_liked === true && (
+        {playlist.is_liked === true && (
           <button className={styles.like} onClick={unlikeSet}>
             <BsSuitHeartFill />
             <span>Liked</span>
           </button>
         )}
-        {isMySet === false && playlist.is_liked === false && (
+        {playlist.is_liked === false && (
           <button className={styles.notLike} onClick={likeSet}>
             <BsSuitHeartFill />
             <span>Like</span>
           </button>
         )}
-        {isMySet === false && playlist.is_reposted === true && (
+        {playlist.is_reposted === true && (
           <button className={styles.repost} onClick={unrepostSet}>
             <BiRepost />
             <span>Reposted</span>
           </button>
         )}
-        {isMySet === false && playlist.is_reposted === false && (
+        {playlist.is_reposted === false && (
           <button className={styles.notRepost} onClick={repostSet}>
             <BiRepost />
             <span>Repost</span>

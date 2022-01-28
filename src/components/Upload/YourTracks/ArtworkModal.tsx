@@ -71,11 +71,10 @@ const ArtworkModal = ({
                   "Content-Type": imageFile.type,
                 },
               });
-              toast.success("이미지 업로드에 성공했습니다");
               fetchYourTracks();
               closeModal();
             } catch (error) {
-              toast.error("이미지 업로드에 실패했습니다");
+              toast.error(`이미지 업로드에 실패했습니다`);
               console.log(error);
             }
           }

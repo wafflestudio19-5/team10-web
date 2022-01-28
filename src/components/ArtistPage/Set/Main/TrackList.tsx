@@ -40,6 +40,7 @@ const TrackList = ({
     setTrackBarArtist,
     setTrackIsPlaying,
     setTrackBarPlaylist,
+    setTrackBarPlaylistId,
     // trackBarPlaylist,
   } = useTrackContext();
   const history = useHistory();
@@ -56,7 +57,11 @@ const TrackList = ({
   //   }, [track.is_reposted, track.is_liked]);
 
   useEffect(() => {
-    if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
+    if (
+      headerTrackSrc === barTrackSrc &&
+      trackIsPlaying &&
+      playing !== "before"
+    ) {
       setPlay(true);
     } else {
       setPlay(false);
@@ -100,7 +105,13 @@ const TrackList = ({
         }, 1);
         if (playing === "before") {
           setPlaying("playing");
+          setAudioSrc(track.audio);
+          audioPlayer.current.src = track.audio;
+          setPlayingTime(0);
+          audioPlayer.current.load();
+          audioPlayer.current.play();
           setTrackBarPlaylist(playlist.tracks);
+          setTrackBarPlaylistId(playlist.id);
           putHit(track.id);
         }
       } else {

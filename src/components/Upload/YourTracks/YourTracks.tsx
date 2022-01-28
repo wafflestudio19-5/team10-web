@@ -27,6 +27,7 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import PrivacyModal from "./PrivacyModal";
 import toast from "react-hot-toast";
+import PlaylistModal from "./PlaylistModal";
 dayjs.extend(relativeTime);
 
 export interface IYourTracks {
@@ -60,6 +61,7 @@ const YourTracks = () => {
   const [artworkModal, setArtworkModal] = useState(false);
   const [privacyModal, setPrivacyModal] = useState(false);
   const [isAllChecked, setIsAllChecked] = useState(false);
+  const [playlistModal, setPlaylistModal] = useState(false);
   const nextPage = useRef(1);
   const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
@@ -161,6 +163,7 @@ const YourTracks = () => {
   };
   const fetchYourTracks = async () => {
     setCurrentPage(1);
+    setIsFinalPage(false);
     nextPage.current = 1;
     finalPage.current = 0;
     if (userSecret.jwt) {
@@ -227,6 +230,8 @@ const YourTracks = () => {
   const closeArtworkModal = () => setArtworkModal(false);
   const openPrivacyModal = () => setPrivacyModal(true);
   const closePrivacyModal = () => setPrivacyModal(false);
+  const openPlaylistModal = () => setPlaylistModal(true);
+  const closePlaylistModal = () => setPlaylistModal(false);
 
   const checkedItems = checkedId
     .map((id) => currentTracks.find((track) => track.id === id))
@@ -267,6 +272,11 @@ const YourTracks = () => {
         fetchYourTracks={fetchYourTracksAgain}
         checkedItems={checkedItems}
         editToggle={editToggle}
+      />
+      <PlaylistModal
+        modal={playlistModal}
+        checkedId={checkedId}
+        closeModal={closePlaylistModal}
       />
       <div className={styles.wrapper}>
         <div className={styles.main}>
@@ -311,7 +321,11 @@ const YourTracks = () => {
                   </div>
                 )}
               </div>
-              <button className={styles.addToPlaylist}>
+              <button
+                className={styles.addToPlaylist}
+                onClick={openPlaylistModal}
+                disabled={checkedId.length === 0}
+              >
                 <MdPlaylistAdd />
                 <span>&nbsp;&nbsp;Add to playlist</span>
               </button>
@@ -333,7 +347,7 @@ const YourTracks = () => {
                   </button>
                   <button
                     className={styles.nextButton}
-                    disabled={isFinalPage && pageRendered === currentPage}
+                    disabled={isFinalPage && nextPage.current === currentPage}
                     onClick={fetchNextTracks}
                   >
                     <AiFillCaretRight />
@@ -430,6 +444,7 @@ const Track = ({
     setPlayingTime,
     setTrackBarArtist,
     setTrackBarPlaylist,
+    setTrackBarPlaylistId,
   } = useTrackContext();
   const history = useHistory();
 
@@ -510,6 +525,7 @@ const Track = ({
   const togglePlayButton = () => {
     if (track && userSecret.permalink) {
       setTrackBarPlaylist([]);
+      setTrackBarPlaylistId(undefined);
 
       if (!play) {
         if (

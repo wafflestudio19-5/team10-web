@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styles from "./TrackBar.module.scss";
 import {
   IoPlaySkipBackSharp,
@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
-import { shuffle } from "lodash";
+import { shuffle, throttle } from "lodash";
 import axios from "axios";
 // import { useAuthContext } from "../../../../context/AuthContext";
 // import axios from "axios";
@@ -152,17 +152,24 @@ const TrackBar = () => {
     }
   }, [trackIsPlaying]);
 
-  const changePlayerCurrentTime = () => {
-    if (progressBar.current && audioPlayer.current) {
-      progressBar.current.value = audioPlayer.current.currentTime;
-      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
-      progressBar.current.style.setProperty(
-        "--seek-before-width",
-        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
-      );
-    }
-    setPlayingTime(audioPlayer.current.currentTime);
-  };
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      if (progressBar.current && audioPlayer.current) {
+        progressBar.current.value = audioPlayer.current.currentTime;
+        // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+        progressBar.current.style.setProperty(
+          "--seek-before-width",
+          `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+        );
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else if (progressBar.current) {
+        setPlayingTime(0);
+        progressBar.current.value = 0;
+        progressBar.current.style.setProperty("--seek-before-width", `0%`);
+      }
+    }, 30000),
+    [playingTime]
+  );
 
   useEffect(() => {
     changePlayerCurrentTime();
@@ -215,43 +222,6 @@ const TrackBar = () => {
       return toast.error("다음 트랙이 없습니다");
     }
     audioPlayer.current.pause();
-    // 새로 url 받아오는 경우
-    // const config: any = {
-    //     method: "get",
-    //     url: `/tracks/${trackBarPlaylist[current + 1].id}`,
-    //     headers: {
-    //       Authorization: `JWT ${userSecret.jwt}`,
-    //     },
-    //     data: {},
-    //   };
-    //   try {
-    //     const { data } = await axios(config);
-    //     setPlayingTime(0);
-    //     setTrackIsPlaying(true);
-    //     setTrackBarTrack({
-    //       id: data.id,
-    //       permalink: data.permalink,
-    //       audio: data.audio,
-    //       image: data.image,
-    //       title: data.title,
-    //     });
-    //     setTrackBarArtist({
-    //       display_name: trackBarPlaylist[current + 1].artist_display_name,
-    //       id: trackBarPlaylist[current + 1].artist,
-    //       permalink: trackBarPlaylist[current + 1].artist_permalink,
-    //     });
-    //     audioPlayer.current.src = data.audio;
-    //     setAudioSrc(data.audio);
-    //     audioPlayer.current.load();
-    //     audioPlayer.current.pause();
-    //     setTimeout(() => {
-    //       audioPlayer.current.play();
-    //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
-    //     }, 1);
-    //   } catch (error) {
-    //     console.log(error);
-    //     toast.error("이전 트랙을 불러올 수 없습니다");
-    //   }
     setPlayingTime(0);
     setTrackIsPlaying(true);
     setTrackBarTrack(trackBarPlaylist[current + 1]);

@@ -212,7 +212,7 @@ const ListenEngagement = ({
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>
-        {isMyTrack === false && track.is_liked && (
+        {track.is_liked && (
           <button
             className={styles.like}
             onClick={unlikeTrack}
@@ -222,7 +222,7 @@ const ListenEngagement = ({
             <span>Liked</span>
           </button>
         )}
-        {isMyTrack === false && track.is_liked === false && (
+        {track.is_liked === false && (
           <button
             className={styles.notLike}
             onClick={likeTrack}
@@ -232,7 +232,7 @@ const ListenEngagement = ({
             <span>Like</span>
           </button>
         )}
-        {isMyTrack === false && track.is_reposted && (
+        {track.is_reposted && (
           <button
             className={styles.repost}
             onClick={unrepostTrack}
@@ -242,7 +242,7 @@ const ListenEngagement = ({
             <span>Reposted</span>
           </button>
         )}
-        {isMyTrack === false && track.is_reposted === false && (
+        {track.is_reposted === false && (
           <button
             className={styles.notRepost}
             onClick={repostTrack}

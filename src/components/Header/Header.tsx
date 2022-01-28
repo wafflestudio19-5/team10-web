@@ -4,13 +4,28 @@ import "./Header.scss";
 import { useEffect } from "react";
 import Cookies from "universal-cookie";
 import { useAuthContext } from "../../context/AuthContext";
+import { useTrackContext } from "../../context/TrackContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 
 function Header() {
   const history = useHistory();
   const cookies = new Cookies();
-  const { userInfo, setUserInfo } = useAuthContext();
+  const { userInfo, setUserInfo, setUserSecret } = useAuthContext();
+  const {
+    setTrackBarArtist,
+    setTrackDuration,
+    setTrackIsPlaying,
+    setPlayingTime,
+    setAudioSrc,
+    setIsMuted,
+    setLoop,
+    setTrackBarPlaylist,
+    setTrackBarTrack,
+    setSeekTime,
+    setTrackBarPlaylistId,
+  } = useTrackContext();
+        
   const [me, setMe] = useState<any>();
 
   useEffect(() => {
@@ -47,6 +62,32 @@ function Header() {
     localStorage.removeItem("permalink");
     localStorage.removeItem("id");
     cookies.remove("is_logged_in", { path: "/" });
+    setTrackDuration(0);
+    setTrackIsPlaying(false);
+    setPlayingTime(0);
+    setAudioSrc("");
+    setIsMuted(false);
+    setLoop(false);
+    setTrackBarArtist({
+      display_name: "",
+      id: 0,
+      permalink: "",
+    });
+    setTrackBarPlaylist([]);
+    setTrackBarTrack({
+      id: 0,
+      title: "",
+      permalink: "",
+      audio: "",
+      image: "",
+    });
+    setSeekTime(0);
+    setTrackBarPlaylistId(undefined);
+    setUserSecret({
+      jwt: undefined,
+      permalink: undefined,
+      id: 0,
+    });
     setUserInfo({
       profile_img: undefined,
       display_name: undefined,

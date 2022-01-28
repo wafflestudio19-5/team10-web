@@ -119,9 +119,6 @@ const TrackPage = () => {
         } else {
           setIsMyTrack(false);
         }
-        if (artist.id !== userSecret.id && response.data.is_private) {
-          setNoTrack(true);
-        }
         const tagList = response.data.tags.map((value: ITag) => value.name);
         setTrack({
           id: response.data.id,
