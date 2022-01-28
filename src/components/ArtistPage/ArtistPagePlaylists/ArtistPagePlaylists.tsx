@@ -55,18 +55,12 @@ function ArtistPagePlaylists() {
       .then((res) => {
         if (page === 1) {
           setPlaylists(
-            res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
-            )
+            res.data.results.filter((item: any) => item.type === "playlist")
           );
         } else {
           setPlaylists((item: any) => [
             ...item,
-            ...res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
-            ),
+            ...res.data.results.filter((item: any) => item.type === "playlist"),
           ]);
         }
         if (res.data.next === null) {

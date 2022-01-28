@@ -389,7 +389,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           ref={player}
           className={`player${item.tracks.id}`}
           key={item.tracks.id}
-          src={item.tracks[trackIndex].audio}
+          src={item.tracks.length !== 0 && item.tracks[trackIndex].audio}
           onEnded={(e) => playNextTrack(e)}
           onSeeked={moveTrackBar}
           volume={0}
@@ -423,6 +423,15 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
               </div>
             )
           )}
+        {item.tracks.length === 0 && (
+          <div className={"playlist-track-null"}>
+            <img
+              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAOCAAAAAB4YAGaAAAAtElEQVR4AY3RT+uCMADG8d7/O3gKifLQQTpoHbp0+RlFET+LKDP6R5Ag08ogvKhrRIlbq/w+bKfPaSvRgklg4rQURV+mP6GGR3r0HZoUeMr0M0zaMSK8WkthnBj0dC2HOGSwaVrRGySdEOeqix1myKWGIlyoHmxM2QbI1xXhCFsM0WPnj4MNEU5wxD/GsNDnoCFCp0Zgs60w5+BehDfnAhceAvj1TFW0jewdfRpQwu7Cfy3vDqsH6oJzha+DAAAAAElFTkSuQmCC"
+              alt="me"
+            />
+            <div>This set is empty.</div>
+          </div>
+        )}
         <div className={"track-buttons"}>
           {isLiking === false && (
             <button onClick={likePlaylist}>
