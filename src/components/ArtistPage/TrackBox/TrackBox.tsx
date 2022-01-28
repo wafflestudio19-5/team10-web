@@ -198,6 +198,8 @@ function TrackBox({
     trackIsPlaying,
     trackBarTrack,
     seekTime,
+    trackBarPlaylist,
+    setTrackBarPlaylist,
   } = useTrackContext();
 
   const playMusicBar = () => {
@@ -247,17 +249,27 @@ function TrackBox({
   };
 
   const playMusic = (e: any) => {
-    if (barPlaying) {
+    if (trackBarTrack.id === item.id) {
+      if (trackBarPlaylist !== []) {
+        setTrackBarPlaylist([]);
+        setIsPlaying(true);
+        player.current.audio.current.play();
+        setCurrentPlay(item.id);
+        audioPlayer.current.currentTime = 0;
+      }
+    } else {
+      if (barPlaying) {
+        handlePlay(e);
+      }
+      if (currentPlay !== null) {
+        let current = document.getElementById(`button${currentPlay}`);
+        current?.click();
+      }
+      setIsPlaying(true);
+      player.current.audio.current.play();
+      setCurrentPlay(item.id);
       handlePlay(e);
     }
-    if (currentPlay !== null) {
-      let current = document.getElementById(`button${currentPlay}`);
-      current?.click();
-    }
-    setIsPlaying(true);
-    player.current.audio.current.play();
-    setCurrentPlay(item.id);
-    handlePlay(e);
   };
 
   const pauseMusic = (e: any) => {
