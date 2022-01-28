@@ -216,7 +216,9 @@ function ArtistPageHeader({ header, user, setUser, getUser, isMe }: any) {
           <div className={"menu-left"}>
             <a
               className={
-                thisPage === "tracks" ? "selected-menu" : "non-selected-menu"
+                thisPage === "tracks" || thisPage === params2
+                  ? "selected-menu"
+                  : "non-selected-menu"
               }
               onClick={() => history.push(`/${permalink}/tracks`)}
             >
