@@ -322,6 +322,16 @@ function TrackBox({
     }
   }, [seekTime]);
 
+  useEffect(() => {
+    if (trackBarTrack.id === item.id) {
+      setIsPlaying(true);
+      player.current.audio.current.currentTime =
+        audioPlayer.current.currentTime;
+      player.current.audio.current.play();
+      setCurrentPlay(item.id);
+    }
+  }, []);
+
   return (
     <div className={"recent-track"}>
       {item.image !== null && (
