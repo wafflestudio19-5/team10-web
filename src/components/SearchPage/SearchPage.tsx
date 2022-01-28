@@ -67,7 +67,12 @@ const SearchPage = () => {
         } else {
           setNoResults(false);
           setResultCount(data.count);
-          setSearchResults(data.results);
+          setSearchResults(
+            data.results.filter(
+              (value: ISearchTrack, index: number, self: ISearchTrack[]) =>
+                index === self.findIndex((t) => t.id === value.id)
+            )
+          );
           if (data.next) {
             nextPage.current += 1;
           } else {
@@ -100,7 +105,14 @@ const SearchPage = () => {
       try {
         const response = await axios(config);
         const data = response.data;
-        setSearchResults(searchResults.concat(data.results));
+        setSearchResults(
+          searchResults
+            .concat(data.results)
+            .filter(
+              (value: ISearchTrack, index: number, self: ISearchTrack[]) =>
+                index === self.findIndex((t) => t.id === value.id)
+            )
+        );
         if (data.next) {
           nextPage.current += 1;
         } else {
