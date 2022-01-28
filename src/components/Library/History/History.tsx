@@ -349,7 +349,7 @@ const History = () => {
               <div className={styles.noLikeWrapper}>
                 <FiClock className={styles.noLike} />
                 <div className={styles.text}>
-                  You have no listening history yet.
+                  You have no listening history of sets yet.
                 </div>
                 <a href="/discover">Browse trending playlists</a>
               </div>
@@ -377,13 +377,16 @@ const History = () => {
           </div>
         </div>
         <div className={styles.trackBox}>
-          {filteredHistory.map((item: any) => (
-            <HistoryItem
-              historyTrack={item}
-              userImg={userImg}
-              fetchHistoryTracks={fetchHistoryTracks}
-            />
-          ))}
+          {historyList.length === 0
+            ? null
+            : filteredHistory.map((item: any) => (
+                <HistoryItem
+                  key={item.key}
+                  historyTrack={item}
+                  userImg={userImg}
+                  fetchHistoryTracks={fetchHistoryTracks}
+                />
+              ))}
         </div>
       </div>
     </div>

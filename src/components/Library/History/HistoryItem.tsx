@@ -295,7 +295,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
     trackBarTrack.id === historyTrack.id ? null : setIsPlaying(false);
   }, [trackBarTrack, audioSrc]);
   const moveWeb = async () => {
-    setIsPlaying(true);
+    setIsPlaying(trackIsPlaying);
   };
   const playMusic = () => {
     if (trackIsPlaying) {

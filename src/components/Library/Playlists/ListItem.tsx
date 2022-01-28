@@ -119,7 +119,11 @@ const ListItem = ({
   return (
     <div className={styles.wrapper}>
       {setImage === null ? (
-        playlist.tracks[0].image === null ? (
+        !(
+          playlist?.tracks !== null &&
+          playlist.tracks.length !== 0 &&
+          playlist.tracks[0].image
+        ) ? (
           <svg
             className={styles.track}
             width="220"
