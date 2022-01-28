@@ -180,11 +180,11 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                       }
                     )
                     .then(() => {
-                      toast("플레이리스트 업로드 성공");
+                      toast("✅ 플레이리스트 업로드 완료");
                       setPlaylistModal(false);
                     })
                     .catch(() => {
-                      toast("set에 추가 실패");
+                      toast("❗️ 업로드 실패 (플레이리스트에 트랙 추가 실패)");
                     });
                 })
                 .catch(() => {
@@ -196,12 +196,35 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                   }
                 });
             })
-            .catch(() => {
-              toast("업로드 실패");
-              toast(`❗️ ${item + 1} 번째 트랙 제목을 변경해주세요.`);
+            .catch((err) => {
               setError(true);
               if (!error) {
                 deleteErrorSet(res1.data.id, myToken);
+              }
+              toast(`❗️ ${item + 1} 번째 트랙 제목을 변경해주세요.`);
+              if (
+                err.response.data.permalink &&
+                err.response.data.permalink[0] ===
+                  `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
+              ) {
+                toast("❗️ 트랙 제목은 띄어쓰기 없이 영어 / 숫자만 가능합니다");
+              }
+              if (
+                err.response.data.permalink &&
+                err.response.data.permalink[0] ===
+                  "Ensure this field has at least 3 characters."
+              ) {
+                toast("❗️ 트랙 제목은 3글자 이상이어야 합니다.");
+              }
+              if (
+                err.response.data.non_field_errors &&
+                err.response.data.non_field_errors[0] ===
+                  "Already existing permalink for the requested user."
+              ) {
+                toast("❗️ 트랙 제목이 중복되었습니다.");
+              }
+              if (err.response.status === 500) {
+                toast("❗️ 서버오류");
               }
             });
         });
@@ -224,7 +247,9 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           err.response.data.permalink[0] ===
             `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
         ) {
-          toast("❗️ 트랙 url은 띄어쓰기 없이 영어 / 숫자만 가능합니다");
+          toast(
+            "❗️ 플레이리스트 url은 띄어쓰기 없이 영어 / 숫자만 가능합니다"
+          );
         }
         if (
           err.response.data.permalink &&

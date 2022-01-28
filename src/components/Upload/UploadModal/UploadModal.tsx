@@ -86,7 +86,7 @@ function UploadModal({ selectedFile, setModal }: any) {
         axios
           .put(res.data.audio_presigned_url, selectedFile, music_options)
           .then(() => {
-            toast("업로드 완료");
+            toast("✅ 트랙 업로드 완료");
           })
           .catch(() => {
             toast("❗️ 음악파일 업로드 실패");
