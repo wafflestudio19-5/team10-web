@@ -22,18 +22,25 @@ function TrackBox({
   const { userSecret, userInfo } = useAuthContext();
   const history = useHistory();
 
+  // 유저가 해당 트랙에 좋아요 / 리포스트를 눌렀는지
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [reposted, setReposted] = useState<boolean>(false);
+  // 댓글, 좋아요, 리포스트 값
   const [comment, setComment] = useState<string>("");
   const [likes, setLikes] = useState<number>(item.like_count);
   const [reposts, setReposts] = useState<number>(item.repost_count);
 
+  // 노래 재생 라이브러리
   const player = useRef<any>();
+  // 재생중인지
   const [isPlaying, setIsPlaying] = useState<boolean>();
+  // 현재 재생하고 있는 트랙
   const [current, setCurrent] = useState<any>(0);
 
+  // add to playlist 모달
   const [playlistModal2, setPlaylistModal2] = useState<boolean>(false);
 
+  // 좋아요 누르기
   const likeTrack = async () => {
     const config: any = {
       method: "post",
@@ -51,6 +58,7 @@ function TrackBox({
     }
   };
 
+  // 좋아요 취소
   const unlikeTrack = async () => {
     const config: any = {
       method: "delete",
@@ -68,6 +76,7 @@ function TrackBox({
     }
   };
 
+  // 리포스트 누르기
   const repostTrack = async () => {
     const config: any = {
       method: "post",
@@ -85,6 +94,7 @@ function TrackBox({
     }
   };
 
+  // 리포스트 취소
   const unrepostTrack = async () => {
     const config: any = {
       method: "delete",
@@ -102,6 +112,7 @@ function TrackBox({
     }
   };
 
+  // 댓글 작성
   const postComment = (e: any) => {
     if (e.key === "Enter") {
       if (comment !== "") {
@@ -133,6 +144,7 @@ function TrackBox({
   useEffect(() => {
     player.current.audio.current.pause();
 
+    // 유저가 트랙에 좋아요를 누른 적 있는지
     const getIsLiking = (id: any) => {
       axios.get(`/users/${id}/likes/tracks`).then((res) => {
         const pages = Array.from(
@@ -157,6 +169,7 @@ function TrackBox({
       });
     };
 
+    // 유저가 트랙을 리포스트한 적 있는지
     const getReposted = (id: any) => {
       axios.get(`/users/${id}/reposts/tracks`).then((res) => {
         const pages = Array.from(
@@ -257,6 +270,7 @@ function TrackBox({
       : setBarPlaying(true);
   };
 
+  // 노래 재생
   const playMusic = (e: any) => {
     if (trackBarTrack.id === item.id) {
       if (trackBarPlaylist !== []) {
@@ -281,6 +295,7 @@ function TrackBox({
     }
   };
 
+  // 노래 일시정지
   const pauseMusic = (e: any) => {
     setCurrentPlay(null);
     setCurrent(player.current.audio.current.currentTime);
@@ -289,12 +304,14 @@ function TrackBox({
     handlePlay(e);
   };
 
+  // 재생 시점을 이동했을 경우 (페이지의 재생바)
   const moveTrackBar = () => {
     const seeked = player.current.audio.current.currentTime;
     setCurrent(seeked);
     audioPlayer.current.currentTime = seeked;
   };
 
+  // 하단바에서 재생시점을 이동했을 경우
   const seekPlayer = () => {
     player.current.audio.current.currentTime = seekTime;
   };
@@ -321,6 +338,7 @@ function TrackBox({
     }
   }, [seekTime]);
 
+  // 하단바에서 해당 노래가 재생되고 있을 경우 연동
   useEffect(() => {
     if (trackBarTrack.id === item.id) {
       setIsPlaying(true);
@@ -333,6 +351,7 @@ function TrackBox({
 
   return (
     <div className={"recent-track"}>
+      // 트랙 이미지
       {item.image !== null && (
         <img
           className="track-Img"
@@ -352,6 +371,7 @@ function TrackBox({
       <div className={"track-right"}>
         <div className="track-info-private">
           <div className={"track-info"}>
+            // 재생버튼
             {!isPlaying && (
               <button onClick={(e) => playMusic(e)} className="play-button">
                 <svg
@@ -366,6 +386,7 @@ function TrackBox({
                 </svg>
               </button>
             )}
+            // 일시정지버튼
             {isPlaying && (
               <button
                 onClick={(e) => pauseMusic(e)}
@@ -384,11 +405,13 @@ function TrackBox({
                 </svg>
               </button>
             )}
+            // 트랙 정보
             <div className={"track-info-name"}>
               <div className={"artistname"}>{artistName}</div>
               <div className={"trackname"}>{item.title}</div>
             </div>
           </div>
+          // private 표시
           {item.is_private && (
             <div className="track-private">
               <img
@@ -399,6 +422,7 @@ function TrackBox({
             </div>
           )}
         </div>
+        // 재생바
         <AudioPlayer
           className={`player${item.id}`}
           src={item.audio}
@@ -410,6 +434,7 @@ function TrackBox({
         <button className="seek" id={`seek${item.id}`} onClick={seekPlayer}>
           seek
         </button>
+        // 댓글
         <div className={"comment"}>
           {userInfo.profile_img === null && (
             <img src="/default_user_image.png" alt="me" />
@@ -426,6 +451,7 @@ function TrackBox({
         </div>
         <div className="track-buttons-count">
           <div className={"track-buttons"}>
+            // 좋아요 버튼
             {isLiking === false && (
               <button onClick={likeTrack}>
                 <img
@@ -444,6 +470,7 @@ function TrackBox({
                 <div>{likes}</div>
               </button>
             )}
+            // 리포스트 버튼
             {reposted === false && (
               <button onClick={repostTrack}>
                 <img
@@ -462,6 +489,7 @@ function TrackBox({
                 <div>{reposts}</div>
               </button>
             )}
+            // add to playlist
             <button
               className="add-to-playlist"
               onClick={() => setPlaylistModal2(true)}
@@ -489,6 +517,7 @@ function TrackBox({
               <div>More</div>
             </button> */}
           </div>
+          // 트랙 재생 수
           <div className="track-count">
             <div className="track-count-play">
               <img
@@ -497,6 +526,7 @@ function TrackBox({
               />
               <div>{item.play_count}</div>
             </div>
+            // 트랙 댓글 수
             <div className="track-count-play">
               <img
                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjAuMyAoNzg5MSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+DQogICAgPHRpdGxlPnN0YXRzX2NvbW1lbnQ8L3RpdGxlPg0KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPg0KICAgIDxkZWZzLz4NCiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBza2V0Y2g6dHlwZT0iTVNQYWdlIj4NCiAgICAgICAgPGcgaWQ9InN0YXRzX2NvbW1lbnQiIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9InJnYigxNTMsIDE1MywgMTUzKSI+DQogICAgICAgICAgICA8cGF0aCBkPSJNNC45OTk2MTQ5OCwzIEMzLjg5NTI1ODEyLDMgMywzLjg4NjU1NDg0IDMsNS4wMDU5MTkwNSBMMyw3Ljk5NDA4MDk1IEMzLDkuMTAxOTE5NDUgMy44ODc0MzMyOSwxMCA0Ljk5OTYxNDk4LDEwIEwxMS4wMDAzODUsMTAgQzEyLjEwNDc0MTksMTAgMTMsOS4xMTM0NDUxNiAxMyw3Ljk5NDA4MDk1IEwxMyw1LjAwNTkxOTA1IEMxMywzLjg5ODA4MDU1IDEyLjExMjU2NjcsMyAxMS4wMDAzODUsMyBMNC45OTk2MTQ5OCwzIFogTTUsMTAgTDUsMTMgTDgsMTAgTDUsMTAgWiIgaWQ9IlJlY3RhbmdsZS00MiIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCIvPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+DQo="
