@@ -341,11 +341,13 @@ function TrackBox({
   // 하단바에서 해당 노래가 재생되고 있을 경우 연동
   useEffect(() => {
     if (trackBarTrack.id === item.id) {
-      setIsPlaying(true);
-      player.current.audio.current.currentTime =
-        audioPlayer.current.currentTime;
-      player.current.audio.current.play();
-      setCurrentPlay(item.id);
+      if (trackIsPlaying) {
+        setIsPlaying(true);
+        player.current.audio.current.currentTime =
+          audioPlayer.current.currentTime;
+        player.current.audio.current.play();
+        setCurrentPlay(item.id);
+      }
     }
   }, []);
 

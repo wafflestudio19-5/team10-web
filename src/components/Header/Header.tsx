@@ -150,13 +150,13 @@ function Header() {
                 )}
                 {userInfo.permalink === undefined && (
                   <div>
-                    {me.profileImg && (
+                    {me.profileImg !== null && (
                       <div>
                         <img src={me.profile_img} alt={"user"} />
                         <text>{me.display_name}</text>
                       </div>
                     )}
-                    {!me.profileImg && (
+                    {me.profileImg === null && (
                       <div>
                         <img src="/default_user_image.png" alt={"user"} />
                         <text>{me.display_name}</text>
@@ -167,10 +167,18 @@ function Header() {
               </button>
               <ul className="dropdown-menu">
                 <li>
-                  {userInfo !== undefined && (
+                  {userInfo.permalink !== undefined && (
                     <a
                       className="dropdown-item"
                       onClick={() => history.push(`/${userInfo.permalink}`)}
+                    >
+                      Profile
+                    </a>
+                  )}
+                  {userInfo.permalink === undefined && (
+                    <a
+                      className="dropdown-item"
+                      onClick={() => history.push(`/${me.permalink}`)}
                     >
                       Profile
                     </a>
