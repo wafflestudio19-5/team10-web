@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             permalink: res.data.permalink,
           });
         } catch (error) {
-          toast("헤더 정보 로드 실패");
+          toast("로그인이 필요합니다.");
         }
       };
       getMe();

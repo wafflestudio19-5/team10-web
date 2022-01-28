@@ -125,7 +125,7 @@ function ArtistPageRepostsSets() {
           />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Playlists</text>
+              <text>My Reposts (Sets)</text>
               {repostsSets &&
                 repostsSets.map((item: any) => (
                   <PlaylistBox

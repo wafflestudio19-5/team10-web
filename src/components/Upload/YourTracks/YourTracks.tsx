@@ -444,6 +444,7 @@ const Track = ({
     setPlayingTime,
     setTrackBarArtist,
     setTrackBarPlaylist,
+    setTrackBarPlaylistId,
   } = useTrackContext();
   const history = useHistory();
 
@@ -524,6 +525,7 @@ const Track = ({
   const togglePlayButton = () => {
     if (track && userSecret.permalink) {
       setTrackBarPlaylist([]);
+      setTrackBarPlaylistId(undefined);
 
       if (!play) {
         if (

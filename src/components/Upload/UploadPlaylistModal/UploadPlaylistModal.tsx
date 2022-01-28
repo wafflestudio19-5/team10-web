@@ -9,6 +9,7 @@ import PlaylistTrack from "./PlaylistTrack/PlaylistTrack";
 
 function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const { userSecret } = useAuthContext();
+  const [error, setError] = useState<boolean>(false);
 
   const permalink = userSecret.permalink;
   const trackNum = Array.from({ length: selectedFiles.length }, (_, i) => i);
@@ -50,6 +51,12 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
     setListPermalink(event.target.value);
   };
 
+  const deleteErrorSet = (id: any, token: any) => {
+    axios.delete(`https://api.soundwaffle.com/sets/${id}`, {
+      headers: { Authorization: `JWT ${token}` },
+    });
+  };
+
   const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
     const myToken = localStorage.getItem("jwt_token");
@@ -79,7 +86,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         }
       )
       .then((res1) => {
-        // 이미지 업로드 하기
+        // set 이미지 업로드 하기
         if (imageFile) {
           const img_options = {
             headers: {
@@ -176,13 +183,25 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                 });
             })
             .catch(() => {
-              toast("업로드 실패");
-              toast("트랙 url이 중복되었는지 확인해주세요");
+              toast(`❗️ ${item + 1} 번째 트랙 제목을 변경해주세요.`);
+              setError(true);
+              if (!error) {
+                deleteErrorSet(res1.data.id, myToken);
+              }
             });
         });
       })
-      .catch(() => {
-        toast("set 만들기 실패");
+      .catch((err) => {
+        toast("업로드 실패");
+        if (title === "") {
+          toast("❗️플레이리스트 제목을 입력하세요.");
+        }
+        if (
+          err.response.data.non_field_errors[0] ===
+          "Already existing set permalink for the requested user."
+        ) {
+          toast("❗️ 플레이리스트 주소가 중복되었습니다.");
+        }
       });
   };
 

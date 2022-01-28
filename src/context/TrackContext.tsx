@@ -30,6 +30,10 @@ interface ITrackContext {
   >;
   seekTime: number;
   setSeekTime: React.Dispatch<React.SetStateAction<number>>;
+  trackBarPlaylistId: number | undefined;
+  setTrackBarPlaylistId: React.Dispatch<
+    React.SetStateAction<number | undefined>
+  >;
 }
 
 const TrackContext = createContext<ITrackContext>({
@@ -72,6 +76,8 @@ const TrackContext = createContext<ITrackContext>({
   setTrackBarPlaylist: () => [],
   seekTime: 0,
   setSeekTime: () => Number,
+  trackBarPlaylistId: undefined,
+  setTrackBarPlaylistId: () => Number,
 });
 
 export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
@@ -101,6 +107,8 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
     []
   );
   const [seekTime, setSeekTime] = useState<ITrackContext["seekTime"]>(0);
+  const [trackBarPlaylistId, setTrackBarPlaylistId] =
+    useState<ITrackContext["trackBarPlaylistId"]>();
 
   return (
     <TrackContext.Provider
@@ -126,6 +134,8 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
         setTrackBarPlaylist,
         seekTime,
         setSeekTime,
+        trackBarPlaylistId,
+        setTrackBarPlaylistId,
       }}
     >
       {children}

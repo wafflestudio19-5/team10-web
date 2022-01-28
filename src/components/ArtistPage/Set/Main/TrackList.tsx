@@ -40,6 +40,7 @@ const TrackList = ({
     setTrackBarArtist,
     setTrackIsPlaying,
     setTrackBarPlaylist,
+    setTrackBarPlaylistId,
     // trackBarPlaylist,
   } = useTrackContext();
   const history = useHistory();
@@ -110,6 +111,7 @@ const TrackList = ({
           audioPlayer.current.load();
           audioPlayer.current.play();
           setTrackBarPlaylist(playlist.tracks);
+          setTrackBarPlaylistId(playlist.id);
           putHit(track.id);
         }
       } else {

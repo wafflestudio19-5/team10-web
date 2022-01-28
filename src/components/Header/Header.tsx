@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router";
 import "./Header.scss";
 import { useEffect } from "react";
 import Cookies from "universal-cookie";
 import { useAuthContext } from "../../context/AuthContext";
 import { useTrackContext } from "../../context/TrackContext";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 function Header() {
   const history = useHistory();
@@ -21,10 +23,42 @@ function Header() {
     setTrackBarPlaylist,
     setTrackBarTrack,
     setSeekTime,
+    setTrackBarPlaylistId,
   } = useTrackContext();
+  const [me, setMe] = useState<any>();
+  const userInfoUndefined = {
+    profile_img: undefined,
+    display_name: undefined,
+    permalink: undefined,
+  };
 
   useEffect(() => {
-    cookies.get("is_logged_in") === undefined && history.push("/");
+    if (cookies.get("is_logged_in") === undefined) {
+      history.push("/");
+    }
+    if (userInfo === userInfoUndefined) {
+      const myToken = localStorage.getItem("jwt_token");
+      const getMe = async () => {
+        const config: any = {
+          method: "get",
+          url: `/users/me`,
+          headers: {
+            Authorization: `JWT ${myToken}`,
+          },
+        };
+        try {
+          const res = await axios(config);
+          setMe({
+            profile_img: res.data.image_profile,
+            display_name: res.data.display_name,
+            permalink: res.data.permalink,
+          });
+        } catch (error) {
+          toast("헤더 정보 불러오기 실패");
+        }
+      };
+      getMe();
+    }
   }, []);
 
   const onSignOut = () => {
@@ -52,6 +86,7 @@ function Header() {
       image: "",
     });
     setSeekTime(0);
+    setTrackBarPlaylistId(undefined);
     setUserSecret({
       jwt: undefined,
       permalink: undefined,
@@ -95,7 +130,7 @@ function Header() {
         <div className={"header_user"}>
           <div className="dropdown">
             <button type="button" data-bs-toggle="dropdown">
-              {userInfo !== undefined && (
+              {userInfo !== userInfoUndefined && (
                 <div>
                   {userInfo.profile_img !== null && (
                     <img src={userInfo.profile_img} alt={"user"} />
@@ -110,10 +145,19 @@ function Header() {
                   <text>{userInfo.display_name}</text>
                 </div>
               )}
-              {userInfo === undefined && (
+              {userInfo === userInfoUndefined && (
                 <div>
-                  <img src={""} alt={"user"} />
-                  <text>user</text>
+                  {me.profile_img !== null && (
+                    <img src={me.profile_img} alt={"user"} />
+                  )}
+                  {me.profile_img === null && (
+                    <img
+                      src="/default_user_image.png"
+                      alt={"user"}
+                      onError={onImageError}
+                    />
+                  )}
+                  <text>{me.display_name}</text>
                 </div>
               )}
             </button>
@@ -134,14 +178,6 @@ function Header() {
                   onClick={() => history.push("/you/likes")}
                 >
                   Likes
-                </a>
-              </li>
-              <li>
-                <a
-                  className="dropdown-item"
-                  onClick={() => history.push("/you/stations")}
-                >
-                  Stations
                 </a>
               </li>
               <li>
@@ -174,9 +210,6 @@ function Header() {
               </svg>
             </button>
             <ul className="dropdown-menu">
-              <li>
-                <a className="dropdown-item">About us</a>
-              </li>
               <li>
                 <a className="dropdown-item" onClick={onSignOut}>
                   Sign out

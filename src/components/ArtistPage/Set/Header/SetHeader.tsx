@@ -51,6 +51,7 @@ const SetHeader = ({
     setTrackBarTrack,
     // trackBarTrack,
     setTrackBarPlaylist,
+    setTrackBarPlaylistId,
   } = useTrackContext();
   const { userSecret } = useAuthContext();
   const progressBar = useRef<any>(null); // 재생 바 태그 접근(input)
@@ -109,6 +110,7 @@ const SetHeader = ({
         image: playlist.tracks[0].image,
       });
       setTrackBarPlaylist(playlist.tracks);
+      setTrackBarPlaylistId(playlist.id);
       audioPlayer.current.src = playlist.tracks[0].audio;
       setTimeout(() => {
         audioPlayer.current.play();
