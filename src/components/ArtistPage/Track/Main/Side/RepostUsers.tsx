@@ -20,6 +20,12 @@ const RepostUsers = ({
 }) => {
   const history = useHistory();
   const { userSecret } = useAuthContext();
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
+  };
 
   return (
     <div className={styles.container} style={{ marginBottom: "30px" }}>
@@ -43,6 +49,7 @@ const RepostUsers = ({
               <img
                 className={styles.image}
                 src={reposter.image_profile || "/default_user_image.png"}
+                onError={onImageError}
                 style={{ zIndex: index }}
                 onClick={clickUser}
                 key={index}

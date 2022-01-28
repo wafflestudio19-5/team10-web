@@ -1,3 +1,4 @@
+import React from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -16,11 +17,13 @@ const TrackList = ({
   track,
   playlist,
   playing,
+  setPlaying,
   fetchSet,
 }: {
   track: ISetTrack;
   playlist: IPlaylist;
   playing: string;
+  setPlaying: React.Dispatch<React.SetStateAction<string>>;
   fetchSet: () => void;
 }) => {
   const [play, setPlay] = useState(false);
@@ -34,7 +37,7 @@ const TrackList = ({
     audioPlayer,
     setAudioSrc,
     setTrackBarTrack,
-    // setTrackBarArtist,
+    setTrackBarArtist,
     setTrackIsPlaying,
     setTrackBarPlaylist,
     // trackBarPlaylist,
@@ -59,6 +62,19 @@ const TrackList = ({
       setPlay(false);
     }
   }, [audioSrc, trackIsPlaying]);
+  const putHit = async (id: number) => {
+    const config: any = {
+      method: "put",
+      url: `/tracks/${id}/hit?set_id=${playlist.id}`,
+      Authorization: userSecret.jwt,
+      data: {},
+    };
+    try {
+      await axios(config);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const togglePlayButton = () => {
     if (track && userSecret.permalink) {
       if (!play) {
@@ -70,11 +86,11 @@ const TrackList = ({
           audioPlayer.current.src = track.audio;
           setAudioSrc(track.audio);
           audioPlayer.current.load();
-          //   setTrackBarArtist({
-          //     display_name: username,
-          //     id: userSecret.id,
-          //     permalink: userSecret.permalink,
-          //   });
+          setTrackBarArtist({
+            display_name: track.artist_display_name,
+            id: track.artist,
+            permalink: track.artist_permalink,
+          });
           setTrackBarTrack(track);
         }
         setPlay(true);
@@ -83,7 +99,9 @@ const TrackList = ({
           audioPlayer.current.play();
         }, 1);
         if (playing === "before") {
+          setPlaying("playing");
           setTrackBarPlaylist(playlist.tracks);
+          putHit(track.id);
         }
       } else {
         audioPlayer.current.pause();
@@ -92,10 +110,11 @@ const TrackList = ({
       }
     }
   };
-  //   console.log(track.id, liked);
+  //   console.log(track);
   const index = playlist.tracks.findIndex((element) => element.id === track.id);
-  const clickArtist = () => history.push(`/${track.artist}`);
-  const clickTrack = () => history.push(`/${track.artist}/${track.permalink}`);
+  const clickArtist = () => history.push(`/${track.artist_permalink}`);
+  const clickTrack = () =>
+    history.push(`/${track.artist_permalink}/${track.permalink}`);
   const likeTrack = async () => {
     const config: any = {
       method: track.is_liked ? "delete" : "post",
@@ -112,14 +131,41 @@ const TrackList = ({
       toast.error("실패했습니다");
     }
   };
+  const repostTrack = async () => {
+    const config: any = {
+      method: track.is_reposted ? "delete" : "post",
+      url: `/reposts/tracks/${track.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      await axios(config);
+      fetchSet();
+    } catch (error) {
+      toast.error("실패했습니다");
+    }
+  };
   const copyLink = async () => {
     await navigator.clipboard.writeText(location.href);
     toast.success("Link has been copied to the clipboard!");
   };
+
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
+
   return (
     <li className={styles.main} key={track.id}>
       <div className={styles.image}>
-        <img src={track.image || "/default_track_image.svg"} />
+        <img
+          src={track.image || "/default_track_image.svg"}
+          onError={onImageError}
+        />
         <div className={styles.playButton} onClick={togglePlayButton}>
           {play ? <IoMdPause /> : <IoMdPlay />}
         </div>
@@ -127,7 +173,7 @@ const TrackList = ({
       <div className={styles.index}>{index + 1}</div>
       <div className={styles.content}>
         <span className={styles.artistName} onClick={clickArtist}>
-          {track.artist} -
+          {track.artist_display_name} -
         </span>
         &nbsp;
         <span className={styles.trackTitle} onClick={clickTrack}>
@@ -137,7 +183,7 @@ const TrackList = ({
       <div className={styles.count}>
         <span>
           <FaPlay />
-          &nbsp;{track.count}
+          &nbsp;{track.play_count}
         </span>
       </div>
       <div className={styles.reaction}>
@@ -147,7 +193,10 @@ const TrackList = ({
         >
           <BsSuitHeartFill />
         </button>
-        <button className={track.is_reposted ? styles.liked : undefined}>
+        <button
+          className={track.is_reposted ? styles.liked : undefined}
+          onClick={repostTrack}
+        >
           <BiRepost />
         </button>
         <button onClick={copyLink}>

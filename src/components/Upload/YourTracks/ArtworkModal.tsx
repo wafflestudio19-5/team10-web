@@ -87,7 +87,7 @@ const ArtworkModal = ({
           ) {
             toast.error("잘못된 요청입니다.");
           }
-          console.log(error);
+          toast.error("이미지 업로드에 실패했습니다");
         }
       }
     }

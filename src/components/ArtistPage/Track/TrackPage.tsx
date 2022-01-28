@@ -8,6 +8,7 @@ import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
 import EditModal from "../../Upload/YourTracks/EditModal";
 import PlaylistModal from "./Modal/PlaylistModal";
+import toast from "react-hot-toast";
 
 export interface ITrack {
   id: number;
@@ -15,16 +16,19 @@ export interface ITrack {
   permalink: string;
   audio: string;
   comment_count: number;
-  count: number;
+  play_count: number;
   created_at: string;
   description: string;
-  genre: null | string;
+  genre: null | ITag;
   image: null | string;
   like_count: number;
   repost_count: number;
   tags: string[];
   is_private: boolean;
-  audio_length: number;
+  //   audio_length: number;
+  is_liked: boolean | undefined;
+  is_reposted: boolean | undefined;
+  is_followed: boolean | undefined;
 }
 export interface IArtist {
   city: string;
@@ -58,7 +62,7 @@ const TrackPage = () => {
     permalink: "",
     audio: "",
     comment_count: 0,
-    count: 0,
+    play_count: 0,
     created_at: "",
     description: "",
     genre: null,
@@ -67,7 +71,10 @@ const TrackPage = () => {
     repost_count: 0,
     tags: [],
     is_private: false,
-    audio_length: 0,
+    // audio_length: 0,
+    is_followed: undefined,
+    is_reposted: undefined,
+    is_liked: undefined,
   });
   const [artist, setArtist] = useState<IArtist>({
     city: "",
@@ -81,73 +88,87 @@ const TrackPage = () => {
   });
   const [userMe, setUserMe] = useState<IUserMe>({ id: 0, image_profile: "" });
   const [isLoading, setIsLoading] = useState(true);
-  const [isMyTrack, setIsMyTrack] = useState<boolean | undefined>(false);
+  const [isMyTrack, setIsMyTrack] = useState<boolean | undefined>(undefined);
   const [editModal, setEditModal] = useState(false);
   const [playlistModal, setPlaylistModal] = useState(false);
 
   const { userSecret } = useAuthContext();
   const { username, trackname } = useParams<IParams>();
-  useEffect(() => {
-    if (username === userSecret.permalink) {
-      setIsMyTrack(true);
-    } else if (username !== userSecret.permalink && track.is_private) {
-      setNoTrack(true);
-    }
-  }, [userSecret.permalink, track.is_private, isLoading]);
-
+  //   useEffect(() => {
+  //     if (username === userSecret.permalink) {
+  //       setIsMyTrack(true);
+  //     } else if (username !== userSecret.permalink && track.is_private) {
+  //       setNoTrack(true);
+  //     }
+  //   }, [userSecret.permalink, track.is_private, isLoading]);
   const fetchTrack = async () => {
-    const encoded = encodeURI(
-      `https://www.soundwaffle.com/${username}/${trackname}`
-    );
-    try {
-      const response = await axios.get(
-        `https://api.soundwaffle.com/resolve?url=${encoded}`
-      );
-      const data = response.data;
-      const artist = response.data.artist;
-      const tagList = data.tags.map((value: ITag) => value.name);
-      setTrack({
-        id: data.id,
-        title: data.title,
-        permalink: data.permalink,
-        audio: data.audio,
-        comment_count: data.comment_count,
-        count: data.count,
-        created_at: data.created_at,
-        description: data.description,
-        genre: data.genre,
-        image: data.image,
-        like_count: data.like_count,
-        repost_count: data.repost_count,
-        tags: tagList,
-        is_private: data.is_private,
-        audio_length: 0,
-      });
-      setArtist({
-        city: artist.city,
-        country: artist.country,
-        display_name: artist.display_name,
-        id: artist.id,
-        permalink: artist.permalink,
-        track_count: artist.track_count,
-        follower_count: artist.follower_count,
-        image_profile: artist.image_profile,
-      });
-      setIsLoading(false);
-    } catch (error) {
-      if (
-        (axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 404) ||
-        (axios.isAxiosError(error) &&
-          error.response &&
-          error.response.status === 400)
-      ) {
-        setNoTrack(true);
+    if (typeof userSecret.jwt === "string") {
+      try {
+        const config: any = {
+          method: "get",
+          url: `https://api.soundwaffle.com/resolve?url=https://www.soundwaffle.com/${username}/${trackname}`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        const response = await axios(config);
+        const artist = response.data.artist;
+        if (artist.id == userSecret.id) {
+          setIsMyTrack(true);
+        } else {
+          setIsMyTrack(false);
+        }
+        if (artist.id !== userSecret.id && response.data.is_private) {
+          setNoTrack(true);
+        }
+        const tagList = response.data.tags.map((value: ITag) => value.name);
+        setTrack({
+          id: response.data.id,
+          title: response.data.title,
+          permalink: response.data.permalink,
+          audio: response.data.audio,
+          comment_count: response.data.comment_count,
+          play_count: response.data.play_count,
+          created_at: response.data.created_at,
+          description: response.data.description,
+          genre: response.data.genre,
+          image: response.data.image,
+          like_count: response.data.like_count,
+          repost_count: response.data.repost_count,
+          tags: tagList,
+          is_private: response.data.is_private,
+          // audio_length: 0,
+          is_liked: response.data.is_liked,
+          is_reposted: response.data.is_reposted,
+          is_followed: response.data.is_followed,
+        });
+        setArtist({
+          city: artist.city,
+          country: artist.country,
+          display_name: artist.display_name,
+          id: artist.id,
+          permalink: artist.permalink,
+          track_count: artist.track_count,
+          follower_count: artist.follower_count,
+          image_profile: artist.image_profile,
+        });
         setIsLoading(false);
+      } catch (error) {
+        if (
+          (axios.isAxiosError(error) &&
+            error.response &&
+            error.response.status === 404) ||
+          (axios.isAxiosError(error) &&
+            error.response &&
+            error.response.status === 400)
+        ) {
+          setNoTrack(true);
+          setIsLoading(false);
+        }
+        toast.error("트랙 정보를 받아올 수 없습니다");
       }
     }
-    return;
   };
   const fetchMe = async () => {
     if (userSecret.jwt) {
@@ -168,8 +189,10 @@ const TrackPage = () => {
     }
   };
   useEffect(() => {
-    fetchTrack();
-  }, []);
+    if (typeof userSecret.jwt === "string") {
+      fetchTrack();
+    }
+  }, [userSecret.jwt]);
   useEffect(() => {
     fetchMe();
   }, [userSecret.jwt]);

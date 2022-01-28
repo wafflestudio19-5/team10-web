@@ -26,6 +26,7 @@ import ArtworkModal from "./ArtworkModal";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import PrivacyModal from "./PrivacyModal";
+import toast from "react-hot-toast";
 dayjs.extend(relativeTime);
 
 export interface IYourTracks {
@@ -38,8 +39,9 @@ export interface IYourTracks {
   repost_count: number;
   comment_count: number;
   genre: string | null;
-  count: number;
+  play_count: number;
   is_private: boolean;
+  tags: ITag[];
 }
 
 const YourTracks = () => {
@@ -63,47 +65,48 @@ const YourTracks = () => {
   const { userSecret } = useAuthContext();
 
   const fetchNextTracks = async () => {
-    if (pageRendered > currentPage && trackCount) {
-      const nextPage = currentPage + 1;
-      const nextTracks = yourTracks.slice(
-        (nextPage - 1) * 10,
-        trackCount >= (currentPage - 1) * 10 + 11
-          ? (nextPage - 1) * 10 + 10
-          : trackCount
-      );
-      setCurrentTracks(nextTracks);
-      setCurrentPage(nextPage);
-    } else {
-      setLoading(true);
-      const tracksConfig: any = {
-        method: "get",
-        url: `/users/${userSecret.id}/tracks?page=${
-          nextPage.current
-        }&page_size=${10}`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const { data } = await axios(tracksConfig);
-        setYourTracks(yourTracks.concat(data.results));
-        setCurrentTracks(data.results);
-        setCurrentPage(currentPage + 1);
-        setPageRendered(pageRendered + 1);
-        setLoading(false);
-        if (data.next) {
-          // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
-          nextPage.current += 1;
-        } else {
-          // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
-          finalPage.current = nextPage.current;
-          setIsFinalPage(true);
-        }
-      } catch (error) {
-        console.log(error);
+    // if (pageRendered > currentPage && trackCount) {
+    //   const nextPage = currentPage + 1;
+    //   const nextTracks = yourTracks.slice(
+    //     (nextPage - 1) * 10,
+    //     trackCount >= (currentPage - 1) * 10 + 11
+    //       ? (nextPage - 1) * 10 + 10
+    //       : trackCount
+    //   );
+    //   setCurrentTracks(nextTracks);
+    //   setCurrentPage(nextPage);
+    // } else {
+    setLoading(true);
+    const tracksConfig: any = {
+      method: "get",
+      url: `/users/${userSecret.id}/tracks?page=${
+        nextPage.current
+      }&page_size=${10}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      const { data } = await axios(tracksConfig);
+      setYourTracks(yourTracks.concat(data.results));
+      setCurrentTracks(data.results);
+      setCurrentPage(currentPage + 1);
+      setPageRendered(pageRendered + 1);
+      setLoading(false);
+      if (data.next) {
+        // 다음 페이지가 있다면 nextPage에 다음 코멘트 페이지 저장
+        nextPage.current += 1;
+      } else {
+        // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 코멘트 페이지 를 마지막 페이지로 저장
+        finalPage.current = nextPage.current;
+        setIsFinalPage(true);
       }
+    } catch (error) {
+      console.log(error);
+      toast.error("트랙 정보를 받아오는 데 실패했습니다");
     }
+    // }
   };
   const getPreviousTracks = () => {
     const previousPage = currentPage - 1;
@@ -138,7 +141,7 @@ const YourTracks = () => {
           setTrackCount(data.count);
           setCurrentTracks(data.results);
           setLoading(false);
-          console.log(data);
+          //   console.log(data);
           if (data.next) {
             // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
             nextPage.current += 1;
@@ -152,54 +155,58 @@ const YourTracks = () => {
         }
       } catch (error) {
         console.log(error);
+        toast.error("트랙 정보를 받아오는 데 실패했습니다");
       }
     }
   };
-  useEffect(() => {
-    const fetchYourTracks = async () => {
-      if (userSecret.jwt) {
-        const config: any = {
+  const fetchYourTracks = async () => {
+    setCurrentPage(1);
+    nextPage.current = 1;
+    finalPage.current = 0;
+    if (userSecret.jwt) {
+      const config: any = {
+        method: "get",
+        url: `/users/me`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        const response = await axios(config);
+        setUsername(response.data.display_name);
+        const tracksConfig: any = {
           method: "get",
-          url: `/users/me`,
+          url: `/users/${userSecret.id}/tracks?page=${1}`,
           headers: {
             Authorization: `JWT ${userSecret.jwt}`,
           },
           data: {},
         };
         try {
-          const response = await axios(config);
-          setUsername(response.data.display_name);
-          const tracksConfig: any = {
-            method: "get",
-            url: `/users/${userSecret.id}/tracks?page=${1}`,
-            headers: {
-              Authorization: `JWT ${userSecret.jwt}`,
-            },
-            data: {},
-          };
-          try {
-            const { data } = await axios(tracksConfig);
-            setTrackCount(data.count);
-            setYourTracks(data.results);
-            setCurrentTracks(data.results);
-            setLoading(false);
-            console.log(data);
-            if (data.next) {
-              // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
-              nextPage.current += 1;
-            } else {
-              // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
-              finalPage.current = nextPage.current;
-              setIsFinalPage(true);
-            }
-          } catch (error) {
-            console.log(error);
+          const { data } = await axios(tracksConfig);
+          setTrackCount(data.count);
+          setYourTracks(data.results);
+          setCurrentTracks(data.results);
+          setLoading(false);
+          //   console.log(data);
+          if (data.next) {
+            // 다음 페이지가 있다면 nextPage에 다음 페이지 저장
+            nextPage.current += 1;
+          } else {
+            // 다음 페이지가 없다면 현재 nextPage 값 === 현재 받아온 페이지 를 마지막 페이지로 저장
+            finalPage.current = nextPage.current;
+            setIsFinalPage(true);
           }
         } catch (error) {
           console.log(error);
         }
+      } catch (error) {
+        console.log(error);
       }
-    };
+    }
+  };
+  useEffect(() => {
     fetchYourTracks();
   }, [userSecret.jwt]);
 
@@ -346,7 +353,7 @@ const YourTracks = () => {
                     username={username}
                     setModal={setModal}
                     setEditTrack={setEditTrack}
-                    fetchYourTracks={fetchYourTracksAgain}
+                    fetchYourTracks={fetchYourTracks}
                     checkedItems={checkedId}
                     isAllChecked={isAllChecked}
                     // setIsAllChecked={setIsAllChecked}
@@ -422,19 +429,19 @@ const Track = ({
     audioPlayer,
     setPlayingTime,
     setTrackBarArtist,
+    setTrackBarPlaylist,
   } = useTrackContext();
   const history = useHistory();
 
   useEffect(() => {
     setChecked(isAllChecked);
   }, [isAllChecked]);
-  console.log(track.title, checked);
 
   const checkHandler = () => {
     const prevValue = checked;
     setChecked(!checked);
     checkedItemHandler(track.id, !prevValue);
-    console.log(checkedItems);
+    // console.log(checkedItems);
   };
 
   //   useEffect(() => {
@@ -484,7 +491,7 @@ const Track = ({
     } else {
       setPlay(false);
     }
-  }, [audioSrc, trackIsPlaying]);
+  }, [audioSrc, trackIsPlaying, audioPlayer.current.src]);
 
   //   const calculateTime = (secs: number) => {
   //     // 트랙 길이를 분:초 단위로 환산
@@ -502,6 +509,8 @@ const Track = ({
 
   const togglePlayButton = () => {
     if (track && userSecret.permalink) {
+      setTrackBarPlaylist([]);
+
       if (!play) {
         if (
           headerTrackSrc !== barTrackSrc &&
@@ -556,19 +565,23 @@ const Track = ({
           permalink: data.permalink,
           audio: data.audio,
           comment_count: data.comment_count,
-          count: data.count,
+          play_count: data.play_count,
           created_at: data.created_at,
           description: data.description,
-          genre: data.genre.name,
+          genre: data.genre,
           image: data.image,
           like_count: data.like_count,
           repost_count: data.repost_count,
           tags: tagList,
           is_private: data.is_private,
-          audio_length: 0,
+          // audio_length: 0,
+          is_liked: data.is_liked,
+          is_reposted: data.is_reposted,
+          is_followed: data.is_followed,
         });
       } catch (error) {
         console.log(error);
+        toast.error("트랙 정보를 받아오는 데 실패했습니다");
       }
     }
   };
@@ -601,6 +614,7 @@ const Track = ({
               }
             } catch (error) {
               console.log(error);
+              toast.error("트랙을 제거하는데 실패했습니다");
             }
           },
         },
@@ -609,6 +623,12 @@ const Track = ({
     return;
   };
   const onClickName = () => history.push(`/${userSecret.permalink}`);
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
 
   return (
     <li key={track.id} onClick={checkHandler}>
@@ -632,7 +652,8 @@ const Track = ({
       >
         <img
           className={styles.trackImage}
-          src={track.image || "/default.track_image.svg"}
+          src={track.image || "/default_track_image.svg"}
+          onError={onImageError}
         />
         <div className={styles.playButton} onClick={togglePlayButton}>
           {play ? <IoMdPause /> : <IoMdPlay />}
@@ -654,10 +675,10 @@ const Track = ({
               <span>{track.comment_count}</span>
             </li>
           )}
-          {track.count !== 0 && (
+          {track.play_count !== 0 && (
             <li>
               <FaPlay />
-              <span>{track.count}</span>
+              <span>{track.play_count}</span>
             </li>
           )}
           {track.like_count !== 0 && (
@@ -690,7 +711,7 @@ const Track = ({
                 <span data-tip="This track is private.">
                   <BsFillFileLock2Fill />
                 </span>
-                <ReactTooltip />
+                <ReactTooltip effect="solid" />
               </div>
             )}
           </div>

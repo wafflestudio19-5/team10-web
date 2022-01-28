@@ -34,6 +34,7 @@ const SetEditModal = ({
   //   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>("");
   const [permalinkList, setPermalinkList] = useState<ITrackPermalink[]>([]);
+  const [genre, setGenre] = useState<string | null | undefined>(null);
 
   const BASIC = "basic info";
   const TRACKS = "tracks";
@@ -52,7 +53,8 @@ const SetEditModal = ({
     setIsPrivate(playlist.is_private);
     // setTags(track.tags);
     setImageUrl(playlist.image);
-    setTagInput(playlist.tags.join(", "));
+    setTagInput(playlist.tags.map((tag) => tag.name).join(", "));
+    setGenre(playlist.genre?.name);
   }, [playlist]);
 
   const openFileSelector = (event: any) => {
@@ -75,6 +77,10 @@ const SetEditModal = ({
     }
   };
 
+  const changeGenre = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setGenre(event.target.value);
+  };
+
   const changeTrackPermalink = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTPermalink(event.target.value);
     if (event.target.value.length === 0) {
@@ -87,7 +93,9 @@ const SetEditModal = ({
           link.permalink === tPermalink && link.id !== playlist.id
       )
     ) {
-      toast.error(`동일한 링크의 다른 트랙이 존재합니다(${tPermalink})`);
+      toast.error(
+        `동일한 링크의 다른 플레이리스트가 존재합니다(${tPermalink})`
+      );
     }
   };
 
@@ -148,6 +156,7 @@ const SetEditModal = ({
           ...(tagInput && {
             tags_input: tagInput.replace(/,/g, "").split(" "),
           }),
+          genre_input: genre,
         },
       };
       try {
@@ -172,6 +181,8 @@ const SetEditModal = ({
           error.response.status === 400
         ) {
           toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+        } else {
+          toast.error("플레이리스트를 업데이트할 수 없습니다");
         }
         console.log(error);
       }
@@ -190,6 +201,7 @@ const SetEditModal = ({
           ...(tagInput && {
             tags_input: tagInput.replace(/,/g, "").split(" "),
           }),
+          genre_input: genre,
         },
       };
       try {
@@ -197,6 +209,7 @@ const SetEditModal = ({
         if (response) {
           fetchSet();
           setModal(false);
+          toast.success("플레이리스트를 업데이트했습니다");
         }
       } catch (error) {
         if (
@@ -205,6 +218,8 @@ const SetEditModal = ({
           error.response.status === 400
         ) {
           toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+        } else {
+          toast.error("플레이리스트를 업데이트할 수 없습니다");
         }
         console.log(error);
       }
@@ -247,7 +262,7 @@ const SetEditModal = ({
               headers: {
                 Authorization: `JWT ${userSecret.jwt}`,
               },
-              data: { track_id: track.id },
+              data: { track_ids: { id: track.id } },
             };
             try {
               await axios(config);
@@ -263,6 +278,12 @@ const SetEditModal = ({
         },
       ],
     });
+  };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
   };
 
   return (
@@ -291,15 +312,18 @@ const SetEditModal = ({
         <div className={styles["upload-modal-body"]}>
           {tab === TRACKS && (
             <ul className={styles.trackContainer}>
-              {playlist.tracks.map((track) => {
+              {playlist.tracks?.map((track) => {
                 return (
                   <li key={track.id}>
                     <div className={styles.imageContainer}>
-                      <img src={track.image || "/default_track_image.svg"} />
+                      <img
+                        src={track.image || "/default_track_image.svg"}
+                        onError={onImageError}
+                      />
                     </div>
                     <div className={styles.content}>
                       <span className={styles.artistName}>
-                        {track.artist} -
+                        {track.artist_display_name} -
                       </span>
                       &nbsp;
                       <span className={styles.trackTitle}>{track.title}</span>
@@ -348,10 +372,13 @@ const SetEditModal = ({
                 </div>
                 <div className={styles["upload-info-genre"]}>
                   <label>Genre</label>
-                  <select>
+                  <select
+                    onChange={(event) => changeGenre(event)}
+                    value={genre || "None"}
+                  >
                     <option value="None">None</option>
-                    <option value="Custom">Custom</option>
-                    {/* <option value="Alternative Rock">Alternative Rock</option>
+                    {/* <option value="Custom">Custom</option> */}
+                    <option value="Alternative Rock">Alternative Rock</option>
                     <option value="Ambient">Ambient</option>
                     <option value="Classical">Classical</option>
                     <option value="Country">Country</option>
@@ -384,7 +411,7 @@ const SetEditModal = ({
                     <option value="Trance">Trance</option>
                     <option value="Trap">Trap</option>
                     <option value="Triphop">Triphop</option>
-                    <option value="World">World</option> */}
+                    <option value="World">World</option>
                   </select>
                 </div>
                 <div className={styles["upload-info-tag"]}>

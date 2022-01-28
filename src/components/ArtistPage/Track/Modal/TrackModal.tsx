@@ -14,6 +14,12 @@ const TrackModal = ({
   track: ITrack;
   artist: IArtist;
 }) => {
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
   return (
     <div
       className={`${styles["modal"]} ${
@@ -33,6 +39,7 @@ const TrackModal = ({
             <div className={styles.trackImage}>
               <img
                 src={track.image || "/default_track_image.svg"}
+                onError={onImageError}
                 alt={`${track.title}의 트랙 이미지`}
               />
               <div />

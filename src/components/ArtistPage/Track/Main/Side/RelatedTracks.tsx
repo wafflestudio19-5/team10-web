@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./SideTracks.module.scss";
 import { IoStatsChart } from "react-icons/io5";
 import { BsSuitHeartFill } from "react-icons/bs";
@@ -7,59 +7,113 @@ import { FaPlay } from "react-icons/fa";
 import { FcComments } from "react-icons/fc";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useHistory } from "react-router";
+import { IArtist, ITrack } from "../../TrackPage";
+import axios from "axios";
+import { useTrackContext } from "../../../../../context/TrackContext";
 
-interface ITrack {
-  artistName: string;
-  trackName: string;
-  plays: string;
-  likes: string;
-  reposts: string;
-  comments: number;
-}
-const Track = ({ track }: { track: ITrack }) => {
+const Track = ({ track, artist }: { track: ITrack; artist: IArtist }) => {
   const [play, setPlay] = useState(false);
-  const clickPlayButton = () => setPlay(!play);
+  const {
+    audioSrc,
+    trackIsPlaying,
+    audioPlayer,
+    setTrackBarPlaylist,
+    setPlayingTime,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    setTrackIsPlaying,
+  } = useTrackContext();
+  const headerTrackSrc = track.audio.split("?")[0];
+  const barTrackSrc = audioSrc.split("?")[0];
+
+  useEffect(() => {
+    if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
+      setPlay(true);
+    } else {
+      setPlay(false);
+    }
+  }, [audioSrc, trackIsPlaying, audioPlayer.current.src]);
+  const togglePlayButton = () => {
+    if (track) {
+      setTrackBarPlaylist([]);
+      if (!play) {
+        if (headerTrackSrc !== barTrackSrc) {
+          setPlayingTime(0);
+          audioPlayer.current.src = track.audio;
+          setAudioSrc(track.audio);
+          audioPlayer.current.load();
+          setTrackBarArtist({
+            display_name: artist.display_name,
+            id: artist.id,
+            permalink: artist.permalink,
+          });
+          setTrackBarTrack(track);
+        }
+        setPlay(true);
+        setTrackIsPlaying(true);
+        setTimeout(() => {
+          audioPlayer.current.play();
+        }, 1);
+      } else {
+        audioPlayer.current.pause();
+        setPlay(false);
+        setTrackIsPlaying(false);
+      }
+    }
+  };
   const history = useHistory();
-  const clickUsername = () => history.push(`/${track.artistName}`);
+  const clickUsername = () => history.push(`/${artist.permalink}`);
   const clickTrack = () =>
-    history.push(`/${track.artistName}/${track.trackName}`);
+    history.push(`/${artist.permalink}/${track.permalink}`);
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
+
   return (
     <li className={styles.tracks}>
       <div className={styles.trackImage}>
-        <div className={styles.playButton} onClick={clickPlayButton}>
+        <img
+          src={track.image || "/default_track_image.svg"}
+          onError={onImageError}
+        />
+        <div className={styles.playButton} onClick={togglePlayButton}>
           {play ? <IoMdPause /> : <IoMdPlay />}
         </div>
       </div>
       <div className={styles.trackInfo}>
         <span className={styles.artistName} onClick={clickUsername}>
-          {track.artistName}
+          {artist.display_name}
         </span>
         <span className={styles.trackName} onClick={clickTrack}>
-          {track.trackName}
+          {track.title}
         </span>
         <div className={styles.miniStats}>
           <div className={styles.statContainer}>
             <div>
               <FaPlay />
-              <span>{track.plays}</span>
+              <span>{track.play_count}</span>
             </div>
           </div>
           <div className={styles.statContainer}>
             <div className={styles.pointer}>
               <BsSuitHeartFill />
-              <span>{track.likes}</span>
+              <span>{track.like_count}</span>
             </div>
           </div>
           <div className={styles.statContainer}>
             <div className={styles.pointer}>
               <BiRepost />
-              <span>{track.reposts}</span>
+              <span>{track.repost_count}</span>
             </div>
           </div>
           <div className={styles.statContainer}>
             <div className={styles.pointer}>
               <FcComments />
-              <span>{track.comments}</span>
+              <span>{track.comment_count}</span>
             </div>
           </div>
         </div>
@@ -68,52 +122,55 @@ const Track = ({ track }: { track: ITrack }) => {
   );
 };
 
-const RelatedTracks = () => {
-  const relatedTracks = [
-    {
-      id: 1,
-      artistName: "Artist Name",
-      trackName: "Track Name",
-      plays: "2.69M",
-      likes: "25.2K",
-      reposts: "1,614",
-      comments: 163,
-    },
-    {
-      id: 2,
-      artistName: "Artist Name",
-      trackName: "Track Name",
-      plays: "2.69M",
-      likes: "25.2K",
-      reposts: "1,614",
-      comments: 163,
-    },
-    {
-      id: 3,
-      artistName: "Artist Name",
-      trackName: "Track Name",
-      plays: "2.69M",
-      likes: "25.2K",
-      reposts: "1,614",
-      comments: 163,
-    },
-  ];
+const RelatedTracks = ({
+  artist,
+  track,
+}: {
+  artist: IArtist;
+  track: ITrack;
+}) => {
+  const [artistTrack, setArtistTrack] = useState<ITrack[]>([]);
+  useEffect(() => {
+    const fetchArtistTracks = async () => {
+      if (artist.id != 0) {
+        const config: any = {
+          method: "get",
+          url: `/users/${artist.id}/tracks?page=1&page_size=4`,
+          data: {},
+        };
+        try {
+          const { data } = await axios(config);
+          const tracks = data.results.filter(
+            (result: ITrack) => result.id !== track.id
+          );
+          setArtistTrack(tracks.slice(0, 3));
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetchArtistTracks();
+  }, [artist.id]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.title}>
-        <div>
-          <IoStatsChart />
-          <span>Related Tracks</span>
+    <>
+      {artistTrack.length !== 0 && (
+        <div className={styles.container}>
+          <div className={styles.title}>
+            <div>
+              <IoStatsChart />
+              <span>Artist's Recent Tracks</span>
+            </div>
+            <span className={styles.viewAll}>View all</span>
+          </div>
+          <ul className={styles.trackList}>
+            {artistTrack.map((track: ITrack) => {
+              return <Track track={track} artist={artist} key={track.id} />;
+            })}
+          </ul>
         </div>
-        <span className={styles.viewAll}>View all</span>
-      </div>
-      <ul className={styles.trackList}>
-        {relatedTracks.map((track) => {
-          return <Track track={track} key={track.id} />;
-        })}
-      </ul>
-    </div>
+      )}
+    </>
   );
 };
 

@@ -7,6 +7,7 @@ import SetModal from "./Modal/SetModal";
 import SetMain from "./Main/SetMain";
 import { useAuthContext } from "../../../context/AuthContext";
 import SetEditModal from "./Modal/SetEditModal";
+import toast from "react-hot-toast";
 
 interface ISetParams {
   username: string;
@@ -15,7 +16,7 @@ interface ISetParams {
 export interface ISetTrack {
   artist: number;
   audio: string;
-  count: number;
+  play_count: number;
   id: number;
   image: string;
   is_liked: boolean;
@@ -47,14 +48,18 @@ export interface IPlaylist {
   genre: {
     id: number;
     name: string;
-  };
+  } | null;
   tags: ITag[];
   is_private: boolean;
   like_count: number;
   repost_count: number;
-  image: string;
+  image: string | null;
   tracks: ISetTrack[];
   created_at: string;
+  is_followed: boolean | undefined;
+  is_liked: boolean | undefined;
+  is_reposted: boolean | undefined;
+  track_count: number;
 }
 
 const SetPage = () => {
@@ -86,11 +91,16 @@ const SetPage = () => {
     is_private: false,
     like_count: 0,
     repost_count: 0,
-    image: "",
+    image: null,
     tracks: [],
     created_at: "",
+    is_followed: undefined,
+    is_liked: undefined,
+    is_reposted: undefined,
+    track_count: 0,
   });
   const [noSet, setNoSet] = useState(false);
+  const [isMySet, setIsMySet] = useState<undefined | boolean>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -99,12 +109,27 @@ const SetPage = () => {
   const { userSecret } = useAuthContext();
   const fetchSet = async () => {
     try {
-      const response = await axios.get(
-        `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`
-      );
-      const data = response.data;
-      setSet(data);
-      console.log(data);
+      const config: any = {
+        method: "get",
+        url: `/resolve?url=https%3A%2F%2Fsoundwaffle.com%2F${username}%2Fsets%2F${playlist}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      const response = await axios(config);
+      if (response.data.creator.id == userSecret.id) {
+        setIsMySet(true);
+      } else {
+        setIsMySet(false);
+      }
+      if (
+        response.data.creator.id !== userSecret.id &&
+        response.data.is_private
+      ) {
+        setNoSet(true);
+      }
+      setSet(response.data);
       setIsLoading(false);
     } catch (error) {
       if (
@@ -118,11 +143,14 @@ const SetPage = () => {
         setNoSet(true);
         setIsLoading(false);
       }
+      toast.error("플레이리스트 정보를 받아오는 데 실패했습니다");
     }
   };
   useEffect(() => {
-    fetchSet();
-  }, []);
+    if (typeof userSecret.jwt === "string") {
+      fetchSet();
+    }
+  }, [userSecret.jwt]);
 
   useEffect(() => {
     if (set.creator.id !== userSecret.id && set.is_private === true) {
@@ -166,6 +194,8 @@ const SetPage = () => {
               fetchSet={fetchSet}
               setEditModal={setEditModal}
               playing={playing}
+              setPlaying={setPlaying}
+              isMySet={isMySet}
             />
           )}
         </div>

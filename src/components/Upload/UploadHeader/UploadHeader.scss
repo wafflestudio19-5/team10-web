@@ -1,60 +1,63 @@
 .upload-header {
-    width: 1240px;
-    height: 50px;
+  width: 1240px;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f2f2f2;
+  margin-bottom: 35px;
+
+  .upload-header-left {
     display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #f2f2f2;
-    margin-bottom: 35px;
+    flex-direction: row;
 
-    .upload-header-left {
-        display: flex;
-        flex-direction: row;
+    .upload-menu {
+      color: #ff5500;
+      border-bottom: 2px solid #ff5500;
 
-        .upload-menu {
-          color: #FF5500;
-          border-bottom: 2px solid #FF5500;
+      &:hover {
+        border-bottom: 2px solid #ff5500;
+      }
+    }
 
-          &:hover {
-            border-bottom: 2px solid #FF5500;
-          }
-        }
-      
-        a {
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 500;
-          color: #333;
-          margin-top: 18px;
-          margin-left: 30px;
-      
-          &:hover {
-            border-bottom: 2px solid #333;
-          }
-        }
+    a,
+    span {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-top: 18px;
+      margin-left: 30px;
+      cursor: pointer;
+
+      &:hover {
+        border-bottom: 2px solid #333;
+      }
+    }
+  }
+
+  .upload-header-right {
+    a,
+    span {
+      display: flex;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-top: 18px;
+      margin-right: 30px;
+      cursor: pointer;
+
+      &:hover {
+        border-bottom: 2px solid #333;
       }
 
-    .upload-header-right {
-      
-        a {
-          display: flex;
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 500;
-          color: #333;
-          margin-top: 18px;
-          margin-right: 30px;
-      
-          &:hover {
-            border-bottom: 2px solid #333;
-          }
-
-          img {
-              margin-bottom: 10px;
-          }
-
-          div {
-              margin-bottom: 10px;
-          }
-        }
+      img {
+        margin-bottom: 10px;
       }
+
+      div {
+        margin-bottom: 10px;
+      }
+    }
+  }
 }

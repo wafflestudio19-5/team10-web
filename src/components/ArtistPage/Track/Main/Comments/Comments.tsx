@@ -13,6 +13,7 @@ import { useAuthContext } from "../../../../../context/AuthContext";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { throttle } from "lodash";
+import toast from "react-hot-toast";
 
 const Comments = ({
   comments,
@@ -103,11 +104,12 @@ const CommentItem = ({
         },
       };
       try {
-        const response = await axios(config);
-        console.log(response);
+        await axios(config);
+        // console.log(response);
         fetchComments();
       } catch (error) {
-        console.log(console.error());
+        console.log(error);
+        toast.error("댓글을 작성하는데 실패했습니다");
       }
     }, 1000);
     submitInput();
@@ -157,11 +159,18 @@ const CommentItem = ({
               }
             } catch (error) {
               console.log(error);
+              toast.error("댓글을 삭제하는데 실패했습니다");
             }
           },
         },
       ],
     });
+  };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
   };
 
   return (
@@ -173,6 +182,7 @@ const CommentItem = ({
         >
           <img
             src={comments[0].writer.image_profile || "/default_user_image.png"}
+            onError={onImageError}
             alt={`${comments[0].writer.display_name}의 프로필 사진`}
           />
         </div>
@@ -222,6 +232,7 @@ const CommentItem = ({
                     src={
                       child.writer.image_profile || "/default_user_image.png"
                     }
+                    onError={onImageError}
                     alt={`${child.writer.display_name}의 프로필 사진`}
                   />
                 </div>
@@ -269,6 +280,7 @@ const CommentItem = ({
           <img
             className={styles.replyUserImage}
             src={userMe.image_profile || "/default_user_image.png"}
+            onError={onImageError}
           />
           <form className={styles.replyInput} onSubmit={onSubmit}>
             <input

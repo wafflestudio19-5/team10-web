@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "./TrackBar.module.scss";
 import {
   IoPlaySkipBackSharp,
@@ -19,9 +20,10 @@ import { useHistory } from "react-router-dom";
 import { useTrackContext } from "../../../../context/TrackContext";
 import toast from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai";
-// import { useAuthContext } from "../../../../context/AuthContext";
+import { useAuthContext } from "../../../../context/AuthContext";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
 import { shuffle } from "lodash";
+import axios from "axios";
 // import { useAuthContext } from "../../../../context/AuthContext";
 // import axios from "axios";
 // import { IFollowings } from "../Main/ListenArtistInfo";
@@ -66,7 +68,7 @@ const TrackBar = () => {
   //   );
   //   const [likeLoading, setLikeLoading] = useState(true);
   //   const [followLoading, setFollowLoading] = useState(true);
-  //   const { userSecret } = useAuthContext();
+  const { userSecret } = useAuthContext();
   const [nextup, setNextup] = useState(false);
   const {
     trackDuration,
@@ -84,8 +86,8 @@ const TrackBar = () => {
     trackBarTrack,
     setTrackBarTrack,
     setTrackBarPlaylist,
-    // setTrackBarArtist,
-    // setAudioSrc,
+    setTrackBarArtist,
+    setAudioSrc,
     trackBarPlaylist,
   } = useTrackContext();
   //   const { userSecret } = useAuthContext();
@@ -198,153 +200,7 @@ const TrackBar = () => {
     history.push(`/${trackBarArtist.permalink}/${trackBarTrack.permalink}`);
   };
 
-  //   const isLikeTrack = async () => {
-  //     if (userSecret.id !== 0 && trackBarTrack.id !== 0) {
-  //       const config: any = {
-  //         method: "get",
-  //         url: `/users/${userSecret.id}/likes/tracks`,
-  //         headers: {
-  //           Authorization: `JWT ${userSecret.jwt}`,
-  //         },
-  //         data: {},
-  //       };
-  //       try {
-  //         // like 트랙 목록 받아오기
-  //         const likeTracks = await axios(config);
-  //         if (likeTracks.data.results.length === 0) {
-  //           setLikeLoading(false);
-  //           setLikeTrack(false);
-  //         } else {
-  //           const trackExist = likeTracks.data.results.find(
-  //             (likeTrack: ILikeTrack) => likeTrack.id === trackBarTrack.id
-  //           );
-  //           if (trackExist) {
-  //             setLikeTrack(true);
-  //           } else {
-  //             setLikeTrack(false);
-  //           }
-  //           setLikeLoading(false);
-  //         }
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     }
-  //   };
-
-  //   const isFollowing = async () => {
-  //     if (trackBarArtist.id !== 0 && userSecret.id !== 0) {
-  //       const followConfig: any = {
-  //         method: "get",
-  //         url: `/users/${trackBarArtist.id}/followers`,
-  //         headers: {
-  //           Authorization: `JWT ${userSecret.jwt}`,
-  //         },
-  //         data: {},
-  //       };
-  //       try {
-  //         const { data } = await axios(followConfig);
-  //         if (data.results.length === 0) {
-  //           setFollowLoading(false);
-  //           setFollowArtist(false);
-  //         } else {
-  //           const trackExist = data.results.find(
-  //             (follower: IFollowings) => follower.id === userSecret.id
-  //           );
-  //           console.log(trackExist, "esatt");
-  //           if (trackExist) {
-  //             setFollowArtist(true);
-  //           } else {
-  //             setFollowArtist(false);
-  //           }
-  //           setFollowLoading(false);
-  //         }
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     }
-  //   };
-  //   useEffect(() => {
-  //     isLikeTrack();
-  //     isFollowing();
-  //   }, [trackBarTrack]);
-
-  //   const onLikeTrack = async () => {
-  //     const config: any = {
-  //       method: "post",
-  //       url: `/likes/tracks/${trackBarTrack.id}`,
-  //       headers: {
-  //         Authorization: `JWT ${userSecret.jwt}`,
-  //       },
-  //       data: {},
-  //     };
-  //     try {
-  //       const response = await axios(config);
-  //       if (response) {
-  //         setLikeTrack(true);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   const unlikeTrack = async () => {
-  //     const config: any = {
-  //       method: "delete",
-  //       url: `/likes/tracks/${trackBarTrack.id}`,
-  //       headers: {
-  //         Authorization: `JWT ${userSecret.jwt}`,
-  //       },
-  //       data: {},
-  //     };
-  //     try {
-  //       const response = await axios(config);
-  //       if (response) {
-  //         setLikeTrack(false);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   const onFollowArtist = async () => {
-  //     const config: any = {
-  //       method: "post",
-  //       url: `/users/me/followings/${trackBarArtist.id}`,
-  //       headers: {
-  //         Authorization: `JWT ${userSecret.jwt}`,
-  //       },
-  //       data: {},
-  //     };
-  //     try {
-  //       const response = await axios(config);
-  //       if (response) {
-  //         setFollowArtist(true);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   const unfollowArtist = async () => {
-  //     const config: any = {
-  //       method: "delete",
-  //       url: `/users/me/followings/${trackBarArtist.id}`,
-  //       headers: {
-  //         Authorization: `JWT ${userSecret.jwt}`,
-  //       },
-  //       data: {},
-  //     };
-  //     try {
-  //       const response = await axios(config);
-  //       if (response) {
-  //         setFollowArtist(false);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   console.log();
-
-  const nextTrack = () => {
+  const nextTrack = async () => {
     if (trackBarPlaylist.length === 0) {
       return toast.error(
         "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
@@ -357,10 +213,53 @@ const TrackBar = () => {
       return toast.error("다음 트랙이 없습니다");
     }
     audioPlayer.current.pause();
+    // 새로 url 받아오는 경우
+    // const config: any = {
+    //     method: "get",
+    //     url: `/tracks/${trackBarPlaylist[current + 1].id}`,
+    //     headers: {
+    //       Authorization: `JWT ${userSecret.jwt}`,
+    //     },
+    //     data: {},
+    //   };
+    //   try {
+    //     const { data } = await axios(config);
+    //     setPlayingTime(0);
+    //     setTrackIsPlaying(true);
+    //     setTrackBarTrack({
+    //       id: data.id,
+    //       permalink: data.permalink,
+    //       audio: data.audio,
+    //       image: data.image,
+    //       title: data.title,
+    //     });
+    //     setTrackBarArtist({
+    //       display_name: trackBarPlaylist[current + 1].artist_display_name,
+    //       id: trackBarPlaylist[current + 1].artist,
+    //       permalink: trackBarPlaylist[current + 1].artist_permalink,
+    //     });
+    //     audioPlayer.current.src = data.audio;
+    //     setAudioSrc(data.audio);
+    //     audioPlayer.current.load();
+    //     audioPlayer.current.pause();
+    //     setTimeout(() => {
+    //       audioPlayer.current.play();
+    //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    //     }, 1);
+    //   } catch (error) {
+    //     console.log(error);
+    //     toast.error("이전 트랙을 불러올 수 없습니다");
+    //   }
     setPlayingTime(0);
     setTrackIsPlaying(true);
     setTrackBarTrack(trackBarPlaylist[current + 1]);
+    setTrackBarArtist({
+      display_name: trackBarPlaylist[current + 1].artist_display_name,
+      id: trackBarPlaylist[current + 1].artist,
+      permalink: trackBarPlaylist[current + 1].artist_permalink,
+    });
     audioPlayer.current.src = trackBarPlaylist[current + 1].audio;
+    setAudioSrc(trackBarPlaylist[current + 1].audio);
     audioPlayer.current.load();
     audioPlayer.current.pause();
     setTimeout(() => {
@@ -369,7 +268,7 @@ const TrackBar = () => {
     }, 1);
   };
 
-  const prevTrack = () => {
+  const prevTrack = async () => {
     if (trackBarPlaylist.length === 0) {
       return toast.error(
         "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
@@ -385,7 +284,13 @@ const TrackBar = () => {
     setPlayingTime(0);
     setTrackIsPlaying(true);
     setTrackBarTrack(trackBarPlaylist[current - 1]);
+    setTrackBarArtist({
+      display_name: trackBarPlaylist[current - 1].artist_display_name,
+      id: trackBarPlaylist[current - 1].artist,
+      permalink: trackBarPlaylist[current - 1].artist_permalink,
+    });
     audioPlayer.current.src = trackBarPlaylist[current - 1].audio;
+    setAudioSrc(trackBarPlaylist[current - 1].audio);
     audioPlayer.current.load();
     audioPlayer.current.pause();
     setTimeout(() => {
@@ -396,6 +301,7 @@ const TrackBar = () => {
 
   useEffect(() => {
     if (audioPlayer.current?.ended) {
+      if (trackBarPlaylist.length === 0) return;
       if (
         audioPlayer.current.src ===
         trackBarPlaylist[trackBarPlaylist.length - 1].audio
@@ -410,6 +316,11 @@ const TrackBar = () => {
   }, [playingTime]);
 
   const shuffleTracks = () => {
+    if (trackBarPlaylist.length === 0) {
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
+    }
     const currentIndex = trackBarPlaylist.findIndex(
       (track) => track.id === trackBarTrack.id
     );
@@ -426,6 +337,72 @@ const TrackBar = () => {
   };
 
   const toggleNextup = () => setNextup(!nextup);
+
+  useEffect(() => {
+    const getLastTrack = async () => {
+      if (userSecret.id != 0) {
+        const config: any = {
+          method: "get",
+          url: `/users/${userSecret.id}/history/tracks`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          const { data } = await axios(config);
+          if (data.count != 0) {
+            const track = data.results[0];
+            setTrackBarTrack({
+              id: track.id,
+              title: track.title,
+              permalink: track.permalink,
+              audio: track.audio,
+              image: track.image,
+            });
+            setAudioSrc(track.audio);
+            setTrackBarArtist({
+              id: track.artist.id,
+              permalink: track.artist.permalink,
+              display_name: track.artist.display_name,
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error("마지막으로 들었던 트랙 정보를 불러올 수 없습니다");
+        }
+      }
+    };
+    getLastTrack();
+  }, [userSecret.id]);
+
+  useEffect(() => {
+    const putHit = async () => {
+      if (trackIsPlaying && userSecret.jwt) {
+        const config: any = {
+          method: "put",
+          url: `/tracks/${trackBarTrack.id}/hit`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          await axios(config);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    putHit();
+  }, [audioPlayer.current.src, userSecret.jwt]);
+
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
 
   return (
     <>
@@ -488,6 +465,7 @@ const TrackBar = () => {
             <div className={styles.trackInfo}>
               <img
                 src={trackBarTrack.image || "/default_track_image.svg"}
+                onError={onImageError}
                 alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
               />
               <div className={styles.artistTrackName}>
@@ -561,8 +539,8 @@ const TrackBar = () => {
                     <TrackBarList
                       key={track.id}
                       track={track}
-                      clickArtist={clickArtist}
-                      clickTrack={clickTrack}
+                      //   clickArtist={clickArtist}
+                      //   clickTrack={clickTrack}
                     />
                   );
                 })}
@@ -577,12 +555,12 @@ const TrackBar = () => {
 
 const TrackBarList = ({
   track,
-  clickArtist,
-  clickTrack,
-}: {
+}: //   clickArtist,
+//   clickTrack,
+{
   track: ITrackBarPlaylist;
-  clickArtist: () => void;
-  clickTrack: () => void;
+  //   clickArtist: () => void;
+  //   clickTrack: () => void;
 }) => {
   const [play, setPlay] = useState(false);
   const {
@@ -594,7 +572,9 @@ const TrackBarList = ({
     setTrackIsPlaying,
     trackIsPlaying,
     trackBarTrack,
+    setTrackBarArtist,
   } = useTrackContext();
+  const history = useHistory();
   const headerTrackSrc = track.audio.split("?")[0];
   const barTrackSrc = audioSrc.split("?")[0];
   const togglePlayButton = () => {
@@ -604,11 +584,11 @@ const TrackBarList = ({
         audioPlayer.current.src = track.audio;
         setAudioSrc(track.audio);
         audioPlayer.current.load();
-        // setTrackBarArtist({
-        //   display_name: username,
-        //   id: track.artist,
-        //   permalink: userSecret.permalink,
-        // });
+        setTrackBarArtist({
+          display_name: track.artist_display_name,
+          id: track.artist,
+          permalink: track.artist_permalink,
+        });
         setTrackBarTrack(track);
       }
       setPlay(true);
@@ -629,6 +609,9 @@ const TrackBarList = ({
       setPlay(false);
     }
   }, [audioSrc, trackIsPlaying]);
+  const clickArtist = () => history.push(`/${track.permalink}`);
+  const clickTrack = () =>
+    history.push(`/${track.artist_permalink}/${track.permalink}`);
 
   return (
     <li
@@ -643,7 +626,7 @@ const TrackBarList = ({
       </div>
       <div className={styles.content}>
         <span className={styles.artistName} onClick={clickArtist}>
-          {track.artist} -
+          {track.artist_display_name} -
         </span>
         &nbsp;
         <span className={styles.trackTitle} onClick={clickTrack}>

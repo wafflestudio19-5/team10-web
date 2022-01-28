@@ -33,7 +33,7 @@ const EditModal = ({
   //   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>("");
   const [permalinkList, setPermalinkList] = useState<ITrackPermalink[]>([]);
-  const [genre, setGenre] = useState<string | null>(null);
+  const [genre, setGenre] = useState<string | null | undefined>(null);
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const EditModal = ({
     // setTags(track.tags);
     setImageUrl(track.image);
     setTagInput(track.tags.join(", "));
-    setGenre(track.genre);
+    setGenre(track.genre?.name);
   }, [track]);
 
   const openFileSelector = (event: any) => {
@@ -149,7 +149,9 @@ const EditModal = ({
           description: description,
           is_private: isPrivate,
           image_extension: imageFile.name.split(".").at(-1),
-          tags_input: tagInput.replace(/,/g, "").split(" "),
+          ...(tagInput && {
+            tags_input: tagInput.replace(/,/g, "").split(" "),
+          }),
           genre_input: genre,
         },
       };
@@ -159,16 +161,12 @@ const EditModal = ({
           fetchYourTracks();
           setModal(false);
           try {
-            const response = await axios.put(
-              data.image_presigned_url,
-              imageFile,
-              {
-                headers: {
-                  "Content-Type": imageFile.type,
-                },
-              }
-            );
-            console.log(response);
+            await axios.put(data.image_presigned_url, imageFile, {
+              headers: {
+                "Content-Type": imageFile.type,
+              },
+            });
+            // console.log(response);
           } catch (error) {
             console.log(error);
           }
@@ -181,7 +179,7 @@ const EditModal = ({
         ) {
           toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
         }
-        console.log(error);
+        toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
       }
     } else {
       config = {
@@ -195,7 +193,9 @@ const EditModal = ({
           permalink: tPermalink,
           description: description,
           is_private: isPrivate,
-          tags_input: tagInput.replace(/,/g, "").split(" "),
+          ...(tagInput && {
+            tags_input: tagInput.replace(/,/g, "").split(" "),
+          }),
           genre_input: genre,
         },
       };
@@ -212,8 +212,9 @@ const EditModal = ({
           error.response.status === 400
         ) {
           toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+        } else {
+          toast.error("트랙 업데이트에 실패했습니다.");
         }
-        console.log(error);
       }
     }
     // try {
@@ -289,7 +290,7 @@ const EditModal = ({
                 value={genre || "None"}
               >
                 <option value="None">None</option>
-                <option value="Custom">Custom</option>
+                {/* <option value="Custom">Custom</option> */}
                 <option value="Alternative Rock">Alternative Rock</option>
                 <option value="Ambient">Ambient</option>
                 <option value="Classical">Classical</option>

@@ -1,14 +1,17 @@
+import axios from "axios";
 import { throttle } from "lodash";
 import React, {
   SetStateAction,
   useCallback,
   useEffect,
   useRef,
+  useState,
   //   useState,
 } from "react";
 import { MdOutlineCancel } from "react-icons/md";
+import { useAuthContext } from "../../../../context/AuthContext";
 import { useTrackContext } from "../../../../context/TrackContext";
-import { IPlaylist } from "../SetPage";
+import { IPlaylist, ISetTrack } from "../SetPage";
 import SetButton from "./SetButton";
 import styles from "./SetHeader.module.scss";
 import SetImage from "./SetImage";
@@ -33,6 +36,7 @@ const SetHeader = ({
   //     number | undefined
   //   >(undefined); // 트랙 길이
   //   const [trackLoading, setTrackLoading] = useState(true);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
   const setHeader = useRef<HTMLDivElement>(null);
   const {
     trackDuration,
@@ -48,6 +52,7 @@ const SetHeader = ({
     // trackBarTrack,
     setTrackBarPlaylist,
   } = useTrackContext();
+  const { userSecret } = useAuthContext();
   const progressBar = useRef<any>(null); // 재생 바 태그 접근(input)
   const animationRef = useRef(0); // 재생 애니메이션
   const calculateTime = (secs: number) => {
@@ -63,11 +68,32 @@ const SetHeader = ({
     setPlayingTime(audioPlayer.current.currentTime);
     changePlayerCurrentTime();
   };
-  //   const buttonDisabled = noSet || setLoading;
-  const buttonDisabled = false;
+  useEffect(() => {
+    const tracks: ISetTrack[] = playlist.tracks;
+    if (playlist?.tracks !== null && tracks.length != 0) {
+      setButtonDisabled(false);
+    }
+  }, [playlist.tracks, noSet]);
+  //   const buttonDisabled = false;
+  const putHit = async () => {
+    const config: any = {
+      method: "put",
+      url: `/tracks/${playlist.tracks[0].id}/hit?set_id=${playlist.id}`,
+      headers: {
+        Authorization: `JWT ${userSecret.jwt}`,
+      },
+      data: {},
+    };
+    try {
+      await axios(config);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const togglePlayPause = () => {
     if (playing === "before") {
       setPlaying("playing");
+      putHit();
       setAudioSrc(playlist.tracks[0].audio);
       setTrackIsPlaying(true);
       setTrackBarArtist({
@@ -81,12 +107,6 @@ const SetHeader = ({
         permalink: playlist.tracks[0].permalink,
         audio: playlist.tracks[0].audio,
         image: playlist.tracks[0].image,
-        // like_count: track.like_count,
-        // repost_count: track.repost_count,
-        // comment_count: track.comment_count,
-        // genre: track.genre,
-        // count: track.count,
-        // is_private: track.is_private,
       });
       setTrackBarPlaylist(playlist.tracks);
       audioPlayer.current.src = playlist.tracks[0].audio;
@@ -137,7 +157,7 @@ const SetHeader = ({
     changePlayerCurrentTime();
   }, [playingTime, audioSrc]);
   useEffect(() => {
-    if (trackIsPlaying) {
+    if (trackIsPlaying && playing !== "before") {
       setPlaying("playing");
     } else if (playing !== "before" && trackIsPlaying === false) {
       setPlaying("paused");
@@ -183,14 +203,17 @@ const SetHeader = ({
           </div>
         )}
         <div className={styles.playingTrack}>
-          {playing === "before" ? (
+          {playing === "before" && !noSet && (
             <div className={styles.trackCount}>
-              <div className={styles.countNumber}>{playlist.tracks.length}</div>
+              <div className={styles.countNumber}>
+                {playlist.tracks?.length}
+              </div>
               <div className={styles.tracks}>
-                {playlist.tracks.length === 1 ? "TRACK" : "TRACKS"}
+                {playlist.tracks?.length === 1 ? "TRACK" : "TRACKS"}
               </div>
             </div>
-          ) : (
+          )}
+          {playing !== "before" && !noSet && (
             <div className={styles.trackPlayer}>
               <div className={styles.time}>
                 <div className={styles.currentTime}>
@@ -203,12 +226,6 @@ const SetHeader = ({
                 </div>
               </div>
               <div className={styles.barContainer}>
-                {/* <audio
-                ref={headerPlayer}
-                src={trackBarTrack.audio}
-                preload="metadata"
-                onLoadedMetadata={onLoadedMetadata}
-              /> */}
                 <input
                   ref={progressBar}
                   type="range"

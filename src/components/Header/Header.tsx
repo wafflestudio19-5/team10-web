@@ -1,3 +1,4 @@
+import React from "react";
 import { useHistory } from "react-router";
 import "./Header.scss";
 import { useEffect, useState } from "react";
@@ -38,12 +39,18 @@ function Header() {
     cookies.remove("is_logged_in", { path: "/" });
     history.push("/logout");
   };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
+  };
 
   return (
     <div className={"header_bar"}>
       <div className={"header"}>
         <div className={"header_logo"}>
-          <a href={"https://soundcloud.com/discover"}>logo</a>
+          <span onClick={() => history.push("/discover")}>logo</span>
         </div>
 
         <div className={"header_menu"}>
@@ -57,7 +64,7 @@ function Header() {
         </div>
 
         <div className={"upload"}>
-          <a href={"/upload"}>Upload</a>
+          <span onClick={() => history.push("/upload")}>Upload</span>
         </div>
 
         <div className={"header_user"}>
@@ -69,7 +76,11 @@ function Header() {
                     <img src={me.image_profile} alt={"user"} />
                   )}
                   {me.image_profile === null && (
-                    <img src={"img/user_img.png"} alt={"user"} />
+                    <img
+                      src={"/img/user_img.png"}
+                      onError={onImageError}
+                      alt={"user"}
+                    />
                   )}
                   <text>{me.display_name}</text>
                 </div>

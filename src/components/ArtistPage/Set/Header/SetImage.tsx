@@ -13,15 +13,24 @@ const SetImage = ({
   setHeader: React.Ref<HTMLDivElement>;
 }) => {
   const imgRef = useRef<HTMLImageElement>(null);
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
   return (
     <div className={styles.albumImage} onClick={openModal}>
       <img
         ref={imgRef}
         src={
-          playlist.image ||
-          playlist.tracks[0].image ||
+          playlist?.image ||
+          (playlist?.tracks !== null &&
+            playlist.tracks.length !== 0 &&
+            playlist.tracks[0].image) ||
           "/default_track_image.svg"
         }
+        onError={onImageError}
         alt={`${playlist.title}의 트랙 이미지`}
         crossOrigin="anonymous"
         onLoad={() => {

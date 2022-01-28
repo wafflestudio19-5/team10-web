@@ -52,7 +52,7 @@ const SetEngagement = ({
     try {
       const response = await axios(config);
       if (response) {
-        console.log("asdfsadj");
+        // console.log("asdfsadj");
         // setLike(true);
         fetchSet();
         fetchLikers();
@@ -65,6 +65,7 @@ const SetEngagement = ({
       ) {
         console.log("Unauthorized");
       }
+      toast.error("실패했습니다");
     }
   };
 
@@ -90,12 +91,13 @@ const SetEngagement = ({
         error &&
         error?.response?.status === 401
       ) {
-        console.log("asdfasd");
+        console.log("Unauthorized");
       }
+      toast.error("실패했습니다");
     }
   };
   const repostSet = async () => {
-    console.log(axios.defaults.headers);
+    // console.log(axios.defaults.headers);
     const config: any = {
       method: "post",
       url: `/reposts/sets/${playlist.id}`,
@@ -111,6 +113,7 @@ const SetEngagement = ({
       fetchReposters();
     } catch (error) {
       console.log(error);
+      toast.error("실패했습니다");
     }
     return;
   };
@@ -130,6 +133,7 @@ const SetEngagement = ({
       fetchReposters();
     } catch (error) {
       console.log(error);
+      toast.error("실패했습니다");
     }
     return;
   };
@@ -180,29 +184,29 @@ const SetEngagement = ({
     });
   };
   const openEditModal = () => setEditModal(true);
-
+  //   console.log(playlist);
   return (
     <div className={styles.main}>
       <div className={styles.buttonGroup}>
-        {isMySet === false && (
+        {isMySet === false && playlist.is_liked === true && (
           <button className={styles.like} onClick={unlikeSet}>
             <BsSuitHeartFill />
             <span>Liked</span>
           </button>
         )}
-        {isMySet === false && (
+        {isMySet === false && playlist.is_liked === false && (
           <button className={styles.notLike} onClick={likeSet}>
             <BsSuitHeartFill />
             <span>Like</span>
           </button>
         )}
-        {isMySet === false && (
+        {isMySet === false && playlist.is_reposted === true && (
           <button className={styles.repost} onClick={unrepostSet}>
             <BiRepost />
             <span>Reposted</span>
           </button>
         )}
-        {isMySet === false && (
+        {isMySet === false && playlist.is_reposted === false && (
           <button className={styles.notRepost} onClick={repostSet}>
             <BiRepost />
             <span>Repost</span>

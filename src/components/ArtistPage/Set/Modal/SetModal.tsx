@@ -1,3 +1,4 @@
+import React from "react";
 import { IPlaylist } from "../SetPage";
 import styles from "./SetModal.module.scss";
 import { GrClose } from "react-icons/gr";
@@ -11,6 +12,12 @@ const SetModal = ({
   closeModal: () => void;
   playlist: IPlaylist;
 }) => {
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
   return (
     <div
       className={`${styles["modal"]} ${
@@ -30,6 +37,7 @@ const SetModal = ({
             <div className={styles.playlistImage}>
               <img
                 src={playlist.image || "/default_track_image.svg"}
+                onError={onImageError}
                 alt={`${playlist.title}의 이미지`}
               />
               <div />

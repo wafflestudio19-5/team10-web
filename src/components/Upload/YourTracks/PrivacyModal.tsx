@@ -7,6 +7,11 @@ import { ChangeEventHandler, useState } from "react";
 import { useAuthContext } from "../../../context/AuthContext";
 import toast from "react-hot-toast";
 
+export interface ITag {
+  id: number;
+  name: string;
+}
+
 const PrivacyModal = ({
   modal,
   closeModal,
@@ -33,17 +38,19 @@ const PrivacyModal = ({
           Authorization: `JWT ${userSecret.jwt}`,
         },
         data: {
-          //   ...(tags.length !== 0 && {
-          //     tags_input: checkedItems[i]?.tags
-          //       .join(", ")
-          //       .concat(tags.replace(/,/g, "").split(" ")),
-          //   }),
+          ...(tags.length !== 0 && {
+            tags_input: checkedItems[i]?.tags
+              .map((tag: ITag) => tag.name)
+              .concat(tags.replace(/,/g, "").split(" ")),
+          }),
           ...(privacy !== undefined && { is_private: privacy }),
         },
       };
       try {
         await axios(config);
         fetchYourTracks();
+        setTags("");
+        setPrivacy(undefined);
         closeModal();
         editToggle();
         toast.success(`${checkedItems[i]?.title}을 업데이트했습니다`);

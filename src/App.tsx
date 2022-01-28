@@ -43,15 +43,54 @@ function App() {
           <Route exact path="/you/history" component={History} />
           <Route exact path="/upload" component={Upload} />
           <Route exact path="/you/tracks" component={YourTracks} />
-          <Route exact path="/:permalink" component={ArtistPageTracks} />
-          <Route exact path="/:permalink/tracks" component={ArtistPageTracks} />
+          <Route
+            exact
+            path="/:permalink"
+            render={(props) => (
+              <ArtistPageTracks key={props.match.params.permalink} {...props} />
+            )}
+          />
+          <Route
+            exact
+            path="/:permalink/tracks"
+            render={(props) => (
+              <ArtistPageTracks key={props.match.params.permalink} {...props} />
+            )}
+          />
           <Route
             exact
             path="/:permalink/sets"
-            component={ArtistPagePlaylists}
+            render={(props) => (
+              <ArtistPagePlaylists
+                key={props.match.params.permalink}
+                {...props}
+              />
+            )}
           />
-          <Route exact path="/:username/:trackname" component={TrackPage} />
-          <Route exact path="/:username/sets/:playlist" component={SetPage} />
+          <Route
+            exact
+            path="/:username/:trackname"
+            render={(props) => (
+              <TrackPage
+                key={props.match.params.username.concat(
+                  props.match.params.trackname
+                )}
+                {...props}
+              />
+            )}
+          />
+          <Route
+            exact
+            path="/:username/sets/:playlist"
+            render={(props) => (
+              <SetPage
+                key={props.match.params.username.concat(
+                  props.match.params.playlist
+                )}
+                {...props}
+              />
+            )}
+          />
         </Switch>
         {location.pathname !== "/" && <TrackBar />}
         {location.pathname !== "/" && <AudioTag />}

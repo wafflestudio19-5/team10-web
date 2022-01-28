@@ -7,7 +7,7 @@ const AudioInfo = ({
   isPrivate,
 }: {
   description: string;
-  isPrivate: boolean;
+  isPrivate: boolean | undefined;
 }) => {
   return (
     <div className={styles.main}>
