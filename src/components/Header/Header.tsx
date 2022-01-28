@@ -56,11 +56,12 @@ function Header() {
                   <text>{userInfo.display_name}</text>
                 </div>
               )}
-              {userInfo === undefined && (
-                <div>
-                  <img src={""} alt={"user"} />
-                  <text>user</text>
-                </div>
+              {me.image_profile === null && (
+                <img
+                  src={"/img/user_img.png"}
+                  onError={onImageError}
+                  alt={"user"}
+                />
               )}
             </button>
             <ul className="dropdown-menu">
