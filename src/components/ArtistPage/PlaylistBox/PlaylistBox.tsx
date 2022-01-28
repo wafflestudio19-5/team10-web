@@ -168,6 +168,8 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     trackBarTrack,
     seekTime,
     setTrackBarPlaylist,
+    trackBarPlaylistId,
+    setTrackBarPlaylistId,
   } = useTrackContext();
 
   const putHit = async () => {
@@ -217,6 +219,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
       setTrackBarArtist(artist);
       setTrackBarTrack(playlist[index]);
       setTrackBarPlaylist(playlist);
+      setTrackBarPlaylistId(item.id);
       audioPlayer.current.src = playlist[index].audio;
       if (trackBarTrack === playlist[index]) {
         audioPlayer.current.currentTime = current;
@@ -309,6 +312,18 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
       document.getElementById(`seek${currentPlay}`)?.click();
     }
   }, [seekTime]);
+
+  useEffect(() => {
+    if (trackBarPlaylistId === item.id) {
+      console.log("hi");
+      setIsPlaying(true);
+      setTrackIndex(trackBarTrack.id);
+      player.current.audio.current.currentTime =
+        audioPlayer.current.currentTime;
+      player.current.audio.current.play();
+      setCurrentPlay(item.id);
+    }
+  }, []);
 
   return (
     <div className={"recent-track"}>
