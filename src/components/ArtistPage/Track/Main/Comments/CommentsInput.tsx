@@ -48,12 +48,19 @@ const CommentsInput = ({
     setInput("");
     setTimeout(() => fetchComments(), 100);
   };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
+  };
 
   return (
     <div className={styles.main}>
       <div className={styles.commentInput}>
         <img
           src={userMe.image_profile || "/default_user_image.png"}
+          onError={onImageError}
           className={styles.userImage}
         />
         <form className={styles.inputContainer} onSubmit={onSubmit}>

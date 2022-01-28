@@ -166,6 +166,12 @@ const CommentItem = ({
       ],
     });
   };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
+  };
 
   return (
     <>
@@ -176,6 +182,7 @@ const CommentItem = ({
         >
           <img
             src={comments[0].writer.image_profile || "/default_user_image.png"}
+            onError={onImageError}
             alt={`${comments[0].writer.display_name}의 프로필 사진`}
           />
         </div>
@@ -225,6 +232,7 @@ const CommentItem = ({
                     src={
                       child.writer.image_profile || "/default_user_image.png"
                     }
+                    onError={onImageError}
                     alt={`${child.writer.display_name}의 프로필 사진`}
                   />
                 </div>
@@ -272,6 +280,7 @@ const CommentItem = ({
           <img
             className={styles.replyUserImage}
             src={userMe.image_profile || "/default_user_image.png"}
+            onError={onImageError}
           />
           <form className={styles.replyInput} onSubmit={onSubmit}>
             <input

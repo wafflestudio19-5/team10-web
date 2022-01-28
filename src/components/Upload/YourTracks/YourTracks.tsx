@@ -623,6 +623,12 @@ const Track = ({
     return;
   };
   const onClickName = () => history.push(`/${userSecret.permalink}`);
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
 
   return (
     <li key={track.id} onClick={checkHandler}>
@@ -647,6 +653,7 @@ const Track = ({
         <img
           className={styles.trackImage}
           src={track.image || "/default_track_image.svg"}
+          onError={onImageError}
         />
         <div className={styles.playButton} onClick={togglePlayButton}>
           {play ? <IoMdPause /> : <IoMdPlay />}

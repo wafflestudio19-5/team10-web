@@ -1,3 +1,4 @@
+import React from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { BsPeopleFill } from "react-icons/bs";
@@ -48,11 +49,18 @@ const CreatorInfo = ({
       console.log(error);
     }
   };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
+  };
   return (
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}>
         <img
           src={playlist.creator.image_profile || "/default_user_image.png"}
+          onError={onImageError}
           alt={`${playlist.creator.display_name}의 프로필 사진`}
         />
       </div>

@@ -144,6 +144,12 @@ const PlaylistModal = ({
 
   const clickAdd = () => setMode(ADD);
   const clickCreate = () => setMode(CREATE);
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
 
   return (
     <div
@@ -253,7 +259,10 @@ const PlaylistModal = ({
                 </div>
                 <div className={styles.trackItem}>
                   <div className={styles.image}>
-                    <img src={track.image || "/default_track_image.svg"} />
+                    <img
+                      src={track.image || "/default_track_image.svg"}
+                      onError={onImageError}
+                    />
                   </div>
                   <div className={styles.content}>
                     <span className={styles.artistName}>
@@ -317,6 +326,12 @@ const PlaylistList = ({
   const history = useHistory();
   const clickPlaylist = () =>
     history.push(`/${userSecret.permalink}/sets/${playlist.permalink}`);
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
 
   return (
     <div className={styles.playlist}>
@@ -328,6 +343,7 @@ const PlaylistList = ({
             playlist.tracks[0].image) ||
           "/default_track_image.svg"
         }
+        onError={onImageError}
       />
       <div className={styles.playlistInfo}>
         <div className={styles.playlistTitle} onClick={clickPlaylist}>

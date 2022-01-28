@@ -279,6 +279,12 @@ const SetEditModal = ({
       ],
     });
   };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
 
   return (
     <div className={styles.modalWrapper} onClick={closeModal}>
@@ -310,7 +316,10 @@ const SetEditModal = ({
                 return (
                   <li key={track.id}>
                     <div className={styles.imageContainer}>
-                      <img src={track.image || "/default_track_image.svg"} />
+                      <img
+                        src={track.image || "/default_track_image.svg"}
+                        onError={onImageError}
+                      />
                     </div>
                     <div className={styles.content}>
                       <span className={styles.artistName}>

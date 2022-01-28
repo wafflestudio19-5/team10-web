@@ -30,6 +30,12 @@ const InPlaylists = ({ artist }: { artist: IArtist }) => {
   }, [artist.id]);
 
   const history = useHistory();
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
   return (
     <>
       {playlists.length !== 0 && (
@@ -53,6 +59,7 @@ const InPlaylists = ({ artist }: { artist: IArtist }) => {
                   <img
                     className={styles.trackImage}
                     src={playlist.image || "/default_track_image.svg"}
+                    onError={onImageError}
                     onClick={clickPlaylist}
                   />
                   <div className={styles.trackInfo}>

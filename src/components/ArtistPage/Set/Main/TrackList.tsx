@@ -152,10 +152,20 @@ const TrackList = ({
     toast.success("Link has been copied to the clipboard!");
   };
 
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
+
   return (
     <li className={styles.main} key={track.id}>
       <div className={styles.image}>
-        <img src={track.image || "/default_track_image.svg"} />
+        <img
+          src={track.image || "/default_track_image.svg"}
+          onError={onImageError}
+        />
         <div className={styles.playButton} onClick={togglePlayButton}>
           {play ? <IoMdPause /> : <IoMdPlay />}
         </div>
