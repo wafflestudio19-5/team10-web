@@ -27,10 +27,8 @@ function UploadBox({ setSelectedFiles, setModal, setPlaylistModal }: any) {
   return (
     <div className="upload-box">
       <form className={"upload-form"}>
-        <div className="upload-text">
-          Drag and drop your tracks & albums here
-        </div>
-        <button onClick={clickFileInput}>or choose files to upload</button>
+        <div className="upload-text">Make your own Track & Playlist</div>
+        <button onClick={clickFileInput}>choose a file to upload</button>
         {isPlaylist && (
           <input
             type="file"
@@ -60,7 +58,7 @@ function UploadBox({ setSelectedFiles, setModal, setPlaylistModal }: any) {
               onChange={() => setIsPlaylist(!isPlaylist)}
             />
             <label className="form-check-label">
-              Make a playlist with multiple files
+              Make a playlist (with multiple files)
             </label>
           </div>
         </div>
