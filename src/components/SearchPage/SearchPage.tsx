@@ -39,10 +39,10 @@ interface ISearchTrack {
 const SearchPage = () => {
   const [noParams, setNoParams] = useState<undefined | boolean>(undefined);
   const [searchResults, setSearchResults] = useState<ISearchTrack[]>([]);
-  const [resultCount, setResultCount] = useState<number | undefined>(undefined);
+  //   const [resultCount, setResultCount] = useState<number | undefined>(undefined);
   const [noResults, setNoResults] = useState(false);
   const [isFinalResult, setIsFinalResult] = useState(false);
-  const [genre, setGenre] = useState<undefined | string>(undefined);
+  //   const [genre, setGenre] = useState<undefined | string>(undefined);
   const nextPage = useRef(1);
   const finalPage = useRef(0);
   const { userSecret } = useAuthContext();
@@ -57,16 +57,16 @@ const SearchPage = () => {
         headers: {
           Authorization: `JWT ${userSecret.jwt}`,
         },
-        data: { genres: [genre] },
+        data: {},
+        // params: { genres: [genre] },
       };
-      console.log(config);
       try {
         const { data } = await axios(config);
         if (data.count == 0) {
           setNoResults(true);
         } else {
           setNoResults(false);
-          setResultCount(data.count);
+          //   setResultCount(data.count);
           setSearchResults(
             data.results.filter(
               (value: ISearchTrack, index: number, self: ISearchTrack[]) =>
@@ -87,10 +87,10 @@ const SearchPage = () => {
     }
   };
 
-  const genreSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    searchTracks();
-  };
+  //   const genreSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
+  //     event.preventDefault();
+  //     searchTracks();
+  //   };
 
   const fetchNextTracks = async () => {
     if (nextPage.current !== finalPage.current) {
@@ -100,7 +100,8 @@ const SearchPage = () => {
         headers: {
           Authorization: `JWT ${userSecret.jwt}`,
         },
-        data: { ...(genre !== undefined && { genres: [genre] }) },
+        data: {},
+        // params: { ...(genre !== undefined && { genres: [genre] }) },
       };
       try {
         const response = await axios(config);
@@ -152,9 +153,9 @@ const SearchPage = () => {
     };
   });
 
-  const onGenreChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    setGenre(event.target.value);
-  };
+  //   const onGenreChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+  //     setGenre(event.target.value);
+  //   };
 
   return (
     <div className={styles.searchWrapper}>
@@ -192,16 +193,16 @@ const SearchPage = () => {
               <div className={styles.resultsFor}>
                 Search results for "{item}"
               </div>
-              <form className={styles.setGenre} onSubmit={genreSearch}>
+              {/* <form className={styles.setGenre} onSubmit={genreSearch}>
                 <div className={styles.label}>Filter by genre:</div>
                 <input value={genre} onChange={onGenreChange} />
                 <button type="submit">Search!</button>
-              </form>
+              </form> */}
             </div>
             <div className={styles.body}>
-              <div className={styles.resultCount}>
+              {/* <div className={styles.resultCount}>
                 Found {resultCount} tracks
-              </div>
+              </div> */}
               {searchResults.map((result) => {
                 return <SearchItem searchTrack={result} key={result.id} />;
               })}
