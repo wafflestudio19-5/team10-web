@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 function Header() {
   const history = useHistory();
   const cookies = new Cookies();
+  const [isLoading, setIsLoading] = useState<boolean>();
   const { userInfo, setUserInfo, setUserSecret } = useAuthContext();
   const {
     setTrackBarArtist,
@@ -28,6 +29,8 @@ function Header() {
   const [me, setMe] = useState<any>();
 
   useEffect(() => {
+    setIsLoading(true);
+
     if (cookies.get("is_logged_in") === undefined) {
       history.push("/");
     }
@@ -54,6 +57,7 @@ function Header() {
       };
       getMe();
     }
+    setIsLoading(false);
   }, []);
 
   const onSignOut = () => {
@@ -102,132 +106,126 @@ function Header() {
     currentTarget.src = "/default_user_image.png";
   };
 
-  return (
-    <div className={"header_bar"}>
-      <div className={"header"}>
-        <div className={"header_logo"}>
-          <span onClick={() => history.push("/discover")}>logo</span>
-        </div>
+  if (isLoading || me === undefined) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <div className={"header_bar"}>
+        <div className={"header"}>
+          <div className={"header_logo"}>
+            <span onClick={() => history.push("/discover")}>logo</span>
+          </div>
 
-        <div className={"header_menu"}>
-          <span onClick={() => history.push("/discover")}>Home</span>
-          <span>Stream</span>
-          <span onClick={() => history.push("/you/library")}>Library</span>
-        </div>
+          <div className={"header_menu"}>
+            <span onClick={() => history.push("/discover")}>Home</span>
+            <span>Stream</span>
+            <span onClick={() => history.push("/you/library")}>Library</span>
+          </div>
 
-        <div className={"search"}>
-          <input placeholder={"Search"} />
-        </div>
+          <div className={"search"}>
+            <input placeholder={"Search"} />
+          </div>
 
-        <div className={"upload"}>
-          <span onClick={() => history.push("/upload")}>Upload</span>
-        </div>
+          <div className={"upload"}>
+            <span onClick={() => history.push("/upload")}>Upload</span>
+          </div>
 
-        <div className={"header_user"}>
-          <div className="dropdown">
-            <button type="button" data-bs-toggle="dropdown">
-              {userInfo.permalink !== undefined && (
-                <div>
-                  {userInfo.profile_img !== null && (
-                    <img src={userInfo.profile_img} alt={"user"} />
-                  )}
-                  {userInfo.profile_img === null && (
-                    <img
-                      src="/default_user_image.png"
-                      alt={"user"}
-                      onError={onImageError}
-                    />
-                  )}
-                  <text>{userInfo.display_name}</text>
-                </div>
-              )}
-              {userInfo.permalink === undefined && (
-                <div>
-                  {me && me.profileImg && (
-                    <div>
-                      <img src={me.profile_img} alt={"user"} />
-                      <text>{me.display_name}</text>
-                    </div>
-                  )}
-                  {me && !me.profileImg && (
-                    <div>
-                      <img src="/default_user_image.png" alt={"user"} />
-                      <text>user</text>
-                    </div>
-                  )}
-                  {!me && (
-                    <div>
+          <div className={"header_user"}>
+            <div className="dropdown">
+              <button type="button" data-bs-toggle="dropdown">
+                {userInfo.permalink !== undefined && (
+                  <div>
+                    {userInfo.profile_img !== null && (
+                      <img src={userInfo.profile_img} alt={"user"} />
+                    )}
+                    {userInfo.profile_img === null && (
                       <img
                         src="/default_user_image.png"
                         alt={"user"}
                         onError={onImageError}
                       />
-                      <text>user</text>
-                    </div>
+                    )}
+                    <text>{userInfo.display_name}</text>
+                  </div>
+                )}
+                {userInfo.permalink === undefined && (
+                  <div>
+                    {me.profileImg && (
+                      <div>
+                        <img src={me.profile_img} alt={"user"} />
+                        <text>{me.display_name}</text>
+                      </div>
+                    )}
+                    {!me.profileImg && (
+                      <div>
+                        <img src="/default_user_image.png" alt={"user"} />
+                        <text>{me.display_name}</text>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  {userInfo !== undefined && (
+                    <a
+                      className="dropdown-item"
+                      onClick={() => history.push(`/${userInfo.permalink}`)}
+                    >
+                      Profile
+                    </a>
                   )}
-                </div>
-              )}
-            </button>
-            <ul className="dropdown-menu">
-              <li>
-                {userInfo !== undefined && (
+                </li>
+                <li>
                   <a
                     className="dropdown-item"
-                    onClick={() => history.push(`/${userInfo.permalink}`)}
+                    onClick={() => history.push("/you/likes")}
                   >
-                    Profile
+                    Likes
                   </a>
-                )}
-              </li>
-              <li>
-                <a
-                  className="dropdown-item"
-                  onClick={() => history.push("/you/likes")}
-                >
-                  Likes
-                </a>
-              </li>
-              <li>
-                <a
-                  className="dropdown-item"
-                  onClick={() => history.push("/you/following")}
-                >
-                  Following
-                </a>
-              </li>
-            </ul>
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    onClick={() => history.push("/you/following")}
+                  >
+                    Following
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <a className={"notifications"} />
+            <a className={"messages"} />
           </div>
 
-          <a className={"notifications"} />
-          <a className={"messages"} />
-        </div>
-
-        <div className={"header_more"}>
-          <div className="dropdown-more">
-            <button type="button" data-bs-toggle="dropdown">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                fill="white"
-                className="bi bi-three-dots"
-                viewBox="0 0 16 16"
-              >
-                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
-              </svg>
-            </button>
-            <ul className="dropdown-menu">
-              <li>
-                <a className="dropdown-item" onClick={onSignOut}>
-                  Sign out
-                </a>
-              </li>
-            </ul>
+          <div className={"header_more"}>
+            <div className="dropdown-more">
+              <button type="button" data-bs-toggle="dropdown">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="white"
+                  className="bi bi-three-dots"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                </svg>
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  <a className="dropdown-item" onClick={onSignOut}>
+                    Sign out
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default Header;

@@ -351,7 +351,6 @@ function TrackBox({
 
   return (
     <div className={"recent-track"}>
-      // 트랙 이미지
       {item.image !== null && (
         <img
           className="track-Img"
@@ -371,7 +370,6 @@ function TrackBox({
       <div className={"track-right"}>
         <div className="track-info-private">
           <div className={"track-info"}>
-            // 재생버튼
             {!isPlaying && (
               <button onClick={(e) => playMusic(e)} className="play-button">
                 <svg
@@ -386,7 +384,6 @@ function TrackBox({
                 </svg>
               </button>
             )}
-            // 일시정지버튼
             {isPlaying && (
               <button
                 onClick={(e) => pauseMusic(e)}
@@ -405,13 +402,11 @@ function TrackBox({
                 </svg>
               </button>
             )}
-            // 트랙 정보
             <div className={"track-info-name"}>
               <div className={"artistname"}>{artistName}</div>
               <div className={"trackname"}>{item.title}</div>
             </div>
           </div>
-          // private 표시
           {item.is_private && (
             <div className="track-private">
               <img
@@ -422,7 +417,6 @@ function TrackBox({
             </div>
           )}
         </div>
-        // 재생바
         <AudioPlayer
           className={`player${item.id}`}
           src={item.audio}
@@ -434,7 +428,6 @@ function TrackBox({
         <button className="seek" id={`seek${item.id}`} onClick={seekPlayer}>
           seek
         </button>
-        // 댓글
         <div className={"comment"}>
           {userInfo.profile_img === null && (
             <img src="/default_user_image.png" alt="me" />
@@ -451,7 +444,6 @@ function TrackBox({
         </div>
         <div className="track-buttons-count">
           <div className={"track-buttons"}>
-            // 좋아요 버튼
             {isLiking === false && (
               <button onClick={likeTrack}>
                 <img
@@ -470,7 +462,6 @@ function TrackBox({
                 <div>{likes}</div>
               </button>
             )}
-            // 리포스트 버튼
             {reposted === false && (
               <button onClick={repostTrack}>
                 <img
@@ -489,7 +480,6 @@ function TrackBox({
                 <div>{reposts}</div>
               </button>
             )}
-            // add to playlist
             <button
               className="add-to-playlist"
               onClick={() => setPlaylistModal2(true)}
@@ -517,7 +507,6 @@ function TrackBox({
               <div>More</div>
             </button> */}
           </div>
-          // 트랙 재생 수
           <div className="track-count">
             <div className="track-count-play">
               <img
@@ -526,7 +515,6 @@ function TrackBox({
               />
               <div>{item.play_count}</div>
             </div>
-            // 트랙 댓글 수
             <div className="track-count-play">
               <img
                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjAuMyAoNzg5MSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+DQogICAgPHRpdGxlPnN0YXRzX2NvbW1lbnQ8L3RpdGxlPg0KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPg0KICAgIDxkZWZzLz4NCiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBza2V0Y2g6dHlwZT0iTVNQYWdlIj4NCiAgICAgICAgPGcgaWQ9InN0YXRzX2NvbW1lbnQiIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9InJnYigxNTMsIDE1MywgMTUzKSI+DQogICAgICAgICAgICA8cGF0aCBkPSJNNC45OTk2MTQ5OCwzIEMzLjg5NTI1ODEyLDMgMywzLjg4NjU1NDg0IDMsNS4wMDU5MTkwNSBMMyw3Ljk5NDA4MDk1IEMzLDkuMTAxOTE5NDUgMy44ODc0MzMyOSwxMCA0Ljk5OTYxNDk4LDEwIEwxMS4wMDAzODUsMTAgQzEyLjEwNDc0MTksMTAgMTMsOS4xMTM0NDUxNiAxMyw3Ljk5NDA4MDk1IEwxMyw1LjAwNTkxOTA1IEMxMywzLjg5ODA4MDU1IDEyLjExMjU2NjcsMyAxMS4wMDAzODUsMyBMNC45OTk2MTQ5OCwzIFogTTUsMTAgTDUsMTMgTDgsMTAgTDUsMTAgWiIgaWQ9IlJlY3RhbmdsZS00MiIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCIvPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+DQo="
