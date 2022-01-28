@@ -86,10 +86,10 @@ function UploadModal({ selectedFile, setModal }: any) {
         axios
           .put(res.data.audio_presigned_url, selectedFile, music_options)
           .then(() => {
-            toast("음악파일 업로드 완료");
+            toast("업로드 완료");
           })
           .catch(() => {
-            toast("음악파일 업로드 실패");
+            toast("❗️ 음악파일 업로드 실패");
           });
 
         // 이미지 업로드
@@ -102,11 +102,8 @@ function UploadModal({ selectedFile, setModal }: any) {
 
           axios
             .put(res.data.image_presigned_url, imageFile, img_options)
-            .then(() => {
-              toast("이미지파일 업로드 완료");
-            })
             .catch(() => {
-              toast("이미지파일 업로드 실패");
+              toast("❗️ 이미지 업로드 실패");
             });
         }
         setModal(false);
