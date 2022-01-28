@@ -52,6 +52,7 @@
 
     .upload-modal-body{
         display: flex;
+        margin-top: 30px;
 
         .upload-image {
             margin-left: 26px;
@@ -224,7 +225,7 @@
         }
 
         .save-button {
-            width: 55px;
+            width: 120px;
             height: 26px;
             line-height: 26px;
             background-color: #FF5500;
@@ -234,5 +235,53 @@
             margin-left: 10px;
             margin-right: 25px;
         }
+    }
+}
+
+.upload-tracks-for-playlist {
+    font-size: 20px;
+    margin-left: 60px;
+    margin-bottom: 15px;
+}
+
+.upload-playlist-for-playlist {
+    font-size: 20px;
+    margin-top: 30px;
+    margin-left: 60px;
+}
+
+.upload-modal-button-1 {
+    width: 800px;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 14px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 30px;
+
+    button {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .cancel-button {
+        width: 55px;
+        height: 26px;
+        line-height: 26px;
+        background-color: white;
+        color: #333;
+        border: none;
+    }
+
+    .save-button {
+        width: 120px;
+        height: 26px;
+        line-height: 26px;
+        background-color: #FF5500;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        margin-left: 10px;
+        margin-right: 25px;
     }
 }

@@ -267,6 +267,29 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         <div>Advanced</div>
       </div>
 
+      <div className="upload-tracks-for-playlist">Tracks</div>
+      {trackNum.map((item: number) => (
+        <PlaylistTrack
+          item={item}
+          selectedFiles={selectedFiles}
+          newFiles={newFiles}
+          setNewFiles={setNewFiles}
+        />
+      ))}
+
+      <div className="upload-modal-button-1">
+        <button
+          className="cancel-button"
+          onClick={() => setPlaylistModal(false)}
+        >
+          Cancel
+        </button>
+        <button className="save-button" onClick={handlePlaylistUpload}>
+          Upload Tracks
+        </button>
+      </div>
+
+      <div className="upload-playlist-for-playlist">Playlist</div>
       <div className="upload-modal-body">
         <div className="upload-image">
           {!imageUrl && (
@@ -378,15 +401,6 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         </div>
       </div>
 
-      {trackNum.map((item: number) => (
-        <PlaylistTrack
-          item={item}
-          selectedFiles={selectedFiles}
-          newFiles={newFiles}
-          setNewFiles={setNewFiles}
-        />
-      ))}
-
       <div className="upload-modal-button">
         <button
           className="cancel-button"
@@ -395,7 +409,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           Cancel
         </button>
         <button className="save-button" onClick={handlePlaylistUpload}>
-          Save
+          Make a Playlist
         </button>
       </div>
     </div>
