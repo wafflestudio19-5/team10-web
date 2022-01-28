@@ -3,7 +3,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadPlaylistModal.scss";
-import DatePicker from "react-datepicker";
+// import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import PlaylistTrack from "./PlaylistTrack/PlaylistTrack";
 
@@ -20,13 +20,16 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [listPermalink, setListPermalink] = useState<string>("");
-  const [date, setDate] = useState(new Date());
+  const [genre, setGenre] = useState<string | undefined>();
+  const [customGenre, setCustomGenre] = useState<any>();
+  const [tag, setTag] = useState<any>();
+  // const [date, setDate] = useState(new Date());
 
   const [newFiles, setNewFiles] = useState<any>(selectedFiles);
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
-    let fileInput = document.getElementById("file-input");
+    let fileInput = document.getElementById("file-input-upm");
     fileInput?.click();
   };
 
@@ -49,8 +52,6 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
 
   const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
-    // 이미지 파일 기능 추가해야됨
-    console.log(imageFile);
     const myToken = localStorage.getItem("jwt_token");
 
     // set 만들기
@@ -62,7 +63,14 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           permalink: listPermalink ? listPermalink : title,
           type: playlistType,
           description: description,
+          genre_input: genre === "custom" ? customGenre : undefined,
+          tags_input: tag ? [tag] : undefined,
           is_private: isPrivate,
+          image_extension: imageFile
+            ? imageFile.name.substr(
+                -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+              )
+            : undefined,
         },
         {
           headers: {
@@ -71,6 +79,21 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         }
       )
       .then((res1) => {
+        // 이미지 업로드 하기
+        if (imageFile) {
+          const img_options = {
+            headers: {
+              "Content-Type": imageFile.type,
+            },
+          };
+
+          axios
+            .put(res1.data.image_presigned_url, imageFile, img_options)
+            .catch(() => {
+              toast("이미지파일 업로드 실패");
+            });
+        }
+
         // 개별 track 만들기
         const tracks = Array.from(
           { length: selectedFiles.length },
@@ -132,7 +155,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                     .post(
                       `https://api.soundwaffle.com/sets/${res1.data.id}/tracks`,
                       {
-                        track_id: res2.data.id,
+                        track_ids: [{ id: res2.data.id }],
                       },
                       {
                         headers: {
@@ -193,7 +216,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           </button>
           <input
             type="file"
-            id="file-input"
+            id="file-input-upm"
             accept=".png"
             onChange={imageToUrl}
           />
@@ -211,36 +234,42 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
               />
             </div>
           </div>
-          <div className="upload-info-genre">
-            <text>Genre</text>
-            <select>
-              <option value="None">None</option>
-              <option value="Custom">Custom</option>
-            </select>
-          </div>
-          <div className="upload-type-date">
+          <div className="uplaod-info-genre-custom">
             <div className="upload-info-genre">
-              <text>Playlist type</text>
-              <select
-                value="playlist"
-                onChange={(e: any) => setPlaylistType(e.target.value)}
-              >
-                <option value="playlist">playlist</option>
-                <option value="album">album</option>
+              <text>Genre</text>
+              <select onChange={(e: any) => setGenre(e.target.value)}>
+                <option value="none">None</option>
+                <option value="custom">Custom</option>
               </select>
             </div>
-            <div className="upload-info-date">
-              <text>Release date</text>
-              <DatePicker
-                className="datepicker"
-                selected={date}
-                onChange={(e: any) => setDate(e)}
-              />
-            </div>
+            {genre === "custom" && (
+              <div className="upload-info-genre">
+                <text>Custom Genre</text>
+                <input onChange={(e) => setCustomGenre(e.target.value)} />
+              </div>
+            )}
           </div>
+          <div className="upload-info-genre">
+            <text>Playlist type</text>
+            <select onChange={(e: any) => setPlaylistType(e.target.value)}>
+              <option value="playlist">playlist</option>
+              <option value="album">album</option>
+            </select>
+          </div>
+          {/* <div className="upload-info-date">
+            <text>Release date</text>
+            <DatePicker
+              className="datepicker"
+              selected={date}
+              onChange={(e: any) => setDate(e)}
+            />
+          </div> */}
           <div className="upload-info-tag">
             <text>Additional tags</text>
-            <input placeholder="Add tags to describe the genre and mood of your track" />
+            <input
+              placeholder="Add tags to describe the genre and mood of your track"
+              onChange={(e) => setTag(e.target.value)}
+            />
           </div>
           <div className="upload-info-description">
             <text>Description</text>

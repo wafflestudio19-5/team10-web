@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router";
-import { useAuthContext } from "../../../context/AuthContext";
-import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
-import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
-import PlaylistBox from "../PlaylistBox/PlaylistBox";
-import "./ArtistPagePlaylists.scss";
+import ArtistPageHeader from "../../ArtistPageFix/ArtistPageHeader";
+import ArtistPageRight from "../../ArtistPageFix/ArtistPageRight";
+import TrackBox from "../../TrackBox/TrackBox";
+import "./ArtistPageRepostsTracks.scss";
 
-function ArtistPagePlaylists() {
-  const { userSecret } = useAuthContext();
+function ArtistPageRepostsTracks() {
   const [isLoading, setIsLoading] = useState<boolean>();
   const [isMe, setIsMe] = useState<boolean>();
 
@@ -22,10 +20,13 @@ function ArtistPagePlaylists() {
   const [header, setHeader] = useState<any>();
   const [ref, inView] = useInView();
 
-  const [playlists, setPlaylists] = useState<any>();
-  const [playlistPage, setPlaylistPage] = useState<any>(null);
+  const [repostTracks, setRepostTracks] = useState<any>();
+  const [repostTrackPage, setRepostTrackPage] = useState<any>(null);
 
   const [currentPlay, setCurrentPlay] = useState<any>(null);
+
+  const [myPlaylist, setMyPlaylist] = useState<any>(null);
+  const [modalPage, setModalPage] = useState<any>(null);
 
   const getUser = (id: any) => {
     axios
@@ -45,34 +46,47 @@ function ArtistPagePlaylists() {
       });
   };
 
-  const getPlaylists = async (id: any, page: any, token: any) => {
+  const getRepostTracks = async (id: any, page: any) => {
     axios
-      .get(`/users/${id}/sets?page=${page}`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      })
+      .get(`/users/${id}/reposts/tracks?page=${page}`)
       .then((res) => {
         if (page === 1) {
-          setPlaylists(
-            res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
-            )
+          setRepostTracks(
+            res.data.results.filter((item: any) => item.is_private === false)
           );
         } else {
-          setPlaylists((item: any) => [
+          setRepostTracks((item: any) => [
             ...item,
             ...res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
+              (item: any) => item.is_private === false
             ),
           ]);
         }
         if (res.data.next === null) {
-          setPlaylistPage(null);
+          setRepostTrackPage(null);
         } else {
-          setPlaylistPage(page + 1);
+          setRepostTrackPage(page + 1);
+        }
+      })
+      .catch(() => {
+        toast("리포스트 불러오기 실패");
+      });
+  };
+
+  const getMyPlaylist = async (id: any, page: any) => {
+    axios
+      .get(`/users/${id}/sets?page=${page}`)
+      .then((res) => {
+        if (page === 1) {
+          setMyPlaylist(res.data.results);
+        } else {
+          setMyPlaylist((item: any) => [...item, ...res.data.results]);
+        }
+
+        if (res.data.next === null) {
+          setModalPage(null);
+        } else {
+          setModalPage(page + 1);
         }
       })
       .catch(() => {
@@ -84,7 +98,6 @@ function ArtistPagePlaylists() {
     setIsLoading(true);
 
     const myPermalink = localStorage.getItem("permalink");
-    const myToken = localStorage.getItem("jwt_token");
 
     // 내 페이지인지 확인
     if (permalink === myPermalink) {
@@ -92,6 +105,17 @@ function ArtistPagePlaylists() {
     } else {
       setIsMe(false);
     }
+
+    // 내 아이디 받아오기 (나중에 context로 바꾸기)
+    const myResolve = `https://soundwaffle.com/${myPermalink}`;
+    axios
+      .get(`resolve?url=${myResolve}`)
+      .then((res) => {
+        getMyPlaylist(res.data.id, 1);
+      })
+      .catch(() => {
+        toast("유저 아이디 불러오기 실패");
+      });
 
     const getInfo = () => {
       // resolve api
@@ -102,8 +126,8 @@ function ArtistPagePlaylists() {
           setPageId(res1.data.id);
           // 유저 정보
           getUser(res1.data.id);
-          // 플레이리스트 불러오기
-          getPlaylists(res1.data.id, 1, myToken);
+          //트랙 불러오기
+          getRepostTracks(res1.data.id, 1);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -114,9 +138,9 @@ function ArtistPagePlaylists() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && playlistPage !== null) {
+    if (!isLoading && repostTrackPage !== null) {
       if (inView) {
-        getPlaylists(pageId, playlistPage, userSecret.jwt);
+        getRepostTracks(pageId, repostTrackPage);
       }
     }
   }, [inView]);
@@ -136,14 +160,19 @@ function ArtistPagePlaylists() {
           />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Playlists</text>
-              {playlists &&
-                playlists.map((item: any) => (
-                  <PlaylistBox
+              <text>My Tracks</text>
+              {repostTracks &&
+                repostTracks.map((item: any, index: any) => (
+                  <TrackBox
+                    index={index}
                     item={item}
+                    artistName={user.display_name}
                     user={user}
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}
+                    myPlaylist={myPlaylist}
+                    modalPage={modalPage}
+                    getMyPlaylist={getMyPlaylist}
                   />
                 ))}
               <div ref={ref} className="inView">
@@ -158,4 +187,4 @@ function ArtistPagePlaylists() {
   }
 }
 
-export default ArtistPagePlaylists;
+export default ArtistPageRepostsTracks;

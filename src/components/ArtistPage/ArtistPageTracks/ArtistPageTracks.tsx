@@ -3,18 +3,20 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router";
+import { useAuthContext } from "../../../context/AuthContext";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
 import TrackBox from "../TrackBox/TrackBox";
 import "./ArtistPageTracks.scss";
 
 function ArtistPageTracks() {
+  const { userSecret } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>();
+  const [isMe, setIsMe] = useState<boolean>();
 
   const params = useParams<any>();
   const permalink = params.permalink;
   const [pageId, setPageId] = useState<number>();
-  const [myId, setMyId] = useState<number>();
 
   const [user, setUser] = useState<any>();
   const [header, setHeader] = useState<any>();
@@ -46,21 +48,18 @@ function ArtistPageTracks() {
       });
   };
 
-  const getTracks = async (id: any, page: any) => {
+  const getTracks = async (id: any, page: any, token: any) => {
     axios
-      .get(`/users/${id}/tracks?page=${page}`)
+      .get(`/users/${id}/tracks?page=${page}`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      })
       .then((res) => {
         if (page === 1) {
-          setTracks(
-            res.data.results.filter((item: any) => item.is_private === false)
-          );
+          setTracks(res.data.results);
         } else {
-          setTracks((item: any) => [
-            ...item,
-            ...res.data.results.filter(
-              (item: any) => item.is_private === false
-            ),
-          ]);
+          setTracks((item: any) => [...item, ...res.data.results]);
         }
         if (res.data.next === null) {
           setTrackPage(null);
@@ -98,13 +97,20 @@ function ArtistPageTracks() {
     setIsLoading(true);
 
     const myPermalink = localStorage.getItem("permalink");
+    const myToken = localStorage.getItem("jwt_token");
+
+    // 내 페이지인지 확인
+    if (permalink === myPermalink) {
+      setIsMe(true);
+    } else {
+      setIsMe(false);
+    }
 
     // 내 아이디 받아오기 (나중에 context로 바꾸기)
     const myResolve = `https://soundwaffle.com/${myPermalink}`;
     axios
       .get(`resolve?url=${myResolve}`)
       .then((res) => {
-        setMyId(res.data.id);
         getMyPlaylist(res.data.id, 1);
       })
       .catch(() => {
@@ -121,7 +127,7 @@ function ArtistPageTracks() {
           // 유저 정보
           getUser(res1.data.id);
           //트랙 불러오기
-          getTracks(res1.data.id, 1);
+          getTracks(res1.data.id, 1, myToken);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -134,7 +140,7 @@ function ArtistPageTracks() {
   useEffect(() => {
     if (!isLoading && trackPage !== null) {
       if (inView) {
-        getTracks(pageId, trackPage);
+        getTracks(pageId, trackPage, userSecret.jwt);
       }
     }
   }, [inView]);
@@ -150,16 +156,17 @@ function ArtistPageTracks() {
             user={user}
             setUser={setUser}
             getUser={getUser}
+            isMe={isMe}
           />
           <div className="artist-body">
             <div className={"recent"}>
               <text>My Tracks</text>
               {tracks &&
-                tracks.map((item: any) => (
+                tracks.map((item: any, index: any) => (
                   <TrackBox
+                    index={index}
                     item={item}
                     artistName={user.display_name}
-                    myId={myId}
                     user={user}
                     currentPlay={currentPlay}
                     setCurrentPlay={setCurrentPlay}

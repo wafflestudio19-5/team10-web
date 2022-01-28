@@ -7,9 +7,9 @@ import { useAuthContext } from "../../../context/AuthContext";
 import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
 import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
 import PlaylistBox from "../PlaylistBox/PlaylistBox";
-import "./ArtistPagePlaylists.scss";
+import "./ArtistPageAlbums.scss";
 
-function ArtistPagePlaylists() {
+function ArtistPageAlbums() {
   const { userSecret } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [isMe, setIsMe] = useState<boolean>();
@@ -22,8 +22,8 @@ function ArtistPagePlaylists() {
   const [header, setHeader] = useState<any>();
   const [ref, inView] = useInView();
 
-  const [playlists, setPlaylists] = useState<any>();
-  const [playlistPage, setPlaylistPage] = useState<any>(null);
+  const [albums, setAlbums] = useState<any>();
+  const [albumPage, setAlbumPage] = useState<any>(null);
 
   const [currentPlay, setCurrentPlay] = useState<any>(null);
 
@@ -45,7 +45,7 @@ function ArtistPagePlaylists() {
       });
   };
 
-  const getPlaylists = async (id: any, page: any, token: any) => {
+  const getAlbums = async (id: any, page: any, token: any) => {
     axios
       .get(`/users/${id}/sets?page=${page}`, {
         headers: {
@@ -54,25 +54,23 @@ function ArtistPagePlaylists() {
       })
       .then((res) => {
         if (page === 1) {
-          setPlaylists(
+          setAlbums(
             res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
+              (item: any) => item.tracks.length !== 0 && item.type === "album"
             )
           );
         } else {
-          setPlaylists((item: any) => [
+          setAlbums((item: any) => [
             ...item,
             ...res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
+              (item: any) => item.tracks.length !== 0 && item.type === "album"
             ),
           ]);
         }
         if (res.data.next === null) {
-          setPlaylistPage(null);
+          setAlbumPage(null);
         } else {
-          setPlaylistPage(page + 1);
+          setAlbumPage(page + 1);
         }
       })
       .catch(() => {
@@ -103,7 +101,7 @@ function ArtistPagePlaylists() {
           // 유저 정보
           getUser(res1.data.id);
           // 플레이리스트 불러오기
-          getPlaylists(res1.data.id, 1, myToken);
+          getAlbums(res1.data.id, 1, myToken);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -114,9 +112,9 @@ function ArtistPagePlaylists() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && playlistPage !== null) {
+    if (!isLoading && albumPage !== null) {
       if (inView) {
-        getPlaylists(pageId, playlistPage, userSecret.jwt);
+        getAlbums(pageId, albumPage, userSecret.jwt);
       }
     }
   }, [inView]);
@@ -137,8 +135,8 @@ function ArtistPagePlaylists() {
           <div className="artist-body">
             <div className={"recent"}>
               <text>My Playlists</text>
-              {playlists &&
-                playlists.map((item: any) => (
+              {albums &&
+                albums.map((item: any) => (
                   <PlaylistBox
                     item={item}
                     user={user}
@@ -158,4 +156,4 @@ function ArtistPagePlaylists() {
   }
 }
 
-export default ArtistPagePlaylists;
+export default ArtistPageAlbums;

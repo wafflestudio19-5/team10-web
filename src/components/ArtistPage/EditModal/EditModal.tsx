@@ -5,7 +5,7 @@ import { useAuthContext } from "../../../context/AuthContext";
 import "./EditModal.scss";
 
 function EditModal({ user, modal, setModal, getUser, setUser }: any) {
-  const { userSecret } = useAuthContext();
+  const { userSecret, userInfo, setUserInfo } = useAuthContext();
 
   const [displayName, setDisplayName] = useState<string>(user.display_name);
   const [firstName, setFirstName] = useState<string>(user.first_name);
@@ -59,6 +59,7 @@ function EditModal({ user, modal, setModal, getUser, setUser }: any) {
         toast("프로필 업데이트 성공");
         setModal(false);
         getUser(user.id);
+        setUserInfo({ ...userInfo, display_name: displayName });
       } catch (error) {
         toast("프로필 업데이트 실패");
       }
@@ -90,6 +91,10 @@ function EditModal({ user, modal, setModal, getUser, setUser }: any) {
             reader.readAsDataURL(imgFile);
             reader.onload = () => {
               setUser({ ...user, image_profile: reader.result });
+              setUserInfo({
+                ...userInfo,
+                profile_img: reader.result?.toString(),
+              });
             };
           })
           .catch(() => {

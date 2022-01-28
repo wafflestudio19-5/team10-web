@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useHistory } from "react-router";
 
-function ArtistPageHeader({ header, user, setUser, getUser }: any) {
+function ArtistPageHeader({ header, user, setUser, getUser, isMe }: any) {
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -15,7 +15,6 @@ function ArtistPageHeader({ header, user, setUser, getUser }: any) {
   const { userSecret } = useAuthContext();
   const params = useParams<any>();
   const permalink = params.permalink;
-  const [isMe, setIsMe] = useState<boolean>();
   const [pageId, setPageId] = useState<number>();
 
   const [modal, setModal] = useState(false);
@@ -137,13 +136,6 @@ function ArtistPageHeader({ header, user, setUser, getUser }: any) {
 
     const myPermalink = localStorage.getItem("permalink");
 
-    // 내 페이지인지 확인
-    if (permalink === myPermalink) {
-      setIsMe(true);
-    } else {
-      setIsMe(false);
-    }
-
     // 내 아이디 받아오기 (나중에 context로 바꾸기)
     const myResolve = `https://soundwaffle.com/${myPermalink}`;
     axios.get(`resolve?url=${myResolve}`).catch(() => {
@@ -178,7 +170,7 @@ function ArtistPageHeader({ header, user, setUser, getUser }: any) {
           {user.image_profile === null && (
             <img
               className="profile-img"
-              src={"img/user_img.png"}
+              src="/default_user_image.png"
               alt={"profileImg"}
             />
           )}
@@ -220,12 +212,10 @@ function ArtistPageHeader({ header, user, setUser, getUser }: any) {
 
         <div className={"menu-bar"}>
           <div className={"menu-left"}>
-            <a onClick={() => history.push(`/${permalink}`)}>All</a>
-            <a>Popular tracks</a>
             <a onClick={() => history.push(`/${permalink}/tracks`)}>Tracks</a>
-            <a>Albums</a>
+            <a onClick={() => history.push(`/${permalink}/albums`)}>Albums</a>
             <a onClick={() => history.push(`/${permalink}/sets`)}>Playlists</a>
-            <a>Reposts</a>
+            <a onClick={() => history.push(`/${permalink}/reposts`)}>Reposts</a>
           </div>
           {isMe === true && (
             <div className="menu-right">

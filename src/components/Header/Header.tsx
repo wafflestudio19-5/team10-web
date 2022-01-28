@@ -1,35 +1,17 @@
 import React from "react";
 import { useHistory } from "react-router";
 import "./Header.scss";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Cookies from "universal-cookie";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { useAuthContext } from "../../context/AuthContext";
 
 function Header() {
   const history = useHistory();
   const cookies = new Cookies();
-  const [me, setMe] = useState<any>();
+  const { userInfo } = useAuthContext();
 
   useEffect(() => {
     cookies.get("is_logged_in") === undefined && history.push("/");
-    const jwt = localStorage.getItem("jwt_token");
-    const getMe = async () => {
-      const config: any = {
-        method: "get",
-        url: `/users/me`,
-        headers: {
-          Authorization: `JWT ${jwt}`,
-        },
-      };
-      try {
-        const res = await axios(config);
-        setMe(res.data);
-      } catch (error) {
-        toast("헤더 정보 로드 실패");
-      }
-    };
-    getMe();
   }, []);
 
   const onSignOut = () => {
@@ -70,10 +52,10 @@ function Header() {
         <div className={"header_user"}>
           <div className="dropdown">
             <button type="button" data-bs-toggle="dropdown">
-              {me !== undefined && (
+              {userInfo !== undefined && (
                 <div>
-                  {me.image_profile !== null && (
-                    <img src={me.image_profile} alt={"user"} />
+                  {userInfo.profile_img !== null && (
+                    <img src={userInfo.profile_img} alt={"user"} />
                   )}
                   {me.image_profile === null && (
                     <img
@@ -82,22 +64,16 @@ function Header() {
                       alt={"user"}
                     />
                   )}
-                  <text>{me.display_name}</text>
-                </div>
-              )}
-              {me === undefined && (
-                <div>
-                  <img src={""} alt={"user"} />
-                  <text>user</text>
+                  <text>{userInfo.display_name}</text>
                 </div>
               )}
             </button>
             <ul className="dropdown-menu">
               <li>
-                {me !== undefined && (
+                {userInfo !== undefined && (
                   <a
                     className="dropdown-item"
-                    onClick={() => history.push(`/${me.permalink}`)}
+                    onClick={() => history.push(`/${userInfo.permalink}`)}
                   >
                     Profile
                   </a>

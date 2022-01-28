@@ -1,27 +1,23 @@
-.upload-type-date {
-    display: flex;
-}
+// .upload-info-date {
+//     display: flex;
+//     flex-direction: column;
+//     margin-bottom: 20px;
+//     margin-left: 10px;
 
-.upload-info-date {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-    margin-left: 10px;
+//     text {
+//         font-size: 12px;
+//         margin-bottom: 7px;
+//     }
 
-    text {
-        font-size: 12px;
-        margin-bottom: 7px;
-    }
-
-    .datepicker {
-        width: 230px;
-        height: 26px;
-        font-size: 14px;
-        border: 1px solid #222;
-        border-radius: 3px;
-        background: url(https://a-v2.sndcdn.com/assets/images/calendar-96bbd47c.svg) no-repeat right 8px center;
-    }
-}
+//     .datepicker {
+//         width: 230px;
+//         height: 26px;
+//         font-size: 14px;
+//         border: 1px solid #222;
+//         border-radius: 3px;
+//         background: url(https://a-v2.sndcdn.com/assets/images/calendar-96bbd47c.svg) no-repeat right 8px center;
+//     }
+// }
 
 .playlist-upload-modal {
     width: 800px;
@@ -128,10 +124,21 @@
                 }
             }
 
+            .upload-info-genre-custom {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
             .upload-info-genre {
                 display: flex;
                 flex-direction: column;
                 margin-bottom: 20px;
+
+                input {
+                    width: 230px;
+                    height: 26px;
+                }
 
                 text {
                     font-size: 12px;

@@ -1,51 +1,26 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import toast from "react-hot-toast";
+import { useHistory } from "react-router";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useTrackContext } from "../../../context/TrackContext";
 import "./PlaylistBox.scss";
 
 function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
   const { userSecret } = useAuthContext();
+  const history = useHistory();
 
   const player = useRef<any>();
   const [isPlaying, setIsPlaying] = useState<boolean>();
   const [trackIndex, setTrackIndex] = useState<number>(0);
+  const [current, setCurrent] = useState<any>(0);
 
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [reposted, setReposted] = useState<boolean>(false);
   const [likes, setLikes] = useState<number>(item.like_count);
   const [reposts, setReposts] = useState<number>(item.repost_count);
-
-  const playMusic = () => {
-    if (currentPlay !== null) {
-      let current = document.getElementById(`button${currentPlay}`);
-      current?.click();
-    }
-    setIsPlaying(true);
-    player.current.audio.current.play();
-    setCurrentPlay(item.id);
-  };
-
-  const pauseMusic = () => {
-    setCurrentPlay(null);
-    setIsPlaying(false);
-    player.current.audio.current.pause();
-  };
-
-  const playNextTrack = () => {
-    if (item.tracks.length === trackIndex + 1) {
-      setTrackIndex(0);
-    } else {
-      setTrackIndex(trackIndex + 1);
-    }
-  };
-
-  const playThisTrack = (num: any) => {
-    setTrackIndex(num);
-    playMusic();
-  };
 
   const likePlaylist = async () => {
     const config: any = {
@@ -115,72 +90,325 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     }
   };
 
+  useEffect(() => {
+    player.current.audio.current.pause();
+
+    const getIsLiking = (id: any) => {
+      axios.get(`/users/${id}/likes/sets`).then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/likes/sets?page=${page}`).then((res) => {
+            const filter1 = res.data.results.filter(
+              (track: any) => track.id === item.id
+            );
+            if (filter1.length !== 0) {
+              setIsLiking(true);
+            }
+          });
+        });
+      });
+    };
+
+    const getReposted = (id: any) => {
+      axios.get(`/users/${id}/reposts/sets`).then((res) => {
+        const pages = Array.from(
+          { length: Math.floor(res.data.count / 10) + 1 },
+          (_, i) => i + 1
+        );
+        pages.map((page) => {
+          axios.get(`users/${id}/reposts/sets?page=${page}`).then((res) => {
+            const filter2 = res.data.results.filter(
+              (track: any) => track.id === item.id
+            );
+            if (filter2.length !== 0) {
+              setReposted(true);
+            }
+          });
+        });
+      });
+    };
+
+    const myPermalink = localStorage.getItem("permalink");
+
+    // 내 아이디 받아오기 (나중에 context로 바꾸기)
+    const myResolve = `https://soundwaffle.com/${myPermalink}`;
+    axios
+      .get(`resolve?url=${myResolve}`)
+      .then((res) => {
+        getIsLiking(res.data.id);
+        getReposted(res.data.id);
+      })
+      .catch(() => {
+        toast("유저 아이디 불러오기 실패");
+      });
+  }, []);
+
+  // 하단바 재생 관련
+  const {
+    setTrackIsPlaying,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarArtist,
+    setTrackBarTrack,
+    trackIsPlaying,
+    trackBarTrack,
+    seekTime,
+    setTrackBarPlaylist,
+  } = useTrackContext();
+
+  const putHit = async () => {
+    if (trackIsPlaying) {
+      const config: any = {
+        method: "put",
+        url: `/tracks/${item.tracks[0].id}/hit?set_id=${item.id}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        await axios(config);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const playMusicBar = () => {
+    if (trackIsPlaying) {
+      audioPlayer.current.play();
+      setPlayingTime(audioPlayer.current.currentTime);
+    } else {
+      audioPlayer.current.pause();
+      setPlayingTime(audioPlayer.current.currentTime);
+    }
+  };
+
+  const togglePlayPause = (playlist: any, index: any, artist: any) => {
+    // 재생/일시정지 버튼 누를 때
+    if (trackBarTrack.id === playlist[index].id) {
+      const prevValue = trackIsPlaying;
+      setTrackIsPlaying(!prevValue);
+      if (!prevValue) {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else {
+        audioPlayer.current.pause();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }
+    } else {
+      setAudioSrc(playlist[index].audio);
+      setTrackIsPlaying(true);
+      putHit();
+      setTrackBarArtist(artist);
+      setTrackBarTrack(playlist[index]);
+      setTrackBarPlaylist(playlist);
+      audioPlayer.current.src = playlist[index].audio;
+      if (trackBarTrack === playlist[index]) {
+        audioPlayer.current.currentTime = current;
+      }
+      setTimeout(() => {
+        audioPlayer.current.play();
+        setPlayingTime(audioPlayer.current.currentTime);
+      }, 1);
+    }
+  };
+
+  const [barPlaying, setBarPlaying] = useState(false);
+
+  const handlePlay = (e: any, index: any) => {
+    e.stopPropagation();
+    togglePlayPause(item.tracks, index, item.creator);
+    trackBarTrack.id === item.id
+      ? setBarPlaying(!trackIsPlaying)
+      : setBarPlaying(true);
+  };
+
+  const playMusic = (e: any, index: any) => {
+    if (barPlaying) {
+      handlePlay(e, trackIndex);
+    }
+    if (currentPlay !== null) {
+      let current = document.getElementById(`button${currentPlay}`);
+      current?.click();
+    }
+    setIsPlaying(true);
+    player.current.audio.current.play();
+    setCurrentPlay(item.id);
+    handlePlay(e, index);
+  };
+
+  const pauseMusic = (e: any) => {
+    setCurrentPlay(null);
+    setCurrent(player.current.audio.current.currentTime);
+    setIsPlaying(false);
+    player.current.audio.current.pause();
+    handlePlay(e, trackIndex);
+  };
+
+  const playNextTrack = (e: any) => {
+    if (item.tracks.length === trackIndex + 1) {
+      setTrackIndex(0);
+    } else {
+      setTrackIndex(trackIndex + 1);
+      handlePlay(e, trackIndex + 1);
+    }
+  };
+
+  const playThisTrack = (num: any, e: any) => {
+    setTrackIndex(num);
+    if (trackIndex === num) {
+      player.current.audio.current.currentTime = 0;
+    } else {
+      playMusic(e, num);
+    }
+  };
+
+  const moveTrackBar = () => {
+    const seeked = player.current.audio.current.currentTime;
+    setCurrent(seeked);
+    audioPlayer.current.currentTime = seeked;
+  };
+
+  const seekPlayer = () => {
+    player.current.audio.current.currentTime = seekTime;
+  };
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? null : setBarPlaying(false);
+  }, [trackBarTrack]);
+
+  const moveWeb = async () => {
+    setBarPlaying(true);
+  };
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? moveWeb().then(() => playMusicBar()) : null;
+  }, []);
+
+  useEffect(() => {
+    trackBarTrack.id === item.id ? setBarPlaying(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
+
+  useEffect(() => {
+    if (seekTime !== 0) {
+      document.getElementById(`seek${currentPlay}`)?.click();
+    }
+  }, [seekTime]);
+
   return (
     <div className={"recent-track"}>
-      <img
-        className="track-Img"
-        src="/default.track_image.svg"
-        alt={"trackImg"}
-      />
+      {item.image && (
+        <img
+          className="track-Img"
+          src={item.image}
+          alt={"trackImg"}
+          onClick={() =>
+            history.push(`/${item.creator.permalink}/sets/${item.permalink}`)
+          }
+        />
+      )}
+      {!item.image && (
+        <img
+          className="track-Img"
+          src="/default_track_image.svg"
+          alt={"trackImg"}
+          onClick={() =>
+            history.push(`/${item.creator.permalink}/sets/${item.permalink}`)
+          }
+        />
+      )}
       <div className={"track-right"}>
-        <div className={"track-info"}>
-          {!isPlaying && (
-            <button onClick={playMusic} className="play-button">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="25"
-                height="25"
-                fill="white"
-                className="bi bi-caret-right-fill"
-                viewBox="0 0 16 16"
+        <div className="track-info-private">
+          <div className={"track-info"}>
+            {!isPlaying && (
+              <button
+                onClick={(e) => playMusic(e, trackIndex)}
+                className="play-button"
               >
-                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
-              </svg>
-            </button>
-          )}
-          {isPlaying && (
-            <button
-              onClick={pauseMusic}
-              id={`button${item.id}`}
-              className="play-button"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="25"
-                height="25"
-                fill="white"
-                className="bi bi-pause-fill"
-                viewBox="0 0 16 16"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="25"
+                  fill="white"
+                  className="bi bi-caret-right-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+                </svg>
+              </button>
+            )}
+            {isPlaying && (
+              <button
+                onClick={(e) => pauseMusic(e)}
+                id={`button${item.id}`}
+                className="play-button"
               >
-                <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
-              </svg>
-            </button>
-          )}
-          <div className={"track-info-name"}>
-            <div className={"artistname"}>{item.creator.display_name}</div>
-            <div className={"trackname"}>{item.title}</div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="25"
+                  fill="white"
+                  className="bi bi-pause-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z" />
+                </svg>
+              </button>
+            )}
+            <div className={"track-info-name"}>
+              <div className={"artistname"}>{item.creator.display_name}</div>
+              <div className={"trackname"}>{item.title}</div>
+            </div>
           </div>
+          {item.is_private && (
+            <div className="track-private">
+              <img
+                src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxwYXRoIGQ9Ik0xMi4wMDMgNy4yNWMuNTQ0IDAgLjk5Ny40NDQuOTk3Ljk5djQuMDJjMCAuNTM5LS40NDYuOTktLjk5Ny45OUg1Ljk5N0EuOTk4Ljk5OCAwIDAxNSAxMi4yNlY4LjI0YzAtLjUzOS40NDYtLjk5Ljk5Ny0uOTl6TTEwIDguNzVIOHYzaDJ2LTN6IiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz4KICAgIDxwYXRoIGQ9Ik0xMS41IDkuNzQ2VjYuMjU0QTIuNDk2IDIuNDk2IDAgMDA5IDMuNzVjLTEuMzggMC0yLjUgMS4xMTEtMi41IDIuNTA0djMuNDkyIiBzdHJva2U9InJnYigyNTUsIDI1NSwgMjU1KSIvPgogIDwvZz4KPC9zdmc+Cg=="
+                alt="private"
+              />
+              <div>Private</div>
+            </div>
+          )}
         </div>
         <AudioPlayer
           ref={player}
           className={`player${item.tracks.id}`}
           key={item.tracks.id}
           src={item.tracks[trackIndex].audio}
-          onEnded={playNextTrack}
+          onEnded={(e) => playNextTrack(e)}
+          onSeeked={moveTrackBar}
+          volume={0}
         />
+        <button className="seek" id={`seek${item.id}`} onClick={seekPlayer}>
+          seek
+        </button>
         {item.tracks.length !== 0 &&
           Array.from({ length: item.tracks.length }, (_, i) => i).map(
             (num: any) => (
               <div className={"playlist-track"}>
-                {item.tracks[num].image === null && (
-                  <img src="/default.track_image.svg" alt="me" />
-                )}
-                {item.tracks[num].image !== null && (
-                  <img src={item.tracks[num].image} alt="me" />
-                )}
-                <div>{num + 1}</div>
-                <div onClick={() => playThisTrack(num)}>
-                  {item.tracks[num].title}
+                <div className={"playlist-track-left"}>
+                  {item.tracks[num].image === null && (
+                    <img src="/default_track_image.svg" alt="me" />
+                  )}
+                  {item.tracks[num].image !== null && (
+                    <img src={item.tracks[num].image} alt="me" />
+                  )}
+                  <div>{num + 1}</div>
+                  <div onClick={(e) => playThisTrack(num, e)}>
+                    {item.tracks[num].title}
+                  </div>
+                </div>
+                <div className={"playlist-track-right"}>
+                  <img
+                    src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHdpZHRoPSIxNnB4IiBoZWlnaHQ9IjE2cHgiIHZpZXdCb3g9IjAgMCAxNiAxNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+DQogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCAzLjAuMyAoNzg5MSkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+DQogICAgPHRpdGxlPnN0YXRzX3BsYXkgNDwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnMvPg0KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHNrZXRjaDp0eXBlPSJNU1BhZ2UiPg0KICAgICAgICA8ZyBpZD0ic3RhdHNfcGxheS0iIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9InJnYigxNTMsIDE1MywgMTUzKSI+DQogICAgICAgICAgICA8cGF0aCBkPSJNNCwxMyBMNCwzIEwxMyw4IEw0LDEzIFoiIGlkPSJzdGF0c19wbGF5LTMiIHNrZXRjaDp0eXBlPSJNU1NoYXBlR3JvdXAiLz4NCiAgICAgICAgPC9nPg0KICAgIDwvZz4NCjwvc3ZnPg0K"
+                    alt="play"
+                  />
+                  <div>{item.tracks[num].play_count}</div>
                 </div>
               </div>
             )

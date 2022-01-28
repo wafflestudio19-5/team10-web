@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router";
-import { useAuthContext } from "../../../context/AuthContext";
-import ArtistPageHeader from "../ArtistPageFix/ArtistPageHeader";
-import ArtistPageRight from "../ArtistPageFix/ArtistPageRight";
-import PlaylistBox from "../PlaylistBox/PlaylistBox";
-import "./ArtistPagePlaylists.scss";
+import ArtistPageHeader from "../../ArtistPageFix/ArtistPageHeader";
+import ArtistPageRight from "../../ArtistPageFix/ArtistPageRight";
+import PlaylistBox from "../../PlaylistBox/PlaylistBox";
+import "./ArtistPageRepostsSets.scss";
 
-function ArtistPagePlaylists() {
-  const { userSecret } = useAuthContext();
+function ArtistPageRepostsSets() {
   const [isLoading, setIsLoading] = useState<boolean>();
   const [isMe, setIsMe] = useState<boolean>();
 
@@ -22,8 +20,8 @@ function ArtistPagePlaylists() {
   const [header, setHeader] = useState<any>();
   const [ref, inView] = useInView();
 
-  const [playlists, setPlaylists] = useState<any>();
-  const [playlistPage, setPlaylistPage] = useState<any>(null);
+  const [repostsSets, setRepostsSets] = useState<any>();
+  const [repostsSetsPage, setRepostsSetsPage] = useState<any>(null);
 
   const [currentPlay, setCurrentPlay] = useState<any>(null);
 
@@ -45,38 +43,30 @@ function ArtistPagePlaylists() {
       });
   };
 
-  const getPlaylists = async (id: any, page: any, token: any) => {
+  const getRepostsSets = async (id: any, page: any) => {
     axios
-      .get(`/users/${id}/sets?page=${page}`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      })
+      .get(`/users/${id}/reposts/sets?page=${page}`)
       .then((res) => {
         if (page === 1) {
-          setPlaylists(
-            res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
-            )
+          setRepostsSets(
+            res.data.results.filter((item: any) => item.is_private === false)
           );
         } else {
-          setPlaylists((item: any) => [
+          setRepostsSets((item: any) => [
             ...item,
             ...res.data.results.filter(
-              (item: any) =>
-                item.tracks.length !== 0 && item.type === "playlist"
+              (item: any) => item.is_private === false
             ),
           ]);
         }
         if (res.data.next === null) {
-          setPlaylistPage(null);
+          setRepostsSetsPage(null);
         } else {
-          setPlaylistPage(page + 1);
+          setRepostsSetsPage(page + 1);
         }
       })
       .catch(() => {
-        toast("플레이리스트 불러오기 실패");
+        toast("리포스트 불러오기 실패");
       });
   };
 
@@ -84,7 +74,6 @@ function ArtistPagePlaylists() {
     setIsLoading(true);
 
     const myPermalink = localStorage.getItem("permalink");
-    const myToken = localStorage.getItem("jwt_token");
 
     // 내 페이지인지 확인
     if (permalink === myPermalink) {
@@ -103,7 +92,7 @@ function ArtistPagePlaylists() {
           // 유저 정보
           getUser(res1.data.id);
           // 플레이리스트 불러오기
-          getPlaylists(res1.data.id, 1, myToken);
+          getRepostsSets(res1.data.id, 1);
         })
         .catch(() => {
           toast("정보 불러오기 실패");
@@ -114,9 +103,9 @@ function ArtistPagePlaylists() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && playlistPage !== null) {
+    if (!isLoading && repostsSetsPage !== null) {
       if (inView) {
-        getPlaylists(pageId, playlistPage, userSecret.jwt);
+        getRepostsSets(pageId, repostsSetsPage);
       }
     }
   }, [inView]);
@@ -137,8 +126,8 @@ function ArtistPagePlaylists() {
           <div className="artist-body">
             <div className={"recent"}>
               <text>My Playlists</text>
-              {playlists &&
-                playlists.map((item: any) => (
+              {repostsSets &&
+                repostsSets.map((item: any) => (
                   <PlaylistBox
                     item={item}
                     user={user}
@@ -158,4 +147,4 @@ function ArtistPagePlaylists() {
   }
 }
 
-export default ArtistPagePlaylists;
+export default ArtistPageRepostsSets;
