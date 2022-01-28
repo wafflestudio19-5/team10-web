@@ -30,6 +30,7 @@ any) {
   const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
   const [genre, setGenre] = useState<string | undefined>();
   const [customGenre, setCustomGenre] = useState<any>();
+  const [tag, setTag] = useState<any>();
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -72,6 +73,7 @@ any) {
             permalink: tPermalink,
             description: description,
             genre_input: genre === "custom" ? customGenre : undefined,
+            tags_input: tag ? [tag] : undefined,
             is_private: isPrivate,
             audio_extension: selectedFile.name.substr(
               -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
@@ -240,7 +242,10 @@ any) {
           </div>
           <div className="upload-info-tag">
             <text>Additional tags</text>
-            <input placeholder="Add tags to describe the genre and mood of your track" />
+            <input
+              placeholder="Add tags to describe the genre and mood of your track"
+              onChange={(e) => setTag(e.target.value)}
+            />
           </div>
           <div className="upload-info-description">
             <text>Description</text>
