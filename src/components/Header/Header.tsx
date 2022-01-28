@@ -9,6 +9,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 function Header() {
+  const [searchInput, setSearchInput] = useState("");
   const history = useHistory();
   const cookies = new Cookies();
   const { userInfo, setUserInfo, setUserSecret } = useAuthContext();
@@ -102,6 +103,25 @@ function Header() {
     currentTarget.src = "/default_user_image.png";
   };
 
+  const onSearchInputChange: React.ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    setSearchInput(event.target.value);
+  };
+
+  const submitSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    return history.push(`/search?text=${searchInput}`);
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const item = params.get("text");
+    if (item) {
+      setSearchInput(item);
+    }
+  }, []);
+
   return (
     <div className={"header_bar"}>
       <div className={"header"}>
@@ -115,9 +135,13 @@ function Header() {
           <span onClick={() => history.push("/you/library")}>Library</span>
         </div>
 
-        <div className={"search"}>
-          <input placeholder={"Search"} />
-        </div>
+        <form className={"search"} onSubmit={submitSearch}>
+          <input
+            placeholder={"Search"}
+            value={searchInput}
+            onChange={onSearchInputChange}
+          />
+        </form>
 
         <div className={"upload"}>
           <span onClick={() => history.push("/upload")}>Upload</span>

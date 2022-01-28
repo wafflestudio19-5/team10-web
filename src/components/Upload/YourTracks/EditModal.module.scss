@@ -119,10 +119,21 @@
         }
       }
 
+      .upload-info-genre-custom {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
       .upload-info-genre {
         display: flex;
         flex-direction: column;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+
+        input {
+          width: 230px;
+          height: 26px;
+        }
 
         text {
           font-size: 12px;
@@ -195,7 +206,7 @@
     margin-top: 30px;
 
     button {
-      margin-top: 30px;
+      margin-top: 20px;
     }
 
     .cancel-button {
