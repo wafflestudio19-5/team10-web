@@ -25,7 +25,6 @@ function Header() {
     setSeekTime,
     setTrackBarPlaylistId,
   } = useTrackContext();
-        
   const [me, setMe] = useState<any>();
 
   useEffect(() => {
