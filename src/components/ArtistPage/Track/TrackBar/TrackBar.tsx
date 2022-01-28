@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styles from "./TrackBar.module.scss";
 import {
   IoPlaySkipBackSharp,
@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai";
 import { useAuthContext } from "../../../../context/AuthContext";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
-import { shuffle } from "lodash";
+import { shuffle, throttle } from "lodash";
 import axios from "axios";
 // import { useAuthContext } from "../../../../context/AuthContext";
 // import axios from "axios";
@@ -152,17 +152,24 @@ const TrackBar = () => {
     }
   }, [trackIsPlaying]);
 
-  const changePlayerCurrentTime = () => {
-    if (progressBar.current && audioPlayer.current) {
-      progressBar.current.value = audioPlayer.current.currentTime;
-      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
-      progressBar.current.style.setProperty(
-        "--seek-before-width",
-        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
-      );
-    }
-    setPlayingTime(audioPlayer.current.currentTime);
-  };
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      if (progressBar.current && audioPlayer.current) {
+        progressBar.current.value = audioPlayer.current.currentTime;
+        // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+        progressBar.current.style.setProperty(
+          "--seek-before-width",
+          `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+        );
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else if (progressBar.current) {
+        setPlayingTime(0);
+        progressBar.current.value = 0;
+        progressBar.current.style.setProperty("--seek-before-width", `0%`);
+      }
+    }, 30000),
+    [playingTime]
+  );
 
   useEffect(() => {
     changePlayerCurrentTime();
