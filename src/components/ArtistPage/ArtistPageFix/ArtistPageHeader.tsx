@@ -14,6 +14,8 @@ function ArtistPageHeader({ header, user, setUser, getUser, isMe }: any) {
 
   const { userSecret } = useAuthContext();
   const params = useParams<any>();
+  const params2 = history.location.pathname.substr(1);
+  const thisPage = params2.substr(params2.indexOf(`/`) + 1);
   const permalink = params.permalink;
   const [pageId, setPageId] = useState<number>();
 
@@ -212,10 +214,42 @@ function ArtistPageHeader({ header, user, setUser, getUser, isMe }: any) {
 
         <div className={"menu-bar"}>
           <div className={"menu-left"}>
-            <a onClick={() => history.push(`/${permalink}/tracks`)}>Tracks</a>
-            <a onClick={() => history.push(`/${permalink}/albums`)}>Albums</a>
-            <a onClick={() => history.push(`/${permalink}/sets`)}>Playlists</a>
-            <a onClick={() => history.push(`/${permalink}/reposts`)}>Reposts</a>
+            <a
+              className={
+                thisPage === "tracks" ? "selected-menu" : "non-selected-menu"
+              }
+              onClick={() => history.push(`/${permalink}/tracks`)}
+            >
+              Tracks
+            </a>
+            <a
+              className={
+                thisPage === "albums" ? "selected-menu" : "non-selected-menu"
+              }
+              onClick={() => history.push(`/${permalink}/albums`)}
+            >
+              Albums
+            </a>
+            <a
+              className={
+                thisPage === "sets" ? "selected-menu" : "non-selected-menu"
+              }
+              onClick={() => history.push(`/${permalink}/sets`)}
+            >
+              Playlists
+            </a>
+            <a
+              className={
+                thisPage === "reposts" ||
+                thisPage === "reposts/tracks" ||
+                thisPage === "reposts/sets"
+                  ? "selected-menu"
+                  : "non-selected-menu"
+              }
+              onClick={() => history.push(`/${permalink}/reposts`)}
+            >
+              Reposts
+            </a>
           </div>
           {isMe === true && (
             <div className="menu-right">

@@ -59,7 +59,7 @@
 
 .comment {
     width: 644px;
-    height: 32px;
+    height: 33px;
     background-color: #f2f2f2;
     border: 1px solid #e5e5e5;
     display: flex;
@@ -70,6 +70,7 @@
     img {
         width: 20px;
         height: 20px;
+        margin-right: 2px;
     }
 
     input {
