@@ -7,11 +7,7 @@ function UploadBox({ setSelectedFiles, setModal, setPlaylistModal }: any) {
   const handleFileInput = async (event: any) => {
     if (!isPlaylist) {
       setModal(true);
-      // setSelectedNum(event.target.files.length);
       setSelectedFiles(event.target.files[0]);
-      // setNumArray(
-      //   Array.from({ length: event.target.files.length }, (_, i) => i)
-      // );
     } else {
       setPlaylistModal(true);
       setSelectedFiles(event.target.files);

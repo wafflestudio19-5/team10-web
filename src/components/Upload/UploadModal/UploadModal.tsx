@@ -5,22 +5,13 @@ import { useAuthContext } from "../../../context/AuthContext";
 import { TagsInput } from "react-tag-input-component";
 import "./UploadModal.scss";
 
-function UploadModal({
-  // num,
-  selectedFile,
-  setModal,
-}: // selectedNum,
-// cancelCount,
-// setCancelCount,
-// numArray,
-// setNumArray,
-any) {
+function UploadModal({ selectedFile, setModal }: any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
   const trackPermalink = selectedFile.name.substr(
     0,
-    selectedFile.name.indexOf(".")
+    selectedFile.name.lastIndexOf(".")
   );
 
   const [imageUrl, setImageUrl] = useState<any>(null);
@@ -53,12 +44,6 @@ any) {
   };
 
   const cancelModal = () => {
-    // setCancelCount(cancelCount + 1);
-    // if (cancelCount + 1 === selectedNum) {
-    //   setModal(false);
-    // } else {
-    //   setNumArray(numArray.filter((item: any) => item !== num));
-    // }
     setModal(false);
   };
 
@@ -76,11 +61,11 @@ any) {
           tags_input: tags !== [] ? tags : undefined,
           is_private: isPrivate,
           audio_extension: selectedFile.name.substr(
-            -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
+            -selectedFile.name.length + selectedFile.name.lastIndexOf(`.`) + 1
           ),
           image_extension: imageFile
             ? imageFile.name.substr(
-                -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+                -imageFile.name.length + imageFile.name.lastIndexOf(`.`) + 1
               )
             : undefined,
         },
@@ -126,14 +111,31 @@ any) {
         }
         setModal(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err.response);
         toast("업로드 실패");
-        toast("트랙 url이 중복되었는지 확인해주세요");
-        if (title === null) {
-          toast("제목은 필수입니다.");
+        if (title === "") {
+          toast("❗️ 제목은 필수입니다.");
         }
-        if (/[ㄱ-ㅎ|가-힣]/.test(tPermalink)) {
-          toast("트랙 url은 영어 / 영어+숫자만 가능합니다");
+        if (/\s/g.test(tPermalink)) {
+          toast("❗️ 트랙 url에서 띄어쓰기는 불가능합니다.");
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
+        ) {
+          toast("❗️ 트랙 url은 영어 / 숫자만 가능합니다");
+        }
+        if (
+          err.response.data.non_field_errors &&
+          err.response.data.non_field_errors[0] ===
+            "Already existing permalink for the requested user."
+        ) {
+          toast("❗️ 트랙 url이 중복되었습니다.");
+        }
+        if (err.response.status === 500) {
+          toast("❗️ 서버오류");
         }
       });
   };
