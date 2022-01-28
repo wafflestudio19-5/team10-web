@@ -13,6 +13,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
 
   const permalink = userSecret.permalink;
   const trackNum = Array.from({ length: selectedFiles.length }, (_, i) => i);
+  const [uploaded, setUploaded] = useState<boolean>(false);
   const [uploads, setUploads] = useState<any>([]);
 
   const [imageUrl, setImageUrl] = useState<any>(null);
@@ -111,6 +112,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
             .then(() => {
               toast(`✅ ${item + 1}번째 트랙 업로드 성공`);
               setUploads((item: any) => [...item, { id: res2.data.id }]);
+              setUploaded(true);
             })
             .catch(() => {
               toast(`❗️ ${item + 1}번째 음악파일 업로드 실패`);
@@ -397,17 +399,19 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         </div>
       </div>
 
-      <div className="upload-modal-button">
-        <button
-          className="cancel-button"
-          onClick={() => setPlaylistModal(false)}
-        >
-          Cancel
-        </button>
-        <button className="save-button" onClick={handlePlaylistUpload}>
-          Make a Playlist
-        </button>
-      </div>
+      {uploaded && (
+        <div className="upload-modal-button">
+          <button
+            className="cancel-button"
+            onClick={() => setPlaylistModal(false)}
+          >
+            Cancel
+          </button>
+          <button className="save-button" onClick={handlePlaylistUpload}>
+            Make a Playlist
+          </button>
+        </div>
+      )}
     </div>
   );
 }
