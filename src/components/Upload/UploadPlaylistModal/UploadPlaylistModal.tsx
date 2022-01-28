@@ -104,7 +104,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           axios
             .put(res1.data.image_presigned_url, imageFile, img_options)
             .catch(() => {
-              toast("❗️ 이미지파일 업로드 실패");
+              toast("❗️ 이미지 업로드 실패");
             });
         }
 
