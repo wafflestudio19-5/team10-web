@@ -199,8 +199,11 @@ function ArtistPageReposts() {
           />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Reposts (Tracks)</text>
+              {repostTracks && repostTracks.length !== 0 && (
+                <text>My Reposts (Tracks)</text>
+              )}
               {repostTracks &&
+                repostTracks.length !== 0 &&
                 repostTracks.map((item: any) => (
                   <TrackBox
                     item={item}
@@ -215,14 +218,19 @@ function ArtistPageReposts() {
                     playMusicBar={playMusic}
                   />
                 ))}
-              <div
-                className="reposts-more"
-                onClick={() => history.push(`/${permalink}/reposts/tracks`)}
-              >
-                + More Tracks
-              </div>
-              <text>My Reposts (Sets)</text>
+              {repostTracks && repostTracks.length !== 0 && (
+                <div
+                  className="reposts-more"
+                  onClick={() => history.push(`/${permalink}/reposts/tracks`)}
+                >
+                  + More Tracks
+                </div>
+              )}
+              {repostSets && repostSets.length !== 0 && (
+                <text>My Reposts (Sets)</text>
+              )}
               {repostSets &&
+                repostSets.length !== 0 &&
                 repostSets.map((item: any) => (
                   <PlaylistBox
                     item={item}
@@ -231,12 +239,14 @@ function ArtistPageReposts() {
                     setCurrentPlay={setCurrentPlay}
                   />
                 ))}
-              <div
-                className="reposts-more"
-                onClick={() => history.push(`/${permalink}/reposts/sets`)}
-              >
-                + More Sets
-              </div>
+              {repostSets && repostSets.length !== 0 && (
+                <div
+                  className="reposts-more"
+                  onClick={() => history.push(`/${permalink}/reposts/sets`)}
+                >
+                  + More Sets
+                </div>
+              )}
             </div>
             <ArtistPageRight user={user} />
           </div>
