@@ -10,7 +10,6 @@ import PlaylistTrack from "./PlaylistTrack/PlaylistTrack";
 
 function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const { userSecret } = useAuthContext();
-  const [error, setError] = useState<boolean>(false);
 
   const permalink = userSecret.permalink;
   const trackNum = Array.from({ length: selectedFiles.length }, (_, i) => i);
@@ -184,23 +183,18 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                       setPlaylistModal(false);
                     })
                     .catch(() => {
-                      toast("❗️ 업로드 실패 (플레이리스트에 트랙 추가 실패)");
+                      deleteErrorSet(res1.data.id, myToken);
+                      deleteErrorTrack(res2.data.id, myToken);
                     });
                 })
                 .catch(() => {
                   toast("❗️ 음악파일 업로드 실패");
                   deleteErrorTrack(res2.data.id, myToken);
-                  setError(true);
-                  if (!error) {
-                    deleteErrorSet(res1.data.id, myToken);
-                  }
+                  deleteErrorSet(res1.data.id, myToken);
                 });
             })
             .catch((err) => {
-              setError(true);
-              if (!error) {
-                deleteErrorSet(res1.data.id, myToken);
-              }
+              deleteErrorSet(res1.data.id, myToken);
               toast(`❗️ ${item + 1} 번째 트랙 제목을 변경해주세요.`);
               if (
                 err.response.data.permalink &&
