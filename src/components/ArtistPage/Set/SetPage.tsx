@@ -123,12 +123,6 @@ const SetPage = () => {
       } else {
         setIsMySet(false);
       }
-      if (
-        response.data.creator.id !== userSecret.id &&
-        response.data.is_private
-      ) {
-        setNoSet(true);
-      }
       setSet(response.data);
       setIsLoading(false);
     } catch (error) {

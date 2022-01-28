@@ -43,17 +43,19 @@ const PlaylistModal = ({
     event
   ) => {
     setSetPermalink(event.target.value);
-    if (event.target.value.length === 0) {
-      toast.error("링크를 작성해주세요");
-    }
   };
   const onPrivacyChange = () => setIsPrivate(!isPrivate);
   const onSave = async () => {
     if (playlistTitle.trim().length === 0) {
       return toast.error("플레이리스트 이름을 작성해 주세요");
     }
-    if (setPermalink.trim().length === 1) {
+    if (setPermalink.trim().length === 0) {
       return toast.error("플레이리스트 링크를 작성해주세요");
+    }
+    if (!/^[0-9a-z_-]+$/g.test(setPermalink)) {
+      return toast.error(
+        `링크에는 숫자, 알파벳 소문자, -, _ 만 사용해 주세요.`
+      );
     }
     const config: any = {
       method: "post",
@@ -85,6 +87,8 @@ const PlaylistModal = ({
       try {
         await axios(trackConfig);
         toast.success("트랙이 추가되었습니다");
+        setSetPermalink("");
+        setPlaylistTitle("");
         closeModal();
         // console.log(response);
       } catch (error) {
