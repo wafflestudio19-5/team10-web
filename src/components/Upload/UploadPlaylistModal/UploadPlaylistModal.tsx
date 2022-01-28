@@ -81,7 +81,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           is_private: isPrivate,
           image_extension: imageFile
             ? imageFile.name.substr(
-                -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+                -imageFile.name.length + imageFile.name.lastIndexOf(`.`) + 1
               )
             : undefined,
         },
@@ -119,27 +119,29 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
               {
                 title: newFiles[item].name,
                 permalink:
-                  newFiles[item].name.indexOf(".") === -1 && listPermalink
+                  newFiles[item].name.lastIndexOf(".") === -1 && listPermalink
                     ? listPermalink + "_" + newFiles[item].name
-                    : newFiles[item].name.indexOf(".") === -1 && !listPermalink
+                    : newFiles[item].name.lastIndexOf(".") === -1 &&
+                      !listPermalink
                     ? title + "_" + newFiles[item].name
-                    : newFiles[item].name.indexOf(".") !== -1 && listPermalink
+                    : newFiles[item].name.lastIndexOf(".") !== -1 &&
+                      listPermalink
                     ? listPermalink +
                       "_" +
                       newFiles[item].name.substr(
                         0,
-                        newFiles[item].name.indexOf(".")
+                        newFiles[item].name.lastIndexOf(".")
                       )
                     : title +
                       "_" +
                       newFiles[item].name.substr(
                         0,
-                        newFiles[item].name.indexOf(".")
+                        newFiles[item].name.lastIndexOf(".")
                       ),
                 is_private: isPrivate,
                 audio_extension: selectedFiles[item].name.substr(
                   -selectedFiles[item].name.length +
-                    selectedFiles[item].name.indexOf(`.`) +
+                    selectedFiles[item].name.lastIndexOf(`.`) +
                     1
                 ),
               },
