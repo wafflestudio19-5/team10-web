@@ -160,7 +160,7 @@ function ArtistPageRepostsTracks() {
           />
           <div className="artist-body">
             <div className={"recent"}>
-              <text>My Tracks</text>
+              <text>My Reposts (Tracks)</text>
               {repostTracks &&
                 repostTracks.map((item: any, index: any) => (
                   <TrackBox
