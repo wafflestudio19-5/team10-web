@@ -12,7 +12,6 @@ import "./TrackBox.scss";
 function TrackBox({
   item,
   artistName,
-  myId,
   user,
   currentPlay,
   setCurrentPlay,
@@ -480,7 +479,6 @@ function TrackBox({
               item={item}
               modalPage={modalPage}
               getMyPlaylist={getMyPlaylist}
-              myId={myId}
               artistName={artistName}
             />
             {/* <button>
