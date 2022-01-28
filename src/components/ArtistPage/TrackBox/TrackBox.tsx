@@ -137,7 +137,12 @@ function TrackBox({
     const getIsLiking = (id: any) => {
       axios.get(`/users/${id}/likes/tracks`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -156,7 +161,12 @@ function TrackBox({
     const getReposted = (id: any) => {
       axios.get(`/users/${id}/reposts/tracks`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {

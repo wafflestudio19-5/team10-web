@@ -96,7 +96,12 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     const getIsLiking = (id: any) => {
       axios.get(`/users/${id}/likes/sets`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -115,7 +120,12 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     const getReposted = (id: any) => {
       axios.get(`/users/${id}/reposts/sets`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
