@@ -50,18 +50,15 @@ function Header() {
                   {userInfo.profile_img !== null && (
                     <img src={userInfo.profile_img} alt={"user"} />
                   )}
-                  {userInfo.profile_img === null && (
-                    <img src="/default_user_image.png" alt={"user"} />
+                  {me.image_profile === null && (
+                    <img
+                      src={"/img/user_img.png"}
+                      onError={onImageError}
+                      alt={"user"}
+                    />
                   )}
                   <text>{userInfo.display_name}</text>
                 </div>
-              )}
-              {me.image_profile === null && (
-                <img
-                  src={"/img/user_img.png"}
-                  onError={onImageError}
-                  alt={"user"}
-                />
               )}
             </button>
             <ul className="dropdown-menu">
