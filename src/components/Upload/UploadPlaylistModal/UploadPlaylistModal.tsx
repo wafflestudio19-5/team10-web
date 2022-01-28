@@ -253,7 +253,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           {!imageUrl && (
             <img
               className="upload-track-img"
-              src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
+              src="/default_track_image.svg"
               alt="track-img"
             />
           )}
