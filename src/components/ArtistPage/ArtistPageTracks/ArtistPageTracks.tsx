@@ -10,9 +10,10 @@ import TrackBox from "../TrackBox/TrackBox";
 import "./ArtistPageTracks.scss";
 
 function ArtistPageTracks() {
-  const { userSecret } = useAuthContext();
+  const { userSecret, userInfo } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [isMe, setIsMe] = useState<boolean>();
+  const [myImage, setMyImage] = useState<string | undefined | null>();
 
   const params = useParams<any>();
   const permalink = params.permalink;
@@ -117,6 +118,18 @@ function ArtistPageTracks() {
         toast("유저 아이디 불러오기 실패");
       });
 
+    if (userInfo.profile_img === undefined) {
+      axios
+        .get(`/users/me`, {
+          headers: {
+            Authorization: `JWT ${myToken}`,
+          },
+        })
+        .then((res) => {
+          setMyImage(res.data.image_profile);
+        });
+    }
+
     const getInfo = () => {
       // resolve api
       const url = `https://soundwaffle.com/${permalink}`;
@@ -173,6 +186,7 @@ function ArtistPageTracks() {
                     myPlaylist={myPlaylist}
                     modalPage={modalPage}
                     getMyPlaylist={getMyPlaylist}
+                    myImage={myImage}
                   />
                 ))}
               <div ref={ref} className="inView">

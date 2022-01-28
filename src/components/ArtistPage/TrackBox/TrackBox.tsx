@@ -18,6 +18,7 @@ function TrackBox({
   myPlaylist,
   modalPage,
   getMyPlaylist,
+  myImage,
 }: any) {
   const { userSecret, userInfo } = useAuthContext();
   const history = useHistory();
@@ -431,12 +432,16 @@ function TrackBox({
           seek
         </button>
         <div className={"comment"}>
+          {userInfo.profile_img === undefined && (
+            <img src={myImage ? myImage : "/default_user_image.png"} alt="me" />
+          )}
           {userInfo.profile_img === null && (
             <img src="/default_user_image.png" alt="me" />
           )}
-          {userInfo.profile_img !== null && (
-            <img src={userInfo.profile_img} alt="me" />
-          )}
+          {userInfo.profile_img !== undefined &&
+            userInfo.profile_img !== null && (
+              <img src={userInfo.profile_img} alt="me" />
+            )}
           <input
             placeholder={"Write a comment and Press Enter"}
             value={comment}
