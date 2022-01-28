@@ -57,14 +57,20 @@ function Header() {
                   {userInfo.profile_img !== null && (
                     <img src={userInfo.profile_img} alt={"user"} />
                   )}
-                  {me.image_profile === null && (
+                  {userInfo.profile_img === null && (
                     <img
-                      src={"/img/user_img.png"}
-                      onError={onImageError}
+                      src="/default_user_image.png"
                       alt={"user"}
+                      onError={onImageError}
                     />
                   )}
                   <text>{userInfo.display_name}</text>
+                </div>
+              )}
+              {userInfo === undefined && (
+                <div>
+                  <img src={""} alt={"user"} />
+                  <text>user</text>
                 </div>
               )}
             </button>
