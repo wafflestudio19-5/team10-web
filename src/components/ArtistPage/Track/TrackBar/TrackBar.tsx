@@ -397,7 +397,7 @@ const TrackBar = () => {
       }
     };
     putHit();
-  }, [audioPlayer.current.src, userSecret.jwt]);
+  }, [audioPlayer.current?.src, userSecret.jwt]);
 
   const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
     currentTarget,

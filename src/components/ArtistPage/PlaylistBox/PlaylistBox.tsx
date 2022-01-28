@@ -379,7 +379,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
           ref={player}
           className={`player${item.tracks.id}`}
           key={item.tracks.id}
-          src={item.tracks[trackIndex].audio}
+          src={item.tracks[trackIndex]?.audio}
           onEnded={(e) => playNextTrack(e)}
           onSeeked={moveTrackBar}
           volume={0}

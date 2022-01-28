@@ -405,21 +405,6 @@ const Discover = () => {
   }, 200);
   useEffect(() => {
     if (userSecret.permalink !== undefined) {
-      const fetchMostNewList = () => {
-        axios({
-          method: "get",
-          url: "/tracks",
-          headers: { Authorization: `JWT ${userSecret.jwt}` },
-          data: {
-            user_id: userSecret.id,
-          },
-        })
-          .then((r: any) => {
-            const newList = r.data.results.slice(-6);
-            setNewTrackList(newList);
-          })
-          .catch(() => toast.error("트랙 정보 불러오기를 실패하였습니다"));
-      };
       const fetchHistoryTracks = async () => {
         await axios({
           method: "get",
@@ -430,7 +415,42 @@ const Discover = () => {
           },
         })
           .then((res) => {
-            setMostTrackList(res.data.results);
+            if (res.data.count === 0) {
+              axios({
+                method: "get",
+                url: "/tracks",
+                headers: { Authorization: `JWT ${userSecret.jwt}` },
+                data: {
+                  user_id: userSecret.id,
+                },
+              })
+                .then((r: any) => {
+                  const newList = r.data.results.slice(0, 6);
+                  const mostList = r.data.results.slice(-4);
+                  setMostTrackList(mostList);
+                  setNewTrackList(newList);
+                })
+                .catch(() =>
+                  toast.error("트랙 정보 불러오기를 실패하였습니다")
+                );
+            } else {
+              axios({
+                method: "get",
+                url: "/tracks",
+                headers: { Authorization: `JWT ${userSecret.jwt}` },
+                data: {
+                  user_id: userSecret.id,
+                },
+              })
+                .then((r: any) => {
+                  const newList = r.data.results.slice(0, 6);
+                  setNewTrackList(newList);
+                })
+                .catch(() =>
+                  toast.error("트랙 정보 불러오기를 실패하였습니다")
+                );
+              setMostTrackList(res.data.results);
+            }
           })
           .catch(() => toast.error("history list를 가져오지 못하였습니다"));
       };
@@ -452,7 +472,6 @@ const Discover = () => {
           toast.error("like list 불러오기를 실패하였습니다");
         }
       };
-      fetchMostNewList();
       fetchHistoryTracks();
       fetchUserId();
     }
