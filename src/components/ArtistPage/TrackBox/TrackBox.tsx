@@ -12,7 +12,6 @@ import "./TrackBox.scss";
 function TrackBox({
   item,
   artistName,
-  myId,
   user,
   currentPlay,
   setCurrentPlay,
@@ -20,7 +19,7 @@ function TrackBox({
   modalPage,
   getMyPlaylist,
 }: any) {
-  const { userSecret } = useAuthContext();
+  const { userSecret, userInfo } = useAuthContext();
   const history = useHistory();
 
   const [isLiking, setIsLiking] = useState<boolean>(false);
@@ -412,11 +411,11 @@ function TrackBox({
           seek
         </button>
         <div className={"comment"}>
-          {user.image_profile === null && (
+          {userInfo.profile_img === null && (
             <img src="/default_user_image.png" alt="me" />
           )}
-          {user.image_profile !== null && (
-            <img src={user.image_profile} alt="me" />
+          {userInfo.profile_img !== null && (
+            <img src={userInfo.profile_img} alt="me" />
           )}
           <input
             placeholder={"Write a comment and Press Enter"}
@@ -480,7 +479,6 @@ function TrackBox({
               item={item}
               modalPage={modalPage}
               getMyPlaylist={getMyPlaylist}
-              myId={myId}
               artistName={artistName}
             />
             {/* <button>

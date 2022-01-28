@@ -57,6 +57,12 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
     });
   };
 
+  const deleteErrorTrack = (id: any, token: any) => {
+    axios.delete(`https://api.soundwaffle.com/tracks/${id}`, {
+      headers: { Authorization: `JWT ${token}` },
+    });
+  };
+
   const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
     const myToken = localStorage.getItem("jwt_token");
@@ -97,7 +103,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           axios
             .put(res1.data.image_presigned_url, imageFile, img_options)
             .catch(() => {
-              toast("이미지파일 업로드 실패");
+              toast("❗️ 이미지파일 업로드 실패");
             });
         }
 
@@ -179,10 +185,16 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
                     });
                 })
                 .catch(() => {
-                  toast("음악파일 업로드 실패");
+                  toast("❗️ 음악파일 업로드 실패");
+                  deleteErrorTrack(res2.data.id, myToken);
+                  setError(true);
+                  if (!error) {
+                    deleteErrorSet(res1.data.id, myToken);
+                  }
                 });
             })
             .catch(() => {
+              toast("업로드 실패");
               toast(`❗️ ${item + 1} 번째 트랙 제목을 변경해주세요.`);
               setError(true);
               if (!error) {
