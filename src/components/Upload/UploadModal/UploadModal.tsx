@@ -28,6 +28,8 @@ any) {
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
+  const [genre, setGenre] = useState<string | undefined>();
+  const [customGenre, setCustomGenre] = useState<any>();
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -69,6 +71,7 @@ any) {
             title: title,
             permalink: tPermalink,
             description: description,
+            genre_input: genre === "custom" ? customGenre : undefined,
             is_private: isPrivate,
             audio_extension: selectedFile.name.substr(
               -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
@@ -220,12 +223,20 @@ any) {
               <input value={tPermalink} onChange={changeTrackPermalink} />
             </div>
           </div>
-          <div className="upload-info-genre">
-            <text>Genre</text>
-            <select>
-              <option value="None">None</option>
-              <option value="Custom">Custom</option>
-            </select>
+          <div className="upload-info-genre-custom">
+            <div className="upload-info-genre">
+              <text>Genre</text>
+              <select onChange={(e: any) => setGenre(e.target.value)}>
+                <option value="none">None</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            {genre === "custom" && (
+              <div className="upload-info-genre">
+                <text>Custom Genre</text>
+                <input onChange={(e) => setCustomGenre(e.target.value)} />
+              </div>
+            )}
           </div>
           <div className="upload-info-tag">
             <text>Additional tags</text>

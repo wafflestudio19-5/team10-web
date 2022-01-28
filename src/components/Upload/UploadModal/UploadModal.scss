@@ -203,3 +203,13 @@
         }
     }
 }
+
+.upload-info-genre-custom {
+    display: flex;
+    justify-content: space-between;
+
+    input {
+        width: 230px;
+        height: 26px;
+    }
+}
