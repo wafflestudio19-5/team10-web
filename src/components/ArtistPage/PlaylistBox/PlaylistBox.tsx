@@ -160,6 +160,24 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     setTrackBarPlaylist,
   } = useTrackContext();
 
+  const putHit = async () => {
+    if (trackIsPlaying) {
+      const config: any = {
+        method: "put",
+        url: `/tracks/${item.tracks[0].id}/hit?set_id=${item.id}`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {},
+      };
+      try {
+        await axios(config);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   const playMusicBar = () => {
     if (trackIsPlaying) {
       audioPlayer.current.play();
@@ -185,6 +203,7 @@ function PlaylistBox({ item, currentPlay, setCurrentPlay }: any) {
     } else {
       setAudioSrc(playlist[index].audio);
       setTrackIsPlaying(true);
+      putHit();
       setTrackBarArtist(artist);
       setTrackBarTrack(playlist[index]);
       setTrackBarPlaylist(playlist);
