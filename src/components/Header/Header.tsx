@@ -147,14 +147,14 @@ function Header() {
             <span>Stream</span>
             <span onClick={() => history.push("/you/library")}>Library</span>
           </div>
-          
-        <form className={"search"} onSubmit={submitSearch}>
-          <input
-            placeholder={"Search"}
-            value={searchInput}
-            onChange={onSearchInputChange}
-          />
-        </form>
+
+          <form className={"search"} onSubmit={submitSearch}>
+            <input
+              placeholder={"Search"}
+              value={searchInput}
+              onChange={onSearchInputChange}
+            />
+          </form>
           <div className={"upload"}>
             <span onClick={() => history.push("/upload")}>Upload</span>
           </div>
