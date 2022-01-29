@@ -39,7 +39,7 @@ const RepostUsers = ({
           <BiRepost />
           <span>{repostersCount} reposts</span>
         </div>
-        <span className={styles.viewAll}>View all</span>
+        {/* <span className={styles.viewAll}>View all</span> */}
       </div>
       <div className={styles.userImages}>
         {trackReposters.map((reposter, index) => {

@@ -2,24 +2,16 @@ import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
+import { TagsInput } from "react-tag-input-component";
 import "./UploadModal.scss";
 
-function UploadModal({
-  // num,
-  selectedFile,
-  setModal,
-}: // selectedNum,
-// cancelCount,
-// setCancelCount,
-// numArray,
-// setNumArray,
-any) {
+function UploadModal({ selectedFile, setModal }: any) {
   const { userSecret } = useAuthContext();
 
   const permalink = userSecret.permalink;
   const trackPermalink = selectedFile.name.substr(
     0,
-    selectedFile.name.indexOf(".")
+    selectedFile.name.lastIndexOf(".")
   );
 
   const [imageUrl, setImageUrl] = useState<any>(null);
@@ -30,7 +22,7 @@ any) {
   const [tPermalink, setTPermalink] = useState<string>(trackPermalink);
   const [genre, setGenre] = useState<string | undefined>();
   const [customGenre, setCustomGenre] = useState<any>();
-  const [tag, setTag] = useState<any>();
+  const [tags, setTags] = useState<any>();
 
   const clickImageInput = (event: any) => {
     event.preventDefault();
@@ -52,58 +44,56 @@ any) {
   };
 
   const cancelModal = () => {
-    // setCancelCount(cancelCount + 1);
-    // if (cancelCount + 1 === selectedNum) {
-    //   setModal(false);
-    // } else {
-    //   setNumArray(numArray.filter((item: any) => item !== num));
-    // }
     setModal(false);
   };
 
   const handleUpload = (e: any) => {
     e.preventDefault();
     const myToken = localStorage.getItem("jwt_token");
-    if (imageFile) {
-      axios
-        .post(
-          "https://api.soundwaffle.com/tracks",
-          {
-            title: title,
-            permalink: tPermalink,
-            description: description,
-            genre_input: genre === "custom" ? customGenre : undefined,
-            tags_input: tag ? [tag] : undefined,
-            is_private: isPrivate,
-            audio_extension: selectedFile.name.substr(
-              -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
-            ),
-            image_extension: imageFile.name.substr(
-              -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
-            ),
+    axios
+      .post(
+        "https://api.soundwaffle.com/tracks",
+        {
+          title: title,
+          permalink: tPermalink,
+          description: description,
+          genre_input: genre === "custom" ? customGenre : undefined,
+          tags_input: tags !== [] ? tags : undefined,
+          is_private: isPrivate,
+          audio_extension: selectedFile.name.substr(
+            -selectedFile.name.length + selectedFile.name.lastIndexOf(`.`) + 1
+          ),
+          image_extension: imageFile
+            ? imageFile.name.substr(
+                -imageFile.name.length + imageFile.name.lastIndexOf(`.`) + 1
+              )
+            : undefined,
+        },
+        {
+          headers: {
+            Authorization: `JWT ${myToken}`,
           },
-          {
-            headers: {
-              Authorization: `JWT ${myToken}`,
-            },
-          }
-        )
-        .then((res) => {
-          const music_options = {
-            headers: {
-              "Content-Type": selectedFile.type,
-            },
-          };
+        }
+      )
+      .then((res) => {
+        // 음악 업로드
+        const music_options = {
+          headers: {
+            "Content-Type": selectedFile.type,
+          },
+        };
 
-          axios
-            .put(res.data.audio_presigned_url, selectedFile, music_options)
-            .then(() => {
-              toast("음악파일 업로드 완료");
-            })
-            .catch(() => {
-              toast("음악파일 업로드 실패");
-            });
+        axios
+          .put(res.data.audio_presigned_url, selectedFile, music_options)
+          .then(() => {
+            toast("✅ 트랙 업로드 완료");
+          })
+          .catch(() => {
+            toast("❗️ 음악파일 업로드 실패");
+          });
 
+        // 이미지 업로드
+        if (imageFile) {
           const img_options = {
             headers: {
               "Content-Type": imageFile.type,
@@ -112,69 +102,46 @@ any) {
 
           axios
             .put(res.data.image_presigned_url, imageFile, img_options)
-            .then(() => {
-              toast("이미지파일 업로드 완료");
-            })
             .catch(() => {
-              toast("이미지파일 업로드 실패");
+              toast("❗️ 이미지 업로드 실패");
             });
-
-          setModal(false);
-        })
-        .catch(() => {
-          toast("업로드 실패");
-          if (title === null) {
-            toast("제목은 필수입니다.");
-          }
-        });
-    } else {
-      axios
-        .post(
-          "https://api.soundwaffle.com/tracks",
-          {
-            title: title,
-            permalink: tPermalink,
-            description: description,
-            is_private: isPrivate,
-            audio_extension: selectedFile.name.substr(
-              -selectedFile.name.length + selectedFile.name.indexOf(`.`) + 1
-            ),
-          },
-          {
-            headers: {
-              Authorization: `JWT ${myToken}`,
-            },
-          }
-        )
-        .then((res) => {
-          const music_options = {
-            headers: {
-              "Content-Type": selectedFile.type,
-            },
-          };
-
-          axios
-            .put(res.data.audio_presigned_url, selectedFile, music_options)
-            .then(() => {
-              toast("음악파일 업로드 완료");
-            })
-            .catch(() => {
-              toast("음악파일 업로드 실패");
-            });
-
-          setModal(false);
-        })
-        .catch(() => {
-          toast("업로드 실패");
-          toast("트랙 url이 중복되었는지 확인해주세요");
-          if (title === null) {
-            toast("제목은 필수입니다.");
-          }
-          if (/[ㄱ-ㅎ|가-힣]/.test(tPermalink)) {
-            toast("트랙 url은 영어 / 영어+숫자만 가능합니다");
-          }
-        });
-    }
+        }
+        setModal(false);
+      })
+      .catch((err) => {
+        console.log(err.response);
+        toast("업로드 실패");
+        if (title === "") {
+          toast("❗️ 트랙 제목을 입력하세요.");
+        }
+        if (/\s/g.test(tPermalink)) {
+          toast("❗️ 트랙 url에서 띄어쓰기는 불가능합니다.");
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
+        ) {
+          toast("❗️ 트랙 url은 영어 / 숫자만 가능합니다");
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            "Ensure this field has at least 3 characters."
+        ) {
+          toast("❗️ 플레이리스트 url은 3글자 이상이어야 합니다.");
+        }
+        if (
+          err.response.data.non_field_errors &&
+          err.response.data.non_field_errors[0] ===
+            "Already existing permalink for the requested user."
+        ) {
+          toast("❗️ 트랙 url이 중복되었습니다.");
+        }
+        if (err.response.status === 500) {
+          toast("❗️ 서버오류");
+        }
+      });
   };
 
   return (
@@ -191,7 +158,7 @@ any) {
           {!imageUrl && (
             <img
               className="upload-track-img"
-              src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
+              src="/default_track_image.svg"
               alt="track-img"
             />
           )}
@@ -242,9 +209,11 @@ any) {
           </div>
           <div className="upload-info-tag">
             <text>Additional tags</text>
-            <input
-              placeholder="Add tags to describe the genre and mood of your track"
-              onChange={(e) => setTag(e.target.value)}
+            <TagsInput
+              value={tags}
+              onChange={setTags}
+              name="tags"
+              placeHolder="Describe the genre and mood of your track. (Press Enter)"
             />
           </div>
           <div className="upload-info-description">
@@ -274,7 +243,7 @@ any) {
                 id="flexRadioDefault1"
                 onChange={() => setIsPrivate(true)}
               />
-              <label className="form-check-label">Privacy</label>
+              <label className="form-check-label">Private</label>
             </div>
           </div>
         </div>

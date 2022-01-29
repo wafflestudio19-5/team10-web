@@ -12,7 +12,6 @@ function AddToPlaylist({
   item,
   modalPage,
   getMyPlaylist,
-  myId,
   artistName,
 }: any) {
   const [addOption, setAddOption] = useState<boolean>(true);
@@ -22,7 +21,6 @@ function AddToPlaylist({
   const [pTitle, setPTitle] = useState<any>();
   const [pPrivate, setPPrivate] = useState<boolean>(false);
 
-  // 서버 일시오류가 있는 것 같으니 나중에 다시 해보기 (500에러)
   const addToPlaylist = (id: any) => {
     axios
       .post(
@@ -39,15 +37,18 @@ function AddToPlaylist({
       .then(() => {
         toast("플레이리스트에 추가 완료");
       })
-      .catch(() => {
+      .catch((err) => {
         toast("플레이리스트에 추가 실패");
+        if (err.response.data.error === "이미 셋에 추가된 트랙이 있습니다.") {
+          toast("❗️ 이미 추가되어있는 플레이리스트입니다.");
+        }
       });
   };
 
   useEffect(() => {
     if (modalPage !== null) {
       if (inView) {
-        getMyPlaylist(myId, modalPage);
+        getMyPlaylist(userSecret.id, modalPage);
       }
     }
   }, [inView]);
@@ -83,6 +84,7 @@ function AddToPlaylist({
           )
           .then(() => {
             toast("플레이리스트 생성 완료");
+            setPlaylistModal2(false);
           })
           .catch(() => {
             toast("set에 추가 실패");
@@ -99,7 +101,10 @@ function AddToPlaylist({
         <section className={"playlistModal-section"}>
           <div className="playlistModal-header">
             <div className="playlistModal-header-left">
-              <div className={addOption ? "addOption true" : "addOption"}>
+              <div
+                className={addOption ? "addOption true" : "addOption"}
+                onClick={() => setAddOption(true)}
+              >
                 Add to playlist
               </div>
               <div
@@ -109,7 +114,12 @@ function AddToPlaylist({
                 Create a playlist
               </div>
             </div>
-            <button onClick={() => setPlaylistModal2(false)}>Close</button>
+            <button
+              className="playlistModal-header-close-button"
+              onClick={() => setPlaylistModal2(false)}
+            >
+              Close
+            </button>
           </div>
           {addOption &&
             myPlaylist &&
@@ -141,12 +151,18 @@ function AddToPlaylist({
                     </div>
                   </div>
                 </div>
-                <button onClick={() => addToPlaylist(item.id)}>
+                <button
+                  className="add-to-playlist"
+                  onClick={() => addToPlaylist(item.id)}
+                >
                   Add to playlist
                 </button>
               </div>
             ))}
           <div ref={ref} className="inView"></div>
+          {addOption && myPlaylist.length === 0 && (
+            <div className="add-to-playlist-empty">No Playlist</div>
+          )}
           {!addOption && (
             <div className="create-option">
               <div className="create-option-title">Playlist title *</div>
@@ -178,7 +194,12 @@ function AddToPlaylist({
                     <label className="form-check-label">Privacy</label>
                   </div>
                 </div>
-                <button onClick={createPlaylist}>Save</button>
+                <button
+                  className="create-a-playlist-save-button"
+                  onClick={createPlaylist}
+                >
+                  Save
+                </button>
               </div>
               <div className="create-option-track">
                 {item.image && <img src={item.image} alt="img" />}

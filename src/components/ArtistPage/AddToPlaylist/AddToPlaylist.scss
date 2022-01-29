@@ -13,6 +13,7 @@
     width: 550px;
     height: fit-content;
     max-height: 550px;
+    min-height: 200px;
     margin: auto;
     background-color: white;
     animation: modal-show .3s;
@@ -44,7 +45,7 @@
             }
         }
 
-        button {
+        .playlistModal-header-close-button {
             height: 26px;
             line-height: 26px;
             font-size: 14px;
@@ -90,13 +91,22 @@
             }
       }
 
-      button {
+      .add-to-playlist {
         width: 112px;
         height: 26px;
         font-size: 14px;
         line-height: 26px;
         margin-bottom: 10px;
       }
+      
+    }
+
+    .add-to-playlist-empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        margin-top: 60px;
     }
 
     .create-option {
@@ -121,6 +131,16 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+
+            .create-a-playlist-save-button {
+                width: 53px;
+                height: 26px;
+                font-size: 14px;
+                background-color: #ff5500;
+                color: white;
+                line-height: 26px;
+                border: none;
+            }
         }
 
         .create-option-privacy {
@@ -147,16 +167,6 @@
                 margin-right: 5px;
                 line-height: 26px;
             }
-        }
-
-        button {
-            width: 53px;
-            height: 26px;
-            font-size: 14px;
-            background-color: #ff5500;
-            color: white;
-            line-height: 26px;
-            border: none;
         }
 
         .create-option-track {

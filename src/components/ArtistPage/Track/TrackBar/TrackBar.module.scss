@@ -190,6 +190,7 @@
   }
   .trackName {
     line-height: 18px;
+    width: 200px;
     color: #666666;
     span {
       cursor: pointer;
@@ -198,7 +199,7 @@
   .listenEngagement {
     height: 24px;
     width: 25px;
-    margin-left: 150px;
+    margin-left: 50px;
     svg {
       font-size: 13px;
     }

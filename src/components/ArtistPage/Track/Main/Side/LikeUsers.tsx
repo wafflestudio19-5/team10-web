@@ -39,7 +39,7 @@ const LikeUsers = ({
           <BsSuitHeartFill />
           <span>{likersCount} likes</span>
         </div>
-        <span className={styles.viewAll}>View all</span>
+        {/* <span className={styles.viewAll}>View all</span> */}
       </div>
       <div className={styles.userImages}>
         {trackLikers.map((liker, index) => {

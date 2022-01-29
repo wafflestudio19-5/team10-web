@@ -18,6 +18,7 @@ const Track = ({ track, artist }: { track: ITrack; artist: IArtist }) => {
     trackIsPlaying,
     audioPlayer,
     setTrackBarPlaylist,
+    setTrackBarPlaylistId,
     setPlayingTime,
     setAudioSrc,
     setTrackBarArtist,
@@ -37,6 +38,7 @@ const Track = ({ track, artist }: { track: ITrack; artist: IArtist }) => {
   const togglePlayButton = () => {
     if (track) {
       setTrackBarPlaylist([]);
+      setTrackBarPlaylistId(undefined);
       if (!play) {
         if (headerTrackSrc !== barTrackSrc) {
           setPlayingTime(0);

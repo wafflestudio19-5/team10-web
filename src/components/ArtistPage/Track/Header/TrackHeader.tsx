@@ -45,6 +45,7 @@ const TrackHeader = ({
     setTrackBarArtist,
     setTrackBarTrack,
     setTrackBarPlaylist,
+    setTrackBarPlaylistId,
     trackBarPlaylist,
   } = useTrackContext();
   // presigned url이 같은 트랙이더라도 뒷부분이 달라져서 앞부분만 비교하기 위함
@@ -113,6 +114,7 @@ const TrackHeader = ({
         ) === undefined
       ) {
         setTrackBarPlaylist([]);
+        setTrackBarPlaylistId(undefined);
       }
       setAudioSrc(track.audio); // 콘텍스트에 오디오 src 담음
       setTrackIsPlaying(true); // 재생

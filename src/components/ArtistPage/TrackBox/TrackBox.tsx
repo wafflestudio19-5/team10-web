@@ -12,29 +12,36 @@ import "./TrackBox.scss";
 function TrackBox({
   item,
   artistName,
-  myId,
   user,
   currentPlay,
   setCurrentPlay,
   myPlaylist,
   modalPage,
   getMyPlaylist,
+  myImage,
 }: any) {
-  const { userSecret } = useAuthContext();
+  const { userSecret, userInfo } = useAuthContext();
   const history = useHistory();
 
+  // 유저가 해당 트랙에 좋아요 / 리포스트를 눌렀는지
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [reposted, setReposted] = useState<boolean>(false);
+  // 댓글, 좋아요, 리포스트 값
   const [comment, setComment] = useState<string>("");
   const [likes, setLikes] = useState<number>(item.like_count);
   const [reposts, setReposts] = useState<number>(item.repost_count);
 
+  // 노래 재생 라이브러리
   const player = useRef<any>();
+  // 재생중인지
   const [isPlaying, setIsPlaying] = useState<boolean>();
+  // 현재 재생하고 있는 트랙
   const [current, setCurrent] = useState<any>(0);
 
+  // add to playlist 모달
   const [playlistModal2, setPlaylistModal2] = useState<boolean>(false);
 
+  // 좋아요 누르기
   const likeTrack = async () => {
     const config: any = {
       method: "post",
@@ -52,6 +59,7 @@ function TrackBox({
     }
   };
 
+  // 좋아요 취소
   const unlikeTrack = async () => {
     const config: any = {
       method: "delete",
@@ -69,6 +77,7 @@ function TrackBox({
     }
   };
 
+  // 리포스트 누르기
   const repostTrack = async () => {
     const config: any = {
       method: "post",
@@ -86,6 +95,7 @@ function TrackBox({
     }
   };
 
+  // 리포스트 취소
   const unrepostTrack = async () => {
     const config: any = {
       method: "delete",
@@ -103,6 +113,7 @@ function TrackBox({
     }
   };
 
+  // 댓글 작성
   const postComment = (e: any) => {
     if (e.key === "Enter") {
       if (comment !== "") {
@@ -134,10 +145,16 @@ function TrackBox({
   useEffect(() => {
     player.current.audio.current.pause();
 
+    // 유저가 트랙에 좋아요를 누른 적 있는지
     const getIsLiking = (id: any) => {
       axios.get(`/users/${id}/likes/tracks`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -153,10 +170,16 @@ function TrackBox({
       });
     };
 
+    // 유저가 트랙을 리포스트한 적 있는지
     const getReposted = (id: any) => {
       axios.get(`/users/${id}/reposts/tracks`).then((res) => {
         const pages = Array.from(
-          { length: Math.floor(res.data.count / 10) + 1 },
+          {
+            length:
+              res.data.count % 10 !== 0
+                ? Math.floor(res.data.count / 10) + 1
+                : Math.floor(res.data.count / 10),
+          },
           (_, i) => i + 1
         );
         pages.map((page) => {
@@ -248,6 +271,7 @@ function TrackBox({
       : setBarPlaying(true);
   };
 
+  // 노래 재생
   const playMusic = (e: any) => {
     if (trackBarTrack.id === item.id) {
       if (trackBarPlaylist !== []) {
@@ -272,6 +296,7 @@ function TrackBox({
     }
   };
 
+  // 노래 일시정지
   const pauseMusic = (e: any) => {
     setCurrentPlay(null);
     setCurrent(player.current.audio.current.currentTime);
@@ -280,12 +305,14 @@ function TrackBox({
     handlePlay(e);
   };
 
+  // 재생 시점을 이동했을 경우 (페이지의 재생바)
   const moveTrackBar = () => {
     const seeked = player.current.audio.current.currentTime;
     setCurrent(seeked);
     audioPlayer.current.currentTime = seeked;
   };
 
+  // 하단바에서 재생시점을 이동했을 경우
   const seekPlayer = () => {
     player.current.audio.current.currentTime = seekTime;
   };
@@ -392,12 +419,16 @@ function TrackBox({
           seek
         </button>
         <div className={"comment"}>
-          {user.image_profile === null && (
+          {userInfo.profile_img === undefined && (
+            <img src={myImage ? myImage : "/default_user_image.png"} alt="me" />
+          )}
+          {userInfo.profile_img === null && (
             <img src="/default_user_image.png" alt="me" />
           )}
-          {user.image_profile !== null && (
-            <img src={user.image_profile} alt="me" />
-          )}
+          {userInfo.profile_img !== undefined &&
+            userInfo.profile_img !== null && (
+              <img src={userInfo.profile_img} alt="me" />
+            )}
           <input
             placeholder={"Write a comment and Press Enter"}
             value={comment}
@@ -460,7 +491,6 @@ function TrackBox({
               item={item}
               modalPage={modalPage}
               getMyPlaylist={getMyPlaylist}
-              myId={myId}
               artistName={artistName}
             />
             {/* <button>
