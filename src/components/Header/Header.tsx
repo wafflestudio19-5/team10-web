@@ -111,6 +111,13 @@ function Header() {
 
   const submitSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
+    if (
+      searchInput?.trim().length === 0 ||
+      searchInput === null ||
+      searchInput === undefined
+    ) {
+      return toast.error("검색어를 입력해주세요");
+    }
     return history.push(`/search?text=${searchInput}`);
   };
 
