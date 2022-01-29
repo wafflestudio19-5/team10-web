@@ -148,9 +148,10 @@ const SearchPage = () => {
   };
 
   useEffect(() => {
-    if (item === null) {
+    if (item === null || item.trim().length <= 1) {
       setNoParams(true);
       setNoResults(true);
+      toast.error("두 글자 이상의 검색어를 입력해주세요");
     } else {
       setNoParams(false);
       //   searchTracks(false);
