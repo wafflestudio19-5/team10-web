@@ -61,33 +61,10 @@ const SocialLogin = ({
         toast.error("회원가입 실패");
       });
   };
-  const responseFacebook = (response: any) => {
-    axios({
-      method: "put",
-      url: "/socialaccount", // /socialaccount 로 바꿔야함
-      data: {
-        email: response.email,
-        name: response.name,
-      },
-    })
-      .then(async (res) => {
-        localStorage.setItem("permalink", res.data.permalink); // 민석님이 제안하신대로 로컬스토리지에 저장하도록 했습니다!
-        localStorage.setItem("jwt_token", res.data.token);
-        localStorage.setItem("id", res.data.id);
-        cookies.set("is_logged_in", true, {
-          path: "/",
-          expires: new Date(Date.now() + 1000 * 3600 * 12),
-        });
-        setUserSecret({
-          id: res.data.id,
-          permalink: res.data.permalink,
-          jwt: res.data.token,
-        });
-        history.push("/discover");
-      })
-      .catch(() => {
-        toast.error("회원가입 실패");
-      });
+  const responseFacebook = () => {
+    toast.error(
+      "개인정보처리방침 url을 만들지 못해서, 아직 구현이 안됐습니다. 죄송합니다 ㅠㅠ"
+    );
   };
 
   return (
@@ -113,12 +90,8 @@ const SocialLogin = ({
         />
         <FacebookLogin
           appId="465809628243999" //현재 테스트 appId, 배포 할때 바꿔야 함 //바꿈
-          onFail={() => {
-            toast.error("소셜 로그인에 실패하였습니다");
-          }}
-          onProfileSuccess={responseFacebook}
-          render={(renderProps) => (
-            <button onClick={renderProps.onClick} className="socialLogin">
+          render={() => (
+            <button onClick={responseFacebook} className="socialLogin">
               <BsFacebook className="facebook" />
               &nbsp;&nbsp; Login with Facebook
             </button>
