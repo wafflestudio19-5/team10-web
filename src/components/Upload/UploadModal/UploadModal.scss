@@ -1,6 +1,7 @@
 .upload-modal {
   width: 800px;
-  height: 700px;
+  height: fit-content;
+  min-height: 720px;
   border: 1px solid #f2f2f2;
   margin: auto;
   margin-top: 30px;
@@ -179,6 +180,7 @@
 
     button {
       margin-top: 30px;
+      margin-bottom: 30px;
     }
 
     .cancel-button {

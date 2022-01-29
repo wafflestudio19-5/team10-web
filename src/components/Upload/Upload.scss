@@ -1,5 +1,7 @@
 .uploadpage-wrapper {
     width: 100vw;
+    min-height: 100vh;
+    height: fit-content;
     background-color: #f2f2f2;
 
   .uploadpage {
@@ -7,6 +9,8 @@
     width: 1240px;
     background-color: white;
     margin-top: 46px;
-    height: calc(100vh - 46px);
+    min-height: 100vh;
+    height: fit-content;
+    padding-bottom: 80px;
   }
 }

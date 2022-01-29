@@ -18,6 +18,7 @@ function TrackBox({
   myPlaylist,
   modalPage,
   getMyPlaylist,
+  myImage,
 }: any) {
   const { userSecret, userInfo } = useAuthContext();
   const history = useHistory();
@@ -341,11 +342,13 @@ function TrackBox({
   // 하단바에서 해당 노래가 재생되고 있을 경우 연동
   useEffect(() => {
     if (trackBarTrack.id === item.id) {
-      setIsPlaying(true);
-      player.current.audio.current.currentTime =
-        audioPlayer.current.currentTime;
-      player.current.audio.current.play();
-      setCurrentPlay(item.id);
+      if (trackIsPlaying) {
+        setIsPlaying(true);
+        player.current.audio.current.currentTime =
+          audioPlayer.current.currentTime;
+        player.current.audio.current.play();
+        setCurrentPlay(item.id);
+      }
     }
   }, []);
 
@@ -429,12 +432,16 @@ function TrackBox({
           seek
         </button>
         <div className={"comment"}>
+          {userInfo.profile_img === undefined && (
+            <img src={myImage ? myImage : "/default_user_image.png"} alt="me" />
+          )}
           {userInfo.profile_img === null && (
             <img src="/default_user_image.png" alt="me" />
           )}
-          {userInfo.profile_img !== null && (
-            <img src={userInfo.profile_img} alt="me" />
-          )}
+          {userInfo.profile_img !== undefined &&
+            userInfo.profile_img !== null && (
+              <img src={userInfo.profile_img} alt="me" />
+            )}
           <input
             placeholder={"Write a comment and Press Enter"}
             value={comment}

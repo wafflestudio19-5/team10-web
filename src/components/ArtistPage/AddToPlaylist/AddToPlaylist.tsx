@@ -21,7 +21,6 @@ function AddToPlaylist({
   const [pTitle, setPTitle] = useState<any>();
   const [pPrivate, setPPrivate] = useState<boolean>(false);
 
-  // 서버 일시오류가 있는 것 같으니 나중에 다시 해보기 (500에러)
   const addToPlaylist = (id: any) => {
     axios
       .post(
@@ -38,8 +37,11 @@ function AddToPlaylist({
       .then(() => {
         toast("플레이리스트에 추가 완료");
       })
-      .catch(() => {
+      .catch((err) => {
         toast("플레이리스트에 추가 실패");
+        if (err.response.data.error === "이미 셋에 추가된 트랙이 있습니다.") {
+          toast("❗️ 이미 추가되어있는 플레이리스트입니다.");
+        }
       });
   };
 

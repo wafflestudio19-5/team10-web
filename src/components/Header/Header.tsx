@@ -100,12 +100,12 @@ function Header() {
     history.push("/logout");
   };
 
-  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
-    currentTarget,
-  }) => {
-    currentTarget.onerror = null;
-    currentTarget.src = "/default_user_image.png";
-  };
+  // const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+  //   currentTarget,
+  // }) => {
+  //   currentTarget.onerror = null;
+  //   currentTarget.src = "/default_user_image.png";
+  // };
 
   const onSearchInputChange: React.ChangeEventHandler<HTMLInputElement> = (
     event
@@ -168,38 +168,43 @@ function Header() {
                       <img src={userInfo.profile_img} alt={"user"} />
                     )}
                     {userInfo.profile_img === null && (
-                      <img
-                        src="/default_user_image.png"
-                        alt={"user"}
-                        onError={onImageError}
-                      />
+                      <img src="/default_user_image.png" alt={"hhh"} />
                     )}
                     <text>{userInfo.display_name}</text>
                   </div>
                 )}
                 {userInfo.permalink === undefined && (
                   <div>
-                    {me.profileImg && (
+                    {me.profileImg !== null && me.profileImg !== undefined && (
                       <div>
-                        <img src={me.profile_img} alt={"user"} />
+                        <img src={me.profile_img} alt={"hhh"} />
                         <text>{me.display_name}</text>
                       </div>
                     )}
-                    {!me.profileImg && (
-                      <div>
-                        <img src="/default_user_image.png" alt={"user"} />
-                        <text>{me.display_name}</text>
-                      </div>
-                    )}
+                    {me.profileImg === null ||
+                      (me.profileImg === undefined && (
+                        <div>
+                          <img src="/default_user_image.png" alt={"hhh"} />
+                          <text>{me.display_name}</text>
+                        </div>
+                      ))}
                   </div>
                 )}
               </button>
               <ul className="dropdown-menu">
                 <li>
-                  {userInfo !== undefined && (
+                  {userInfo.permalink !== undefined && (
                     <a
                       className="dropdown-item"
                       onClick={() => history.push(`/${userInfo.permalink}`)}
+                    >
+                      Profile
+                    </a>
+                  )}
+                  {userInfo.permalink === undefined && (
+                    <a
+                      className="dropdown-item"
+                      onClick={() => history.push(`/${me.permalink}`)}
                     >
                       Profile
                     </a>

@@ -4,7 +4,7 @@ import "./PlaylistTrack.scss";
 function PlaylistTrack({ item, selectedFiles, newFiles, setNewFiles }: any) {
   const trackTitle = selectedFiles[item].name.substr(
     0,
-    selectedFiles[item].name.indexOf(".")
+    selectedFiles[item].name.lastIndexOf(".")
   );
   const [title, setTitle] = useState<string>(trackTitle);
 

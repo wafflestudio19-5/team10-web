@@ -4,15 +4,17 @@ import toast from "react-hot-toast";
 import { useAuthContext } from "../../../context/AuthContext";
 import "./UploadPlaylistModal.scss";
 // import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// import "react-datepicker/dist/react-datepicker.css";
+import { TagsInput } from "react-tag-input-component";
 import PlaylistTrack from "./PlaylistTrack/PlaylistTrack";
 
 function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const { userSecret } = useAuthContext();
-  const [error, setError] = useState<boolean>(false);
 
   const permalink = userSecret.permalink;
   const trackNum = Array.from({ length: selectedFiles.length }, (_, i) => i);
+  const [uploaded, setUploaded] = useState<boolean>(false);
+  const [uploads, setUploads] = useState<any>([]);
 
   const [imageUrl, setImageUrl] = useState<any>(null);
   const [imageFile, setImageFile] = useState<any>(null);
@@ -23,7 +25,7 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
   const [listPermalink, setListPermalink] = useState<string>("");
   const [genre, setGenre] = useState<string | undefined>();
   const [customGenre, setCustomGenre] = useState<any>();
-  const [tag, setTag] = useState<any>();
+  const [tags, setTags] = useState<any>();
   // const [date, setDate] = useState(new Date());
 
   const [newFiles, setNewFiles] = useState<any>(selectedFiles);
@@ -51,22 +53,112 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
     setListPermalink(event.target.value);
   };
 
-  const deleteErrorSet = (id: any, token: any) => {
+  const deleteErrorSet = (id: any) => {
     axios.delete(`https://api.soundwaffle.com/sets/${id}`, {
-      headers: { Authorization: `JWT ${token}` },
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
     });
   };
 
-  const deleteErrorTrack = (id: any, token: any) => {
+  const deleteErrorTrack = (id: any) => {
     axios.delete(`https://api.soundwaffle.com/tracks/${id}`, {
-      headers: { Authorization: `JWT ${token}` },
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+    });
+  };
+
+  const handleTracksUpload = (e: any) => {
+    e.preventDefault();
+    // 개별 track 만들기
+    const tracks = Array.from({ length: selectedFiles.length }, (_, i) => i);
+    tracks.map((item: number) => {
+      axios
+        .post(
+          "https://api.soundwaffle.com/tracks",
+          {
+            title:
+              newFiles[item].name.lastIndexOf(".") === -1
+                ? newFiles[item].name
+                : newFiles[item].name.substr(
+                    0,
+                    newFiles[item].name.lastIndexOf(".")
+                  ),
+            permalink:
+              "play" + Math.floor(Math.random() * (100000000 - 100 + 1)) + 100,
+            is_private: isPrivate,
+            audio_extension: selectedFiles[item].name.substr(
+              -selectedFiles[item].name.length +
+                selectedFiles[item].name.lastIndexOf(`.`) +
+                1
+            ),
+          },
+          {
+            headers: {
+              Authorization: `JWT ${userSecret.jwt}`,
+            },
+          }
+        )
+        .then((res2) => {
+          const music_options = {
+            headers: {
+              "Content-Type": selectedFiles[item].type,
+            },
+          };
+          // S3에 음악파일 업로드
+          axios
+            .put(
+              res2.data.audio_presigned_url,
+              selectedFiles[item],
+              music_options
+            )
+            .then(() => {
+              toast(`✅ ${item + 1}번째 트랙 업로드 성공`);
+              setUploads((item: any) => [...item, { id: res2.data.id }]);
+              setUploaded(true);
+            })
+            .catch(() => {
+              toast(`❗️ ${item + 1}번째 음악파일 업로드 실패`);
+              deleteErrorTrack(res2.data.id);
+            });
+        })
+        .catch((err) => {
+          if (
+            err.response.data.permalink &&
+            err.response.data.permalink[0] ===
+              `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
+          ) {
+            toast(
+              `❗️ ${item + 1}번째 트랙 제목을 변경해주세요.
+              트랙 제목은 띄어쓰기 없이 영어 / 숫자만 가능합니다`
+            );
+          }
+          if (
+            err.response.data.permalink &&
+            err.response.data.permalink[0] ===
+              "Ensure this field has at least 3 characters."
+          ) {
+            toast(
+              `❗️ ${item + 1}번째 트랙 제목을 변경해주세요.
+              트랙 제목은 3글자 이상이어야 합니다.`
+            );
+          }
+          if (
+            err.response.data.non_field_errors &&
+            err.response.data.non_field_errors[0] ===
+              "Already existing permalink for the requested user."
+          ) {
+            toast(
+              `❗️ ${item + 1}번째 트랙 제목을 변경해주세요.
+              트랙 제목이 중복되었습니다.`
+            );
+          }
+          if (err.response.status === 500) {
+            toast("❗️ 서버오류");
+          }
+        });
     });
   };
 
   const handlePlaylistUpload = (e: any) => {
     e.preventDefault();
-    const myToken = localStorage.getItem("jwt_token");
-
     // set 만들기
     axios
       .post(
@@ -77,17 +169,17 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           type: playlistType,
           description: description,
           genre_input: genre === "custom" ? customGenre : undefined,
-          tags_input: tag ? [tag] : undefined,
+          tags_input: tags !== [] ? tags : undefined,
           is_private: isPrivate,
           image_extension: imageFile
             ? imageFile.name.substr(
-                -imageFile.name.length + imageFile.name.indexOf(`.`) + 1
+                -imageFile.name.length + imageFile.name.lastIndexOf(`.`) + 1
               )
             : undefined,
         },
         {
           headers: {
-            Authorization: `JWT ${myToken}`,
+            Authorization: `JWT ${userSecret.jwt}`,
           },
         }
       )
@@ -103,116 +195,61 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           axios
             .put(res1.data.image_presigned_url, imageFile, img_options)
             .catch(() => {
-              toast("❗️ 이미지파일 업로드 실패");
+              toast("❗️ 이미지 업로드 실패");
             });
         }
 
-        // 개별 track 만들기
-        const tracks = Array.from(
-          { length: selectedFiles.length },
-          (_, i) => i
-        );
-        tracks.map((item: number) => {
-          axios
-            .post(
-              "https://api.soundwaffle.com/tracks",
-              {
-                title: newFiles[item].name,
-                permalink:
-                  newFiles[item].name.indexOf(".") === -1 && listPermalink
-                    ? listPermalink + "_" + newFiles[item].name
-                    : newFiles[item].name.indexOf(".") === -1 && !listPermalink
-                    ? title + "_" + newFiles[item].name
-                    : newFiles[item].name.indexOf(".") !== -1 && listPermalink
-                    ? listPermalink +
-                      "_" +
-                      newFiles[item].name.substr(
-                        0,
-                        newFiles[item].name.indexOf(".")
-                      )
-                    : title +
-                      "_" +
-                      newFiles[item].name.substr(
-                        0,
-                        newFiles[item].name.indexOf(".")
-                      ),
-                is_private: isPrivate,
-                audio_extension: selectedFiles[item].name.substr(
-                  -selectedFiles[item].name.length +
-                    selectedFiles[item].name.indexOf(`.`) +
-                    1
-                ),
+        // set에 트랙 추가하기
+        axios
+          .post(
+            `https://api.soundwaffle.com/sets/${res1.data.id}/tracks`,
+            {
+              track_ids: uploads,
+            },
+            {
+              headers: {
+                Authorization: `JWT ${userSecret.jwt}`,
               },
-              {
-                headers: {
-                  Authorization: `JWT ${myToken}`,
-                },
-              }
-            )
-            .then((res2) => {
-              const music_options = {
-                headers: {
-                  "Content-Type": selectedFiles[item].type,
-                },
-              };
-              // S3에 음악파일 업로드
-              axios
-                .put(
-                  res2.data.audio_presigned_url,
-                  selectedFiles[item],
-                  music_options
-                )
-                .then(() => {
-                  // set에 트랙 추가하기
-                  axios
-                    .post(
-                      `https://api.soundwaffle.com/sets/${res1.data.id}/tracks`,
-                      {
-                        track_ids: [{ id: res2.data.id }],
-                      },
-                      {
-                        headers: {
-                          Authorization: `JWT ${myToken}`,
-                        },
-                      }
-                    )
-                    .then(() => {
-                      toast("플레이리스트 업로드 성공");
-                      setPlaylistModal(false);
-                    })
-                    .catch(() => {
-                      toast("set에 추가 실패");
-                    });
-                })
-                .catch(() => {
-                  toast("❗️ 음악파일 업로드 실패");
-                  deleteErrorTrack(res2.data.id, myToken);
-                  setError(true);
-                  if (!error) {
-                    deleteErrorSet(res1.data.id, myToken);
-                  }
-                });
-            })
-            .catch(() => {
-              toast("업로드 실패");
-              toast(`❗️ ${item + 1} 번째 트랙 제목을 변경해주세요.`);
-              setError(true);
-              if (!error) {
-                deleteErrorSet(res1.data.id, myToken);
-              }
-            });
-        });
+            }
+          )
+          .then(() => {
+            toast("✅ 플레이리스트 업로드 완료");
+            setPlaylistModal(false);
+          })
+          .catch(() => {
+            deleteErrorSet(res1.data.id);
+          });
       })
       .catch((err) => {
         toast("업로드 실패");
         if (title === "") {
-          toast("❗️플레이리스트 제목을 입력하세요.");
+          toast("❗️ 플레이리스트 제목을 입력하세요.");
         }
         if (
+          err.response.data.non_field_errors &&
           err.response.data.non_field_errors[0] ===
-          "Already existing set permalink for the requested user."
+            "Already existing set permalink for the requested user."
         ) {
-          toast("❗️ 플레이리스트 주소가 중복되었습니다.");
+          toast("❗️ 플레이리스트 url이 중복되었습니다.");
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            `Enter a valid "slug" consisting of letters, numbers, underscores or hyphens.`
+        ) {
+          toast(
+            "❗️ 플레이리스트 url은 띄어쓰기 없이 영어 / 숫자만 가능합니다"
+          );
+        }
+        if (
+          err.response.data.permalink &&
+          err.response.data.permalink[0] ===
+            "Ensure this field has at least 3 characters."
+        ) {
+          toast("❗️ 플레이리스트 url은 3글자 이상이어야 합니다.");
+        }
+        if (err.response.status === 500) {
+          toast("❗️ 서버오류");
         }
       });
   };
@@ -226,12 +263,60 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
         <div>Advanced</div>
       </div>
 
+      <div className="upload-tracks-for-playlist-privacy">
+        <div className="upload-tracks-for-playlist">Tracks</div>
+        <div className="upload-info-privacy">
+          <text>Privacy:</text>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="flexRadioDefault2"
+              onChange={() => setIsPrivate(false)}
+            />
+            <label className="form-check-label">Public (default)</label>
+          </div>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="flexRadioDefault"
+              id="flexRadioDefault1"
+              onChange={() => setIsPrivate(true)}
+            />
+            <label className="form-check-label">Private</label>
+          </div>
+        </div>
+      </div>
+      {trackNum.map((item: number) => (
+        <PlaylistTrack
+          item={item}
+          selectedFiles={selectedFiles}
+          newFiles={newFiles}
+          setNewFiles={setNewFiles}
+        />
+      ))}
+
+      <div className="upload-modal-button-1">
+        <button
+          className="cancel-button"
+          onClick={() => setPlaylistModal(false)}
+        >
+          Cancel
+        </button>
+        <button className="save-button" onClick={handleTracksUpload}>
+          Upload Tracks
+        </button>
+      </div>
+
+      <div className="upload-playlist-for-playlist">Playlist</div>
       <div className="upload-modal-body">
         <div className="upload-image">
           {!imageUrl && (
             <img
               className="upload-track-img"
-              src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Sky.jpg"
+              src="/default_track_image.svg"
               alt="track-img"
             />
           )}
@@ -297,9 +382,11 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
           </div> */}
           <div className="upload-info-tag">
             <text>Additional tags</text>
-            <input
-              placeholder="Add tags to describe the genre and mood of your track"
-              onChange={(e) => setTag(e.target.value)}
+            <TagsInput
+              value={tags}
+              onChange={setTags}
+              name="tags"
+              placeHolder="Describe the genre and mood of your track. (Press Enter)"
             />
           </div>
           <div className="upload-info-description">
@@ -309,52 +396,22 @@ function UploadPlaylistModal({ selectedFiles, setPlaylistModal }: any) {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <div className="upload-info-privacy">
-            <text>Privacy:</text>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="flexRadioDefault"
-                id="flexRadioDefault2"
-                onChange={() => setIsPrivate(false)}
-              />
-              <label className="form-check-label">Public (default)</label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="flexRadioDefault"
-                id="flexRadioDefault1"
-                onChange={() => setIsPrivate(true)}
-              />
-              <label className="form-check-label">Privacy</label>
-            </div>
-          </div>
         </div>
       </div>
 
-      {trackNum.map((item: number) => (
-        <PlaylistTrack
-          item={item}
-          selectedFiles={selectedFiles}
-          newFiles={newFiles}
-          setNewFiles={setNewFiles}
-        />
-      ))}
-
-      <div className="upload-modal-button">
-        <button
-          className="cancel-button"
-          onClick={() => setPlaylistModal(false)}
-        >
-          Cancel
-        </button>
-        <button className="save-button" onClick={handlePlaylistUpload}>
-          Save
-        </button>
-      </div>
+      {uploaded && (
+        <div className="upload-modal-button">
+          <button
+            className="cancel-button"
+            onClick={() => setPlaylistModal(false)}
+          >
+            Cancel
+          </button>
+          <button className="save-button" onClick={handlePlaylistUpload}>
+            Make a Playlist
+          </button>
+        </div>
+      )}
     </div>
   );
 }
