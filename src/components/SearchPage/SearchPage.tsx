@@ -61,6 +61,9 @@ const SearchPage = () => {
     if (genre && withGenre) {
       history.push(`/search?text=${item}&genres[]=${genre}`);
     }
+    if (!withGenre) {
+      setGenre("");
+    }
     if (userSecret.jwt) {
       const search = throttle(async () => {
         const config: any = {
@@ -71,7 +74,9 @@ const SearchPage = () => {
           },
           data: {},
           params: {
-            ...(genre !== undefined && { genres: [genre] }),
+            ...(genre !== undefined &&
+              genre.trim().length !== 0 &&
+              withGenre && { genres: [genre] }),
           },
         };
         try {
@@ -160,6 +165,7 @@ const SearchPage = () => {
       setGenre(urlGenre);
       searchTracks(true);
     } else {
+      setGenre(undefined);
       searchTracks(false);
     }
   }, [item, userSecret.jwt, urlGenre]);
