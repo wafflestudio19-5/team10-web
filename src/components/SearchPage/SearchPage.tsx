@@ -174,7 +174,7 @@ const SearchPage = () => {
     const scrollHeight = document.documentElement.scrollHeight;
     const scrollTop = document.documentElement.scrollTop;
     const clientHeight = document.documentElement.clientHeight;
-    if (scrollTop + clientHeight >= scrollHeight) {
+    if (scrollTop + clientHeight == scrollHeight) {
       // 페이지 끝에 도달하면 추가 데이터를 받아온다
       fetchNextTracks();
     }
