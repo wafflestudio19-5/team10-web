@@ -140,6 +140,20 @@ function ArtistPageAlbums() {
                     setCurrentPlay={setCurrentPlay}
                   />
                 ))}
+              {!albums ||
+                (albums.length === 0 && (
+                  <div className="artistpage-empty">
+                    <img
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAACnBAMAAADd8MzuAAAAJ1BMVEUAAADt7e3v7+/u7u7u7u7v7+/V1dXu7u7v7+/v7+/u7u7u7u7t7e1+coy7AAAADXRSTlMAK4/V8v8GlP29LPOQA9OSagAAAOlJREFUeAHt3CVCBQEUBdCLdxIR3QEkIgvAXRuVRMatswESGVkC68It/jQPOfeP20mjf+Yl6R2dbzgTA0myfTzfeJZ2k+7L+YIsb6VnviQ76auBLzJSA89krAaezX0NvJqXbhrOiwkGg8FgMBgMBoP/E9zV+gpgMBgMBr9MmPq3MBgMBoPB3wb+Hvzd+1MwGAwGf+uDwWDwN/IlLcCfmQKDweDKIxcYDHbvBAaDwWB/hjQAg8FgMLjgfS4wGAwGg30LAwaDwWAwGFxW16euktFDDTyT6xp4v6w+V1lFsroabMnVeNPu7UDyBMXh8J9inpNdAAAAAElFTkSuQmCC"
+                      alt="empty"
+                    />
+                    <div>Seems a little quiet over here</div>
+                    <div>Upload an album to share it with your followers.</div>
+                    {/* <button onClick={() => history.push(`/upload`)}>
+                      Upload now
+                    </button> */}
+                  </div>
+                ))}
               <div ref={ref} className="inView">
                 text
               </div>
