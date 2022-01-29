@@ -9,6 +9,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 function Header() {
+  const [searchInput, setSearchInput] = useState("");
   const history = useHistory();
   const cookies = new Cookies();
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -106,6 +107,32 @@ function Header() {
     currentTarget.src = "/default_user_image.png";
   };
 
+  const onSearchInputChange: React.ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    setSearchInput(event.target.value);
+  };
+
+  const submitSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    if (
+      searchInput?.trim().length === 0 ||
+      searchInput === null ||
+      searchInput === undefined
+    ) {
+      return toast.error("검색어를 입력해주세요");
+    }
+    return history.push(`/search?text=${searchInput}`);
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const item = params.get("text");
+    if (item) {
+      setSearchInput(item);
+    }
+  }, []);
+
   if (isLoading || me === undefined) {
     return <div>Loading...</div>;
   } else {
@@ -115,17 +142,19 @@ function Header() {
           <div className={"header_logo"}>
             <span onClick={() => history.push("/discover")}>logo</span>
           </div>
-
           <div className={"header_menu"}>
             <span onClick={() => history.push("/discover")}>Home</span>
             <span>Stream</span>
             <span onClick={() => history.push("/you/library")}>Library</span>
           </div>
-
-          <div className={"search"}>
-            <input placeholder={"Search"} />
-          </div>
-
+          
+        <form className={"search"} onSubmit={submitSearch}>
+          <input
+            placeholder={"Search"}
+            value={searchInput}
+            onChange={onSearchInputChange}
+          />
+        </form>
           <div className={"upload"}>
             <span onClick={() => history.push("/upload")}>Upload</span>
           </div>
