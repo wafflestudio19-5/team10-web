@@ -16,15 +16,15 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
   const { userSecret } = useAuthContext();
   const history = useHistory();
   const goTrack = () => {
-    history.push(`/${historyTrack.artist.permalink}/${historyTrack.permalink}`);
+    history.push(`/${historyTrack.artist.permalink}/${historyTrack.permalink}`); // trackPage로 가는 함수
   };
   const goArtist = () => {
-    history.push(`/${historyTrack.artist.permalink}`);
+    history.push(`/${historyTrack.artist.permalink}`); // artistPage로 가는 함수
   };
-  const [heart, setHeart] = useState(false);
-  const [repost, setRepost] = useState(false);
-  const [comment, setComment] = useState<string>("");
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [heart, setHeart] = useState(false); // like 유무 state
+  const [repost, setRepost] = useState(false); // repost 유무 state
+  const [comment, setComment] = useState<string>(""); // comment input
+  const [isPlaying, setIsPlaying] = useState<boolean>(false); // track playing 유무
   const [headerTrackDuration, setHeaderTrackDuration] = useState<
     number | undefined
   >(undefined);
@@ -50,6 +50,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
   const barTrackSrc = audioSrc.split("?")[0];
 
   const hitTrack = async (track_id: string | number) => {
+    // hit track 함수
     await axios({
       method: "put",
       url: `tracks/${track_id}/hit`,
@@ -124,7 +125,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
       });
       setIsSameTrack(true);
       audioPlayer.current.src = historyTrack.audio;
-      setTrackBarPlaylist([]);
+      setTrackBarPlaylist([]); // playlist 초기화
       hitTrack(historyTrack.id);
       setTimeout(() => {
         audioPlayer.current.play();
@@ -218,6 +219,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
   }, [audioSrc]);
 
   const handleHeart = async (e: any) => {
+    // like 함수 및, like 후 해당 list track GET 하는 함수
     e.stopPropagation();
     if (heart === false) {
       await axios({
@@ -238,6 +240,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
   };
 
   const repostTrack = async (e: any) => {
+    // repost 하는 함수 및, repost 후 해당 list track GET 하는 함수
     e.stopPropagation();
     if (repost === false) {
       await axios({
@@ -258,6 +261,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
   };
 
   const postComment = (e: any) => {
+    // comment post하는 함수
     if (e.key === "Enter") {
       axios
         .post(
@@ -281,6 +285,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
     }
   };
   const handlePlay = (e: any) => {
+    // playButton handle 하는 함수
     e.stopPropagation();
     togglePlayPause();
     trackBarTrack.id === historyTrack.id
@@ -288,16 +293,19 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
       : setIsPlaying(true);
   };
   useEffect(() => {
+    // like, repost 유무 체크하는 useEffect
     setHeart(historyTrack.is_liked);
     setRepost(historyTrack.is_reposted);
   }, [historyTrack]);
   useEffect(() => {
+    // url 이동할때 trackBar playing 유무 체크 하는 uesEffect
     trackBarTrack.id === historyTrack.id ? null : setIsPlaying(false);
   }, [trackBarTrack, audioSrc]);
   const moveWeb = async () => {
     setIsPlaying(trackIsPlaying);
   };
   const playMusic = () => {
+    // moveWeb관련 함수
     if (trackIsPlaying) {
       audioPlayer.current.play();
       setPlayingTime(audioPlayer.current.currentTime);
@@ -307,6 +315,7 @@ const HistoryItem = ({ historyTrack, userImg, fetchHistoryTracks }: any) => {
     }
   };
   useEffect(() => {
+    // web 이동시 trackBar play상태 가져오는 함수
     trackBarTrack.id === historyTrack.id
       ? moveWeb().then(() => playMusic())
       : null;
