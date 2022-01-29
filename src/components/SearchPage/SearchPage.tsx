@@ -54,11 +54,11 @@ const SearchPage = () => {
   const item = params.get("text");
   const urlGenre = params.get("genres[]");
 
-  const searchTracks = async () => {
+  const searchTracks = async (withGenre: boolean) => {
     if (item?.trim().length === 0 || item === null) {
       return;
     }
-    if (genre) {
+    if (genre && withGenre) {
       history.push(`/search?text=${item}&genres[]=${genre}`);
     }
     if (userSecret.jwt) {
@@ -107,7 +107,7 @@ const SearchPage = () => {
   const genreSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     // setSearchedGenre(genre);
-    searchTracks();
+    searchTracks(true);
   };
 
   const fetchNextTracks = async () => {
@@ -153,10 +153,13 @@ const SearchPage = () => {
       setNoResults(true);
     } else {
       setNoParams(false);
-      searchTracks();
+      //   searchTracks(false);
     }
     if (urlGenre) {
       setGenre(urlGenre);
+      searchTracks(true);
+    } else {
+      searchTracks(false);
     }
   }, [item, userSecret.jwt, urlGenre]);
 

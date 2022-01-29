@@ -116,11 +116,11 @@ function Header() {
   const submitSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     if (
-      searchInput?.trim().length === 0 ||
+      searchInput?.trim().length <= 1 ||
       searchInput === null ||
       searchInput === undefined
     ) {
-      return toast.error("검색어를 입력해주세요");
+      return toast.error("두 글자 이상의 검색어를 입력해주세요");
     }
     return history.push(`/search?text=${searchInput}`);
   };
@@ -132,6 +132,12 @@ function Header() {
       setSearchInput(item);
     }
   }, []);
+
+  useEffect(() => {
+    if (!window.location.href.includes("soundwaffle.com/search")) {
+      setSearchInput("");
+    }
+  }, [window.location.href]);
 
   if (isLoading || me === undefined) {
     return <div>Loading...</div>;
