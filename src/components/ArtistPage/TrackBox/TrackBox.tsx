@@ -352,6 +352,23 @@ function TrackBox({
     }
   }, []);
 
+  useEffect(() => {
+    if (trackBarTrack.id === item.id) {
+      if (isPlaying !== trackIsPlaying) {
+        if (isPlaying) {
+          setCurrentPlay(null);
+          setCurrent(player.current.audio.current.currentTime);
+          setIsPlaying(false);
+          player.current.audio.current.pause();
+        } else {
+          setIsPlaying(true);
+          player.current.audio.current.play();
+          setCurrentPlay(item.id);
+        }
+      }
+    }
+  }, [trackIsPlaying]);
+
   return (
     <div className={"recent-track"}>
       {item.image !== null && (
