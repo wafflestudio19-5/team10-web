@@ -52,14 +52,14 @@ const SearchPage = () => {
   const history = useHistory();
   const params = new URLSearchParams(window.location.search);
   const item = params.get("text");
-  const urlGenre = params.get("genre[]");
+  const urlGenre = params.get("genres[]");
 
   const searchTracks = async () => {
     if (item?.trim().length === 0 || item === null) {
       return;
     }
     if (genre) {
-      history.push(`/search?text=${item}&genre[]=${genre}`);
+      history.push(`/search?text=${item}&genres[]=${genre}`);
     }
     if (userSecret.jwt) {
       const search = throttle(async () => {
