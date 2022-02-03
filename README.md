@@ -1,10 +1,13 @@
 # team10-web
 
+**[SoundWaffle](https://www.soundwaffle.com)** 
+
 - 클론한 서비스: **`SoundCloud`**
 - 배포: `AWS S3` + `Cloudfront`
 - 라이브러리는 **`React`**, 언어는 `Typescript` 사용
 
 - 주요 기능:
+  - 회원가입, 로그인, 로그아웃할 수 있음(12시간동안 자동 로그인)
   - 음악을 감상하고 `like`, `repost` 하거나 아티스트를 `follow`할  수 있음
   - 음악이나 플레이리스트를 사진과 함께 업로드하고 수정할 수 있음
   - 최근 감상한 음악과 플레이리스트, `like`, `repost`,  `follow`한 내역을 확인할 수 있음
