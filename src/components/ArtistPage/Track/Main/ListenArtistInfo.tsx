@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "./ListenArtistInfo.module.scss";
 import { BsPeopleFill } from "react-icons/bs";
 import { IoStatsChart } from "react-icons/io5";
@@ -6,98 +6,105 @@ import { RiUserFollowFill, RiUserUnfollowLine } from "react-icons/ri";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
-import { IArtist, IUserMe } from "../TrackPage";
+import { IArtist, ITrack, IUserMe } from "../TrackPage";
+import toast from "react-hot-toast";
 
-interface IArtistInfo {
-  image: null | string;
-  followers: number;
-  tracks: number;
-}
+// interface IArtistInfo {
+//   image: null | string;
+//   followers: number;
+//   tracks: number;
+// }
 export interface IFollowings {
   id: number;
 }
 const ListenArtistInfo = ({
   artist,
-  userMe,
+  //   userMe,
   isMyTrack,
+  //   setArtist,
+  track,
+  fetchTrack,
 }: {
   artist: IArtist;
   userMe: IUserMe;
   isMyTrack: boolean | undefined;
+  setArtist: React.Dispatch<React.SetStateAction<IArtist>>;
+  track: ITrack;
+  fetchTrack: () => void;
 }) => {
-  const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
-    image: null,
-    followers: 0,
-    tracks: 0,
-  });
-  const [followArtist, setFollowArtist] = useState(false);
-  const [followLoading, setFollowLoading] = useState(true);
+  //   const [artistInfo, setArtistInfo] = useState<IArtistInfo>({
+  //     image: null,
+  //     followers: 0,
+  //     tracks: 0,
+  //   });
+  //   const [followArtist, setFollowArtist] = useState(false);
+  //   const [followLoading, setFollowLoading] = useState(true);
 
   const { userSecret } = useAuthContext();
 
   const history = useHistory();
   const { permalink, display_name } = artist;
   const clickUsername = () => history.push(`/${permalink}`);
-  const clickFollowers = () => history.push(`/${permalink}/followers`);
-  const clickTracks = () => history.push(`/${permalink}/tracks`);
+  //   const clickFollowers = () => history.push(`/${permalink}/followers`);
+  //   const clickTracks = () => history.push(`/${permalink}/tracks`);
 
-  const fetchArtist = async () => {
-    if (artist.id !== 0) {
-      const config: any = {
-        method: "get",
-        url: `/users/${artist.id}`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const response = await axios(config);
-        const data = response.data;
-        setArtistInfo({
-          image: data.image_profile,
-          followers: data.follower_count,
-          tracks: data.track_count,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-  const isFollowing = async () => {
-    if (artist.id !== 0 && userMe.id !== 0) {
-      const followConfig: any = {
-        method: "get",
-        url: `/users/${userMe.id}/followings`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const { data } = await axios(followConfig);
-        if (data.results.length === 0) {
-          setFollowLoading(false);
-        } else {
-          const trackExist = data.results.find(
-            (following: IFollowings) => following.id === artist.id
-          );
-          if (trackExist) {
-            setFollowArtist(true);
-          }
-          setFollowLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-  useEffect(() => {
-    fetchArtist();
-  }, [artist]);
-  useEffect(() => {
-    isFollowing();
-  }, [userMe, userSecret]);
+  //   const fetchArtist = async () => {
+  //     if (artist.id !== 0) {
+  //       const config: any = {
+  //         method: "get",
+  //         url: `/users/${artist.id}`,
+  //         headers: {
+  //           Authorization: `JWT ${userSecret.jwt}`,
+  //         },
+  //         data: {},
+  //       };
+  //       try {
+  //         const response = await axios(config);
+  //         const data = response.data;
+  //         setArtist({
+  //           ...artist,
+
+  //           follower_count: data.follower_count,
+  //         });
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   };
+  //   const isFollowing = async () => {
+  //     if (artist.id !== 0 && userMe.id !== 0) {
+  //       const followConfig: any = {
+  //         method: "get",
+  //         url: `/users/${userMe.id}/followings`,
+  //         headers: {
+  //           Authorization: `JWT ${userSecret.jwt}`,
+  //         },
+  //         data: {},
+  //       };
+  //       try {
+  //         const { data } = await axios(followConfig);
+  //         if (data.results.length === 0) {
+  //           setFollowLoading(false);
+  //         } else {
+  //           const trackExist = data.results.find(
+  //             (following: IFollowings) => following.id === artist.id
+  //           );
+  //           if (trackExist) {
+  //             setFollowArtist(true);
+  //           }
+  //           setFollowLoading(false);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   };
+  //   //   useEffect(() => {
+  //   //     fetchArtist();
+  //   //   }, [artist]);
+  //   useEffect(() => {
+  //     isFollowing();
+  //   }, [userMe, userSecret]);
 
   const followUser = async () => {
     const config: any = {
@@ -109,13 +116,11 @@ const ListenArtistInfo = ({
       data: {},
     };
     try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(true);
-        fetchArtist();
-      }
+      await axios(config);
+      fetchTrack();
     } catch (error) {
       console.log(error);
+      toast.error("유저를 팔로우하는데 실패했습니다");
     }
   };
   const unfollowUser = async () => {
@@ -128,21 +133,27 @@ const ListenArtistInfo = ({
       data: {},
     };
     try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(false);
-        fetchArtist();
-      }
+      await axios(config);
+      fetchTrack();
     } catch (error) {
       console.log(error);
+      toast.error("유저를 언팔로우하는데 실패했습니다");
     }
+  };
+
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
   };
 
   return (
     <div className={styles.main}>
       <div className={styles.profileImg} onClick={clickUsername}>
         <img
-          src={artistInfo.image || "/default_user_image.png"}
+          src={artist.image_profile || "/default_user_image.png"}
+          onError={onImageError}
           alt={`${artist.display_name}의 프로필 사진`}
         />
       </div>
@@ -150,26 +161,34 @@ const ListenArtistInfo = ({
         {display_name}
       </div>
       <ul className={styles.userInfo}>
-        <li onClick={clickFollowers}>
+        <li
+        // onClick={clickFollowers}
+        >
           <BsPeopleFill />
-          <span>{artistInfo.followers}</span>
+          <span>{artist.follower_count}</span>
         </li>
-        <li onClick={clickTracks}>
+        <li
+        // onClick={clickTracks}
+        >
           <IoStatsChart />
-          <span>{artistInfo.tracks}</span>
+          <span>{artist.track_count}</span>
         </li>
       </ul>
-      {isMyTrack === false && followArtist && (
-        <button className={styles.unfollowArtist} onClick={unfollowUser}>
+      {isMyTrack === false && track.is_followed && (
+        <button
+          className={styles.unfollowArtist}
+          onClick={unfollowUser}
+          disabled={track.is_followed === undefined}
+        >
           <RiUserUnfollowLine />
           <span>Following</span>
         </button>
       )}
-      {isMyTrack === false && !followArtist && (
+      {isMyTrack === false && track.is_followed === false && (
         <button
           className={styles.followArtist}
           onClick={followUser}
-          disabled={followLoading}
+          disabled={track.is_followed === undefined}
         >
           <RiUserFollowFill />
           <span>Follow</span>

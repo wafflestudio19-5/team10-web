@@ -1,6 +1,6 @@
 import styles from "./LikeItem.module.scss";
 import { IoMdPlay, IoMdPause } from "react-icons/io";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsFillPlayFill, BsThreeDots } from "react-icons/bs";
 import { BiRepost } from "react-icons/bi";
 import { AiFillHeart } from "react-icons/ai";
@@ -8,6 +8,9 @@ import { FaCommentAlt } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { useAuthContext } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
+import { useTrackContext } from "../../../context/TrackContext";
+// import toast from "react-hot-toast";
 
 const LikeItems = ({
   userPermal,
@@ -15,30 +18,59 @@ const LikeItems = ({
   title,
   img,
   artist,
-  count,
+  play_count,
   like,
   comment,
   repost,
   trackId,
+  setLikeList,
+  setLikeCount,
+  togglePlayPause,
+  track,
+  playMusic,
+  setNewTrackList,
+  setMostTrackList,
 }: {
   userPermal: string;
   trackPermal: string;
   title: string;
   img: string;
   artist: string;
-  count: number;
+  play_count: number;
   like: number;
   comment: number;
   repost: number;
   trackId: number;
+  setLikeList: any;
+  setLikeCount: any;
+  togglePlayPause: any;
+  track: any;
+  playMusic: any;
+  setNewTrackList: any;
+  setMostTrackList: any;
 }) => {
   const [play, setPlay] = useState(false);
   const [heart, setHeart] = useState(true);
   const history = useHistory();
   const { userSecret } = useAuthContext();
-  const handlePlay = () => {
-    setPlay(!play);
+  const { trackIsPlaying, trackBarTrack } = useTrackContext();
+  const handlePlay = (e: any) => {
+    e.stopPropagation();
+    togglePlayPause(track, track.artist);
+    trackBarTrack.id === trackId ? setPlay(!trackIsPlaying) : setPlay(true);
   };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? null : setPlay(false);
+  }, [trackBarTrack]);
+  const moveWeb = async () => {
+    setPlay(true);
+  };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? moveWeb().then(() => playMusic()) : null;
+  }, []);
+  useEffect(() => {
+    trackBarTrack.id === trackId ? setPlay(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
   const goArtistPage = () => {
     history.push(`/${userPermal}`);
   };
@@ -62,6 +94,38 @@ const LikeItems = ({
       });
       setHeart(!heart);
     }
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/likes/tracks`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    })
+      .then((res) => {
+        setLikeCount(res.data.count);
+        setLikeList(res.data.results);
+      })
+      .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
+    axios({
+      method: "get",
+      url: "/tracks",
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    })
+      .then((r: any) => {
+        const mostList = r.data.results.slice(0, 4);
+        const newList = r.data.results.slice(-6);
+        setMostTrackList(mostList);
+        setNewTrackList(newList);
+      })
+      .catch(() => toast.error("트랙 정보 불러오기를 실패하였습니다"));
+  };
+  const clickDots = (e: any) => {
+    e.stopPropagation();
+    toast.error("아직 구현되지 않은 기능입니다");
   };
   return (
     <div className={styles.itemWrapper}>
@@ -69,8 +133,8 @@ const LikeItems = ({
         {img === null ? (
           <svg
             className={styles.track}
-            width="220"
-            height="220"
+            width="45"
+            height="45"
             viewBox="0 0 220 220"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +188,7 @@ const LikeItems = ({
         <div className={styles.counts}>
           <div className={styles.playCount}>
             <BsFillPlayFill />
-            &nbsp; {count}
+            &nbsp; {play_count}
           </div>
           <div className={styles.likeCount}>
             <AiFillHeart />
@@ -151,7 +215,7 @@ const LikeItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              <BsThreeDots className={styles.details} />
+              <BsThreeDots className={styles.details} onClick={clickDots} />
             </div>
           </>
         ) : (
@@ -164,7 +228,7 @@ const LikeItems = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              <BsThreeDots className={styles.details} />
+              <BsThreeDots className={styles.details} onClick={clickDots} />
             </div>
           </>
         )}

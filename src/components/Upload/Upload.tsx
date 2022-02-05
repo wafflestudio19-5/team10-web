@@ -3,20 +3,32 @@ import UploadHeader from "./UploadHeader/UploadHeader";
 import UploadBox from "./UploadBox/UploadBox";
 import { useState } from "react";
 import UploadModal from "./UploadModal/UploadModal";
+import UploadPlaylistModal from "./UploadPlaylistModal/UploadPlaylistModal";
 
 function Upload() {
   const [modal, setModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [playlistModal, setPlaylistModal] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<any>();
 
   return (
     <div className={"uploadpage-wrapper"}>
       <div className={"uploadpage"}>
         <UploadHeader />
-        {!modal && (
-          <UploadBox setModal={setModal} setSelectedFile={setSelectedFile} />
+        {!modal && !playlistModal && (
+          <UploadBox
+            setModal={setModal}
+            setPlaylistModal={setPlaylistModal}
+            setSelectedFiles={setSelectedFiles}
+          />
         )}
         {modal && (
-          <UploadModal selectedFile={selectedFile} setModal={setModal} />
+          <UploadModal selectedFile={selectedFiles} setModal={setModal} />
+        )}
+        {playlistModal && (
+          <UploadPlaylistModal
+            selectedFiles={selectedFiles}
+            setPlaylistModal={setPlaylistModal}
+          />
         )}
       </div>
     </div>

@@ -1,0 +1,215 @@
+.playlistModal2 {
+    background-color: rgb(242, 242, 242, 0.9);
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.playlistModal-section {
+    width: 550px;
+    height: fit-content;
+    max-height: 550px;
+    min-height: 200px;
+    margin: auto;
+    background-color: white;
+    animation: modal-show .3s;
+    overflow-y: auto;
+
+    .playlistModal-header {
+        width: 500px;
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 25px;
+        border-bottom: 1px solid #f2f2f2;
+        font-size: 24px;
+
+        .playlistModal-header-left {
+            display: flex;
+
+            div {
+                margin-right: 20px;
+
+                &:hover {
+                    border-bottom: 2px solid #333;
+                }
+            }
+
+            .true {
+                color: #ff5500;
+                border-bottom: 2px solid #ff5500;
+            }
+        }
+
+        .playlistModal-header-close-button {
+            height: 26px;
+            line-height: 26px;
+            font-size: 14px;
+            color: white;
+            background-color: #ff5500;
+            border: none;
+        }
+    }
+
+    .each-playlist {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 500px;
+        margin-left: 25px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #f2f2f2;
+
+        .each-playlist-left {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+
+            .each-playlist-image {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+            }
+
+            .each-playlist-title {
+                font-size: 12px;
+            }
+
+            .each-playlist-count {
+                font-size: 11px;
+                display: flex;
+                align-items: center;
+
+                img {
+                    width: 16px;
+                    height: 12px;
+                }
+            }
+      }
+
+      .add-to-playlist {
+        width: 112px;
+        height: 26px;
+        font-size: 14px;
+        line-height: 26px;
+        margin-bottom: 10px;
+      }
+      
+    }
+
+    .add-to-playlist-empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        margin-top: 60px;
+    }
+
+    .create-option {
+        width: 500px;
+        margin-left: 25px;
+        
+        .create-option-title {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .create-option-input {
+            width: 500px;
+            height: 26px;
+            margin-bottom: 20px;
+        }
+
+        .create-option-privacy-save {
+            width: 500px;
+            height: 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
+            .create-a-playlist-save-button {
+                width: 53px;
+                height: 26px;
+                font-size: 14px;
+                background-color: #ff5500;
+                color: white;
+                line-height: 26px;
+                border: none;
+            }
+        }
+
+        .create-option-privacy {
+            display: flex;
+            align-items: center;
+        }
+
+        .privacy-text {
+            font-size: 12px;
+            line-height: 26px;
+            margin-right: 10px;
+        }
+
+        .form-check {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+
+            input {
+                margin-right: 5px;
+            }
+
+            label {
+                margin-right: 5px;
+                line-height: 26px;
+            }
+        }
+
+        .create-option-track {
+            height: 31px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #f2f2f2;
+            margin-bottom: 20px;
+            
+            img {
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .artistName {
+                margin-right: 5px;
+            }
+        }
+    }
+}
+
+.open {
+    display: flex;
+    align-items: center;
+    animation: modal-bg-show .3s;
+}
+
+@keyframes modal-show {
+    from {
+        opacity: 0;
+        margin-top: -50px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0;
+    }
+}
+
+@keyframes modal-bg-show {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

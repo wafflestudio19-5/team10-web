@@ -1,0 +1,107 @@
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  background-color: rgba(223, 223, 223, 0.8);
+  transition: opacity 0.5s;
+  /* 모달 창 */
+  section {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 377px;
+    width: 600px;
+    box-sizing: border-box;
+    background-color: white;
+    padding: 25px;
+  }
+  /* 모달이 열린 상태인 경우 */
+  &.openModal {
+    opacity: 1;
+    pointer-events: initial;
+  }
+  /* 모달이 닫힌 상태인 경우 */
+  &.closedModal {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+.closeButton {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+.trackInfo {
+  height: 32px;
+  width: 550px;
+  font-size: 22px;
+  border-bottom: 1px solid lightgray;
+}
+.buttons {
+  margin-top: 20px;
+  border-top: 1px solid lightgray;
+  padding: 20px 0;
+  text-align: right;
+  .cancelButton {
+    width: 55px;
+    height: 26px;
+    line-height: 26px;
+    background-color: white;
+    color: #333;
+    border: none;
+  }
+  .saveButton {
+    width: 55px;
+    height: 26px;
+    line-height: 26px;
+    background-color: #ff5500;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    margin-left: 10px;
+  }
+}
+.tagInput {
+  width: 550px;
+  height: 145px;
+  box-sizing: border-box;
+  margin: 32px 0 10px 0;
+  .tagLabel {
+    margin-bottom: 8px;
+    font: 12px/1.4 Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda,
+      Verdana, Tahoma, sans-serif;
+    color: #333;
+  }
+  textarea {
+    padding: 2px 7px;
+    width: 550px;
+    height: 120px;
+  }
+}
+.checkboxContainer {
+  display: inline-block;
+  .private,
+  .public,
+  .noModify {
+    display: inline-flex;
+    align-items: center;
+    input {
+      margin-right: 5px;
+    }
+    span {
+      margin-right: 15px;
+    }
+  }
+}
+.privacy {
+  font: 12px/1.4 Lucida Grande, Lucida Sans Unicode, Lucida Sans, Garuda,
+    Verdana, Tahoma, sans-serif;
+  color: #333;
+  margin: 20px 0 6px 0;
+}

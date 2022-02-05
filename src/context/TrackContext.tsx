@@ -1,25 +1,39 @@
 import React, { createContext, useContext, useRef, useState } from "react";
-import { IArtist, ITrack } from "../components/ArtistPage/Track/TrackPage";
+import {
+  ITrackBarArtist,
+  ITrackBarPlaylist,
+  ITrackBarTrack,
+} from "../components/ArtistPage/Track/TrackBar/TrackBar";
+// import { IArtist } from "../components/ArtistPage/Track/TrackPage";
 
-// 토큰 타입 지정
 interface ITrackContext {
   trackDuration: number; // 현재 재생되고 있는 트랙 길이
   setTrackDuration: React.Dispatch<React.SetStateAction<number>>;
-  trackIsPlaying: boolean; // 현재 트랙이 재생되고 있는지
+  trackIsPlaying: boolean; // 현재 트랙이 재생되고 있는지 아닌지(재생/일시정지 여부)
   setTrackIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   playingTime: number; // 현재 재생되고 있는 시점(재생되고 있는 트랙 페이지일 경우 트랙페이지 플레이어와 하단 바 플레이어 싱크를 맞추기 위함)
   setPlayingTime: React.Dispatch<React.SetStateAction<number>>;
-  audioPlayer: any; // 현재 재생되고 있는 오디오 -- 이거를 하단 바와 다른 곳에 있는 플레이어에 동시 적용하는 방식을 생각해보았습니다
-  audioSrc: string; // 오디오 src
+  audioPlayer: any; // 현재 재생되고 있는 오디오 -- 이거를 하단 바와 다른 곳에 있는 플레이어에 동시 적용하는 방식입니다(실제 재생되는 오디오는 하나(ArtistPage > Track > Audio > AudioTag.tsx에서))
+  audioSrc: string; // 현재 오디오 src(결과적으로는 audioPlayer.current.src와 같습니다)
   setAudioSrc: React.Dispatch<React.SetStateAction<string>>;
   isMuted: boolean; // 음소거 여부
   setIsMuted: React.Dispatch<React.SetStateAction<boolean>>;
-  loop: boolean;
+  loop: boolean; // 반복재생 여부
   setLoop: React.Dispatch<React.SetStateAction<boolean>>;
-  trackBarArtist: IArtist;
-  setTrackBarArtist: React.Dispatch<React.SetStateAction<IArtist>>;
-  trackBarTrack: ITrack;
-  setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrack>>;
+  trackBarArtist: ITrackBarArtist; // 재생 트랙 아티스트 정보
+  setTrackBarArtist: React.Dispatch<React.SetStateAction<ITrackBarArtist>>;
+  trackBarTrack: ITrackBarTrack; // 재생 트랙 정보
+  setTrackBarTrack: React.Dispatch<React.SetStateAction<ITrackBarTrack>>;
+  trackBarPlaylist: ITrackBarPlaylist[]; // 재생 플레이리스트 담는 곳
+  setTrackBarPlaylist: React.Dispatch<
+    React.SetStateAction<ITrackBarPlaylist[]>
+  >;
+  seekTime: number;
+  setSeekTime: React.Dispatch<React.SetStateAction<number>>;
+  trackBarPlaylistId: number | undefined;
+  setTrackBarPlaylistId: React.Dispatch<
+    React.SetStateAction<number | undefined>
+  >;
 }
 
 const TrackContext = createContext<ITrackContext>({
@@ -38,8 +52,8 @@ const TrackContext = createContext<ITrackContext>({
   setLoop: () => Boolean,
   trackBarArtist: {
     display_name: "",
-    country: "",
-    city: "",
+    // country: "",
+    // city: "",
     id: 0,
     permalink: "",
   },
@@ -49,19 +63,21 @@ const TrackContext = createContext<ITrackContext>({
     title: "",
     permalink: "",
     audio: "",
-    comment_count: 0,
-    count: 0,
-    created_at: "",
-    description: "",
-    genre: null,
     image: "",
-    like_count: 0,
-    repost_count: 0,
-    tags: [],
-    is_private: false,
-    audio_length: 0,
+    // like_count: 0,
+    // repost_count: 0,
+    // comment_count: 0,
+    // genre: "",
+    // count: 0,
+    // is_private: false,
   },
   setTrackBarTrack: () => {},
+  trackBarPlaylist: [],
+  setTrackBarPlaylist: () => [],
+  seekTime: 0,
+  setSeekTime: () => Number,
+  trackBarPlaylistId: undefined,
+  setTrackBarPlaylistId: () => Number,
 });
 
 export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
@@ -75,30 +91,24 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
   const [audioSrc, setAudioSrc] = useState<ITrackContext["audioSrc"]>("");
   const [isMuted, setIsMuted] = useState(false);
   const [loop, setLoop] = useState(false);
-  const [trackBarArtist, setTrackBarArtist] = useState<IArtist>({
+  const [trackBarArtist, setTrackBarArtist] = useState<ITrackBarArtist>({
     display_name: "",
-    country: "",
-    city: "",
     id: 0,
     permalink: "",
   });
-  const [trackBarTrack, setTrackBarTrack] = useState<ITrack>({
+  const [trackBarTrack, setTrackBarTrack] = useState<ITrackBarTrack>({
     id: 0,
     title: "",
     permalink: "",
     audio: "",
-    comment_count: 0,
-    count: 0,
-    created_at: "",
-    description: "",
-    genre: null,
     image: "",
-    like_count: 0,
-    repost_count: 0,
-    tags: [],
-    is_private: false,
-    audio_length: 0,
   });
+  const [trackBarPlaylist, setTrackBarPlaylist] = useState<ITrackBarPlaylist[]>(
+    []
+  );
+  const [seekTime, setSeekTime] = useState<ITrackContext["seekTime"]>(0);
+  const [trackBarPlaylistId, setTrackBarPlaylistId] =
+    useState<ITrackContext["trackBarPlaylistId"]>();
 
   return (
     <TrackContext.Provider
@@ -120,6 +130,12 @@ export const TrackProvider = ({ children }: { children: React.ReactNode }) => {
         setTrackBarArtist,
         trackBarTrack,
         setTrackBarTrack,
+        trackBarPlaylist,
+        setTrackBarPlaylist,
+        seekTime,
+        setSeekTime,
+        trackBarPlaylistId,
+        setTrackBarPlaylistId,
       }}
     >
       {children}

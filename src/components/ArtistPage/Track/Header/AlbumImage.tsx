@@ -13,11 +13,18 @@ const AlbumImage = ({
   trackHeader: React.Ref<HTMLDivElement>;
 }) => {
   const imgRef = useRef(null);
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
+  };
   return (
     <div className={styles.albumImage} onClick={openModal}>
       <img
         ref={imgRef}
-        src={track.image || "/default.track_image.svg"}
+        src={track.image || "/default_track_image.svg"}
+        onError={onImageError}
         alt={`${track.title}의 트랙 이미지`}
         crossOrigin="anonymous"
         onLoad={() => {

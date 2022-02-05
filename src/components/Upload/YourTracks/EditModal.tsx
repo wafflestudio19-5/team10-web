@@ -30,8 +30,11 @@ const EditModal = ({
   const [description, setDescription] = useState<string>("");
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [tPermalink, setTPermalink] = useState<string>("");
-  const [tags, setTags] = useState<string[]>([]);
+  //   const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState<string>("");
   const [permalinkList, setPermalinkList] = useState<ITrackPermalink[]>([]);
+  const [genre, setGenre] = useState<string | null | undefined>(null);
+  const [customGenre, setCustomGenre] = useState<any>();
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -39,8 +42,15 @@ const EditModal = ({
     setTPermalink(track.permalink);
     setDescription(track.description);
     setIsPrivate(track.is_private);
-    setTags(track.tags);
+    // setTags(track.tags);
     setImageUrl(track.image);
+    setTagInput(track.tags.join(", "));
+    if (track.genre?.name !== "None" && track.genre !== null) {
+      setGenre("custom");
+      setCustomGenre(track.genre?.name);
+    } else {
+      setGenre(track.genre?.name);
+    }
   }, [track]);
 
   const openFileSelector = (event: any) => {
@@ -79,6 +89,10 @@ const EditModal = ({
     }
   };
 
+  const changeGenre = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setGenre(event.target.value);
+  };
+
   useEffect(() => {
     const getPermalinks = async () => {
       if (userSecret.jwt) {
@@ -109,6 +123,10 @@ const EditModal = ({
     }
   };
 
+  const changeTags = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTagInput(event.target.value);
+  };
+
   const onSaveChanges = async () => {
     // if (
     //   !title ||
@@ -118,6 +136,11 @@ const EditModal = ({
     //   toast.error("제목과 링크를 확인해 주세요");
     //   return;
     // }
+    if (!/^[0-9a-zA-Z_-]+$/g.test(tPermalink)) {
+      return toast.error(
+        `링크에는 숫자, 알파벳 소문자와 대문자, -, _ 만 사용해 주세요.`
+      );
+    }
     let config: any;
     if (imageFile) {
       config = {
@@ -131,9 +154,41 @@ const EditModal = ({
           permalink: tPermalink,
           description: description,
           is_private: isPrivate,
-          image_filename: imageFile.name,
+          image_extension: imageFile.name.split(".").at(-1),
+          ...(tagInput
+            ? {
+                tags_input: tagInput.replace(/,/g, "").split(" "),
+              }
+            : { tags_input: [] }),
+          genre_input: genre === "custom" ? customGenre : null,
         },
       };
+      try {
+        const { data } = await axios(config);
+        if (data) {
+          fetchYourTracks();
+          setModal(false);
+          try {
+            await axios.put(data.image_presigned_url, imageFile, {
+              headers: {
+                "Content-Type": imageFile.type,
+              },
+            });
+            // console.log(response);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      } catch (error) {
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 400
+        ) {
+          toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+        }
+        toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+      }
     } else {
       config = {
         method: "patch",
@@ -146,30 +201,55 @@ const EditModal = ({
           permalink: tPermalink,
           description: description,
           is_private: isPrivate,
+          ...(tagInput
+            ? {
+                tags_input: tagInput.replace(/,/g, "").split(" "),
+              }
+            : { tags_input: [] }),
+          genre_input: genre === "custom" ? customGenre : null,
         },
       };
-    }
-    try {
-      const response = await axios(config);
-      if (response) {
-        fetchYourTracks();
-        setModal(false);
+      try {
+        const response = await axios(config);
+        if (response) {
+          fetchYourTracks();
+          setModal(false);
+        }
+      } catch (error) {
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.status === 400
+        ) {
+          toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+        } else {
+          toast.error("트랙 업데이트에 실패했습니다.");
+        }
       }
-    } catch (error) {
-      if (
-        axios.isAxiosError(error) &&
-        error.response &&
-        error.response.status === 400
-      ) {
-        toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
-      }
-      console.log(error);
     }
+    // try {
+    //   const response = await axios(config);
+    //   if (response) {
+    //     fetchYourTracks();
+    //     setModal(false);
+    //   }
+    // } catch (error) {
+    //   if (
+    //     axios.isAxiosError(error) &&
+    //     error.response &&
+    //     error.response.status === 400
+    //   ) {
+    //     toast.error("잘못된 요청입니다. 제목과 링크를 확인해주세요.");
+    //   }
+    //   console.log(error);
+    // }
   };
 
+  const closeModal = () => setModal(false);
+
   return (
-    <div className={styles.modalWrapper} onClick={() => setModal(false)}>
-      <div className={styles.closeButton} onClick={() => setModal(false)}>
+    <div className={styles.modalWrapper} onClick={closeModal}>
+      <div className={styles.closeButton} onClick={closeModal}>
         <GrClose />
       </div>
       <div
@@ -202,41 +282,50 @@ const EditModal = ({
               <img src="https://a-v2.sndcdn.com/assets/images/camera-2d93bb05.svg" />
               <div>Upload image</div>
             </button>
-            <input
-              type="file"
-              accept="impge/png"
-              onChange={handleImageInput}
-              ref={imageRef}
-            />
+            <input type="file" onChange={handleImageInput} ref={imageRef} />
           </div>
           <div className={styles["upload-info"]}>
             <div className={styles["upload-info-title"]}>
-              <text>Title</text>
+              <label>Title</label>
               <input value={title} onChange={changeTitle} />
               <div className={styles["upload-info-permalink"]}>
                 <div>{`soundcloud.com/${userSecret.permalink}/`}</div>
                 <input value={tPermalink} onChange={changeTrackPermalink} />
               </div>
             </div>
-            <div className={styles["upload-info-genre"]}>
-              <text>Genre</text>
-              <select>
-                <option value="None">None</option>
-                <option value="Custom">Custom</option>
-              </select>
+            <div className={styles["uplaod-info-genre-custom"]}>
+              <div className={styles["upload-info-genre"]}>
+                <label>Genre</label>
+                <select
+                  onChange={(event) => changeGenre(event)}
+                  value={genre || "None"}
+                >
+                  <option value="None">None</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              {genre === "custom" && (
+                <div className={styles["upload-info-genre"]}>
+                  <text>Custom Genre</text>
+                  <input
+                    onChange={(e) => setCustomGenre(e.target.value)}
+                    value={customGenre}
+                  />
+                </div>
+              )}
             </div>
             <div className={styles["upload-info-tag"]}>
-              <text>Additional tags</text>
+              <label>Additional tags</label>
               <input
+                value={tagInput}
                 placeholder={
-                  tags.length !== 0
-                    ? ""
-                    : "Add tags to describe the genre and mood of your track"
+                  "Add tags to describe the genre and mood of your track"
                 }
+                onChange={changeTags}
               />
             </div>
             <div className={styles["upload-info-description"]}>
-              <text>Description</text>
+              <label>Description</label>
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
@@ -267,7 +356,7 @@ const EditModal = ({
                   onChange={() => setIsPrivate(true)}
                 />
                 <label className={styles["form-check-label"]}>
-                  &nbsp;Privacy
+                  &nbsp;Private
                 </label>
               </div>
             </div>

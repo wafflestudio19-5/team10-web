@@ -1,3 +1,4 @@
+import React, { useCallback } from "react";
 import styles from "./TrackBar.module.scss";
 import {
   IoPlaySkipBackSharp,
@@ -7,32 +8,68 @@ import {
   IoShuffleSharp,
 } from "react-icons/io5";
 import { BiRepeat } from "react-icons/bi";
-import { BsFillSuitHeartFill } from "react-icons/bs";
+// import { BsFillSuitHeartFill } from "react-icons/bs";
 import {
-  RiUserFollowFill,
-  RiUserUnfollowFill,
+  //   RiUserFollowFill,
+  //   RiUserUnfollowFill,
   RiVolumeMuteFill,
 } from "react-icons/ri";
 import { MdVolumeUp, MdPlaylistPlay } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useTrackContext } from "../../../../context/TrackContext";
+import toast from "react-hot-toast";
+import { AiOutlineClose } from "react-icons/ai";
 import { useAuthContext } from "../../../../context/AuthContext";
+import { IoMdPause, IoMdPlay } from "react-icons/io";
+import { shuffle, throttle } from "lodash";
 import axios from "axios";
-import { IFollowings } from "../Main/ListenArtistInfo";
-import { ILikeTrack } from "../Main/ListenEngagement";
+// import { useAuthContext } from "../../../../context/AuthContext";
+// import axios from "axios";
+// import { IFollowings } from "../Main/ListenArtistInfo";
+// import { ILikeTrack } from "../Main/ListenEngagement";
 // import throttle from "lodash/throttle";
 
 // import axios from "axios";
 
-const TrackBar = () => {
-  const [likeTrack, setLikeTrack] = useState<boolean | undefined>(undefined);
-  const [followArtist, setFollowArtist] = useState<boolean | undefined>(
-    undefined
-  );
-  const [likeLoading, setLikeLoading] = useState(true);
-  const [followLoading, setFollowLoading] = useState(true);
+export interface ITrackBarTrack {
+  id: number;
+  title: string;
+  permalink: string;
+  audio: string;
+  image: string | null;
+  //   like_count: number;
+  //   repost_count: number;
+  //   comment_count: number;
+  //   genre: string | null;
+  //   count: number;
+  //   is_private: boolean;
+}
+export interface ITrackBarArtist {
+  display_name: string;
+  id: number;
+  permalink: string;
+}
+export interface ITrackBarPlaylist {
+  id: number;
+  title: string;
+  permalink: string;
+  audio: string;
+  image: string | null;
+  artist: number;
+  artist_display_name: string;
+  artist_permalink: string;
+}
 
+const TrackBar = () => {
+  //   const [likeTrack, setLikeTrack] = useState<boolean | undefined>(undefined);
+  //   const [followArtist, setFollowArtist] = useState<boolean | undefined>(
+  //     undefined
+  //   );
+  //   const [likeLoading, setLikeLoading] = useState(true);
+  //   const [followLoading, setFollowLoading] = useState(true);
+  const { userSecret } = useAuthContext();
+  const [nextup, setNextup] = useState(false);
   const {
     trackDuration,
     trackIsPlaying,
@@ -47,8 +84,14 @@ const TrackBar = () => {
     setLoop,
     trackBarArtist,
     trackBarTrack,
+    setTrackBarTrack,
+    setTrackBarPlaylist,
+    setTrackBarArtist,
+    setAudioSrc,
+    trackBarPlaylist,
+    setSeekTime,
   } = useTrackContext();
-  const { userSecret } = useAuthContext();
+  //   const { userSecret } = useAuthContext();
 
   const history = useHistory();
 
@@ -109,27 +152,38 @@ const TrackBar = () => {
     }
   }, [trackIsPlaying]);
 
-  const changePlayerCurrentTime = () => {
-    if (progressBar.current && audioPlayer.current) {
-      progressBar.current.value = audioPlayer.current.currentTime;
-      // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
-      progressBar.current.style.setProperty(
-        "--seek-before-width",
-        `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
-      );
-    }
-    setPlayingTime(audioPlayer.current.currentTime);
-  };
+  const changePlayerCurrentTime = useCallback(
+    throttle(() => {
+      if (progressBar.current && audioPlayer.current) {
+        progressBar.current.value = audioPlayer.current.currentTime;
+        // 재생 바에 슬라이더가 있는 곳까지 색을 바꾸기 위함
+        progressBar.current.style.setProperty(
+          "--seek-before-width",
+          `${(audioPlayer.current.currentTime / trackDuration) * 100}%`
+        );
+        setPlayingTime(audioPlayer.current.currentTime);
+      } else if (progressBar.current) {
+        setPlayingTime(0);
+        progressBar.current.value = 0;
+        progressBar.current.style.setProperty("--seek-before-width", `0%`);
+      }
+    }, 30000),
+    [playingTime]
+  );
 
   useEffect(() => {
     changePlayerCurrentTime();
   }, [playingTime]);
 
   const onPlayerClick = () => {
+    audioPlayer.current.pause();
     // 재생 바 아무곳이나 누르면 일시정지 상태였더라도 재생되도록 함
-    setTrackIsPlaying(true);
     setPlayingTime(progressBar.current.value);
-    audioPlayer.current.play();
+    setSeekTime(progressBar.current.value);
+    setTrackIsPlaying(true);
+    setTimeout(() => {
+      audioPlayer.current.play();
+    }, 10);
     barAnimationRef.current = requestAnimationFrame(whilePlaying);
   };
 
@@ -155,193 +209,179 @@ const TrackBar = () => {
     history.push(`/${trackBarArtist.permalink}/${trackBarTrack.permalink}`);
   };
 
-  const isLikeTrack = async () => {
-    if (userSecret.id !== 0 && trackBarTrack.id !== 0) {
-      const config: any = {
-        method: "get",
-        url: `/users/${userSecret.id}/likes/tracks`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        // like 트랙 목록 받아오기
-        const likeTracks = await axios(config);
-        if (likeTracks.data.results.length === 0) {
-          setLikeLoading(false);
-          setLikeTrack(false);
-        } else {
-          const trackExist = likeTracks.data.results.find(
-            (likeTrack: ILikeTrack) => likeTrack.id === trackBarTrack.id
-          );
-          if (trackExist) {
-            setLikeTrack(true);
-          } else {
-            setLikeTrack(false);
-          }
-          setLikeLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+  const nextTrack = async () => {
+    if (trackBarPlaylist.length === 0) {
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
     }
+    const current = trackBarPlaylist.findIndex(
+      (track) => track.id === trackBarTrack.id
+    );
+    if (current === trackBarPlaylist.length - 1) {
+      return toast.error("다음 트랙이 없습니다");
+    }
+    audioPlayer.current.pause();
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setTrackBarTrack(trackBarPlaylist[current + 1]);
+    setTrackBarArtist({
+      display_name: trackBarPlaylist[current + 1].artist_display_name,
+      id: trackBarPlaylist[current + 1].artist,
+      permalink: trackBarPlaylist[current + 1].artist_permalink,
+    });
+    audioPlayer.current.src = trackBarPlaylist[current + 1].audio;
+    setAudioSrc(trackBarPlaylist[current + 1].audio);
+    audioPlayer.current.load();
+    audioPlayer.current.pause();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
   };
 
-  const isFollowing = async () => {
-    if (trackBarArtist.id !== 0 && userSecret.id !== 0) {
-      const followConfig: any = {
-        method: "get",
-        url: `/users/${trackBarArtist.id}/followers`,
-        headers: {
-          Authorization: `JWT ${userSecret.jwt}`,
-        },
-        data: {},
-      };
-      try {
-        const { data } = await axios(followConfig);
-        if (data.results.length === 0) {
-          setFollowLoading(false);
-          setFollowArtist(false);
-        } else {
-          const trackExist = data.results.find(
-            (follower: IFollowings) => follower.id === userSecret.id
-          );
-          console.log(trackExist, "esatt");
-          if (trackExist) {
-            setFollowArtist(true);
-          } else {
-            setFollowArtist(false);
-          }
-          setFollowLoading(false);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+  const prevTrack = async () => {
+    if (trackBarPlaylist.length === 0) {
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
     }
+    const current = trackBarPlaylist.findIndex(
+      (track) => track.id === trackBarTrack.id
+    );
+    if (current === 0) {
+      return toast.error("이전 트랙이 없습니다");
+    }
+    audioPlayer.current.pause();
+    setPlayingTime(0);
+    setTrackIsPlaying(true);
+    setTrackBarTrack(trackBarPlaylist[current - 1]);
+    setTrackBarArtist({
+      display_name: trackBarPlaylist[current - 1].artist_display_name,
+      id: trackBarPlaylist[current - 1].artist,
+      permalink: trackBarPlaylist[current - 1].artist_permalink,
+    });
+    audioPlayer.current.src = trackBarPlaylist[current - 1].audio;
+    setAudioSrc(trackBarPlaylist[current - 1].audio);
+    audioPlayer.current.load();
+    audioPlayer.current.pause();
+    setTimeout(() => {
+      audioPlayer.current.play();
+      barAnimationRef.current = requestAnimationFrame(whilePlaying);
+    }, 1);
   };
+
   useEffect(() => {
-    isLikeTrack();
-    isFollowing();
-  }, [trackBarTrack]);
-
-  const onLikeTrack = async () => {
-    const config: any = {
-      method: "post",
-      url: `/likes/tracks/${trackBarTrack.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setLikeTrack(true);
+    if (audioPlayer.current?.ended) {
+      if (trackBarPlaylist.length === 0) return;
+      if (
+        audioPlayer.current.src ===
+        trackBarPlaylist[trackBarPlaylist.length - 1].audio
+      ) {
+        setTrackBarTrack(trackBarPlaylist[0]);
+        audioPlayer.current.src = trackBarPlaylist[0].audio;
+        setPlayingTime(0);
+        return;
       }
-    } catch (error) {
-      console.log(error);
+      nextTrack();
     }
-  };
-  const unlikeTrack = async () => {
-    const config: any = {
-      method: "delete",
-      url: `/likes/tracks/${trackBarTrack.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setLikeTrack(false);
-      }
-    } catch (error) {
-      console.log(error);
+  }, [playingTime]);
+
+  const shuffleTracks = () => {
+    if (trackBarPlaylist.length === 0) {
+      return toast.error(
+        "해당 기능은 플레이리스트를 재생했을 때 사용할 수 있습니다"
+      );
+    }
+    const currentIndex = trackBarPlaylist.findIndex(
+      (track) => track.id === trackBarTrack.id
+    );
+    if (currentIndex < trackBarPlaylist.length - 2) {
+      const prevTracks = trackBarPlaylist.slice(0, currentIndex + 1);
+      const nextTracks = trackBarPlaylist.slice(
+        currentIndex + 1,
+        trackBarPlaylist.length
+      );
+      const shuffled = shuffle(nextTracks);
+      const newPlaylist = prevTracks.concat(shuffled);
+      setTrackBarPlaylist(newPlaylist);
     }
   };
 
-  const onFollowArtist = async () => {
-    const config: any = {
-      method: "post",
-      url: `/users/me/followings/${trackBarArtist.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
-    };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(true);
+  const toggleNextup = () => setNextup(!nextup);
+
+  useEffect(() => {
+    const getLastTrack = async () => {
+      if (userSecret.id != 0) {
+        const config: any = {
+          method: "get",
+          url: `/users/${userSecret.id}/history/tracks`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          const { data } = await axios(config);
+          if (data.count != 0) {
+            const track = data.results[0];
+            setTrackBarTrack({
+              id: track.id,
+              title: track.title,
+              permalink: track.permalink,
+              audio: track.audio,
+              image: track.image,
+            });
+            setAudioSrc(track.audio);
+            setTrackBarArtist({
+              id: track.artist.id,
+              permalink: track.artist.permalink,
+              display_name: track.artist.display_name,
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error("마지막으로 들었던 트랙 정보를 불러올 수 없습니다");
+        }
       }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const unfollowArtist = async () => {
-    const config: any = {
-      method: "delete",
-      url: `/users/me/followings/${trackBarArtist.id}`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {},
     };
-    try {
-      const response = await axios(config);
-      if (response) {
-        setFollowArtist(false);
+    getLastTrack();
+  }, [userSecret.id]);
+
+  useEffect(() => {
+    const putHit = async () => {
+      if (trackIsPlaying && userSecret.jwt) {
+        const config: any = {
+          method: "put",
+          url: `/tracks/${trackBarTrack.id}/hit`,
+          headers: {
+            Authorization: `JWT ${userSecret.jwt}`,
+          },
+          data: {},
+        };
+        try {
+          await axios(config);
+        } catch (error) {
+          console.log(error);
+        }
       }
-    } catch (error) {
-      console.log(error);
-    }
+    };
+    putHit();
+  }, [audioPlayer.current?.src, userSecret.jwt]);
+
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_track_image.svg";
   };
-
-  console.log();
-
-  //   const nextTrack = () => {
-  //     setPlayingTime(0);
-  //     setTrackIsPlaying(true);
-  //     setAudioSrc(
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-  //     );
-  //     audioPlayer.current.src =
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
-
-  //     audioPlayer.current.load();
-  //     setTimeout(() => {
-  //       audioPlayer.current.play();
-  //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
-  //     }, 1);
-  //   };
-
-  //   const prevTrack = () => {
-  //     setPlayingTime(0);
-  //     setTrackIsPlaying(true);
-  //     setAudioSrc(
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-  //     );
-  //     audioPlayer.current.src =
-  //       "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-
-  //     audioPlayer.current.load();
-  //     setTimeout(() => {
-  //       audioPlayer.current.play();
-  //       barAnimationRef.current = requestAnimationFrame(whilePlaying);
-  //     }, 1);
-  //   };
 
   return (
     <>
       {!!audioSrc.length && (
         <div className={styles.container}>
           <div className={styles.main}>
-            <button
-              className={styles.previousTrack}
-              // onClick={prevTrack}
-            >
+            <button className={styles.previousTrack} onClick={prevTrack}>
               <IoPlaySkipBackSharp />
             </button>
             {trackIsPlaying ? (
@@ -353,13 +393,10 @@ const TrackBar = () => {
                 <IoPlaySharp />
               </button>
             )}
-            <button
-              className={styles.nextTrack}
-              // onClick={nextTrack}
-            >
+            <button className={styles.nextTrack} onClick={nextTrack}>
               <IoPlaySkipForwardSharp />
             </button>
-            <button className={styles.shuffle}>
+            <button className={styles.shuffle} onClick={shuffleTracks}>
               <IoShuffleSharp />
             </button>
             <button
@@ -399,7 +436,8 @@ const TrackBar = () => {
             )}
             <div className={styles.trackInfo}>
               <img
-                src={trackBarTrack.image || "/default.track_image.svg"}
+                src={trackBarTrack.image || "/default_track_image.svg"}
+                onError={onImageError}
                 alt={`${trackBarArtist.display_name}의 ${trackBarTrack.title} 트랙 이미지`}
               />
               <div className={styles.artistTrackName}>
@@ -410,7 +448,7 @@ const TrackBar = () => {
                   <span>{trackBarTrack.title}</span>
                 </div>
               </div>
-              {trackBarArtist.id === userSecret.id || (
+              {/* {trackBarArtist.id === userSecret.id || (
                 <>
                   {likeTrack === true && (
                     <button
@@ -449,15 +487,125 @@ const TrackBar = () => {
                     </button>
                   )}
                 </>
-              )}
-              <button className={`${styles.nextUp} ${styles.listenEngagement}`}>
+              )} */}
+              <button
+                className={`${styles.nextUp} ${styles.listenEngagement}`}
+                onClick={toggleNextup}
+              >
                 <MdPlaylistPlay />
               </button>
             </div>
           </div>
+          {nextup ? (
+            <div className={styles.nextList}>
+              <div className={styles.header}>
+                <div className={styles.panel}>Next up</div>
+                <span onClick={() => setNextup(false)}>
+                  <AiOutlineClose />
+                </span>
+              </div>
+
+              <ul className={styles.trackList}>
+                {trackBarPlaylist.map((track) => {
+                  return (
+                    <TrackBarList
+                      key={track.id}
+                      track={track}
+                      //   clickArtist={clickArtist}
+                      //   clickTrack={clickTrack}
+                    />
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
         </div>
       )}
     </>
+  );
+};
+
+const TrackBarList = ({
+  track,
+}: //   clickArtist,
+//   clickTrack,
+{
+  track: ITrackBarPlaylist;
+  //   clickArtist: () => void;
+  //   clickTrack: () => void;
+}) => {
+  const [play, setPlay] = useState(false);
+  const {
+    audioSrc,
+    setPlayingTime,
+    audioPlayer,
+    setAudioSrc,
+    setTrackBarTrack,
+    setTrackIsPlaying,
+    trackIsPlaying,
+    trackBarTrack,
+    setTrackBarArtist,
+  } = useTrackContext();
+  const history = useHistory();
+  const headerTrackSrc = track.audio.split("?")[0];
+  const barTrackSrc = audioSrc.split("?")[0];
+  const togglePlayButton = () => {
+    if (!play) {
+      if (headerTrackSrc !== barTrackSrc) {
+        setPlayingTime(0);
+        audioPlayer.current.src = track.audio;
+        setAudioSrc(track.audio);
+        audioPlayer.current.load();
+        setTrackBarArtist({
+          display_name: track.artist_display_name,
+          id: track.artist,
+          permalink: track.artist_permalink,
+        });
+        setTrackBarTrack(track);
+      }
+      setPlay(true);
+      setTrackIsPlaying(true);
+      setTimeout(() => {
+        audioPlayer.current.play();
+      }, 1);
+    } else {
+      audioPlayer.current.pause();
+      setPlay(false);
+      setTrackIsPlaying(false);
+    }
+  };
+  useEffect(() => {
+    if (headerTrackSrc === barTrackSrc && trackIsPlaying) {
+      setPlay(true);
+    } else {
+      setPlay(false);
+    }
+  }, [audioSrc, trackIsPlaying]);
+  const clickArtist = () => history.push(`/${track.permalink}`);
+  const clickTrack = () =>
+    history.push(`/${track.artist_permalink}/${track.permalink}`);
+
+  return (
+    <li
+      key={track.id}
+      className={track.id === trackBarTrack.id ? styles.playing : undefined}
+    >
+      <div className={styles.image}>
+        <img src={track.image || "/default_track_image.svg"} />
+        <div className={styles.playButton} onClick={() => togglePlayButton()}>
+          {play ? <IoMdPause /> : <IoMdPlay />}
+        </div>
+      </div>
+      <div className={styles.content}>
+        <span className={styles.artistName} onClick={clickArtist}>
+          {track.artist_display_name} -
+        </span>
+        &nbsp;
+        <span className={styles.trackTitle} onClick={clickTrack}>
+          {track.title}
+        </span>
+      </div>
+    </li>
   );
 };
 

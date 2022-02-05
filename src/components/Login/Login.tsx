@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import Cookies from "universal-cookie";
 import styles from "./Login.module.scss";
 import LoginModal from "./LoginModal/LoginModal";
 
@@ -9,9 +10,10 @@ const Login = () => {
     setModal(!modal);
   };
   const history = useHistory();
+  const cookie = new Cookies();
 
   useEffect(() => {
-    if (localStorage.getItem("jwt_token")) {
+    if (cookie.get("is_logged_in")) {
       history.push("/discover");
     }
   }, []);

@@ -65,10 +65,10 @@
   width: 123px;
   height: 26px;
   box-sizing: border-box;
-  //   color: #333333;
-  color: #cccccc;
-  //   background: #ffffff;
-  background: #f2f2f2;
+  color: #333333;
+  //   color: #cccccc;
+  background: #ffffff;
+  //   background: #f2f2f2;
   border: 1px solid #e5e5e5;
   border-radius: 3px;
   display: flex;
@@ -95,7 +95,7 @@
     &:first-child {
       padding-top: 0.8em;
     }
-    z-index: 30;
+    z-index: 15;
   }
   li {
     padding: 7px;
@@ -106,8 +106,8 @@
 .addToPlaylist {
   width: 139px;
   height: 26px;
-  color: #cccccc;
-  background: #f2f2f2;
+  color: #333;
+  background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 3px;
   display: flex;
@@ -416,4 +416,8 @@
       }
     }
   }
+}
+.privacyTags,
+.artwork {
+  cursor: pointer;
 }

@@ -12,6 +12,8 @@ import { ITrack, IUserMe } from "../../TrackPage";
 import { useAuthContext } from "../../../../../context/AuthContext";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { throttle } from "lodash";
+import toast from "react-hot-toast";
 
 const Comments = ({
   comments,
@@ -28,6 +30,7 @@ const Comments = ({
   commentCount: number;
   isFinalComment: boolean;
 }) => {
+  //   console.log(comments);
   const sortedComments = comments.reduce((sorted: any, comment: IComment) => {
     if (!sorted[comment.group]) {
       sorted[comment.group] = [];
@@ -45,11 +48,11 @@ const Comments = ({
       </header>
       <ul className={styles.commentsList}>
         {comments.length !== 0
-          ? sortedComments.reverse().map((comments: IComment[]) => {
+          ? sortedComments.reverse().map((comment: IComment[]) => {
               return (
                 <CommentItem
-                  comments={comments}
-                  key={comments[0].group}
+                  comments={comment}
+                  key={comment[0].group}
                   track={track}
                   fetchComments={fetchComments}
                   userMe={userMe}
@@ -85,32 +88,39 @@ const CommentItem = ({
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const config: any = {
-      method: "post",
-      url: `/tracks/${track.id}/comments`,
-      headers: {
-        Authorization: `JWT ${userSecret.jwt}`,
-      },
-      data: {
-        content: commentInput,
-        group: comments[0].group,
-      },
-    };
-    try {
-      const response = await axios(config);
-      console.log(response);
-      fetchComments();
-    } catch (error) {
-      console.log(console.error());
+    if (commentInput.trim().length === 0) {
+      return;
     }
+    const submitInput = throttle(async () => {
+      const config: any = {
+        method: "post",
+        url: `/tracks/${track.id}/comments`,
+        headers: {
+          Authorization: `JWT ${userSecret.jwt}`,
+        },
+        data: {
+          content: commentInput,
+          group: comments[0].group,
+        },
+      };
+      try {
+        await axios(config);
+        // console.log(response);
+        fetchComments();
+      } catch (error) {
+        console.log(error);
+        toast.error("댓글을 작성하는데 실패했습니다");
+      }
+    }, 1000);
+    submitInput();
     setInput("");
     setShowReply(false);
     fetchComments();
   };
 
   const history = useHistory();
-  const clickUsername = (id: number) => {
-    return history.push(`/${comments[id].writer.permalink}`);
+  const clickUsername = (permalink: string) => {
+    return history.push(`/${permalink}`);
   };
 
   //   const commentedTime = (comment: IComment) => {
@@ -144,16 +154,23 @@ const CommentItem = ({
             try {
               const response = await axios(config);
               if (response) {
+                console.log("deleted");
                 fetchComments();
               }
             } catch (error) {
               console.log(error);
+              toast.error("댓글을 삭제하는데 실패했습니다");
             }
           },
         },
       ],
     });
-    return;
+  };
+  const onImageError: React.ReactEventHandler<HTMLImageElement> = ({
+    currentTarget,
+  }) => {
+    currentTarget.onerror = null;
+    currentTarget.src = "/default_user_image.png";
   };
 
   return (
@@ -161,10 +178,11 @@ const CommentItem = ({
       <li key={comments[0].id}>
         <div
           className={styles.userImage}
-          onClick={() => clickUsername(comments[0].writer.id)}
+          onClick={() => clickUsername(comments[0].writer.permalink)}
         >
           <img
             src={comments[0].writer.image_profile || "/default_user_image.png"}
+            onError={onImageError}
             alt={`${comments[0].writer.display_name}의 프로필 사진`}
           />
         </div>
@@ -172,7 +190,7 @@ const CommentItem = ({
           <div className={styles.commentInfo}>
             <span
               className={styles.hoverClick}
-              onClick={() => clickUsername(comments[0].writer.id)}
+              onClick={() => clickUsername(comments[0].writer.permalink)}
             >
               {comments[0].writer.id === userSecret.id
                 ? "You"
@@ -208,12 +226,13 @@ const CommentItem = ({
               <li key={child.id}>
                 <div
                   className={styles.userImage}
-                  onClick={() => clickUsername(child.writer.id)}
+                  onClick={() => clickUsername(child.writer.permalink)}
                 >
                   <img
                     src={
                       child.writer.image_profile || "/default_user_image.png"
                     }
+                    onError={onImageError}
                     alt={`${child.writer.display_name}의 프로필 사진`}
                   />
                 </div>
@@ -221,7 +240,7 @@ const CommentItem = ({
                   <div className={styles.commentInfo}>
                     <span
                       className={styles.hoverClick}
-                      onClick={() => clickUsername(child.writer.id)}
+                      onClick={() => clickUsername(child.writer.permalink)}
                     >
                       {child.writer.id === userSecret.id
                         ? "You"
@@ -261,6 +280,7 @@ const CommentItem = ({
           <img
             className={styles.replyUserImage}
             src={userMe.image_profile || "/default_user_image.png"}
+            onError={onImageError}
           />
           <form className={styles.replyInput} onSubmit={onSubmit}>
             <input

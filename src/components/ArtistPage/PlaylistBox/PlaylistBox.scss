@@ -1,0 +1,158 @@
+.recent-track {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 50px;
+
+    .track-Img {
+        width: 160px;
+        height: 160px;
+    }
+}
+
+.track-right {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.track-info {
+    display: flex;
+    flex-direction: row;
+}
+
+.track-info-name {
+    display: flex;
+    flex-direction: column;
+    margin-left: 5px;
+}
+
+.artistname {
+    font-size: 12px;
+    color: #333;
+}
+
+.trackname {
+    font-size: 15px;
+    color: #000;
+    margin-top: -3px;
+}
+
+.rhap_container {
+    width: 644px;
+    height: 60px;
+    box-shadow: none;
+    padding: 5px;
+
+    .rhap_progress-section {
+        margin-top: 10px;
+    }
+
+    // button {
+    //     display: none;
+    // }
+
+    // .rhap_volume-bar-area {
+    //     display: none;
+    // }
+}
+
+.playlist-track {
+    width: 644px;
+    height: 31px;
+    border: 1px solid #e5e5e5;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+
+    .playlist-track-left {
+        display: flex;
+        flex-direction: row;
+        font-size: 12px;
+        align-items: center;
+    
+        img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+    
+        div {
+            font-size: 12px;
+            margin-right: 10px;
+        }
+    }
+
+    .playlist-track-right {
+        display: flex;
+        font-size: 11px;
+        align-items: center;
+
+        img {
+            width: 16px;
+            height: 12px;
+        }
+
+        div {
+            color: #999;
+            margin-right: 10px;
+        }
+    }
+}
+
+.track-buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 65px;
+        height: 22px;
+        background-color: white;
+        border: 1px solid #ccc;
+        font-size: 11px;
+        border-radius: 3px;
+        margin-right: 10px;
+    }
+
+    img {
+        width: 20px;
+        height: 20px;
+        color: #333;
+        margin-right: 3px;
+    }
+
+    div {
+        line-height: 22px;
+    }
+
+    .liked-button {
+        color: #ff5500;
+    }
+
+    .reposted-button {
+        color: #ff5500;
+    }
+}
+
+.play-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 36px;
+    border: none;
+    background-color: #ff3300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+.playlist-track-null {
+    width: 644px;
+    height: 31px;
+    border: 1px solid #e5e5e5;
+    align-items: center;
+    display: flex;
+}

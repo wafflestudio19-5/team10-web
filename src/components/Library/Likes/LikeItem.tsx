@@ -1,11 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { AiFillHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { FaUserCheck, FaUserPlus } from "react-icons/fa";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
 import { Link, useHistory } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useTrackContext } from "../../../context/TrackContext";
 import styles from "./LikeItem.module.scss";
 
 const LikeItem = ({
@@ -16,7 +18,11 @@ const LikeItem = ({
   artistId,
   trackPermal,
   artistPermal,
-  followList,
+  togglePlayPause,
+  track,
+  playMusic,
+  fetchLikesList,
+  is_followed,
 }: {
   title: string;
   img: string;
@@ -25,7 +31,11 @@ const LikeItem = ({
   artistId: number;
   trackPermal: string;
   artistPermal: string;
-  followList: any;
+  togglePlayPause: any;
+  track: any;
+  playMusic: any;
+  fetchLikesList: any;
+  is_followed: any;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -36,12 +46,26 @@ const LikeItem = ({
   };
   const [play, setPlay] = useState(false);
   const [heart, setHeart] = useState(true);
-  const [follow, setFollow] = useState(false);
+  const [follow, setFollow] = useState<boolean | string>(false);
   const { userSecret } = useAuthContext();
+  const { trackIsPlaying, trackBarTrack } = useTrackContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
-    setPlay(!play);
+    togglePlayPause(track, track.artist);
+    trackBarTrack.id === trackId ? setPlay(!trackIsPlaying) : setPlay(true);
   };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? null : setPlay(false);
+  }, [trackBarTrack]);
+  const moveWeb = async () => {
+    setPlay(true);
+  };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? moveWeb().then(() => playMusic()) : null;
+  }, []);
+  useEffect(() => {
+    trackBarTrack.id === trackId ? setPlay(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
   const handleHeart = async (e: any) => {
     e.stopPropagation();
     if (heart === false) {
@@ -49,16 +73,17 @@ const LikeItem = ({
         method: "post",
         url: `/likes/tracks/${trackId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast.error("like에 실패하였습니다"));
       setHeart(!heart);
     } else {
       await axios({
         method: "delete",
         url: `/likes/tracks/${trackId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast.error("like에 실패하였습니다"));
       setHeart(!heart);
     }
+    fetchLikesList();
   };
   const handleFollow = async (e: any) => {
     e.stopPropagation();
@@ -67,25 +92,29 @@ const LikeItem = ({
         method: "post",
         url: `/users/me/followings/${artistId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast.error("팔로우에 실패하였습니다"));
       setFollow(!follow);
     } else {
       await axios({
         method: "delete",
         url: `/users/me/followings/${artistId}`,
         headers: { Authorization: `JWT ${userSecret.jwt}` },
-      });
+      }).catch(() => toast.error("팔로우에 실패하였습니다"));
       setFollow(!follow);
     }
+    fetchLikesList();
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
+    toast.error("아직 구현되지 않은 기능입니다");
   };
   useEffect(() => {
-    if (followList.length !== 0) {
-      followList.includes(artistId) ? setFollow(!follow) : null;
-    }
-  }, [followList]);
+    artistId === userSecret.id
+      ? setFollow("no")
+      : is_followed
+      ? setFollow(true)
+      : setFollow(false);
+  }, [is_followed]);
   return (
     <div className={styles.wrapper}>
       {img === null ? (
@@ -151,7 +180,7 @@ const LikeItem = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              {follow ? (
+              {follow === "no" ? null : follow ? (
                 <FaUserCheck className={styles.follow} onClick={handleFollow} />
               ) : (
                 <FaUserPlus
@@ -170,7 +199,7 @@ const LikeItem = ({
                 className={heart ? styles.liked : styles.like}
                 onClick={handleHeart}
               />
-              {follow ? (
+              {follow === "no" ? null : follow ? (
                 <FaUserCheck className={styles.follow} onClick={handleFollow} />
               ) : (
                 <FaUserPlus

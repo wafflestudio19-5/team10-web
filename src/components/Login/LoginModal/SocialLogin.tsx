@@ -3,6 +3,11 @@ import { useRef } from "react";
 import { GoogleLogin } from "react-google-login";
 import toast from "react-hot-toast";
 import { useHistory } from "react-router-dom";
+import Cookies from "universal-cookie";
+import { useAuthContext } from "../../../context/AuthContext";
+import FacebookLogin from "@greatsumini/react-facebook-login";
+import { FcGoogle } from "react-icons/fc";
+import { BsFacebook } from "react-icons/bs";
 
 const SocialLogin = ({
   handleInput,
@@ -15,13 +20,15 @@ const SocialLogin = ({
   email: string;
   handleSignIn: any;
 }) => {
+  const { setUserSecret } = useAuthContext();
   const input = useRef<HTMLInputElement>(null);
   input.current?.focus();
   const history = useHistory();
+  const cookies = new Cookies();
   const responseGoogle = (response: any) => {
     axios({
       method: "put",
-      url: "/google/callback",
+      url: "/socialaccount", // /socialaccount 로 바꿔야함
       data: {
         email: response.profileObj.email,
         family_name:
@@ -36,14 +43,30 @@ const SocialLogin = ({
       },
     })
       .then(async (res) => {
-        localStorage.setItem("permalink", res.data.permalink);
+        localStorage.setItem("permalink", res.data.permalink); // 민석님이 제안하신대로 로컬스토리지에 저장하도록 했습니다!
         localStorage.setItem("jwt_token", res.data.token);
+        localStorage.setItem("id", res.data.id);
+        cookies.set("is_logged_in", true, {
+          path: "/",
+          expires: new Date(Date.now() + 1000 * 3600 * 12),
+        });
+        setUserSecret({
+          id: res.data.id,
+          permalink: res.data.permalink,
+          jwt: res.data.token,
+        });
         history.push("/discover");
       })
       .catch(() => {
         toast.error("회원가입 실패");
       });
   };
+  const responseFacebook = () => {
+    toast.error(
+      "개인정보처리방침 url을 만들지 못해서, 아직 구현이 안됐습니다. 죄송합니다 ㅠㅠ"
+    );
+  };
+
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
       <div className="social">
@@ -53,6 +76,26 @@ const SocialLogin = ({
           onSuccess={responseGoogle}
           onFailure={responseGoogle}
           cookiePolicy={"single_host_origin"}
+          className="socialLogin"
+          render={(renderProps) => (
+            <button
+              onClick={renderProps.onClick}
+              disabled={renderProps.disabled}
+              className="socialLogin"
+            >
+              <FcGoogle className="google" />
+              &nbsp;&nbsp; Login with Google
+            </button>
+          )}
+        />
+        <FacebookLogin
+          appId="465809628243999" //현재 테스트 appId, 배포 할때 바꿔야 함 //바꿈
+          render={() => (
+            <button onClick={responseFacebook} className="socialLogin">
+              <BsFacebook className="facebook" />
+              &nbsp;&nbsp; Login with Facebook
+            </button>
+          )}
         />
       </div>
       <div className="or">——————————— &nbsp;or&nbsp; ———————————</div>

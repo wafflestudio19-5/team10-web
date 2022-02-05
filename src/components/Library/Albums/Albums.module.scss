@@ -1,3 +1,7 @@
+.pageWrapper {
+  width: 100vw;
+  background-color: #f2f2f2;
+}
 .wrapper {
   margin: auto;
   padding: 46px 0 46px 0;
@@ -44,24 +48,86 @@
     display: flex;
     flex-direction: column;
     border-bottom: #f2f2f2 solid 2px;
-    p {
-      font-size: 20px;
-      height: 18px;
-      line-height: 18px;
+    .listHeader {
       font-weight: 7000;
       margin: 40px 0 0 30px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      .headerText {
+        font-size: 18px;
+        height: 30px;
+        line-height: 18px;
+        color: #999999;
+      }
+      .filterWrapper {
+        height: 30px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        div {
+          font-size: 16px;
+          text-align: center;
+          margin: 0;
+          color: #999999;
+        }
+        .squareIcon {
+          width: 25px;
+          height: 25px;
+          margin: 0 5px 0 5px;
+          color: #999999;
+        }
+        .listIcon {
+          width: 20px;
+          height: 20px;
+          margin: 0 5px 0 5px;
+          color: #cccccc;
+        }
+        .filter {
+          width: 300px;
+          height: 30px;
+          border-radius: 5px;
+          margin: 0 5px 0 5px;
+          border: 1.5px #cccccc solid;
+          &:focus {
+            outline: none;
+            border: 1.5px #999999 solid;
+          }
+        }
+      }
     }
-    div {
+    .itemsWrapper,
+    .noItemsWrapper {
+      flex-wrap: wrap;
       display: flex;
       flex-direction: row;
       margin: 10px 10px 0 10px;
-      justify-content: space-between;
-      div {
-        width: 180px;
-        height: 180px;
-        margin-bottom: 80px;
-        border: solid 1px #c2c2c2;
+      width: 1220px;
+      .noLikeWrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .noLike {
+          color: #cccccc;
+          width: 250px;
+          height: 250px;
+        }
+        .text {
+          font-size: 16px;
+        }
+        a {
+          font-size: 16px;
+          margin: 10px;
+        }
       }
+    }
+    .itemsWrapper {
+      justify-content: flex-start;
+    }
+    .noItemsWrapper {
+      justify-content: center;
     }
   }
 }

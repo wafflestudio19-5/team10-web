@@ -7,17 +7,33 @@ import { AiFillHeart } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { useAuthContext } from "../../../context/AuthContext";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { useTrackContext } from "../../../context/TrackContext";
 
 const MostItems = ({
   title,
   img,
   trackId,
-  likeListId,
+  trackPermalink,
+  artistPermalink,
+  setLikeList,
+  setLikeCount,
+  togglePlayPause,
+  track,
+  playMusic,
+  is_liked,
 }: {
   title: string;
   img: string;
   trackId: number | string;
-  likeListId: any;
+  trackPermalink: string;
+  artistPermalink: string;
+  setLikeList: any;
+  setLikeCount: any;
+  togglePlayPause: any;
+  track: any;
+  playMusic: any;
+  is_liked: boolean;
 }) => {
   const history = useHistory();
   const goTrack = () => {
@@ -30,10 +46,24 @@ const MostItems = ({
     trackPermal: "",
   });
   const { userSecret } = useAuthContext();
+  const { trackIsPlaying, trackBarTrack } = useTrackContext();
   const handlePlay = (e: any) => {
     e.stopPropagation();
-    setPlay(!play);
+    togglePlayPause(track, track.artist);
+    trackBarTrack.id === trackId ? setPlay(!trackIsPlaying) : setPlay(true);
   };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? null : setPlay(false);
+  }, [trackBarTrack]);
+  const moveWeb = async () => {
+    setPlay(true);
+  };
+  useEffect(() => {
+    trackBarTrack.id === trackId ? moveWeb().then(() => playMusic()) : null;
+  }, []);
+  useEffect(() => {
+    trackBarTrack.id === trackId ? setPlay(trackIsPlaying) : null;
+  }, [trackIsPlaying]);
   const handleHeart = async (e: any) => {
     e.stopPropagation();
     if (heart === false) {
@@ -51,22 +81,34 @@ const MostItems = ({
       });
       setHeart(!heart);
     }
+    await axios({
+      method: "get",
+      url: `/users/${userSecret.id}/likes/tracks`,
+      headers: { Authorization: `JWT ${userSecret.jwt}` },
+      data: {
+        user_id: userSecret.id,
+      },
+    })
+      .then((res) => {
+        setLikeCount(res.data.count);
+        setLikeList(res.data.results);
+      })
+      .catch(() => toast.error("like list 불러오기를 실패하였습니다"));
   };
   const clickDots = (e: any) => {
     e.stopPropagation();
+    toast.error("아직 구현되지 않은 기능입니다");
   };
   useEffect(() => {
-    if (trackId <= 999990 && likeListId[0] !== -1) {
-      axios.get(`/tracks/${trackId}`).then((r) => {
-        const permalink = {
-          artistPermal: r.data.artist.permalink,
-          trackPermal: r.data.permalink,
-        };
-        setPermalink(permalink);
-      });
-      setHeart(likeListId.includes(trackId));
+    if (trackId <= 999990) {
+      const permalink = {
+        artistPermal: artistPermalink,
+        trackPermal: trackPermalink,
+      };
+      setPermalink(permalink);
+      setHeart(is_liked);
     }
-  }, [trackId, likeListId]);
+  }, [trackId, is_liked, track]);
   return (
     <div className={styles.wrapper}>
       {img === null ? (

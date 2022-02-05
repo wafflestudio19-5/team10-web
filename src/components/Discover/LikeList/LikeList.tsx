@@ -2,7 +2,23 @@ import { BiHeartSquare } from "react-icons/bi";
 import LikeItems from "./LikeItems";
 import styles from "./LikeList.module.scss";
 
-const LikeList = ({ likeList }: { likeList: any }) => {
+const LikeList = ({
+  likeList,
+  setLikeList,
+  setLikeCount,
+  togglePlayPause,
+  playMusic,
+  setNewTrackList,
+  setMostTrackList,
+}: {
+  likeList: any;
+  setLikeList: any;
+  setLikeCount: any;
+  togglePlayPause: any;
+  playMusic: any;
+  setNewTrackList: any;
+  setMostTrackList: any;
+}) => {
   return (
     <>
       {likeList.length === 0 ? (
@@ -12,7 +28,7 @@ const LikeList = ({ likeList }: { likeList: any }) => {
         </div>
       ) : (
         likeList
-          .slice(-3)
+          .slice(0, 3)
           .map((item: any) => (
             <LikeItems
               userPermal={item.artist.permalink}
@@ -20,12 +36,19 @@ const LikeList = ({ likeList }: { likeList: any }) => {
               title={item.title}
               img={item.image}
               artist={item.artist.display_name}
-              count={item.count}
+              play_count={item.play_count}
               like={item.like_count}
               comment={item.comment_count}
               repost={item.repost_count}
               key={item.id}
               trackId={item.id}
+              setLikeList={setLikeList}
+              setLikeCount={setLikeCount}
+              togglePlayPause={togglePlayPause}
+              track={item}
+              playMusic={playMusic}
+              setNewTrackList={setNewTrackList}
+              setMostTrackList={setMostTrackList}
             />
           ))
       )}

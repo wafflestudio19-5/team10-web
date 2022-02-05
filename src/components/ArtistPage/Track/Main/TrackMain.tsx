@@ -12,6 +12,9 @@ import LikeUsers from "./Side/LikeUsers";
 import { IArtist, ITrack, IUserMe } from "../TrackPage";
 import axios from "axios";
 import { useAuthContext } from "../../../../context/AuthContext";
+import toast from "react-hot-toast";
+import RelatedTracks from "./Side/RelatedTracks";
+import InPlaylists from "./Side/InPlaylists";
 
 export interface IComment {
   id: number;
@@ -50,6 +53,8 @@ const TrackMain = ({
   userMe,
   isMyTrack,
   setEditModal,
+  openPlaylistModal,
+  setArtist,
 }: {
   track: ITrack;
   artist: IArtist;
@@ -57,6 +62,8 @@ const TrackMain = ({
   fetchTrack: () => void;
   isMyTrack: boolean | undefined;
   setEditModal: React.Dispatch<React.SetStateAction<boolean>>;
+  openPlaylistModal: () => void;
+  setArtist: React.Dispatch<React.SetStateAction<IArtist>>;
 }) => {
   const [comments, setComments] = useState<IComment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
@@ -94,6 +101,7 @@ const TrackMain = ({
       }
     } catch (error) {
       console.log(error);
+      toast.error("댓글 정보를 불러올 수 없습니다");
     }
   };
   const fetchNextComments = async () => {
@@ -123,6 +131,7 @@ const TrackMain = ({
         }
       } catch (error) {
         console.log(error);
+        toast.error("댓글 정보를 불러올 수 없습니다");
       }
     }
   };
@@ -146,9 +155,10 @@ const TrackMain = ({
         const response = await axios(config);
         setCommentCount(response.data.count);
         refetchedComments.push(...response.data.results);
-        console.log(refetchedComments);
+        // console.log(refetchedComments);
       } catch (error) {
         console.log(error);
+        toast.error("댓글 정보를 불러올 수 없습니다");
       }
     }
     setComments([...refetchedComments]);
@@ -186,6 +196,9 @@ const TrackMain = ({
       setTrackLikers(data.results);
     } catch (error) {
       console.log(error);
+      toast.error(
+        "해당 플레이리스트를을 좋아요한 유저 목록을 받아올 수 없습니다"
+      );
     }
   };
   const fetchReposters = async () => {
@@ -203,6 +216,9 @@ const TrackMain = ({
       setTrackReposters(data.results);
     } catch (error) {
       console.log(error);
+      toast.error(
+        "해당 플레이리스트를 리포스트한 유저 목록을 받아올 수 없습니다"
+      );
     }
   };
 
@@ -230,6 +246,7 @@ const TrackMain = ({
             setEditModal={setEditModal}
             fetchLikers={fetchLikers}
             fetchReposters={fetchReposters}
+            openPlaylistModal={openPlaylistModal}
           />
         </div>
         <div className={styles.infoComments}>
@@ -237,6 +254,9 @@ const TrackMain = ({
             artist={artist}
             userMe={userMe}
             isMyTrack={isMyTrack}
+            setArtist={setArtist}
+            track={track}
+            fetchTrack={fetchTrack}
           />
           <div>
             {track.description && (
@@ -257,17 +277,17 @@ const TrackMain = ({
         </div>
       </div>
       <div className={styles.side}>
-        {/* <RelatedTracks />
-        <InPlaylists /> */}
+        <RelatedTracks artist={artist} track={track} />
+        <InPlaylists artist={artist} />
         <LikeUsers
-          track={track}
-          artist={artist}
+          //   track={track}
+          //   artist={artist}
           trackLikers={trackLikers}
           likersCount={likersCount}
         />
         <RepostUsers
-          track={track}
-          artist={artist}
+          //   track={track}
+          //   artist={artist}
           trackReposters={trackReposters}
           repostersCount={repostersCount}
         />

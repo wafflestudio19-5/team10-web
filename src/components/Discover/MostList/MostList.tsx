@@ -3,10 +3,16 @@ import styles from "./MostList.module.scss";
 
 const MostList = ({
   mostTrackList,
-  likeListId,
+  setLikeList,
+  setLikeCount,
+  togglePlayPause,
+  playMusic,
 }: {
   mostTrackList: any;
-  likeListId: any;
+  setLikeList: any;
+  setLikeCount: any;
+  togglePlayPause: any;
+  playMusic: any;
 }) => {
   return (
     <div className={styles.mostList}>
@@ -16,7 +22,14 @@ const MostList = ({
           img={item.image}
           key={item.id}
           trackId={item.id}
-          likeListId={likeListId}
+          trackPermalink={item.permalink}
+          artistPermalink={item.artist.permalink}
+          setLikeList={setLikeList}
+          setLikeCount={setLikeCount}
+          togglePlayPause={togglePlayPause}
+          track={item}
+          playMusic={playMusic}
+          is_liked={item.is_liked}
         />
       ))}
     </div>
